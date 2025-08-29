@@ -1,98 +1,147 @@
 // src/pages/Login.jsx
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../utils/firebase";
+import { auth } from "../../utils/firebase";
+import { useAuth } from "../../context/AuthContext";
+import { Eye, EyeOff } from "lucide-react";
 
-function Login() {
+export default function Login() {
+  const { usuario, setUsuario } = useAuth();
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [clave, setClave] = useState("");
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [mostrarClave, setMostrarClave] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
+  // Redirección silenciosa si ya está logueado
+  useEffect(() => {
+    if (usuario) {
+      navigate("/ver-perfil", { replace: true });
+    }
+  }, [usuario, navigate]);
 
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      navigate("/"); // Redirigir al Home
-    } catch (err) {
-      console.error("Error en login:", err);
-      if (err.code === "auth/user-not-found") {
-        setError("No existe una cuenta con este correo.");
-      } else if (err.code === "auth/wrong-password") {
-        setError("Contraseña incorrecta.");
-      } else {
-        setError("Error al iniciar sesión. Inténtalo de nuevo.");
-      }
+  // Validación básica de email
+  const validarEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+  const iniciarSesion = async (e) => {
+    e.preventDefault();
+
+    if (!validarEmail(email)) {
+      setError("Correo electrónico inválido");
+      return;
     }
 
-    setLoading(false);
+    if (clave.trim() === "") {
+      setError("La contraseña no puede estar vacía");
+      return;
+    }
+
+    try {
+      const cred = await signInWithEmailAndPassword(auth, email, clave);
+      setUsuario(cred.user);
+      setError("");
+      navigate("/ver-perfil");
+    } catch (err) {
+      // Manejo de errores de Firebase
+      let mensaje = "Correo o contraseña incorrectos.";
+
+      if (import.meta.env.MODE === "development") {
+        console.error("Error en login:", err);
+      }
+
+      switch (err.code) {
+        case "auth/user-not-found":
+          mensaje = "No existe una cuenta con este correo.";
+          break;
+        case "auth/wrong-password":
+          mensaje = "La contraseña es incorrecta.";
+          break;
+        case "auth/invalid-email":
+          mensaje = "El formato del correo no es válido.";
+          break;
+        case "auth/user-disabled":
+          mensaje = "Esta cuenta ha sido deshabilitada.";
+          break;
+        default:
+          mensaje = "Error al iniciar sesión. Intenta de nuevo.";
+      }
+
+      setError(mensaje);
+    }
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
-      <div className="bg-white shadow-lg rounded-2xl p-8 w-full max-w-md">
+    <div className="flex justify-center items-center min-h-screen bg-gray-100 px-4">
+      <form
+        onSubmit={iniciarSesion}
+        className="bg-white shadow-lg rounded-2xl p-8 w-full max-w-md"
+      >
         <h2 className="text-2xl font-bold text-center text-pink-600 mb-6">
           Iniciar sesión
         </h2>
 
         {error && (
-          <p className="bg-red-100 text-red-700 p-2 rounded mb-4 text-sm">
-            {error}
-          </p>
+          <p className="text-red-600 text-sm mb-4 text-center">{error}</p>
         )}
 
-        <form onSubmit={handleLogin} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-600">
-              Correo electrónico
-            </label>
-            <input
-              type="email"
-              className="w-full p-3 border rounded-lg mt-1 focus:outline-none focus:ring-2 focus:ring-pink-500"
-              placeholder="ejemplo@correo.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
+        {/* Correo */}
+        <label className="block mb-2 font-medium text-gray-700">
+          Correo electrónico
+        </label>
+        <input
+          type="email"
+          placeholder="ejemplo@correo.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          className={`w-full p-3 rounded-lg border focus:outline-none focus:ring-2 ${
+            error.includes("Correo") ? "border-red-500 bg-red-100 focus:ring-red-400" : "border-gray-300 focus:ring-pink-400"
+          }`}
+        />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-600">
-              Contraseña
-            </label>
-            <input
-              type="password"
-              className="w-full p-3 border rounded-lg mt-1 focus:outline-none focus:ring-2 focus:ring-pink-500"
-              placeholder="********"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-
+        {/* Contraseña */}
+        <label className="block mt-4 mb-2 font-medium text-gray-700">
+          Contraseña
+        </label>
+        <div className="relative">
+          <input
+            type={mostrarClave ? "text" : "password"}
+            placeholder="••••••••"
+            value={clave}
+            onChange={(e) => setClave(e.target.value)}
+            required
+            className={`w-full p-3 rounded-lg border focus:outline-none focus:ring-2 pr-10 ${
+              error.toLowerCase().includes("contraseña") ? "border-red-500 bg-red-100 focus:ring-red-400" : "border-gray-300 focus:ring-pink-400"
+            }`}
+          />
           <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-pink-600 text-white py-3 rounded-lg font-semibold hover:bg-pink-700 transition disabled:opacity-50"
+            type="button"
+            onClick={() => setMostrarClave(!mostrarClave)}
+            className="absolute right-3 top-3 text-gray-500 hover:text-gray-700"
           >
-            {loading ? "Cargando..." : "Ingresar"}
+            {mostrarClave ? <EyeOff size={20} /> : <Eye size={20} />}
           </button>
-        </form>
+        </div>
 
-        <p className="text-sm text-center mt-6">
+        {/* Botón */}
+        <button
+          type="submit"
+          className="w-full mt-6 bg-pink-500 hover:bg-pink-600 text-white font-semibold py-3 rounded-lg transition duration-300"
+        >
+          Entrar
+        </button>
+
+        <p className="mt-4 text-sm text-gray-600 text-center">
           ¿No tienes cuenta?{" "}
-          <a href="/register" className="text-pink-600 font-medium hover:underline">
+          <Link
+            to="/register"
+            className="text-pink-600 font-semibold hover:underline"
+          >
             Regístrate aquí
-          </a>
+          </Link>
         </p>
-      </div>
+      </form>
     </div>
   );
 }
-
-export default Login;

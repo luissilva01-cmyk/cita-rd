@@ -1,123 +1,157 @@
-// src/pages/Register.jsx
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { auth } from "../utils/firebase";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../../utils/firebase";
+import { useAuth } from "../../context/AuthContext";
+import { Eye, EyeOff } from "lucide-react";
 
-function Register() {
-  const [nombre, setNombre] = useState("");
+export default function Register() {
+  const { usuario, setUsuario } = useAuth();
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [clave, setClave] = useState("");
+  const [confirmarClave, setConfirmarClave] = useState("");
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [mostrarClave, setMostrarClave] = useState(false);
+  const [mostrarConfirmarClave, setMostrarConfirmarClave] = useState(false);
   const navigate = useNavigate();
 
-  const handleRegister = async (e) => {
+  useEffect(() => {
+    if (usuario) {
+      navigate("/ver-perfil", { replace: true });
+    }
+  }, [usuario, navigate]);
+
+  const validarEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+  const registrarUsuario = async (e) => {
     e.preventDefault();
-    setError("");
-    setLoading(true);
 
-    try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-
-      // Guardamos el nombre en el perfil del usuario de Firebase
-      await updateProfile(userCredential.user, {
-        displayName: nombre,
-      });
-
-      navigate("/"); // Redirigir al Home después de registrarse
-    } catch (err) {
-      console.error("Error en registro:", err);
-      if (err.code === "auth/email-already-in-use") {
-        setError("Este correo ya está en uso.");
-      } else if (err.code === "auth/weak-password") {
-        setError("La contraseña debe tener al menos 6 caracteres.");
-      } else {
-        setError("Error al registrarse. Inténtalo de nuevo.");
-      }
+    if (!validarEmail(email)) {
+      setError("Correo electrónico inválido");
+      return;
+    }
+    if (clave.length < 6) {
+      setError("La contraseña debe tener al menos 6 caracteres");
+      return;
+    }
+    if (clave !== confirmarClave) {
+      setError("Las contraseñas no coinciden");
+      return;
     }
 
-    setLoading(false);
+    try {
+      const cred = await createUserWithEmailAndPassword(auth, email, clave);
+      setUsuario(cred.user);
+      setError("");
+      navigate("/crear-perfil");
+    } catch (err) {
+      setError(err.message || "Error al registrar usuario.");
+    }
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
-      <div className="bg-white shadow-lg rounded-2xl p-8 w-full max-w-md">
+    <div className="flex justify-center items-center min-h-screen bg-gray-100 px-4">
+      <form
+        onSubmit={registrarUsuario}
+        className="bg-white shadow-lg rounded-2xl p-8 w-full max-w-md"
+      >
         <h2 className="text-2xl font-bold text-center text-pink-600 mb-6">
-          Crear cuenta
+          Registro
         </h2>
 
         {error && (
-          <p className="bg-red-100 text-red-700 p-2 rounded mb-4 text-sm">
-            {error}
-          </p>
+          <p className="text-red-600 text-sm mb-4 text-center">{error}</p>
         )}
 
-        <form onSubmit={handleRegister} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-600">
-              Nombre
-            </label>
-            <input
-              type="text"
-              className="w-full p-3 border rounded-lg mt-1 focus:outline-none focus:ring-2 focus:ring-pink-500"
-              placeholder="Tu nombre"
-              value={nombre}
-              onChange={(e) => setNombre(e.target.value)}
-              required
-            />
-          </div>
+        {/* Correo */}
+        <label className="block mb-2 font-medium text-gray-700">
+          Correo electrónico
+        </label>
+        <input
+          type="email"
+          placeholder="ejemplo@correo.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          className={`w-full p-3 rounded-lg border focus:outline-none focus:ring-2 ${
+            error.includes("Correo")
+              ? "border-red-500 bg-red-100 focus:ring-red-400"
+              : "border-gray-300 focus:ring-pink-400"
+          }`}
+        />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-600">
-              Correo electrónico
-            </label>
-            <input
-              type="email"
-              className="w-full p-3 border rounded-lg mt-1 focus:outline-none focus:ring-2 focus:ring-pink-500"
-              placeholder="ejemplo@correo.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-600">
-              Contraseña
-            </label>
-            <input
-              type="password"
-              className="w-full p-3 border rounded-lg mt-1 focus:outline-none focus:ring-2 focus:ring-pink-500"
-              placeholder="********"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-
+        {/* Contraseña */}
+        <label className="block mt-4 mb-2 font-medium text-gray-700">
+          Contraseña
+        </label>
+        <div className="relative">
+          <input
+            type={mostrarClave ? "text" : "password"}
+            placeholder="••••••••"
+            value={clave}
+            onChange={(e) => setClave(e.target.value)}
+            required
+            className={`w-full p-3 rounded-lg border focus:outline-none focus:ring-2 pr-10 ${
+              error.includes("contraseña") || error.includes("Contraseña")
+                ? "border-red-500 bg-red-100 focus:ring-red-400"
+                : "border-gray-300 focus:ring-pink-400"
+            }`}
+          />
           <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-pink-600 text-white py-3 rounded-lg font-semibold hover:bg-pink-700 transition disabled:opacity-50"
+            type="button"
+            onClick={() => setMostrarClave(!mostrarClave)}
+            className="absolute right-3 top-3 text-gray-500 hover:text-gray-700"
           >
-            {loading ? "Creando cuenta..." : "Registrarse"}
+            {mostrarClave ? <EyeOff size={20} /> : <Eye size={20} />}
           </button>
-        </form>
+        </div>
 
-        <p className="text-sm text-center mt-6">
+        {/* Confirmar contraseña */}
+        <label className="block mt-4 mb-2 font-medium text-gray-700">
+          Confirmar contraseña
+        </label>
+        <div className="relative">
+          <input
+            type={mostrarConfirmarClave ? "text" : "password"}
+            placeholder="••••••••"
+            value={confirmarClave}
+            onChange={(e) => setConfirmarClave(e.target.value)}
+            required
+            className={`w-full p-3 rounded-lg border focus:outline-none focus:ring-2 pr-10 ${
+              error.includes("coinciden")
+                ? "border-red-500 bg-red-100 focus:ring-red-400"
+                : "border-gray-300 focus:ring-pink-400"
+            }`}
+          />
+          <button
+            type="button"
+            onClick={() =>
+              setMostrarConfirmarClave(!mostrarConfirmarClave)
+            }
+            className="absolute right-3 top-3 text-gray-500 hover:text-gray-700"
+          >
+            {mostrarConfirmarClave ? <EyeOff size={20} /> : <Eye size={20} />}
+          </button>
+        </div>
+
+        {/* Botón */}
+        <button
+          type="submit"
+          className="w-full mt-6 bg-pink-500 hover:bg-pink-600 text-white font-semibold py-3 rounded-lg transition duration-300"
+        >
+          Crear cuenta
+        </button>
+
+        <p className="mt-4 text-sm text-gray-600 text-center">
           ¿Ya tienes cuenta?{" "}
-          <a href="/login" className="text-pink-600 font-medium hover:underline">
+          <Link
+            to="/login"
+            className="text-pink-600 font-semibold hover:underline"
+          >
             Inicia sesión aquí
-          </a>
+          </Link>
         </p>
-      </div>
+      </form>
     </div>
   );
 }
-
-export default Register;

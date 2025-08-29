@@ -8,10 +8,11 @@ export default function Register() {
   const { usuario, setUsuario } = useAuth();
   const [email, setEmail] = useState("");
   const [clave, setClave] = useState("");
+  const [confirmarClave, setConfirmarClave] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  // Redirección silenciosa si ya está logueado
+  // Redirección si ya está logueado
   useEffect(() => {
     if (usuario) {
       navigate("/ver-perfil", { replace: true });
@@ -22,22 +23,37 @@ export default function Register() {
 
   const registrarUsuario = async (e) => {
     e.preventDefault();
-    if (!validarEmail(email)) {
-      setError("Correo electrónico inválido");
+    const correo = email.trim();
+
+    if (!validarEmail(correo)) {
+      setError("El correo electrónico no es válido.");
       return;
     }
     if (clave.length < 6) {
-      setError("La contraseña debe tener al menos 6 caracteres");
+      setError("La contraseña debe tener al menos 6 caracteres.");
+      return;
+    }
+    if (clave !== confirmarClave) {
+      setError("Las contraseñas no coinciden.");
       return;
     }
 
     try {
-      const cred = await createUserWithEmailAndPassword(auth, email, clave);
+      const cred = await createUserWithEmailAndPassword(auth, correo, clave);
       setUsuario(cred.user);
       setError("");
       navigate("/crear-perfil");
     } catch (err) {
-      setError(err.message || "Error al registrar usuario.");
+      // Traducción de errores comunes de Firebase
+      let mensaje = "Error al registrar usuario.";
+      if (err.code === "auth/email-already-in-use") {
+        mensaje = "Este correo ya está registrado.";
+      } else if (err.code === "auth/invalid-email") {
+        mensaje = "El correo ingresado no es válido.";
+      } else if (err.code === "auth/weak-password") {
+        mensaje = "La contraseña es demasiado débil.";
+      }
+      setError(mensaje);
     }
   };
 
@@ -53,6 +69,7 @@ export default function Register() {
           placeholder="ejemplo@correo.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          className={error.includes("correo") ? "input-error" : ""}
           required
         />
 
@@ -62,6 +79,17 @@ export default function Register() {
           placeholder="••••••••"
           value={clave}
           onChange={(e) => setClave(e.target.value)}
+          className={error.includes("contraseña") ? "input-error" : ""}
+          required
+        />
+
+        <label>Confirmar contraseña</label>
+        <input
+          type="password"
+          placeholder="Repite la contraseña"
+          value={confirmarClave}
+          onChange={(e) => setConfirmarClave(e.target.value)}
+          className={error.includes("coinciden") ? "input-error" : ""}
           required
         />
 
@@ -73,4 +101,3 @@ export default function Register() {
     </div>
   );
 }
-

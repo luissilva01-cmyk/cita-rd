@@ -9,7 +9,7 @@ import NotFound from "./pages/NotFound";
 import CrearPerfil from "./components/perfil/CrearPerfil";
 import VerPerfil from "./components/perfil/VerPerfil";
 import ExplorarPerfiles from "./components/explorar/ExplorarPerfiles";
-import VerPerfilPublico from "./pages/VerPerfilPublico"; // ✅ importar la página pública
+import VerPerfilPublico from "./pages/VerPerfilPublico"; // Página pública para ver perfil
 
 import AuthProvider from "./context/AuthProvider";
 import AuthLayout from "./components/comunes/AuthLayout";
@@ -17,6 +17,7 @@ import PrivateRoute from "./components/comunes/PrivateRoute";
 
 function AnimatedRoutes() {
   const location = useLocation();
+
   const pageVariants = {
     initial: { opacity: 0, y: 20 },
     animate: { opacity: 1, y: 0 },
@@ -28,6 +29,7 @@ function AnimatedRoutes() {
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
+        
         {/* Home */}
         <Route
           path="/"
@@ -124,7 +126,7 @@ function AnimatedRoutes() {
           }
         />
 
-        {/* 👇 Nueva ruta pública dinámica para ver perfiles */}
+        {/* Ruta pública dinámica para ver perfiles */}
         <Route
           path="/perfil/:id"
           element={

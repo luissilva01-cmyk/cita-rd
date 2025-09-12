@@ -1,0 +1,85 @@
+:root {
+  /* 🎨 Colores principales */
+  --color-primary: #ff5722;
+  --color-primary-hover: #e64a19;
+  --color-secondary: #ffccbc;
+
+  /* ⚡ Estados */
+  --color-success: #4caf50;
+  --color-error: #f44336;
+  --color-warning: #ff9800;
+  --color-info: #2196f3;
+
+  /* 🖤 Base */
+  --color-bg: #f9f9f9;
+  --color-text: #333;
+  --color-white: #ffffff;
+
+  /* 📏 Espaciado y bordes */
+  --radius: 0.75rem;
+  --transition: 0.2s ease-in-out;
+}
+/* 🔤 Tipografía base */
+body {
+  font-family: 'Inter', 'Segoe UI', Roboto, Arial, sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  margin: 0;
+  padding: 0;
+  line-height: 1.5;
+}
+
+/* 🔗 Links */
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+a:hover {
+  color: var(--color-primary-hover);
+}
+
+/* 🔘 Botones */
+button {
+  background: var(--color-primary);
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.5rem 1rem;
+  color: var(--color-white);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+button:hover {
+  background: var(--color-primary-hover);
+}
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slideDown {
+  animation: slideDown 0.3s ease-in-out;
+}

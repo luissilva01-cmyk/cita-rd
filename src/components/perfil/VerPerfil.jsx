@@ -1,7 +1,7 @@
 // src/pages/VerPerfil.jsx
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { db } from "../utils/firebase";
+import { db } from "../../utils/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { motion } from "framer-motion";
 

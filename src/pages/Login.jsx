@@ -1,9 +1,8 @@
-// src/pages/Login.jsx
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../utils/firebase"; // ✅ ruta corregida
-import { useAuth } from "../../context/AuthContext";
+import { auth } from "../utils/firebase"; // ruta correcta
+import { useAuth } from "../context/useAuth"; // ✅ uso del hook correcto
 import { Eye, EyeOff } from "lucide-react";
 
 export default function Login() {
@@ -14,59 +13,24 @@ export default function Login() {
   const [mostrarClave, setMostrarClave] = useState(false);
   const navigate = useNavigate();
 
-  // Redirección silenciosa si ya está logueado
   useEffect(() => {
     if (usuario) {
       navigate("/ver-perfil", { replace: true });
     }
   }, [usuario, navigate]);
 
-  // Validación básica de email
-  const validarEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-
   const iniciarSesion = async (e) => {
     e.preventDefault();
-
-    if (!validarEmail(email)) {
-      setError("Correo electrónico inválido");
-      return;
-    }
-
-    if (clave.trim() === "") {
-      setError("La contraseña no puede estar vacía");
-      return;
-    }
-
     try {
       const cred = await signInWithEmailAndPassword(auth, email, clave);
       setUsuario(cred.user);
       setError("");
       navigate("/ver-perfil");
     } catch (err) {
-      // Manejo de errores de Firebase
-      let mensaje = "Correo o contraseña incorrectos.";
-
-      if (import.meta.env.MODE === "development") {
-        console.error("Error en login:", err);
-      }
-
-      switch (err.code) {
-        case "auth/user-not-found":
-          mensaje = "No existe una cuenta con este correo.";
-          break;
-        case "auth/wrong-password":
-          mensaje = "La contraseña es incorrecta.";
-          break;
-        case "auth/invalid-email":
-          mensaje = "El formato del correo no es válido.";
-          break;
-        case "auth/user-disabled":
-          mensaje = "Esta cuenta ha sido deshabilitada.";
-          break;
-        default:
-          mensaje = "Error al iniciar sesión. Intenta de nuevo.";
-      }
-
+      let mensaje = "Error al iniciar sesión";
+      if (err.code === "auth/user-not-found") mensaje = "Usuario no encontrado";
+      else if (err.code === "auth/wrong-password") mensaje = "Contraseña incorrecta";
+      else if (err.code === "auth/invalid-email") mensaje = "Correo inválido";
       setError(mensaje);
     }
   };
@@ -78,7 +42,7 @@ export default function Login() {
         className="bg-white shadow-lg rounded-2xl p-8 w-full max-w-md"
       >
         <h2 className="text-2xl font-bold text-center text-pink-600 mb-6">
-          Iniciar sesión
+          Iniciar Sesión
         </h2>
 
         {error && (
@@ -95,9 +59,7 @@ export default function Login() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className={`w-full p-3 rounded-lg border focus:outline-none focus:ring-2 ${
-            error.includes("Correo") ? "border-red-500 bg-red-100 focus:ring-red-400" : "border-gray-300 focus:ring-pink-400"
-          }`}
+          className="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-400"
         />
 
         {/* Contraseña */}
@@ -111,9 +73,7 @@ export default function Login() {
             value={clave}
             onChange={(e) => setClave(e.target.value)}
             required
-            className={`w-full p-3 rounded-lg border focus:outline-none focus:ring-2 pr-10 ${
-              error.toLowerCase().includes("contraseña") ? "border-red-500 bg-red-100 focus:ring-red-400" : "border-gray-300 focus:ring-pink-400"
-            }`}
+            className="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-400 pr-10"
           />
           <button
             type="button"
@@ -129,7 +89,7 @@ export default function Login() {
           type="submit"
           className="w-full mt-6 bg-pink-500 hover:bg-pink-600 text-white font-semibold py-3 rounded-lg transition duration-300"
         >
-          Entrar
+          Iniciar Sesión
         </button>
 
         <p className="mt-4 text-sm text-gray-600 text-center">

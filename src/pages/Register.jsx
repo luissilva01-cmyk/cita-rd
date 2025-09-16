@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../utils/firebase"; // ✅ ruta corregida
-import { useAuth } from "../../context/AuthContext";
+import { auth } from "../utils/firebase"; // ruta correcta
+import { useAuth } from "../context/useAuth"; // ✅ cambio aquí
 import { Eye, EyeOff } from "lucide-react";
 
 export default function Register() {

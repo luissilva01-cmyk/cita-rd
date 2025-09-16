@@ -1,5 +1,5 @@
 // src/services/chatService.js
-import { db } from "../firebase"; // Ajusta la ruta según dónde esté tu firebase.js
+import { db } from "../utils/firebase"; // ruta corregida
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 
 // Crear un chat entre dos usuarios

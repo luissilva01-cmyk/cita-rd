@@ -11,14 +11,13 @@ import NotFound from "./pages/NotFound";
 
 // Componentes de perfil
 import CrearPerfil from "./components/perfil/CrearPerfil";
-import VerPerfil from "./components/perfil/VerPerfil";
 import VerPerfilPublico from "./components/perfil/VerPerfilPublico";
 
 // Componentes de exploración
 import ExplorarPerfiles from "./components/explorar/ExplorarPerfiles";
 
 // Context y rutas privadas
-import AuthProvider from "./context/AuthProvider";
+import { AuthProvider } from "./context/AuthProvider"; 
 import AuthLayout from "./components/comunes/AuthLayout";
 import PrivateRoute from "./components/comunes/PrivateRoute";
 
@@ -66,7 +65,7 @@ function AnimatedRoutes() {
         </Route>
         <Route element={<PrivateRoute />}>
           <Route path="/crear-perfil" element={<CrearPerfil />} />
-          <Route path="/ver-perfil" element={<VerPerfil />} />
+      
         </Route>
         <Route path="/explorar" element={<ExplorarPerfiles />} />
         <Route path="/perfil/:id" element={<VerPerfilPublico />} />

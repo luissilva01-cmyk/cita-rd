@@ -5,6 +5,7 @@ import react from "@vitejs/plugin-react";
 // Configuración de Vite
 export default defineConfig({
   plugins: [react()],
+  base: "/", // ⚠️ necesario para deploy en Vercel
   build: {
     // Configuración de Rollup
     rollupOptions: {

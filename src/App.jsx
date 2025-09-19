@@ -24,6 +24,7 @@ import PrivateRoute from "./components/comunes/PrivateRoute";
 // Otros componentes
 import EmailBanner from "./components/comunes/EmailBanner";
 import ChatTest from "./components/chat/ChatTest";
+import EnvDebug from "./components/EnvDebug";
 
 // Toast
 import ToastContext from "./context/ToastContext";

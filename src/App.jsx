@@ -24,7 +24,7 @@ import PrivateRoute from "./components/comunes/PrivateRoute";
 // Otros componentes
 import EmailBanner from "./components/comunes/EmailBanner";
 import ChatTest from "./components/chat/ChatTest";
-import EnvDebug from "./components/EnvDebug"; // ✅ Importación confirmada
+import EnvDebug from "./components/EnvDebug";
 
 // Toast
 import ToastContext from "./context/ToastContext";
@@ -69,10 +69,7 @@ function AnimatedRoutes() {
         </Route>
         <Route path="/explorar" element={<ExplorarPerfiles />} />
         <Route path="/perfil/:id" element={<VerPerfilPublico />} />
-
-        {/* ✅ Ruta agregada para depuración */}
         <Route path="/debug" element={<EnvDebug />} />
-
         <Route path="*" element={<NotFound />} />
       </Routes>
     </AnimatePresence>
@@ -89,6 +86,17 @@ function App() {
       setToasts(prev => prev.filter(t => t.id !== id));
     }, 3000);
   }, []);
+
+  // ✅ Verificación de variable de entorno
+  if (!import.meta.env.VITE_FIREBASE_API_KEY) {
+    return (
+      <div style={{ padding: "2rem", fontFamily: "sans-serif" }}>
+        ❌ Error: La variable <code>VITE_FIREBASE_API_KEY</code> no fue recibida.
+        <br />
+        Verifica que esté definida en Vercel y marcada para el entorno <strong>Production</strong>.
+      </div>
+    );
+  }
 
   return (
     <AuthProvider>

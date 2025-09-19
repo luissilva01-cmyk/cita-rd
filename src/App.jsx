@@ -24,7 +24,7 @@ import PrivateRoute from "./components/comunes/PrivateRoute";
 // Otros componentes
 import EmailBanner from "./components/comunes/EmailBanner";
 import ChatTest from "./components/chat/ChatTest";
-import EnvDebug from "./components/EnvDebug";
+import EnvDebug from "./components/EnvDebug"; // ✅ Importación confirmada
 
 // Toast
 import ToastContext from "./context/ToastContext";
@@ -66,10 +66,13 @@ function AnimatedRoutes() {
         </Route>
         <Route element={<PrivateRoute />}>
           <Route path="/crear-perfil" element={<CrearPerfil />} />
-      
         </Route>
         <Route path="/explorar" element={<ExplorarPerfiles />} />
         <Route path="/perfil/:id" element={<VerPerfilPublico />} />
+
+        {/* ✅ Ruta agregada para depuración */}
+        <Route path="/debug" element={<EnvDebug />} />
+
         <Route path="*" element={<NotFound />} />
       </Routes>
     </AnimatePresence>

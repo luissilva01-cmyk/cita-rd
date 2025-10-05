@@ -1,59 +1,65 @@
-// src/pages/VerPerfil.jsx
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { db } from "../../utils/firebase";
+// src/components/perfil/VerPerfil.jsx
+import { useEffect, useState } from "react";
+import { auth, db } from "../../utils/firebase"; // ← CORREGIDO
 import { doc, getDoc } from "firebase/firestore";
-import { motion } from "framer-motion";
-
-const MotionDiv = motion.div;
-const MotionH1 = motion.h1;
+import { useNavigate } from "react-router-dom";
 
 export default function VerPerfil() {
-  const { id } = useParams();
   const [perfil, setPerfil] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchPerfil = async () => {
-      const docSnap = await getDoc(doc(db, "perfiles", id));
+      const user = auth.currentUser;
+      if (!user) {
+        navigate("/login"); // redirigir si no está logueado
+        return;
+      }
+
+      const docRef = doc(db, "perfiles", user.uid);
+      const docSnap = await getDoc(docRef);
+
       if (docSnap.exists()) {
         setPerfil(docSnap.data());
+      } else {
+        setPerfil(null);
       }
+      setLoading(false);
     };
-    fetchPerfil();
-  }, [id]);
 
-  if (!perfil) return <p className="text-center mt-10">Cargando perfil...</p>;
+    fetchPerfil();
+  }, [navigate]);
+
+  if (loading) return <p className="text-center mt-10">Cargando perfil...</p>;
+
+  if (!perfil)
+    return (
+      <div className="text-center mt-10">
+        <p>No tienes perfil creado.</p>
+        <button
+          onClick={() => navigate("/perfil/crear")}
+          className="mt-4 px-6 py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
+        >
+          Crear perfil
+        </button>
+      </div>
+    );
 
   return (
-    <MotionDiv
-      className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-100 to-pink-200 p-6"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.6 }}
-    >
-      <MotionDiv
-        className="bg-white shadow-lg rounded-2xl p-8 max-w-sm w-full text-center"
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        <MotionH1
-          className="text-2xl font-bold text-pink-600 mb-4"
-          initial={{ y: -20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.5 }}
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-6">
+      <div className="bg-white shadow-xl rounded-2xl p-8 w-full max-w-md text-center">
+        <h2 className="text-3xl font-bold mb-4">{perfil.nombre}</h2>
+        <p className="text-gray-700 mb-2">{perfil.email}</p>
+        <p className="text-gray-600 mb-6">{perfil.bio}</p>
+
+        <button
+          onClick={() => navigate("/perfil/crear")}
+          className="px-6 py-3 bg-green-500 text-white rounded-md hover:bg-green-600 transition"
         >
-          Perfil de {perfil.nombre}
-        </MotionH1>
-
-        <img
-          src={perfil.foto || "https://via.placeholder.com/150"}
-          alt={perfil.nombre}
-          className="w-28 h-28 rounded-full mx-auto mb-4 object-cover"
-        />
-
-        <p className="text-gray-700 text-lg">Edad: {perfil.edad}</p>
-      </MotionDiv>
-    </MotionDiv>
+          Editar perfil
+        </button>
+      </div>
+    </div>
   );
 }

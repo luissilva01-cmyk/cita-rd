@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { doc, getDoc } from "firebase/firestore";
-import { db } from "../../utils/firebase"; // ← corregido
+import { db } from "../../utils/firebase";
 
 export default function VerPerfilPublico() {
   const { id } = useParams(); // 👈 ID de la URL

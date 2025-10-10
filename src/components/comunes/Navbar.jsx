@@ -2,12 +2,13 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion as Motion } from "framer-motion";
-import { useAuth } from "../../context/useAuth";
+import { useContext } from "react";
+import { AuthContext } from "../../context/AuthContext";
 import { auth } from "../../utils/firebase";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { usuario, setUsuario } = useAuth();
+  const { usuario, setUsuario } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const cerrarSesion = async () => {
@@ -19,13 +20,13 @@ export default function Navbar() {
   const menuVariants = {
     hidden: { opacity: 0, y: -20 },
     visible: { opacity: 1, y: 0, transition: { staggerChildren: 0.1 } },
-    exit: { opacity: 0, y: -20 }
+    exit: { opacity: 0, y: -20 },
   };
 
   const itemVariants = {
     hidden: { opacity: 0, x: -10 },
     visible: { opacity: 1, x: 0 },
-    exit: { opacity: 0, x: -10 }
+    exit: { opacity: 0, x: -10 },
   };
 
   return (
@@ -35,13 +36,13 @@ export default function Navbar() {
           CitaRD
         </Link>
 
-        {/* Menú desktop */}
         <div className="hidden sm:flex space-x-4 items-center">
           <Link to="/">Inicio</Link>
           <Link to="/explorar">Explorar</Link>
           {usuario ? (
             <>
-              <Link to="/ver-perfil">Mi Perfil</Link>
+              <Link to="/perfil">Mi Perfil</Link>
+              <Link to="/editar-perfil">Editar Perfil</Link>
               <button
                 onClick={cerrarSesion}
                 className="bg-white text-pink-500 px-3 py-1 rounded-md font-semibold hover:bg-gray-200"
@@ -77,7 +78,6 @@ export default function Navbar() {
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
           >
             {menuOpen ? (
               <path
@@ -98,7 +98,7 @@ export default function Navbar() {
         </button>
       </div>
 
-      {/* Menú móvil con animación */}
+      {/* Menú móvil */}
       <AnimatePresence>
         {menuOpen && (
           <Motion.div
@@ -108,50 +108,52 @@ export default function Navbar() {
             animate="visible"
             exit="exit"
           >
-            {[
-              { label: "Inicio", to: "/" },
-              { label: "Explorar", to: "/explorar" },
-              ...(usuario ? [{ label: "Mi Perfil", to: "/ver-perfil" }] : []),
-            ].map((item) => (
-              <Motion.div
-                key={item.to}
-                variants={itemVariants}
-                className="block"
-                onClick={() => setMenuOpen(false)}
-              >
-                <Link to={item.to}>{item.label}</Link>
-              </Motion.div>
-            ))}
+            {[{ label: "Inicio", to: "/" }, { label: "Explorar", to: "/explorar" }].map(
+              (item) => (
+                <Motion.div
+                  key={item.to}
+                  variants={itemVariants}
+                  className="block"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <Link to={item.to}>{item.label}</Link>
+                </Motion.div>
+              )
+            )}
 
             {usuario ? (
-              <Motion.div variants={itemVariants}>
-                <button
-                  onClick={() => {
-                    cerrarSesion();
-                    setMenuOpen(false);
-                  }}
-                  className="block w-full text-left bg-white text-pink-500 px-3 py-1 rounded-md font-semibold hover:bg-gray-200"
-                >
-                  Cerrar sesión
-                </button>
-              </Motion.div>
+              <>
+                <Motion.div variants={itemVariants}>
+                  <Link to="/perfil" onClick={() => setMenuOpen(false)}>
+                    Mi Perfil
+                  </Link>
+                </Motion.div>
+                <Motion.div variants={itemVariants}>
+                  <Link to="/editar-perfil" onClick={() => setMenuOpen(false)}>
+                    Editar Perfil
+                  </Link>
+                </Motion.div>
+                <Motion.div variants={itemVariants}>
+                  <button
+                    onClick={() => {
+                      cerrarSesion();
+                      setMenuOpen(false);
+                    }}
+                    className="block w-full text-left bg-white text-pink-500 px-3 py-1 rounded-md font-semibold hover:bg-gray-200"
+                  >
+                    Cerrar sesión
+                  </button>
+                </Motion.div>
+              </>
             ) : (
               <>
                 <Motion.div variants={itemVariants}>
-                  <Link
-                    to="/login"
-                    onClick={() => setMenuOpen(false)}
-                    className="block bg-white text-pink-500 px-3 py-1 rounded-md font-semibold hover:bg-gray-200"
-                  >
+                  <Link to="/login" onClick={() => setMenuOpen(false)}>
                     Iniciar sesión
                   </Link>
                 </Motion.div>
                 <Motion.div variants={itemVariants}>
-                  <Link
-                    to="/register"
-                    onClick={() => setMenuOpen(false)}
-                    className="block bg-white text-pink-500 px-3 py-1 rounded-md font-semibold hover:bg-gray-200"
-                  >
+                  <Link to="/register" onClick={() => setMenuOpen(false)}>
                     Registrarse
                   </Link>
                 </Motion.div>

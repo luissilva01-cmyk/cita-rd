@@ -1,7 +1,5 @@
-// src/App.jsx
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "./context/AuthProvider";
+import { Routes, Route } from "react-router-dom";
 
 // Pages
 import Home from "./pages/Home";
@@ -16,18 +14,16 @@ import Navbar from "./components/comunes/Navbar";
 
 export default function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/perfil" element={<Perfil />} />
-          <Route path="/editar-perfil" element={<EditarPerfil />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Router>
-    </AuthProvider>
+    <>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/perfil" element={<Perfil />} />
+        <Route path="/editar-perfil" element={<EditarPerfil />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </>
   );
 }

@@ -1,53 +1,85 @@
 // src/pages/Perfil.jsx
-import { useEffect, useState } from "react";
-import { db, auth } from "../utils/firebase";
-import { doc, getDoc } from "firebase/firestore";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
+import { AuthContext } from "../context/AuthContext";
+import { db } from "../utils/firebase";
+import { doc, getDoc } from "firebase/firestore";
 
-function Perfil() {
-  const [perfil, setPerfil] = useState(null);
+export default function Perfil() {
+  const { usuario } = useContext(AuthContext);
+  const [perfilData, setPerfilData] = useState(null);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchPerfil = async () => {
+      if (!usuario) return;
       try {
-        const user = auth.currentUser;
-        if (!user) return;
-
-        const ref = doc(db, "perfiles", user.uid);
-        const snap = await getDoc(ref);
-
-        if (snap.exists()) {
-          setPerfil(snap.data());
+        const docRef = doc(db, "perfiles", usuario.uid);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setPerfilData(docSnap.data());
         } else {
-          toast.error("No tienes perfil creado aún");
-          navigate("/");
+          setPerfilData(null);
         }
       } catch (error) {
-        toast.error("Error al cargar perfil: " + error.message);
+        console.error("Error al cargar el perfil:", error);
+      } finally {
+        setLoading(false);
       }
     };
-
     fetchPerfil();
-  }, [navigate]);
+  }, [usuario]);
 
-  if (!perfil) return <p className="text-center mt-10">Cargando perfil...</p>;
+  if (!usuario)
+    return (
+      <div className="p-6 text-center">
+        <p>Inicia sesión para ver tu perfil.</p>
+        <button
+          onClick={() => navigate("/login")}
+          className="mt-4 bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg"
+        >
+          Ir a iniciar sesión
+        </button>
+      </div>
+    );
+
+  if (loading)
+    return <p className="p-6 text-center">Cargando perfil...</p>;
 
   return (
-    <div className="max-w-md mx-auto mt-10 bg-white shadow-lg rounded-2xl p-6">
-      <h2 className="text-2xl font-bold mb-4 text-center">Mi Perfil</h2>
-      <p><strong>Nombre:</strong> {perfil.nombre}</p>
-      <p><strong>Bio:</strong> {perfil.bio}</p>
-      <p><strong>Email:</strong> {perfil.email}</p>
-      <button
-        onClick={() => navigate("/editar-perfil")}
-        className="mt-4 w-full bg-orange-500 hover:bg-orange-600 text-white py-2 rounded-lg font-semibold"
-      >
-        Editar Perfil
-      </button>
+    <div className="p-6 max-w-md mx-auto bg-white rounded-xl shadow-md text-center">
+      <h2 className="text-2xl font-bold mb-4">Mi Perfil</h2>
+      {perfilData ? (
+        <>
+          <p>
+            <strong>Nombre:</strong> {perfilData.nombre}
+          </p>
+          <p>
+            <strong>Email:</strong> {usuario.email}
+          </p>
+          <p>
+            <strong>Bio:</strong> {perfilData.bio}
+          </p>
+
+          <button
+            onClick={() => navigate("/editar-perfil")}
+            className="mt-6 bg-purple-500 hover:bg-purple-600 text-white px-6 py-2 rounded-lg font-semibold transition-all"
+          >
+            Editar perfil
+          </button>
+        </>
+      ) : (
+        <>
+          <p className="text-gray-600">No tienes un perfil creado aún.</p>
+          <button
+            onClick={() => navigate("/editar-perfil")}
+            className="mt-4 bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg font-semibold transition-all"
+          >
+            Crear perfil
+          </button>
+        </>
+      )}
     </div>
   );
 }
-
-export default Perfil;

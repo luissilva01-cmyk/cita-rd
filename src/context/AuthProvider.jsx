@@ -1,4 +1,3 @@
-// src/context/AuthProvider.jsx
 import React, { useState, useEffect } from "react";
 import { auth } from "../utils/firebase";
 import { onAuthStateChanged } from "firebase/auth";
@@ -9,10 +8,13 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
+      console.log("🔄 Detectado cambio de autenticación:", user);
       setUsuario(user);
     });
     return () => unsubscribe();
   }, []);
+
+  console.log("👥 [AuthProvider] Usuario actual:", usuario);
 
   return (
     <AuthContext.Provider value={{ usuario, setUsuario }}>

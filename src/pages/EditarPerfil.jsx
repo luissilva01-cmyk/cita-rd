@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../utils/firebase";
@@ -10,18 +10,15 @@ export default function EditarPerfil() {
 
   const [nombre, setNombre] = useState("");
   const [bio, setBio] = useState("");
+  const [edad, setEdad] = useState("");
+  const [intereses, setIntereses] = useState("");
+  const [ubicacion, setUbicacion] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    // Esperamos hasta que AuthProvider determine si hay usuario
-    if (usuario === undefined) {
-      console.log("⏳ Esperando estado de autenticación...");
-      return;
-    }
-
+    if (usuario === undefined) return;
     if (usuario === null) {
-      console.warn("⚠️ No hay usuario logueado, redirigiendo a login...");
       navigate("/login");
       return;
     }
@@ -33,15 +30,16 @@ export default function EditarPerfil() {
 
         if (docSnap.exists()) {
           const data = docSnap.data();
-          console.log("✅ Perfil cargado desde Firestore:", data);
+          console.log("✅ Perfil cargado:", data);
           setNombre(data.nombre || "");
           setBio(data.bio || "");
-        } else {
-          console.log("🆕 No existe perfil previo, empezando vacío.");
+          setEdad(data.edad || "");
+          setIntereses(data.intereses?.join(", ") || "");
+          setUbicacion(data.ubicacion || "");
         }
       } catch (err) {
         console.error("❌ Error cargando perfil:", err);
-        setError("No se pudo cargar tu perfil. Revisa la consola.");
+        setError("No se pudo cargar tu perfil.");
       } finally {
         setLoading(false);
       }
@@ -53,14 +51,17 @@ export default function EditarPerfil() {
   const handleGuardar = async (e) => {
     e.preventDefault();
 
-    if (!nombre.trim() || !bio.trim()) {
-      setError("Todos los campos son obligatorios.");
+    if (!nombre.trim() || !bio.trim() || !edad.trim() || !intereses.trim()) {
+      setError("Por favor completa todos los campos obligatorios.");
       return;
     }
 
     try {
       setLoading(true);
-      console.log("📤 Guardando perfil con datos:", { nombre, bio, email: usuario.email });
+      const interesesArray = intereses
+        .split(",")
+        .map((i) => i.trim().toLowerCase())
+        .filter((i) => i.length > 0);
 
       const docRef = doc(db, "perfiles", usuario.uid);
       await setDoc(
@@ -68,28 +69,26 @@ export default function EditarPerfil() {
         {
           nombre,
           bio,
+          edad,
+          intereses: interesesArray,
+          ubicacion,
           email: usuario.email,
         },
         { merge: true }
       );
 
-      console.log("✅ Perfil guardado correctamente.");
+      console.log("✅ Perfil actualizado correctamente.");
       navigate("/perfil");
     } catch (err) {
       console.error("❌ Error guardando perfil:", err);
-      setError("No se pudo guardar tu perfil. Revisa la consola.");
+      setError("No se pudo guardar tu perfil.");
     } finally {
       setLoading(false);
     }
   };
 
-  if (usuario === undefined) {
-    return <p className="p-6 text-center">Cargando autenticación...</p>;
-  }
-
-  if (loading) {
+  if (usuario === undefined || loading)
     return <p className="p-6 text-center">Cargando perfil...</p>;
-  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-6">
@@ -104,14 +103,40 @@ export default function EditarPerfil() {
             placeholder="Nombre"
             value={nombre}
             onChange={(e) => setNombre(e.target.value)}
-            className="border px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-purple-400"
+            className="border px-4 py-2 rounded focus:ring-2 focus:ring-purple-400"
           />
+
           <textarea
-            placeholder="Bio"
+            placeholder="Biografía"
             value={bio}
             onChange={(e) => setBio(e.target.value)}
-            className="border px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-purple-400"
+            className="border px-4 py-2 rounded focus:ring-2 focus:ring-purple-400"
           />
+
+          <input
+            type="number"
+            placeholder="Edad"
+            value={edad}
+            onChange={(e) => setEdad(e.target.value)}
+            className="border px-4 py-2 rounded focus:ring-2 focus:ring-purple-400"
+          />
+
+          <input
+            type="text"
+            placeholder="Intereses (separados por comas: cine, viajes, música)"
+            value={intereses}
+            onChange={(e) => setIntereses(e.target.value)}
+            className="border px-4 py-2 rounded focus:ring-2 focus:ring-purple-400"
+          />
+
+          <input
+            type="text"
+            placeholder="Ciudad o ubicación (opcional)"
+            value={ubicacion}
+            onChange={(e) => setUbicacion(e.target.value)}
+            className="border px-4 py-2 rounded focus:ring-2 focus:ring-purple-400"
+          />
+
           <button
             type="submit"
             disabled={loading}

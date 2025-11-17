@@ -1,4 +1,7 @@
-import { createContext } from "react";
+import { createContext, useContext } from "react";
 
-// Solo exportamos el contexto
 export const AuthContext = createContext(null);
+
+export function useAuth() {
+  return useContext(AuthContext);
+}

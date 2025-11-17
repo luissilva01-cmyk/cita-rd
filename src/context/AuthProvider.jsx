@@ -9,12 +9,34 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       console.log("🔄 Detectado cambio de autenticación:", user);
-      setUsuario(user);
+
+      if (user) {
+        setUsuario(user);
+        console.log("👥 [AuthProvider] Usuario actual:", user);
+
+        // ✅ Guardamos el UID y el email en localStorage
+        localStorage.setItem(
+          "usuario",
+          JSON.stringify({
+            uid: user.uid,
+            email: user.email,
+          })
+        );
+
+        // Guardamos el uid también por separado (por compatibilidad)
+        localStorage.setItem("uid", user.uid);
+      } else {
+        setUsuario(null);
+        console.log("👥 [AuthProvider] Usuario actual:", null);
+
+        // ✅ Limpiamos storage al cerrar sesión
+        localStorage.removeItem("usuario");
+        localStorage.removeItem("uid");
+      }
     });
+
     return () => unsubscribe();
   }, []);
-
-  console.log("👥 [AuthProvider] Usuario actual:", usuario);
 
   return (
     <AuthContext.Provider value={{ usuario, setUsuario }}>

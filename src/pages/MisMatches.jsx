@@ -1,36 +1,54 @@
 import React, { useEffect, useState } from "react";
 import { db } from "../utils/firebase";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { collection, query, where, getDocs, doc, getDoc } from "firebase/firestore";
 import { motion } from "framer-motion";
+import { useAuth } from "../context/AuthContext";
 
 export default function MisMatches() {
+  const { user } = useAuth();
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
-  const usuarioActual = localStorage.getItem("uid");
 
   useEffect(() => {
+    if (!user?.uid) return;
+
     const obtenerMatches = async () => {
       try {
+        // 1️⃣ Buscar matches donde el usuario actual participa
         const q = query(
           collection(db, "matches"),
-          where("usuarios", "array-contains", usuarioActual)
+          where("usuarios", "array-contains", user.uid)
         );
-        const snapshot = await getDocs(q);
+        const snap = await getDocs(q);
 
-        const idsOtrosUsuarios = snapshot.docs
-          .map((doc) =>
-            doc.data().usuarios.find((id) => id !== usuarioActual)
-          )
+        if (snap.empty) {
+          setMatches([]);
+          return;
+        }
+
+        // 2️⃣ De cada match, obtener el UID del otro usuario
+        const otrosUids = snap.docs
+          .map((doc) => doc.data().usuarios.find((uid) => uid !== user.uid))
           .filter(Boolean);
 
-        if (idsOtrosUsuarios.length > 0) {
-          const perfilesSnap = await getDocs(collection(db, "perfiles"));
-          const perfilesFiltrados = perfilesSnap.docs
-            .map((doc) => ({ id: doc.id, ...doc.data() }))
-            .filter((perfil) => idsOtrosUsuarios.includes(perfil.userId));
+        // 3️⃣ Descargar SOLO los perfiles necesarios (optimizado)
+        const perfiles = [];
+        for (let uid of otrosUids) {
+          const perfilRef = doc(db, "perfiles", uid);
+          const perfilSnap = await getDoc(perfilRef);
 
-          setMatches(perfilesFiltrados);
+          if (perfilSnap.exists()) {
+            perfiles.push({
+              id: uid,
+              ...perfilSnap.data(),
+              fechaMatch: snap.docs.find((d) =>
+                d.data().usuarios.includes(uid)
+              )?.data().timestamp,
+            });
+          }
         }
+
+        setMatches(perfiles);
       } catch (error) {
         console.error("❌ Error al obtener los matches:", error);
       } finally {
@@ -39,7 +57,7 @@ export default function MisMatches() {
     };
 
     obtenerMatches();
-  }, [usuarioActual]);
+  }, [user]);
 
   if (loading) {
     return (
@@ -76,21 +94,20 @@ export default function MisMatches() {
             className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition"
           >
             <img
-              src={match.fotoURL || "/default-avatar.png"}
+              src={match.foto || "/default-avatar.png"}
               alt={match.nombre}
               className="w-full h-56 object-cover"
             />
             <div className="p-4">
               <h2 className="text-xl font-semibold text-gray-800">
-                {match.nombre},{" "}
-                <span className="text-gray-500">{match.edad}</span>
+                {match.nombre}
               </h2>
               <p className="text-sm text-gray-600 mt-1">{match.bio}</p>
 
               <p className="text-xs text-gray-400 mt-1">
                 💞 Desde:{" "}
-                {match.timestamp
-                  ? new Date(match.timestamp.toDate()).toLocaleDateString()
+                {match.fechaMatch
+                  ? new Date(match.fechaMatch.toDate()).toLocaleDateString()
                   : "Reciente"}
               </p>
 

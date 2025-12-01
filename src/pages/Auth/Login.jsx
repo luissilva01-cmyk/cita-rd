@@ -52,79 +52,84 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-200 via-pink-200 to-yellow-200 p-6">
-      <div className="bg-white shadow-xl rounded-2xl p-8 w-full max-w-md">
-        <h2 className="text-3xl font-bold text-center mb-6 bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">
-          Iniciar Sesión
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-200 via-pink-100 to-yellow-200 p-5">
+
+      {/* Contenedor aislado */}
+      <div className="w-full max-w-md bg-white/90 backdrop-blur-xl shadow-2xl rounded-3xl p-8 animate-[fadeIn_0.4s_ease]">
+
+        <h2 className="text-3xl font-extrabold text-center mb-6 text-gray-800">
+          Bienvenido 👋
         </h2>
 
         {error && (
-          <p className="text-red-600 text-center mb-4" role="alert">
+          <p className="text-red-600 text-center mb-4 font-medium" role="alert">
             {error}
           </p>
         )}
 
-        <form onSubmit={handleLogin} className="flex flex-col gap-4">
-          {/* Campo de correo */}
-          <input
-            type="email"
-            placeholder="Correo electrónico"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="border px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-purple-400"
-          />
+        <form onSubmit={handleLogin} className="flex flex-col gap-5">
 
-          {/* Campo de contraseña con botón 👁️ */}
-          <div className="relative">
+          {/* Correo */}
+          <div>
+            <label className="text-sm font-medium text-gray-700">Correo</label>
             <input
-              type={showPassword ? "text" : "password"}
-              placeholder="Contraseña"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="border px-4 py-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-purple-400 pr-10"
+              type="email"
+              placeholder="tucorreo@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="mt-1 w-full border border-gray-300 px-4 py-2 rounded-xl focus:ring-2 focus:ring-orange-400 focus:outline-none transition-all"
             />
-            <button
-              type="button"
-              onClick={() => setShowPassword((prev) => !prev)}
-              className="absolute right-3 top-2.5 text-gray-500 hover:text-purple-600"
-              aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
-            >
-              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-            </button>
           </div>
 
-          {/* Enlace de recuperación justo debajo del campo */}
+          {/* Contraseña */}
+          <div>
+            <label className="text-sm font-medium text-gray-700">Contraseña</label>
+            <div className="relative mt-1">
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full border border-gray-300 px-4 py-2 rounded-xl focus:ring-2 focus:ring-orange-400 focus:outline-none transition-all pr-12"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((p) => !p)}
+                className="absolute right-3 top-2 text-gray-500 hover:text-orange-500"
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+            </div>
+          </div>
+
+          {/* Recuperar contraseña */}
           <div className="text-right -mt-2">
-            <Link
-              to="/recuperar"
-              className="text-sm text-purple-600 hover:underline"
-            >
+            <Link className="text-sm text-orange-600 hover:underline" to="/recuperar">
               ¿Olvidaste tu contraseña?
             </Link>
           </div>
 
-          {/* Botón principal */}
+          {/* Botón de Login */}
           <button
             type="submit"
             disabled={loading}
-            className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-pink-500 hover:to-purple-500 text-white py-2 px-6 rounded-lg font-semibold transition-all duration-300 flex justify-center items-center"
+            className="bg-orange-500 text-white py-3 rounded-xl font-semibold text-lg shadow-md hover:bg-orange-600 transition-all active:scale-[0.97] flex justify-center"
           >
-            {loading && (
-              <span className="animate-spin border-2 border-white border-t-transparent rounded-full w-5 h-5 mr-2" />
+            {loading ? (
+              <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+            ) : (
+              "Iniciar sesión"
             )}
-            {loading ? "Entrando..." : "Entrar"}
           </button>
         </form>
 
-        {/* Enlace para registrarse */}
-        <div className="flex justify-center mt-6">
-          <p className="text-sm text-gray-700">
-            ¿No tienes cuenta?{" "}
-            <Link to="/register" className="text-purple-600 hover:underline font-medium">
-              Regístrate aquí
-            </Link>
-          </p>
-        </div>
+        {/* Enlace a registro */}
+        <p className="text-center text-gray-700 mt-6">
+          ¿No tienes cuenta?
+          <Link to="/register" className="text-orange-600 font-semibold ml-1 hover:underline">
+            Regístrate
+          </Link>
+        </p>
       </div>
     </div>
   );

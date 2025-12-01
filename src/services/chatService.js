@@ -1,15 +1,61 @@
 // src/services/chatService.js
-import { db } from "../utils/firebase"; // ruta corregida
-import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { db } from "../utils/firebase";
+import { doc, getDoc, updateDoc, serverTimestamp } from "firebase/firestore";
 
-// Crear un chat entre dos usuarios
-export const crearChat = async (uid1, uid2) => {
-  const chatId = [uid1, uid2].sort().join("_"); // ID único basado en los dos uids
+/**
+ * Crear chat solo si no existe
+ */
+export async function crearChatSiNoExiste(chatId, userA, userB) {
+  const chatRef = doc(db, "chats", chatId);
+  const snap = await getDoc(chatRef);
 
-  await setDoc(doc(db, "chats", chatId), {
-    participants: [uid1, uid2],
-    createdAt: serverTimestamp(),
+  if (!snap.exists()) {
+    await updateDoc(chatRef, {
+      users: [userA, userB],
+      messages: [],
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+      typing: {},
+    }).catch(async () => {
+      // Si updateDoc falla porque no existe, usamos setDoc
+      const { setDoc } = await import("firebase/firestore");
+      await setDoc(chatRef, {
+        users: [userA, userB],
+        messages: [],
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+        typing: {},
+      });
+    });
+  }
+}
+
+/**
+ * Enviar un mensaje
+ */
+export async function enviarMensaje(chatId, message) {
+  const chatRef = doc(db, "chats", chatId);
+
+  await updateDoc(chatRef, {
+    messages: message,
+    updatedAt: serverTimestamp(),
   });
+}
 
-  return chatId; // devolvemos el ID del chat
-};
+/**
+ * Actualizar estado "typing"
+ */
+export async function setTyping(chatId, userId, isTyping) {
+  const chatRef = doc(db, "chats", chatId);
+  const snap = await getDoc(chatRef);
+
+  if (!snap.exists()) return;
+
+  await updateDoc(chatRef, {
+    typing: {
+      ...snap.data().typing,
+      [userId]: isTyping,
+    },
+    updatedAt: serverTimestamp(),
+  });
+}

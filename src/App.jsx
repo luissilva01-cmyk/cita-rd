@@ -1,61 +1,65 @@
 // src/App.jsx
-import React from "react";
+import React, { Suspense, lazy } from "react";
 import { Routes, Route } from "react-router-dom";
-
-// 🏠 Páginas principales
-import Home from "./pages/Home";
-import Perfil from "./pages/Perfil";
-import EditarPerfil from "./pages/EditarPerfil";
-import ExplorarPerfiles from "./pages/ExplorarPerfiles";
-import ExplorarPerfilesV2 from "./pages/ExplorarPerfilesV2"; // Swipe/Tinder Style
-import NotFound from "./pages/NotFound";
-
-// 🔐 Autenticación
-import Login from "./pages/Auth/Login";
-import Register from "./pages/Auth/Register";
-import Recuperar from "./pages/Auth/Recuperar";
-import CorreoEnviado from "./pages/Auth/CorreoEnviado";
-
-// 🌐 Componentes comunes
 import Navbar from "./components/comunes/Navbar";
-
-// 🧩 Contextos
 import { AuthProvider } from "./context/AuthProvider";
 
-// 🗨️ Páginas del chat (nuevo)
-import ChatPage from "./pages/ChatPage";
+// 💤 Carga diferida (lazy loading) para optimizar rendimiento
+const Home = lazy(() => import("./pages/Home"));
+const Perfil = lazy(() => import("./pages/Perfil"));
+const EditarPerfil = lazy(() => import("./pages/EditarPerfil"));
+const ExplorarPerfiles = lazy(() => import("./pages/ExplorarPerfiles"));
+const ExplorarPerfilesV2 = lazy(() => import("./pages/ExplorarPerfilesV2"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const Login = lazy(() => import("./pages/Auth/Login"));
+const Register = lazy(() => import("./pages/Auth/Register"));
+const Recuperar = lazy(() => import("./pages/Auth/Recuperar"));
+const CorreoEnviado = lazy(() => import("./pages/Auth/CorreoEnviado"));
+const ChatPage = lazy(() => import("./pages/ChatPage"));
+const Preferencias = lazy(() => import("./pages/Preferencias"));
+const UsuariosBloqueados = lazy(() => import("./pages/UsuariosBloqueados"));
+const ConfiguracionCuenta = lazy(() => import("./pages/ConfiguracionCuenta"));
+const MisMatches = lazy(() => import("./pages/MisMatches"));
+const ExplorarPerfilesSwipe = lazy(() => import("./pages/ExplorarPerfilesSwipe"));
+const ExplorarPerfilesMejorado = lazy(() => import("./pages/ExplorarPerfilesMejorado"));
 
 export default function App() {
   return (
     <AuthProvider>
-      {/* 🧭 Barra de navegación global */}
       <Navbar />
+      <Suspense fallback={<div className="loading">Cargando...</div>}>
+        <Routes>
+          {/* 🏠 Inicio */}
+          <Route path="/" element={<Home />} />
 
-      {/* 🚦 Rutas */}
-      <Routes>
-        {/* 🏠 Inicio */}
-        <Route path="/" element={<Home />} />
+          {/* 🔐 Autenticación */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/recuperar" element={<Recuperar />} />
+          <Route path="/correo-enviado" element={<CorreoEnviado />} />
 
-        {/* 🔐 Auth */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/recuperar" element={<Recuperar />} />
-        <Route path="/correo-enviado" element={<CorreoEnviado />} />
+          {/* 👤 Perfiles */}
+          <Route path="/perfil" element={<Perfil />} />
+          <Route path="/editar-perfil" element={<EditarPerfil />} />
 
-        {/* 👤 Perfiles */}
-        <Route path="/perfil" element={<Perfil />} />
-        <Route path="/editar-perfil" element={<EditarPerfil />} />
+          {/* 🌍 Explorar */}
+          <Route path="/explorar" element={<ExplorarPerfiles />} />
+          <Route path="/descubrir" element={<ExplorarPerfilesMejorado />} />
+          <Route path="/swipe" element={<ExplorarPerfilesSwipe />} />
 
-        {/* 🌍 Explorar */}
-        <Route path="/explorar" element={<ExplorarPerfiles />} />
-        <Route path="/descubrir" element={<ExplorarPerfilesV2 />} />
+          {/* 💬 Chat y Matches */}
+          <Route path="/chat/:chatId" element={<ChatPage />} />
+          <Route path="/matches" element={<MisMatches />} />
 
-        {/* 💬 Chat (nuevo) */}
-        <Route path="/chat/:chatId" element={<ChatPage />} />
+          {/* ⚙️ Configuración */}
+          <Route path="/preferencias" element={<Preferencias />} />
+          <Route path="/bloqueados" element={<UsuariosBloqueados />} />
+          <Route path="/configuracion" element={<ConfiguracionCuenta />} />
 
-        {/* 🚫 Página no encontrada */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+          {/* 🚫 Página no encontrada */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Suspense>
     </AuthProvider>
   );
 }

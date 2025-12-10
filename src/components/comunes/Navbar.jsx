@@ -1,29 +1,18 @@
-import React, { useContext, useEffect, useState } from "react";
+import React from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { AuthContext } from "../../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 import { signOut } from "firebase/auth";
 import { auth } from "../../utils/firebase";
 
 export default function Navbar() {
-  const { usuario, setUsuario } = useContext(AuthContext);
+  const { user, setUser } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [usuarioLocal, setUsuarioLocal] = useState(null);
-
-  // 🔄 Sincroniza con localStorage en caso de recargar la página
-  useEffect(() => {
-    const storedUser = localStorage.getItem("usuario");
-    if (storedUser) {
-      setUsuarioLocal(JSON.parse(storedUser));
-    } else {
-      setUsuarioLocal(null);
-    }
-  }, [usuario]);
 
   const cerrarSesion = async () => {
     try {
       await signOut(auth);
-      setUsuario(null);
+      setUser(null);
       localStorage.removeItem("usuario");
       localStorage.removeItem("uid");
       navigate("/login");
@@ -31,9 +20,6 @@ export default function Navbar() {
       console.error("❌ Error al cerrar sesión:", err);
     }
   };
-
-  // ✅ Si no hay usuario, mostramos versión pública del navbar
-  const user = usuario || usuarioLocal;
 
   return (
     <nav className="bg-white shadow-md fixed top-0 left-0 w-full z-50">
@@ -99,12 +85,34 @@ export default function Navbar() {
                     : "text-gray-700"
                 } hover:text-orange-600`}
               >
-                🔥 Descubrir Gente Nueva
+                🔥 Descubrir
+              </Link>
+
+              <Link
+                to="/matches"
+                className={`${
+                  location.pathname === "/matches"
+                    ? "text-orange-600 font-semibold"
+                    : "text-gray-700"
+                } hover:text-orange-600`}
+              >
+                💘 Matches
+              </Link>
+
+              <Link
+                to="/preferencias"
+                className={`${
+                  location.pathname === "/preferencias"
+                    ? "text-orange-600 font-semibold"
+                    : "text-gray-700"
+                } hover:text-orange-600`}
+              >
+                ⚙️
               </Link>
 
               <button
                 onClick={cerrarSesion}
-                className="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600"
+                className="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition"
               >
                 Cerrar Sesión
               </button>

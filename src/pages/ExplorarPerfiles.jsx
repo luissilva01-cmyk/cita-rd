@@ -1,154 +1,115 @@
-// src/pages/ExplorarPerfiles.jsx
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { db } from "../utils/firebase";
-import { collection, getDocs } from "firebase/firestore";
-import { Link } from "react-router-dom";
+import { collection, getDocs, addDoc, query, where, setDoc, doc } from "firebase/firestore"; // ← getDoc removido
+import { motion } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
-
-import { darLike } from "../services/likesService";
 
 export default function ExplorarPerfiles() {
   const { user } = useAuth();
   const [perfiles, setPerfiles] = useState([]);
-  const [indiceActual, setIndiceActual] = useState(0);
-  const [mensaje, setMensaje] = useState("");
-  const [bloqueado, setBloqueado] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [likedIds, setLikedIds] = useState([]);
+  const [animatingId, setAnimatingId] = useState(null);
 
-  // Cargar perfiles
   useEffect(() => {
-    (async () => {
-      try {
-        const snap = await getDocs(collection(db, "perfiles"));
-        const data = snap.docs
-          .map((d) => ({ id: d.id, ...d.data() }))
-          .filter((p) => p.uid !== user?.uid)
-          .sort(() => Math.random() - 0.5);
-
-        setPerfiles(data);
-      } catch (error) {
-        console.error("Error cargando perfiles:", error);
+    const obtenerPerfiles = async () => {
+      if (!user?.uid) {
+        setLoading(false);
+        return;
       }
-    })();
+
+      try {
+        const q = query(collection(db, "perfiles"), where("uid", "!=", user.uid));
+        const snap = await getDocs(q);
+
+        const data = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        setPerfiles(data);
+
+        // Obtener likes previos del usuario
+        const likesSnap = await getDocs(
+          query(collection(db, "likes"), where("from", "==", user.uid))
+        );
+
+        setLikedIds(likesSnap.docs.map((d) => d.data().to));
+      } catch (error) {
+        console.error("Error al cargar perfiles:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    obtenerPerfiles();
   }, [user]);
 
-  // Acción de Like / Skip
-  const manejarLike = async () => {
-    if (!user) {
-      setMensaje("Debes iniciar sesión para dar like");
-      return;
+  const darLike = async (perfil) => {
+    if (likedIds.includes(perfil.uid)) return;
+
+    setAnimatingId(perfil.uid);
+    setTimeout(() => setAnimatingId(null), 700);
+
+    await addDoc(collection(db, "likes"), {
+      from: user.uid,
+      to: perfil.uid,
+      timestamp: new Date(),
+    });
+
+    setLikedIds((prev) => [...prev, perfil.uid]);
+
+    // MATCH VERIFICATION
+    const reverseLike = await getDocs(
+      query(collection(db, "likes"), where("from", "==", perfil.uid), where("to", "==", user.uid))
+    );
+
+    if (!reverseLike.empty) {
+      const matchRef = doc(collection(db, "matches"));
+      await setDoc(matchRef, {
+        usuarios: [user.uid, perfil.uid],
+        timestamp: new Date(),
+      });
+      alert(`🔥 ¡Match con ${perfil.nombre}!`);
     }
-
-    const p = perfiles[indiceActual];
-    if (!p) return;
-
-    setBloqueado(true);
-
-    const res = await darLike(user.uid, p.uid);
-
-    if (res.ok) {
-      if (res.match) {
-        setMensaje("💘 ¡Match! Se abrió un chat automáticamente");
-      } else {
-        setMensaje("👍 ¡Like enviado!");
-      }
-    } else {
-      setMensaje("❌ Error enviando like.");
-    }
-
-    setTimeout(() => {
-      setMensaje("");
-      setBloqueado(false);
-      setIndiceActual((i) => i + 1);
-    }, 1500);
   };
 
-  const manejarSkip = () => {
-    setMensaje("⏭️ Siguiente…");
-    setBloqueado(true);
-
-    setTimeout(() => {
-      setMensaje("");
-      setBloqueado(false);
-      setIndiceActual((i) => i + 1);
-    }, 800);
-  };
-
-  // Renders condicionales
-  if (!user) {
-    return (
-      <p className="text-center mt-10 text-gray-500">
-        Debes iniciar sesión para explorar perfiles 👀
-      </p>
-    );
-  }
-
-  if (perfiles.length === 0) {
-    return (
-      <p className="text-center mt-10 text-gray-500">No hay perfiles 😅</p>
-    );
-  }
-
-  if (indiceActual >= perfiles.length) {
-    return (
-      <p className="text-center mt-10 text-gray-500">
-        Ya no hay más perfiles 👀
-      </p>
-    );
-  }
-
-  const perfil = perfiles[indiceActual];
-  const foto =
-    perfil?.foto?.startsWith("http")
-      ? perfil.foto
-      : "https://placehold.co/400x500?text=Sin+Foto";
+  if (loading) return <p className="text-center mt-10">Cargando perfiles...</p>;
 
   return (
-    <div className="flex flex-col items-center mt-8 px-4">
-      <h1 className="text-2xl font-bold mb-4 text-orange-600">
-        Explorar Perfiles
-      </h1>
+    <div className="p-6 min-h-screen bg-gradient-to-b from-white to-orange-50">
+      <h1 className="text-3xl font-bold text-orange-600 mb-6 text-center">Explorar perfiles</h1>
 
-      <div
-        className={`w-80 bg-white rounded-xl shadow-xl overflow-hidden ${
-          bloqueado ? "opacity-80 pointer-events-none" : ""
-        }`}
-      >
-        <img
-          src={foto}
-          alt={perfil.nombre}
-          className="w-full h-64 object-cover"
-        />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {perfiles.map((perfil) => (
+          <motion.div
+            key={perfil.uid}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl"
+          >
+            <img
+              src={perfil.foto || "/default-avatar.png"}
+              alt={perfil.nombre}
+              className="w-full h-56 object-cover"
+            />
 
-        <div className="p-4">
-          <h2 className="text-xl font-semibold">{perfil.nombre}</h2>
-          <p className="text-gray-600 mt-1">
-            {perfil.bio || "Sin descripción."}
-          </p>
-        </div>
-      </div>
+            <div className="p-4">
+              <h2 className="text-lg font-bold text-gray-800">{perfil.nombre}</h2>
+              <p className="text-sm text-gray-600">{perfil.bio}</p>
 
-      {mensaje && (
-        <div className="mt-4 px-4 py-2 bg-orange-500 text-white rounded-lg shadow animate-pulse">
-          {mensaje}
-        </div>
-      )}
-
-      <div className="mt-6 flex gap-6">
-        <button
-          onClick={manejarSkip}
-          disabled={bloqueado}
-          className="px-7 py-4 text-xl bg-gray-300 rounded-full shadow hover:bg-gray-400 transition active:scale-90 disabled:opacity-50"
-        >
-          ❌
-        </button>
-
-        <button
-          onClick={manejarLike}
-          disabled={bloqueado}
-          className="px-7 py-4 text-xl bg-orange-500 text-white rounded-full shadow hover:bg-orange-600 transition active:scale-90 disabled:opacity-50"
-        >
-          ❤️
-        </button>
+              <motion.button
+                onClick={() => darLike(perfil)}
+                animate={animatingId === perfil.uid ? { scale: [1, 1.3, 1] } : {}}
+                transition={{ duration: 0.6 }}
+                className={`mt-4 w-full py-2 rounded-full font-semibold text-white ${
+                  likedIds.includes(perfil.uid)
+                    ? "bg-pink-500 cursor-not-allowed"
+                    : "bg-orange-500 hover:bg-orange-600"
+                }`}
+              >
+                {likedIds.includes(perfil.uid) ? "❤ Ya te gusta" : "🤍 Me gusta"}
+              </motion.button>
+            </div>
+          </motion.div>
+        ))}
       </div>
     </div>
   );

@@ -2,10 +2,10 @@
 import React, { useEffect, useState } from "react";
 import { getDocs, collection } from "firebase/firestore";
 import { db } from "../utils/firebase";
-import { filtrarPerfiles } from "../utils/filtrarPerfiles";
 import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom";
-import { darLike, yaLeDioLike } from "../services/likesService";
+import { darLike } from "../services/likesService";
+import toast from "react-hot-toast";
 
 export default function ExplorarPerfilesV2() {
   const { user } = useAuth();
@@ -23,18 +23,6 @@ export default function ExplorarPerfilesV2() {
         // Filtrar para no mostrar el perfil propio
         let resultado = lista.filter((p) => p.uid !== user?.uid);
 
-        // Filtrado inteligente adicional
-        if (user) {
-          resultado = filtrarPerfiles({
-            usuarioActual: {
-              uid: user.uid,
-              intereses: user.intereses || [],
-              ubicacion: user.ubicacion || null,
-            },
-            perfiles: resultado,
-          });
-        }
-
         setPerfiles(resultado);
       } catch (error) {
         console.error("Error al cargar perfiles:", error);
@@ -43,7 +31,9 @@ export default function ExplorarPerfilesV2() {
       }
     };
 
-    obtenerPerfiles();
+    if (user) {
+      obtenerPerfiles();
+    }
   }, [user]);
 
   if (cargando) return <p className="text-center mt-10">Cargando perfiles...</p>;
@@ -64,17 +54,21 @@ export default function ExplorarPerfilesV2() {
   };
 
   const handleLike = async () => {
-    if (!user) return alert("Debes iniciar sesión.");
-
-    const yaLike = await yaLeDioLike(user.uid, perfil.uid);
-    if (yaLike) return alert("Ya le diste like antes.");
+    if (!user) {
+      toast.error("Debes iniciar sesión.");
+      return;
+    }
 
     setAnimacion("translate-x-[200px] rotate-[25deg] opacity-0");
 
     const resultado = await darLike(user.uid, perfil.uid);
 
     if (resultado.ok && resultado.match) {
-      alert("🎉 ¡Match! Ambos se gustaron ❤️");
+      toast.success("🎉 ¡Match! Ambos se gustaron ❤️");
+    } else if (resultado.ok) {
+      toast.success("❤️ Like enviado");
+    } else {
+      toast.error(resultado.msg);
     }
 
     siguiente();

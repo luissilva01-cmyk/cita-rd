@@ -4,42 +4,39 @@ import { onAuthStateChanged } from "firebase/auth";
 import { AuthContext } from "./AuthContext";
 
 export const AuthProvider = ({ children }) => {
-  const [usuario, setUsuario] = useState(null);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      console.log("🔄 Detectado cambio de autenticación:", user);
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      console.log("🔄 Auth state changed:", firebaseUser);
 
-      if (user) {
-        setUsuario(user);
-        console.log("👥 [AuthProvider] Usuario actual:", user);
+      if (firebaseUser) {
+        setUser(firebaseUser);
 
-        // ✅ Guardamos el UID y el email en localStorage
         localStorage.setItem(
           "usuario",
           JSON.stringify({
-            uid: user.uid,
-            email: user.email,
+            uid: firebaseUser.uid,
+            email: firebaseUser.email,
           })
         );
 
-        // Guardamos el uid también por separado (por compatibilidad)
-        localStorage.setItem("uid", user.uid);
+        localStorage.setItem("uid", firebaseUser.uid);
       } else {
-        setUsuario(null);
-        console.log("👥 [AuthProvider] Usuario actual:", null);
-
-        // ✅ Limpiamos storage al cerrar sesión
+        setUser(null);
         localStorage.removeItem("usuario");
         localStorage.removeItem("uid");
       }
+      
+      setLoading(false);
     });
 
     return () => unsubscribe();
   }, []);
 
   return (
-    <AuthContext.Provider value={{ usuario, setUsuario }}>
+    <AuthContext.Provider value={{ user, setUser, loading }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,76 +1,70 @@
-// src/services/likesService.js
-import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
-import { db } from "../utils/firebase";
-import { crearChatSiNoExiste } from "./chatService";
+import { db } from "../utils/firebase"; // ← IMPORT CORREGIDO
+import { 
+  collection, 
+  addDoc, 
+  getDocs, 
+  query, 
+  where, 
+  serverTimestamp 
+} from "firebase/firestore";
 
 /**
- * Registrar un like de A hacia B
+ * Dar like entre usuarios y detectar match si hay reciprocidad
+ * @param {string} miUid  → ID del usuario que da like
+ * @param {string} otroUid → ID del usuario que recibe el like
  */
-export async function darLike(uidA, uidB) {
+export async function darLike(miUid, otroUid) {
   try {
-    const refA_B = doc(db, "likes", `${uidA}_${uidB}`);
-
-    await setDoc(refA_B, {
-      from: uidA,
-      to: uidB,
-      createdAt: serverTimestamp(),
-    });
-
-    // Revisar si el otro ya dio like
-    const refB_A = doc(db, "likes", `${uidB}_${uidA}`);
-    const snapB_A = await getDoc(refB_A);
-
-    const esMatch = snapB_A.exists();
-
-    if (esMatch) {
-      await crearChatSiNoExiste(uidA, uidB);
+    if (!miUid || !otroUid) {
+      return { ok: false, msg: "IDs de usuarios inválidos" };
     }
 
-    return {
-      ok: true,
-      match: esMatch,
-    };
+    if (miUid === otroUid) {
+      return { ok: false, msg: "No puedes darte like a ti mismo" };
+    }
 
-  } catch (error) {
-    console.error("Error en darLike:", error);
-    return {
-      ok: false,
-      msg: "Hubo un error al dar like.",
-    };
-  }
-}
+    // 🔎 1) Verificar si el like ya existe (evitar duplicados)
+    const likeQuery = query(
+      collection(db, "likes"),
+      where("from", "==", miUid),
+      where("to", "==", otroUid)
+    );
 
-/**
- * Ver si A ya le dio like a B
- */
-export async function yaLeDioLike(uidA, uidB) {
-  try {
-    const ref = doc(db, "likes", `${uidA}_${uidB}`);
-    const snap = await getDoc(ref);
-    return snap.exists();
-  } catch (error) {
-    console.error("Error en yaLeDioLike:", error);
-    return false;
-  }
-}
+    const yaExiste = await getDocs(likeQuery);
+    if (!yaExiste.empty) {
+      return { ok: false, msg: "Ya le diste like antes" };
+    }
 
-/**
- * Compatibilidad: devolver si existe match
- */
-export async function hayMatch(uidA, uidB) {
-  try {
-    const refA_B = doc(db, "likes", `${uidA}_${uidB}`);
-    const refB_A = doc(db, "likes", `${uidB}_${uidA}`);
+    // ❤️ 2) Registrar like
+    await addDoc(collection(db, "likes"), {
+      from: miUid,
+      to: otroUid,
+      timestamp: serverTimestamp(),
+    });
 
-    const [snap1, snap2] = await Promise.all([
-      getDoc(refA_B),
-      getDoc(refB_A),
-    ]);
+    // 🔥 3) Verificar reciprocidad para detectar MATCH
+    const reciprocoQuery = query(
+      collection(db, "likes"),
+      where("from", "==", otroUid),
+      where("to", "==", miUid)
+    );
 
-    return snap1.exists() && snap2.exists();
+    const reciproco = await getDocs(reciprocoQuery);
 
-  } catch (error) {
-    console.error("Error en hayMatch:", error);
-    return false;
+    if (!reciproco.empty) {
+      // Registrar match
+      await addDoc(collection(db, "matches"), {
+        usuarios: [miUid, otroUid],
+        timestamp: serverTimestamp(),
+      });
+
+      return { ok: true, match: true, msg: "🔥 ¡Es un match!" };
+    }
+
+    return { ok: true, match: false, msg: "❤️ Like enviado" };
+
+  } catch (e) {
+    console.error("Error al dar like:", e);
+    return { ok: false, msg: "Error al procesar el like" };
   }
 }

@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../utils/firebase";
-import { AuthContext } from "../context/AuthContext";
+import { useAuth } from "../context/AuthContext";
 
 export default function EditarPerfil() {
-  const { usuario } = useContext(AuthContext);
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   const [nombre, setNombre] = useState("");
@@ -17,22 +17,22 @@ export default function EditarPerfil() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (usuario === undefined) return;
-    if (usuario === null) {
+    if (user === undefined) return;
+    if (user === null) {
       navigate("/login");
       return;
     }
 
     const fetchPerfil = async () => {
       try {
-        const docRef = doc(db, "perfiles", usuario.uid);
+        const docRef = doc(db, "perfiles", user.uid);
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
           const data = docSnap.data();
           console.log("✅ Perfil cargado:", data);
           setNombre(data.nombre || "");
-          setBio(data.bio || "");
+          setBio(data.bio || data.descripcion || "");
           setEdad(data.edad || "");
           setIntereses(data.intereses?.join(", ") || "");
           setUbicacion(data.ubicacion || "");
@@ -46,7 +46,7 @@ export default function EditarPerfil() {
     };
 
     fetchPerfil();
-  }, [usuario, navigate]);
+  }, [user, navigate]);
 
   const handleGuardar = async (e) => {
     e.preventDefault();
@@ -63,16 +63,18 @@ export default function EditarPerfil() {
         .map((i) => i.trim().toLowerCase())
         .filter((i) => i.length > 0);
 
-      const docRef = doc(db, "perfiles", usuario.uid);
+      const docRef = doc(db, "perfiles", user.uid);
       await setDoc(
         docRef,
         {
+          uid: user.uid,
           nombre,
           bio,
-          edad,
+          descripcion: bio,
+          edad: parseInt(edad),
           intereses: interesesArray,
           ubicacion,
-          email: usuario.email,
+          email: user.email,
         },
         { merge: true }
       );
@@ -87,11 +89,11 @@ export default function EditarPerfil() {
     }
   };
 
-  if (usuario === undefined || loading)
-    return <p className="p-6 text-center">Cargando perfil...</p>;
+  if (user === undefined || loading)
+    return <p className="p-6 text-center mt-20">Cargando perfil...</p>;
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-6">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-6 pt-20">
       <div className="bg-white shadow-lg rounded-2xl p-8 w-full max-w-md">
         <h2 className="text-2xl font-bold text-center mb-6">Editar Perfil</h2>
 
@@ -103,14 +105,16 @@ export default function EditarPerfil() {
             placeholder="Nombre"
             value={nombre}
             onChange={(e) => setNombre(e.target.value)}
-            className="border px-4 py-2 rounded focus:ring-2 focus:ring-purple-400"
+            className="border px-4 py-2 rounded focus:ring-2 focus:ring-orange-400"
+            required
           />
 
           <textarea
             placeholder="Biografía"
             value={bio}
             onChange={(e) => setBio(e.target.value)}
-            className="border px-4 py-2 rounded focus:ring-2 focus:ring-purple-400"
+            className="border px-4 py-2 rounded focus:ring-2 focus:ring-orange-400 h-24"
+            required
           />
 
           <input
@@ -118,7 +122,10 @@ export default function EditarPerfil() {
             placeholder="Edad"
             value={edad}
             onChange={(e) => setEdad(e.target.value)}
-            className="border px-4 py-2 rounded focus:ring-2 focus:ring-purple-400"
+            className="border px-4 py-2 rounded focus:ring-2 focus:ring-orange-400"
+            min="18"
+            max="99"
+            required
           />
 
           <input
@@ -126,7 +133,8 @@ export default function EditarPerfil() {
             placeholder="Intereses (separados por comas: cine, viajes, música)"
             value={intereses}
             onChange={(e) => setIntereses(e.target.value)}
-            className="border px-4 py-2 rounded focus:ring-2 focus:ring-purple-400"
+            className="border px-4 py-2 rounded focus:ring-2 focus:ring-orange-400"
+            required
           />
 
           <input
@@ -134,13 +142,13 @@ export default function EditarPerfil() {
             placeholder="Ciudad o ubicación (opcional)"
             value={ubicacion}
             onChange={(e) => setUbicacion(e.target.value)}
-            className="border px-4 py-2 rounded focus:ring-2 focus:ring-purple-400"
+            className="border px-4 py-2 rounded focus:ring-2 focus:ring-orange-400"
           />
 
           <button
             type="submit"
             disabled={loading}
-            className="bg-purple-500 hover:bg-purple-600 text-white py-2 px-6 rounded-lg font-semibold transition-all duration-300"
+            className="bg-orange-500 hover:bg-orange-600 text-white py-3 px-6 rounded-lg font-semibold transition-all duration-300 disabled:opacity-50"
           >
             {loading ? "Guardando..." : "Guardar cambios"}
           </button>

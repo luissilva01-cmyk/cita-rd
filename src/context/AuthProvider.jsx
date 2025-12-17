@@ -9,27 +9,32 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      console.log("🔄 Auth state changed:", firebaseUser);
+      try {
+        console.log("🔄 Auth state changed:", firebaseUser);
 
-      if (firebaseUser) {
-        setUser(firebaseUser);
+        if (firebaseUser) {
+          setUser(firebaseUser);
 
-        localStorage.setItem(
-          "usuario",
-          JSON.stringify({
-            uid: firebaseUser.uid,
-            email: firebaseUser.email,
-          })
-        );
+          localStorage.setItem(
+            "usuario",
+            JSON.stringify({
+              uid: firebaseUser.uid,
+              email: firebaseUser.email,
+            })
+          );
 
-        localStorage.setItem("uid", firebaseUser.uid);
-      } else {
+          localStorage.setItem("uid", firebaseUser.uid);
+        } else {
+          setUser(null);
+          localStorage.removeItem("usuario");
+          localStorage.removeItem("uid");
+        }
+      } catch (error) {
+        console.error("Error in auth state change:", error);
         setUser(null);
-        localStorage.removeItem("usuario");
-        localStorage.removeItem("uid");
+      } finally {
+        setLoading(false);
       }
-      
-      setLoading(false);
     });
 
     return () => unsubscribe();

@@ -3,7 +3,9 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth, parseFirebaseError } from "../../utils/firebase";
-import { Eye, EyeOff } from "lucide-react";
+import { motion } from "framer-motion";
+import { Eye, EyeOff, Mail, Lock, Heart, ArrowRight } from "lucide-react";
+import SimpleButton from "../../components/comunes/SimpleButton";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -23,8 +25,8 @@ export default function Login() {
       setError("Correo no válido.");
       return false;
     }
-    if (password.length < 8) {
-      setError("La contraseña debe tener al menos 8 caracteres.");
+    if (password.length < 6) {
+      setError("La contraseña debe tener al menos 6 caracteres.");
       return false;
     }
     setError("");
@@ -52,85 +54,163 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-200 via-pink-100 to-yellow-200 p-5">
+    <div className="min-h-screen flex items-center justify-center p-6">
+      {/* Elementos decorativos */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <motion.div
+          animate={{ rotate: 360, scale: [1, 1.2, 1] }}
+          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+          className="absolute -top-20 -left-20 w-40 h-40 bg-gradient-to-r from-pink-400/20 to-purple-400/20 rounded-full blur-xl"
+        />
+        <motion.div
+          animate={{ rotate: -360, scale: [1.2, 1, 1.2] }}
+          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+          className="absolute -bottom-20 -right-20 w-60 h-60 bg-gradient-to-r from-blue-400/20 to-cyan-400/20 rounded-full blur-xl"
+        />
+      </div>
 
-      {/* Contenedor aislado */}
-      <div className="w-full max-w-md bg-white/90 backdrop-blur-xl shadow-2xl rounded-3xl p-8 animate-[fadeIn_0.4s_ease]">
-
-        <h2 className="text-3xl font-extrabold text-center mb-6 text-gray-800">
-          Bienvenido 👋
-        </h2>
-
-        {error && (
-          <p className="text-red-600 text-center mb-4 font-medium" role="alert">
-            {error}
+      <motion.div
+        initial={{ opacity: 0, y: 30, scale: 0.9 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.6 }}
+        className="w-full max-w-md relative z-10"
+      >
+        {/* Logo y título */}
+        <div className="text-center mb-8">
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="w-20 h-20 bg-gradient-primary rounded-full flex items-center justify-center mx-auto mb-4 shadow-glow"
+          >
+            <Heart className="text-white" size={32} />
+          </motion.div>
+          <h1 className="text-3xl font-bold text-white mb-2">
+            ¡Bienvenido de vuelta!
+          </h1>
+          <p className="text-gray-200">
+            Inicia sesión para continuar tu búsqueda del amor
           </p>
-        )}
+        </div>
 
-        <form onSubmit={handleLogin} className="flex flex-col gap-5">
+        {/* Formulario */}
+        <div className="card-glass">
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="mb-6 p-4 bg-red-500/20 border border-red-500/30 rounded-xl text-red-200 text-center"
+            >
+              {error}
+            </motion.div>
+          )}
 
-          {/* Correo */}
-          <div>
-            <label className="text-sm font-medium text-gray-700">Correo</label>
-            <input
-              type="email"
-              placeholder="tucorreo@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 w-full border border-gray-300 px-4 py-2 rounded-xl focus:ring-2 focus:ring-orange-400 focus:outline-none transition-all"
-            />
-          </div>
-
-          {/* Contraseña */}
-          <div>
-            <label className="text-sm font-medium text-gray-700">Contraseña</label>
-            <div className="relative mt-1">
-              <input
-                type={showPassword ? "text" : "password"}
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full border border-gray-300 px-4 py-2 rounded-xl focus:ring-2 focus:ring-orange-400 focus:outline-none transition-all pr-12"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword((p) => !p)}
-                className="absolute right-3 top-2 text-gray-500 hover:text-orange-500"
-              >
-                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-              </button>
+          <form onSubmit={handleLogin} className="space-y-6">
+            {/* Campo de email */}
+            <div>
+              <label className="block text-sm font-medium text-white mb-2">
+                Correo electrónico
+              </label>
+              <div className="relative">
+                <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <input
+                  type="email"
+                  placeholder="tu@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="input-glass pl-12 w-full"
+                  required
+                />
+              </div>
             </div>
-          </div>
 
-          {/* Recuperar contraseña */}
-          <div className="text-right -mt-2">
-            <Link className="text-sm text-orange-600 hover:underline" to="/recuperar">
-              ¿Olvidaste tu contraseña?
+            {/* Campo de contraseña */}
+            <div>
+              <label className="block text-sm font-medium text-white mb-2">
+                Contraseña
+              </label>
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="input-glass pl-12 pr-12 w-full"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
+            </div>
+
+            {/* Enlace de recuperación */}
+            <div className="text-right">
+              <Link 
+                to="/recuperar" 
+                className="text-sm text-purple-300 hover:text-white transition-colors"
+              >
+                ¿Olvidaste tu contraseña?
+              </Link>
+            </div>
+
+            {/* Botón de login */}
+            <SimpleButton
+              type="submit"
+              disabled={loading}
+              size="lg"
+              className="w-full"
+            >
+              {loading ? (
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              ) : (
+                <>
+                  Iniciar Sesión
+                  <ArrowRight size={20} />
+                </>
+              )}
+            </SimpleButton>
+          </form>
+
+          {/* Enlace a registro */}
+          <div className="mt-8 text-center">
+            <p className="text-gray-200 mb-4">¿No tienes una cuenta?</p>
+            <Link to="/register">
+              <SimpleButton variant="outline" className="w-full">
+                Crear cuenta nueva
+              </SimpleButton>
             </Link>
           </div>
+        </div>
 
-          {/* Botón de Login */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="bg-orange-500 text-white py-3 rounded-xl font-semibold text-lg shadow-md hover:bg-orange-600 transition-all active:scale-[0.97] flex justify-center"
-          >
-            {loading ? (
-              <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-            ) : (
-              "Iniciar sesión"
-            )}
-          </button>
-        </form>
-
-        {/* Enlace a registro */}
-        <p className="text-center text-gray-700 mt-6">
-          ¿No tienes cuenta?
-          <Link to="/register" className="text-orange-600 font-semibold ml-1 hover:underline">
-            Regístrate
-          </Link>
-        </p>
-      </div>
+        {/* Características */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+          className="mt-8 text-center"
+        >
+          <div className="flex justify-center items-center gap-6 text-sm text-gray-300">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+              <span>100% Seguro</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+              <span>Verificado</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
+              <span>Privado</span>
+            </div>
+          </div>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }

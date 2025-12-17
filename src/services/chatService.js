@@ -157,3 +157,71 @@ export async function eliminarReacción(chatId, messageId, userId) {
 
   await updateDoc(msgRef, { reactions });
 }
+
+/* ----------------------------------------------------
+   🔹 8. Obtener conversaciones del usuario
+---------------------------------------------------- */
+export async function obtenerConversaciones(userId) {
+  try {
+    // Obtener todos los chats donde el usuario participa
+    const chatsRef = collection(db, "chats");
+    const q = query(chatsRef, orderBy("updatedAt", "desc"));
+    const chatsSnap = await getDocs(q);
+
+    const conversaciones = [];
+
+    for (const chatDoc of chatsSnap.docs) {
+      const chatData = chatDoc.data();
+      
+      // Verificar si el usuario está en este chat
+      if (!chatData.users || !chatData.users.includes(userId)) {
+        continue;
+      }
+
+      // Obtener el otro usuario
+      const otherUserId = chatData.users.find(id => id !== userId);
+      if (!otherUserId) continue;
+
+      // Obtener datos del otro usuario
+      const otherUserDoc = await getDoc(doc(db, "usuarios", otherUserId));
+      if (!otherUserDoc.exists()) continue;
+
+      const otherUserData = otherUserDoc.data();
+
+      // Obtener el último mensaje
+      const messagesRef = collection(db, "chats", chatDoc.id, "messages");
+      const lastMessageQuery = query(messagesRef, orderBy("createdAt", "desc"), limit(1));
+      const lastMessageSnap = await getDocs(lastMessageQuery);
+      
+      let ultimoMensaje = null;
+      if (!lastMessageSnap.empty) {
+        ultimoMensaje = {
+          id: lastMessageSnap.docs[0].id,
+          ...lastMessageSnap.docs[0].data()
+        };
+      }
+
+      // Contar mensajes no leídos (simplificado)
+      const noLeidos = 0; // Implementar lógica de mensajes no leídos si es necesario
+
+      conversaciones.push({
+        id: chatDoc.id,
+        otherUser: {
+          id: otherUserId,
+          nombre: otherUserData.nombre,
+          fotoUrl: otherUserData.fotoUrl,
+          enLinea: otherUserData.enLinea || false
+        },
+        ultimoMensaje,
+        noLeidos,
+        esNuevoMatch: !ultimoMensaje, // Es nuevo match si no hay mensajes
+        updatedAt: chatData.updatedAt
+      });
+    }
+
+    return conversaciones;
+  } catch (error) {
+    console.error('Error obteniendo conversaciones:', error);
+    return [];
+  }
+}

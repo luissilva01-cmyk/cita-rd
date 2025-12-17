@@ -3,6 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../utils/firebase";
 import { useAuth } from "../context/AuthContext";
+import GaleriaFotos from "../components/GaleriaFotos";
+import Icebreakers from "../components/Icebreakers";
+import SpotifyIntegracion from "../components/SpotifyIntegracion";
 
 export default function EditarPerfil() {
   const { user } = useAuth();
@@ -13,6 +16,9 @@ export default function EditarPerfil() {
   const [edad, setEdad] = useState("");
   const [intereses, setIntereses] = useState("");
   const [ubicacion, setUbicacion] = useState("");
+  const [fotos, setFotos] = useState([]);
+  const [prompts, setPrompts] = useState([]);
+  const [datosSpotify, setDatosSpotify] = useState({ artistas: [], canciones: [] });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -36,6 +42,9 @@ export default function EditarPerfil() {
           setEdad(data.edad || "");
           setIntereses(data.intereses?.join(", ") || "");
           setUbicacion(data.ubicacion || "");
+          setFotos(data.fotos || [data.fotoPerfil].filter(Boolean) || []);
+          setPrompts(data.prompts || []);
+          setDatosSpotify(data.spotify || { artistas: [], canciones: [] });
         }
       } catch (err) {
         console.error("❌ Error cargando perfil:", err);
@@ -75,6 +84,11 @@ export default function EditarPerfil() {
           intereses: interesesArray,
           ubicacion,
           email: user.email,
+          fotos,
+          fotoPerfil: fotos[0] || null, // Primera foto como principal
+          prompts,
+          spotify: datosSpotify,
+          fechaActualizacion: new Date(),
         },
         { merge: true }
       );
@@ -145,6 +159,34 @@ export default function EditarPerfil() {
             className="border px-4 py-2 rounded focus:ring-2 focus:ring-orange-400"
           />
 
+          {/* Galería de Fotos */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Fotos de perfil
+            </label>
+            <GaleriaFotos 
+              fotos={fotos}
+              onFotosChange={setFotos}
+              editable={true}
+              maxFotos={6}
+            />
+          </div>
+
+          {/* Icebreakers */}
+          <div>
+            <Icebreakers
+              prompts={prompts}
+              onPromptsChange={setPrompts}
+              editable={true}
+              maxPrompts={3}
+            />
+          </div>
+
+          {/* Integración Spotify */}
+          <div>
+            <SpotifyIntegracion onDatosActualizados={handleSpotifyData} />
+          </div>
+
           <button
             type="submit"
             disabled={loading}
@@ -157,3 +199,7 @@ export default function EditarPerfil() {
     </div>
   );
 }
+
+  const handleSpotifyData = (datos) => {
+    setDatosSpotify(datos);
+  };

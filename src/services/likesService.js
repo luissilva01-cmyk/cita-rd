@@ -5,7 +5,10 @@ import {
   getDocs, 
   query, 
   where, 
-  serverTimestamp 
+  serverTimestamp,
+  doc,
+  getDoc,
+  updateDoc
 } from "firebase/firestore";
 
 /**
@@ -53,12 +56,25 @@ export async function darLike(miUid, otroUid) {
 
     if (!reciproco.empty) {
       // Registrar match
-      await addDoc(collection(db, "matches"), {
+      const matchDoc = await addDoc(collection(db, "matches"), {
         usuarios: [miUid, otroUid],
         timestamp: serverTimestamp(),
       });
 
-      return { ok: true, match: true, msg: "🔥 ¡Es un match!" };
+      // Obtener datos del usuario para el match
+      const otherUserDoc = await getDoc(doc(db, "usuarios", otroUid));
+      const otherUserData = otherUserDoc.exists() ? otherUserDoc.data() : null;
+
+      return { 
+        ok: true, 
+        match: true, 
+        msg: "🔥 ¡Es un match!",
+        matchId: matchDoc.id,
+        matchedUser: otherUserData ? {
+          id: otroUid,
+          ...otherUserData
+        } : null
+      };
     }
 
     return { ok: true, match: false, msg: "❤️ Like enviado" };
@@ -66,5 +82,176 @@ export async function darLike(miUid, otroUid) {
   } catch (e) {
     console.error("Error al dar like:", e);
     return { ok: false, msg: "Error al procesar el like" };
+  }
+}
+
+/**
+ * Crear like con tipo (like, superlike, pass)
+ * @param {string} usuarioId - ID del usuario que da el like
+ * @param {string} perfilId - ID del perfil que recibe el like
+ * @param {string} tipo - 'like', 'superlike', 'pass'
+ */
+export async function crearLike(usuarioId, perfilId, tipo = 'like') {
+  try {
+    if (tipo === 'pass') {
+      // Para pass, solo registramos que ya fue visto
+      await addDoc(collection(db, "likes"), {
+        usuarioId,
+        perfilId,
+        tipo: 'pass',
+        fecha: serverTimestamp(),
+      });
+      return { ok: true, match: false };
+    }
+
+    // Para like y superlike, usar la función existente
+    const resultado = await darLike(usuarioId, perfilId);
+    
+    // Si es superlike, actualizar el registro
+    if (tipo === 'superlike' && resultado.ok) {
+      // Buscar el like recién creado y actualizarlo
+      const likeQuery = query(
+        collection(db, "likes"),
+        where("from", "==", usuarioId),
+        where("to", "==", perfilId)
+      );
+      
+      const likeSnap = await getDocs(likeQuery);
+      if (!likeSnap.empty) {
+        const likeDoc = likeSnap.docs[0];
+        await updateDoc(likeDoc.ref, { tipo: 'superlike' });
+      }
+    }
+
+    // Si no hay match pero el like fue exitoso, obtener datos del usuario
+    if (resultado.ok && !resultado.match) {
+      const otherUserDoc = await getDoc(doc(db, "usuarios", perfilId));
+      const otherUserData = otherUserDoc.exists() ? otherUserDoc.data() : null;
+      
+      return {
+        ...resultado,
+        likedUser: otherUserData ? {
+          id: perfilId,
+          ...otherUserData
+        } : null
+      };
+    }
+
+    return resultado;
+  } catch (error) {
+    console.error('Error creando like:', error);
+    return { ok: false, msg: "Error al procesar la acción" };
+  }
+}
+
+/**
+ * Obtener matches del usuario
+ * @param {string} userId - ID del usuario
+ */
+export async function obtenerMatches(userId) {
+  try {
+    const matchesQuery = query(
+      collection(db, "matches"),
+      where("usuarios", "array-contains", userId)
+    );
+
+    const matchesSnap = await getDocs(matchesQuery);
+    const matches = [];
+
+    for (const matchDoc of matchesSnap.docs) {
+      const matchData = matchDoc.data();
+      const otherUserId = matchData.usuarios.find(id => id !== userId);
+      
+      if (otherUserId) {
+        // Obtener datos del otro usuario
+        const otherUserDoc = await getDoc(doc(db, "usuarios", otherUserId));
+        if (otherUserDoc.exists()) {
+          const otherUserData = otherUserDoc.data();
+          
+          // Verificar si fue superlike
+          const likeQuery = query(
+            collection(db, "likes"),
+            where("from", "==", otherUserId),
+            where("to", "==", userId)
+          );
+          
+          const likeSnap = await getDocs(likeQuery);
+          const tipoLike = !likeSnap.empty ? likeSnap.docs[0].data().tipo || 'like' : 'like';
+
+          matches.push({
+            id: matchDoc.id,
+            nombre: otherUserData.nombre,
+            fotoUrl: otherUserData.fotoUrl,
+            edad: otherUserData.edad,
+            ciudad: otherUserData.ciudad,
+            tipo: tipoLike,
+            fechaMatch: matchData.timestamp,
+            otherUserId
+          });
+        }
+      }
+    }
+
+    return matches.sort((a, b) => b.fechaMatch - a.fechaMatch);
+  } catch (error) {
+    console.error('Error obteniendo matches:', error);
+    return [];
+  }
+}
+
+/**
+ * Obtener likes recibidos por el usuario
+ * @param {string} userId - ID del usuario
+ */
+export async function obtenerLikesRecibidos(userId) {
+  try {
+    const likesQuery = query(
+      collection(db, "likes"),
+      where("to", "==", userId),
+      where("tipo", "in", ["like", "superlike"])
+    );
+
+    const likesSnap = await getDocs(likesQuery);
+    const likes = [];
+
+    for (const likeDoc of likesSnap.docs) {
+      const likeData = likeDoc.data();
+      
+      // Verificar que no sea un match ya existente
+      const matchQuery = query(
+        collection(db, "matches"),
+        where("usuarios", "array-contains-any", [userId, likeData.from])
+      );
+      
+      const matchSnap = await getDocs(matchQuery);
+      const esMatch = matchSnap.docs.some(doc => {
+        const usuarios = doc.data().usuarios;
+        return usuarios.includes(userId) && usuarios.includes(likeData.from);
+      });
+
+      if (!esMatch) {
+        // Obtener datos del usuario que dio like
+        const userDoc = await getDoc(doc(db, "usuarios", likeData.from));
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          
+          likes.push({
+            id: likeDoc.id,
+            nombre: userData.nombre,
+            fotoUrl: userData.fotoUrl,
+            edad: userData.edad,
+            ciudad: userData.ciudad,
+            tipo: likeData.tipo || 'like',
+            fecha: likeData.timestamp,
+            userId: likeData.from
+          });
+        }
+      }
+    }
+
+    return likes.sort((a, b) => b.fecha - a.fecha);
+  } catch (error) {
+    console.error('Error obteniendo likes recibidos:', error);
+    return [];
   }
 }

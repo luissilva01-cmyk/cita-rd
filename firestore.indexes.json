@@ -38,6 +38,33 @@
         { "fieldPath": "bloqueador", "order": "ASCENDING" },
         { "fieldPath": "bloqueado", "order": "ASCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "stories",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "activa", "order": "ASCENDING" },
+        { "fieldPath": "fechaExpiracion", "order": "ASCENDING" },
+        { "fieldPath": "fechaCreacion", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "stories",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "activa", "order": "ASCENDING" },
+        { "fieldPath": "fechaExpiracion", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "swipes",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "deshecho", "order": "ASCENDING" },
+        { "fieldPath": "timestamp", "order": "DESCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []

@@ -95,7 +95,14 @@ export default function UltraModernProfile() {
         <h2 className="text-gray-900 dark:text-white text-lg font-bold leading-tight tracking-tight flex-1 text-center">
           Mi Perfil
         </h2>
-        <div className="flex w-12 items-center justify-end">
+        <div className="flex items-center gap-2">
+          <button 
+            onClick={() => navigate('/ai-coach')}
+            className="flex items-center justify-center rounded-full w-10 h-10 hover:bg-pink-100 dark:hover:bg-pink-900/30 transition-colors text-pink-600 dark:text-pink-400"
+            title="AI Coach"
+          >
+            <span className="material-symbols-outlined text-2xl">psychology</span>
+          </button>
           <button 
             onClick={handleSettings}
             className="flex items-center justify-center rounded-full w-10 h-10 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors text-gray-900 dark:text-white"
@@ -229,14 +236,25 @@ export default function UltraModernProfile() {
             </div>
           </div>
 
-          {/* Edit Button Area */}
-          <div className="pt-4 pb-6">
+          {/* Action Buttons Area */}
+          <div className="pt-4 pb-6 space-y-3">
+            {/* AI Coach Button */}
+            <button 
+              onClick={() => navigate('/ai-coach')}
+              className="w-full flex cursor-pointer items-center justify-center rounded-xl h-14 px-6 bg-gradient-to-r from-pink-500 to-purple-600 text-white text-base font-bold tracking-wide shadow-lg shadow-pink-500/20 hover:scale-[1.01] active:scale-[0.98] transition-all"
+            >
+              <span className="material-symbols-outlined mr-2">psychology</span>
+              AI Coach
+            </button>
+            
+            {/* Edit Profile Button */}
             <button 
               onClick={handleEditProfile}
               className="w-full flex cursor-pointer items-center justify-center rounded-xl h-14 px-6 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-base font-bold tracking-wide shadow-lg shadow-gray-900/20 hover:scale-[1.01] active:scale-[0.98] transition-all"
             >
               Editar Perfil
             </button>
+            
             <div className="text-center mt-4">
               <button className="text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
                 Ver vista previa de perfil

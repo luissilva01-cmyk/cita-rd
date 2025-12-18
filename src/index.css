@@ -512,3 +512,117 @@ html, body, #root {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;  /* Chrome, Safari and Opera */
 }
+/* Dating App Specific Styles */
+.dating-card {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+.dating-card:hover {
+  transform: translateY(-2px);
+}
+
+/* Safe Area Support for iOS */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Custom Scrollbar */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Responsive Container */
+@media (min-width: 768px) {
+  .mobile-container {
+    max-width: 430px;
+    margin: 0 auto;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    border-radius: 1.5rem;
+    overflow: hidden;
+  }
+}
+
+/* Button Animations */
+.btn-swipe {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+.btn-swipe:active {
+  transform: scale(0.95);
+}
+
+.btn-swipe:hover {
+  transform: scale(1.1);
+}
+
+/* Gradient Backgrounds */
+.bg-dating-gradient {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.bg-like-gradient {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+}
+
+.bg-pass-gradient {
+  background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+}
+
+/* Material Icons Filled */
+.material-symbols-outlined.filled {
+  font-variation-settings: 'FILL' 1;
+}
+
+/* Profile Card Animations */
+.profile-card {
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.profile-card.swiping-left {
+  transform: translateX(-100%) rotate(-30deg);
+  opacity: 0;
+}
+
+.profile-card.swiping-right {
+  transform: translateX(100%) rotate(30deg);
+  opacity: 0;
+}
+
+/* Loading Animation */
+@keyframes pulse-dating {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.pulse-dating {
+  animation: pulse-dating 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Notification Badge */
+.notification-badge {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}

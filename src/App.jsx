@@ -43,6 +43,7 @@ const UltraModernChat = lazy(() => import("./pages/UltraModernChat"));
 const UltraModernChats = lazy(() => import("./pages/UltraModernChats"));
 const UltraModernProfile = lazy(() => import("./pages/UltraModernProfile"));
 const PerfilDetallado = lazy(() => import("./pages/PerfilDetallado"));
+const AICoach = lazy(() => import("./pages/AICoach"));
 
 // Loading component
 const LoadingScreen = () => (
@@ -66,7 +67,7 @@ function AppContent() {
     <Suspense fallback={<LoadingScreen />}>
       <Routes>
         {/* 🏠 Inicio */}
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<UltraModernHome />} />
 
         {/* 🔐 Autenticación */}
         <Route path="/login" element={<Login />} />
@@ -109,6 +110,7 @@ function AppContent() {
         <Route path="/ultra-chats" element={<UltraModernChats />} />
         <Route path="/ultra-profile" element={<UltraModernProfile />} />
         <Route path="/perfil/:profileId" element={<PerfilDetallado />} />
+        <Route path="/ai-coach" element={<AICoach />} />
 
         {/* 🚫 Página no encontrada */}
         <Route path="*" element={<NotFound />} />

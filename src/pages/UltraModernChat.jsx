@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import AIIcebreakerSuggestions from '../components/chat/AIIcebreakerSuggestions';
 
 export default function UltraModernChat() {
   const { chatId } = useParams();
@@ -11,6 +12,8 @@ export default function UltraModernChat() {
   const [otherUser, setOtherUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isTyping, setIsTyping] = useState(true);
+  const [showAISuggestions, setShowAISuggestions] = useState(false);
+  const [userProfile, setUserProfile] = useState(null);
   const chatContainerRef = useRef(null);
 
   useEffect(() => {
@@ -51,11 +54,22 @@ export default function UltraModernChat() {
       
       setOtherUser(demoOtherUser);
       setMessages(demoMessages);
+      
+      // Demo user profile for AI suggestions
+      setUserProfile({
+        nombre: user?.displayName || 'Usuario',
+        edad: 25,
+        intereses: ['Música', 'Viajes', 'Fotografía']
+      });
+      
+      // Show AI suggestions if this is a new conversation (few messages)
+      setShowAISuggestions(demoMessages.length <= 3);
+      
       setLoading(false);
     };
 
     loadChat();
-  }, [chatId, user?.uid]);
+  }, [chatId, user?.uid, user?.displayName]);
 
   // Auto scroll to bottom
   useEffect(() => {
@@ -82,6 +96,7 @@ export default function UltraModernChat() {
 
     setMessages(prev => [...prev, message]);
     setNewMessage('');
+    setShowAISuggestions(false); // Hide AI suggestions after sending a message
     
     // Simulate typing stop and new message from other user
     setTimeout(() => {
@@ -262,8 +277,19 @@ export default function UltraModernChat() {
               type="text"
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+              onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
             />
+            <button 
+              onClick={() => setShowAISuggestions(!showAISuggestions)}
+              className={`flex items-center justify-center p-2 mr-1 transition-colors ${
+                showAISuggestions 
+                  ? 'text-pink-500' 
+                  : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'
+              }`}
+              title="Sugerencias de AI"
+            >
+              <span className="material-symbols-outlined text-[20px]">psychology</span>
+            </button>
             <button className="flex items-center justify-center p-2 mr-1 text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors">
               <span className="material-symbols-outlined text-[24px] filled">mood</span>
             </button>
@@ -283,6 +309,17 @@ export default function UltraModernChat() {
           </button>
         </div>
       </footer>
+
+      {/* AI Icebreaker Suggestions */}
+      <AIIcebreakerSuggestions
+        targetProfile={otherUser}
+        userProfile={userProfile}
+        onSelectIcebreaker={(icebreaker) => {
+          setNewMessage(icebreaker);
+          setShowAISuggestions(false);
+        }}
+        isVisible={showAISuggestions}
+      />
     </div>
   );
 }

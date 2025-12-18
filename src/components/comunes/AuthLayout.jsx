@@ -1,4 +1,5 @@
-// src/components/comunes/AuthLayout.jsx
+import React from 'react';
+
 export default function AuthLayout({ title, children }) {
   return (
     <div className="flex justify-center items-center h-screen bg-gray-50">

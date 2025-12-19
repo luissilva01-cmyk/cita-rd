@@ -38,10 +38,11 @@ export async function darLike(miUid, otroUid) {
       return { ok: false, msg: "Ya le diste like antes" };
     }
 
-    // ❤️ 2) Registrar like
+    // ❤️ 2) Registrar like (añadir tipo por defecto)
     await addDoc(collection(db, "likes"), {
       from: miUid,
       to: otroUid,
+      tipo: "like",
       timestamp: serverTimestamp(),
     });
 
@@ -55,13 +56,32 @@ export async function darLike(miUid, otroUid) {
     const reciproco = await getDocs(reciprocoQuery);
 
     if (!reciproco.empty) {
-      // Registrar match
+      // Evitar crear match duplicado: buscar si ya existe un match entre ambos
+      const existingMatchQuery = query(
+        collection(db, "matches"),
+        where("usuarios", "array-contains", miUid)
+      );
+      const existingMatchSnap = await getDocs(existingMatchQuery);
+      const existingMatchDoc = existingMatchSnap.docs.find(d => d.data().usuarios.includes(otroUid));
+
+      if (existingMatchDoc) {
+        const otherUserDoc = await getDoc(doc(db, "usuarios", otroUid));
+        const otherUserData = otherUserDoc.exists() ? otherUserDoc.data() : null;
+        return { 
+          ok: true, 
+          match: true, 
+          msg: "🔥 Ya existe un match",
+          matchId: existingMatchDoc.id,
+          matchedUser: otherUserData ? { id: otroUid, ...otherUserData } : null
+        };
+      }
+
+      // Registrar nuevo match
       const matchDoc = await addDoc(collection(db, "matches"), {
         usuarios: [miUid, otroUid],
         timestamp: serverTimestamp(),
       });
 
-      // Obtener datos del usuario para el match
       const otherUserDoc = await getDoc(doc(db, "usuarios", otroUid));
       const otherUserData = otherUserDoc.exists() ? otherUserDoc.data() : null;
 
@@ -70,10 +90,7 @@ export async function darLike(miUid, otroUid) {
         match: true, 
         msg: "🔥 ¡Es un match!",
         matchId: matchDoc.id,
-        matchedUser: otherUserData ? {
-          id: otroUid,
-          ...otherUserData
-        } : null
+        matchedUser: otherUserData ? { id: otroUid, ...otherUserData } : null
       };
     }
 
@@ -94,12 +111,12 @@ export async function darLike(miUid, otroUid) {
 export async function crearLike(usuarioId, perfilId, tipo = 'like') {
   try {
     if (tipo === 'pass') {
-      // Para pass, solo registramos que ya fue visto
+      // Registrar pass usando mismos campos que el sistema
       await addDoc(collection(db, "likes"), {
-        usuarioId,
-        perfilId,
+        from: usuarioId,
+        to: perfilId,
         tipo: 'pass',
-        fecha: serverTimestamp(),
+        timestamp: serverTimestamp(),
       });
       return { ok: true, match: false };
     }
@@ -192,7 +209,12 @@ export async function obtenerMatches(userId) {
       }
     }
 
-    return matches.sort((a, b) => b.fechaMatch - a.fechaMatch);
+    // Ordenar robustamente por timestamp (Firestore Timestamp -> millis)
+    return matches.sort((a, b) => {
+      const aTs = a.fechaMatch && typeof a.fechaMatch.toMillis === 'function' ? a.fechaMatch.toMillis() : (a.fechaMatch || 0);
+      const bTs = b.fechaMatch && typeof b.fechaMatch.toMillis === 'function' ? b.fechaMatch.toMillis() : (b.fechaMatch || 0);
+      return bTs - aTs;
+    });
   } catch (error) {
     console.error('Error obteniendo matches:', error);
     return [];
@@ -220,7 +242,7 @@ export async function obtenerLikesRecibidos(userId) {
       // Verificar que no sea un match ya existente
       const matchQuery = query(
         collection(db, "matches"),
-        where("usuarios", "array-contains-any", [userId, likeData.from])
+        where("usuarios", "array-contains", userId)
       );
       
       const matchSnap = await getDocs(matchQuery);
@@ -249,7 +271,12 @@ export async function obtenerLikesRecibidos(userId) {
       }
     }
 
-    return likes.sort((a, b) => b.fecha - a.fecha);
+    // Ordenar robustamente por timestamp
+    return likes.sort((a, b) => {
+      const aTs = a.fecha && typeof a.fecha.toMillis === 'function' ? a.fecha.toMillis() : (a.fecha || 0);
+      const bTs = b.fecha && typeof b.fecha.toMillis === 'function' ? b.fecha.toMillis() : (b.fecha || 0);
+      return bTs - aTs;
+    });
   } catch (error) {
     console.error('Error obteniendo likes recibidos:', error);
     return [];

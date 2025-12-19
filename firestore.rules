@@ -1,52 +1,15 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-
     // ==============================
     // Colección perfiles
     // Cada usuario puede crear/editar su propio perfil
-    // Todos pueden leer perfiles públicos (excepto bloqueados)
+    // Todos pueden leer perfiles públicos
     // ==============================
     match /perfiles/{userId} {
-      allow create: if request.auth != null && request.auth.uid == userId
-        && request.resource.data.uid == userId
-        && request.resource.data.nombre is string
-        && request.resource.data.nombre.size() > 0;
-      
+      allow create: if request.auth != null && request.auth.uid == userId;
       allow update, delete: if request.auth != null && request.auth.uid == userId;
-      
-      allow read: if request.auth != null;
-    }
-
-    // ==============================
-    // Colección likes
-    // Solo el usuario puede dar likes
-    // Solo puede leer sus propios likes
-    // ==============================
-    match /likes/{likeId} {
-      allow create: if request.auth != null 
-        && request.resource.data.from == request.auth.uid
-        && request.resource.data.to != request.auth.uid;
-      
-      allow read: if request.auth != null 
-        && (resource.data.from == request.auth.uid || resource.data.to == request.auth.uid);
-      
-      allow delete: if request.auth != null && resource.data.from == request.auth.uid;
-    }
-
-    // ==============================
-    // Colección matches
-    // Solo se puede leer si eres parte del match
-    // ==============================
-    match /matches/{matchId} {
-      allow read: if request.auth != null 
-        && request.auth.uid in resource.data.usuarios;
-      
-      allow create: if request.auth != null 
-        && request.auth.uid in request.resource.data.usuarios;
-      
-      allow delete: if request.auth != null 
-        && request.auth.uid in resource.data.usuarios;
+      allow read: if true; // lectura pública para explorar perfiles
     }
 
     // ==============================
@@ -54,98 +17,28 @@ service cloud.firestore {
     // Solo participantes pueden leer o escribir mensajes
     // ==============================
     match /chats/{chatId} {
-      allow read, write: if request.auth != null && request.auth.uid in resource.data.users;
-      allow create: if request.auth != null && request.auth.uid in request.resource.data.users;
+      allow read, write: if request.auth != null && 
+        request.auth.uid in resource.data.participants;
 
       // ==============================
       // Subcolección messages
       // Solo participantes pueden enviar/leer mensajes
       // ==============================
       match /messages/{messageId} {
-        allow read: if request.auth != null 
-          && request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.users;
-        
-        allow create: if request.auth != null 
-          && request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.users
-          && request.resource.data.senderId == request.auth.uid;
-        
-        allow update: if request.auth != null 
-          && request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.users;
+        allow read, write: if request.auth != null && 
+          request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants;
       }
     }
 
     // ==============================
-    // Colección bloqueos
-    // Solo el usuario puede bloquear/desbloquear
+    // Colección matches (para compatibilidad con el código actual)
     // ==============================
-    match /bloqueos/{bloqueoId} {
-      allow create: if request.auth != null 
-        && request.resource.data.bloqueador == request.auth.uid;
+    match /matches/{matchId} {
+      allow read, write: if request.auth != null;
       
-      allow read: if request.auth != null 
-        && resource.data.bloqueador == request.auth.uid;
-      
-      allow delete: if request.auth != null 
-        && resource.data.bloqueador == request.auth.uid;
-    }
-
-    // ==============================
-    // Colección reportes
-    // Cualquier usuario autenticado puede reportar
-    // ==============================
-    match /reportes/{reporteId} {
-      allow create: if request.auth != null 
-        && request.resource.data.reportador == request.auth.uid;
-      
-      allow read: if request.auth != null 
-        && resource.data.reportador == request.auth.uid;
-    }
-
-    // ==============================
-    // Colección preferencias
-    // Solo el usuario puede ver/editar sus preferencias
-    // ==============================
-    match /preferencias/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-    }
-
-    // ==============================
-    // Colección stories
-    // Solo el usuario puede crear/editar sus stories
-    // Todos pueden leer stories activas
-    // ==============================
-    match /stories/{storyId} {
-      allow create: if request.auth != null 
-        && request.resource.data.userId == request.auth.uid;
-      
-      allow read: if request.auth != null 
-        && resource.data.activa == true;
-      
-      allow update: if request.auth != null 
-        && resource.data.userId == request.auth.uid;
-      
-      allow delete: if request.auth != null 
-        && resource.data.userId == request.auth.uid;
-    }
-
-    // ==============================
-    // Colección verificaciones
-    // Solo el usuario puede ver su verificación
-    // ==============================
-    match /verificaciones/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-    }
-
-    // ==============================
-    // Colección swipes (para rewind)
-    // Solo el usuario puede ver sus swipes
-    // ==============================
-    match /swipes/{swipeId} {
-      allow create: if request.auth != null 
-        && request.resource.data.userId == request.auth.uid;
-      
-      allow read, delete: if request.auth != null 
-        && resource.data.userId == request.auth.uid;
+      match /messages/{messageId} {
+        allow read, write: if request.auth != null;
+      }
     }
 
     // ==============================

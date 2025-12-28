@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { Edit3, MapPin, Briefcase, Heart, Settings } from 'lucide-react';
+import { Edit3, MapPin, Briefcase, Heart, Settings, Camera, BarChart3 } from 'lucide-react';
 import { UserProfile } from '../../types';
+import PhotoUploader from '../../components/PhotoUploader';
+import ProfileScore from '../../components/ProfileScore';
 
 interface ProfileViewProps {
   user: UserProfile;
@@ -10,6 +12,8 @@ interface ProfileViewProps {
 const ProfileView: React.FC<ProfileViewProps> = ({ user, onUpdate }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedUser, setEditedUser] = useState(user);
+  const [showPhotoUploader, setShowPhotoUploader] = useState(false);
+  const [showProfileScore, setShowProfileScore] = useState(false);
 
   const handleSave = () => {
     onUpdate(editedUser);
@@ -19,6 +23,18 @@ const ProfileView: React.FC<ProfileViewProps> = ({ user, onUpdate }) => {
   const handleCancel = () => {
     setEditedUser(user);
     setIsEditing(false);
+  };
+
+  const handlePhotosUpdate = (photos: string[]) => {
+    const updatedUser = { ...editedUser, images: photos };
+    setEditedUser(updatedUser);
+    onUpdate(updatedUser);
+    
+    // Force ProfileScore to re-analyze when photos change
+    if (showProfileScore) {
+      // The ProfileScore component will automatically re-analyze due to useEffect dependency on photos
+      console.log('📊 Fotos actualizadas, ProfileScore se recalculará automáticamente');
+    }
   };
 
   return (
@@ -35,20 +51,66 @@ const ProfileView: React.FC<ProfileViewProps> = ({ user, onUpdate }) => {
       </div>
 
       <div className="p-6 space-y-6">
-        {/* Profile Image */}
-        <div className="text-center">
-          <div className="relative inline-block">
-            <img
-              src={user.images[0] || 'https://via.placeholder.com/150'}
-              alt={user.name}
-              className="w-32 h-32 rounded-full object-cover mx-auto border-4 border-white shadow-lg"
-            />
-            {isEditing && (
-              <button className="absolute bottom-0 right-0 w-10 h-10 bg-rose-500 rounded-full flex items-center justify-center text-white shadow-lg">
-                <Edit3 size={16} />
-              </button>
-            )}
+        {/* Profile Score Section */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold text-slate-800">Score del Perfil</h3>
+            <button
+              onClick={() => setShowProfileScore(!showProfileScore)}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+            >
+              <BarChart3 size={16} />
+              {showProfileScore ? 'Ocultar' : 'Ver Score'}
+            </button>
           </div>
+
+          {showProfileScore && (
+            <div className="bg-slate-50 rounded-lg p-4">
+              <ProfileScore
+                photos={user.images || []}
+                userId={user.id}
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Profile Photos Section */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold text-slate-800">Mis Fotos</h3>
+            <button
+              onClick={() => setShowPhotoUploader(!showPhotoUploader)}
+              className="flex items-center gap-2 px-4 py-2 bg-rose-500 text-white rounded-lg hover:bg-rose-600 transition-colors"
+            >
+              <Camera size={16} />
+              Gestionar Fotos
+            </button>
+          </div>
+
+          {/* Current profile image preview */}
+          <div className="text-center">
+            <div className="relative inline-block">
+              <img
+                src={user.images[0] || 'https://via.placeholder.com/150'}
+                alt={user.name}
+                className="w-32 h-32 rounded-full object-cover mx-auto border-4 border-white shadow-lg"
+              />
+            </div>
+            <p className="text-sm text-slate-600 mt-2">Foto principal</p>
+          </div>
+
+          {/* Photo uploader */}
+          {showPhotoUploader && (
+            <div className="bg-slate-50 rounded-lg p-4">
+              <PhotoUploader
+                userId={user.id}
+                currentPhotos={user.images || []}
+                onPhotosUpdate={handlePhotosUpdate}
+                maxPhotos={6}
+                showAnalysis={true}
+              />
+            </div>
+          )}
         </div>
 
         {/* Basic Info */}

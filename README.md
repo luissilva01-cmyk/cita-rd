@@ -1,170 +1,86 @@
-# 💘 CitaRD - App de Citas
+# 💕 CitaRD - Dating App con IA
 
-Una aplicación de citas moderna y completa construida con React, Firebase y Tailwind CSS.
+## 🚀 App de Citas Dominicana con Inteligencia Artificial
 
-## ✨ Características
+CitaRD es una aplicación de citas moderna diseñada específicamente para República Dominicana, con funcionalidades avanzadas de IA para mejorar la experiencia de matching y conversación.
 
-### 🔐 Autenticación
-- Registro e inicio de sesión con email/contraseña
-- Recuperación de contraseña
-- Verificación de email
-- Gestión de sesiones con Firebase Auth
+### ✨ Características Principales
 
-### 👤 Perfiles de Usuario
-- Crear y editar perfil personalizado
-- Subida de fotos con Cloudinary
-- Información: nombre, edad, género, intereses, descripción
-- Geolocalización automática
-- Perfiles públicos y privados
+- 🔥 **Swipe Interface** - Descubre personas compatibles
+- 💬 **Chat en Tiempo Real** - Mensajes instantáneos con Firebase
+- 🤖 **IA Coach** - Sugerencias inteligentes para romper el hielo
+- 📱 **Diseño Moderno** - Interfaz responsive y atractiva
+- 🌍 **Geolocalización** - Encuentra personas cerca de ti
+- 🔐 **Seguro** - Integración con Firebase para datos seguros
 
-### 🔍 Exploración Inteligente
-- **Sistema de Swipe** tipo Tinder con animaciones
-- **Filtros avanzados**:
-  - Rango de edad (18-99)
-  - Distancia máxima (1-200 km)
-  - Género de interés
-- **Ordenamiento por relevancia**:
-  - Intereses comunes
-  - Proximidad geográfica
-  - Completitud del perfil
-- Múltiples vistas de exploración
+### 🛠️ Tecnologías
 
-### ❤️ Sistema de Likes y Matches
-- Dar like a perfiles
-- Detección automática de matches recíprocos
-- Modal animado cuando hay match
-- Prevención de likes duplicados
-- Página de matches con acceso directo al chat
-
-### 💬 Chat en Tiempo Real
-- Mensajes instantáneos entre matches
-- Mensajes de texto, imágenes y audio
-- Indicador de "escribiendo..."
-- Reacciones con emojis
-- Responder mensajes específicos
-- Scroll infinito para mensajes antiguos
-- Zoom de imágenes
-
-### 🛡️ Seguridad y Privacidad
-- **Sistema de bloqueos**: Bloquear/desbloquear usuarios
-- **Sistema de reportes**: Reportar comportamiento inapropiado
-- **Preferencias de privacidad**: Controlar visibilidad del perfil
-- **Reglas de Firestore** robustas con validación de datos
-
-### ⚙️ Configuración
-- Preferencias de búsqueda personalizables
-- Configuración de notificaciones
-- Gestión de cuenta y seguridad
-- Lista de usuarios bloqueados
-
-### 🎨 Experiencia de Usuario
-- **Onboarding interactivo** para nuevos usuarios
-- Animaciones fluidas con Framer Motion
-- Diseño responsive con Tailwind CSS
-- Notificaciones toast elegantes
-- Carga diferida (lazy loading) para optimización
-
-## 🚀 Tecnologías
-
-- **Frontend**: React 19, Vite
-- **Routing**: React Router DOM v7
-- **Estilos**: Tailwind CSS v4
-- **Animaciones**: Framer Motion
-- **Backend**: Firebase (Auth, Firestore)
-- **Almacenamiento**: Cloudinary
-- **Notificaciones**: React Hot Toast
+- **Frontend**: React 19 + TypeScript
+- **Backend**: Firebase Firestore
+- **IA**: Google Gemini para sugerencias inteligentes
+- **Estilos**: Tailwind CSS
 - **Iconos**: Lucide React
-- **Audio**: WaveSurfer.js
+- **Deployment**: Netlify (CDN optimizado)
 
-## 📦 Instalación
+### 🎯 Funcionalidades
 
-1. Clona el repositorio:
+#### Discovery
+- Swipe para hacer match con personas
+- Perfiles detallados con fotos e intereses
+- Algoritmo de compatibilidad
+
+#### Chat
+- Mensajes en tiempo real
+- Sugerencias de icebreakers con IA
+- Interfaz moderna tipo WhatsApp
+
+#### Perfil
+- Gestión completa de perfil
+- Subida de fotos
+- Configuración de preferencias
+
+### 🚀 Demo en Vivo
+
+**URL**: [Próximamente - CitaRD.app]
+
+### 📱 Capturas de Pantalla
+
+*Próximamente - Screenshots de la app*
+
+### 🔧 Desarrollo Local
+
 ```bash
-git clone https://github.com/tu-usuario/cita-rd.git
+# Clonar repositorio
+git clone https://github.com/luissilva01-cmyk/cita-rd.git
+
+# Entrar al directorio
 cd cita-rd
-```
 
-2. Instala las dependencias:
-```bash
-npm install
-```
-
-3. Configura las variables de entorno:
-```bash
-cp .env.example .env.local
-```
-
-4. Edita `.env.local` con tus credenciales de Firebase y Cloudinary
-
-5. Inicia el servidor de desarrollo:
-```bash
+# Ejecutar localmente
 npm run dev
+# o
+serve .
+
+# Abrir http://localhost:3000
 ```
 
-## 🔧 Configuración
+### 🌍 Deployment
 
-Ver [DEPLOYMENT.md](./DEPLOYMENT.md) para instrucciones detalladas de configuración y despliegue.
+Esta app está optimizada para deployment estático:
 
-## 📁 Estructura del Proyecto
+- ✅ **Netlify** (Recomendado)
+- ✅ **Vercel**
+- ✅ **Firebase Hosting**
+- ✅ **GitHub Pages**
 
-```
-src/
-├── components/          # Componentes reutilizables
-│   ├── chat/           # Componentes de chat
-│   ├── comunes/        # Componentes compartidos
-│   ├── explorar/       # Componentes de exploración
-│   └── perfiles/       # Componentes de perfiles
-├── context/            # Context API (Auth, Toast)
-├── hooks/              # Custom hooks
-├── pages/              # Páginas de la aplicación
-│   └── Auth/           # Páginas de autenticación
-├── services/           # Servicios de Firebase
-│   ├── bloqueosService.js
-│   ├── chatService.js
-│   ├── likesService.js
-│   ├── preferenciasService.js
-│   ├── reportesService.js
-│   └── uploadService.js
-├── utils/              # Utilidades
-│   ├── filtrarPerfilesAvanzado.js
-│   ├── firebase.js
-│   └── ...
-└── App.jsx             # Componente principal
-```
+### 📄 Licencia
 
-## 🔒 Seguridad
+MIT License - Desarrollado con ❤️ en República Dominicana
 
-Las reglas de Firestore implementadas garantizan:
-- Los usuarios solo pueden editar su propio perfil
-- Solo los participantes de un chat pueden ver mensajes
-- Los likes y matches están protegidos
-- Los reportes son privados
-- Las preferencias son privadas por usuario
+### 👨‍💻 Desarrollador
 
-## 🎯 Próximas Funcionalidades
-
-- [ ] Notificaciones push con Firebase Cloud Messaging
-- [ ] Múltiples fotos de perfil (galería)
-- [ ] Sistema de verificación de perfiles
-- [ ] Super likes y rewind
-- [ ] Modo premium con suscripciones
-- [ ] Stickers y GIFs en chat
-- [ ] Compartir ubicación en tiempo real
-- [ ] Analytics y métricas de uso
-- [ ] PWA con modo offline
-
-## 📝 Changelog
-
-Ver [CHANGELOG.md](./CHANGELOG.md) para el historial de cambios.
-
-## 📄 Licencia
-
-Este proyecto está bajo la Licencia MIT.
-
-## 👨‍💻 Autor
-
-Desarrollado con ❤️ para la comunidad dominicana
+**Luis Silva** - [@luissilva01-cmyk](https://github.com/luissilva01-cmyk)
 
 ---
 
-**¿Encontraste un bug o tienes una sugerencia?** Abre un issue en GitHub.
+**¡Conecta con alma en CitaRD!** 💕🇩🇴

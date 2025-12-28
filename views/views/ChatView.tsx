@@ -84,22 +84,32 @@ const ChatView: React.FC<ChatViewProps> = ({ match, messages, onSendMessage, onB
         ref={scrollRef} 
         className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50 no-scrollbar"
       >
-        {messages.map((msg) => (
-          <div 
-            key={msg.id} 
-            className={`flex ${msg.senderId === 'me' ? 'justify-end' : 'justify-start'}`}
-          >
-            <div 
-              className={`max-w-[75%] px-4 py-2.5 rounded-2xl text-sm ${
-                msg.senderId === 'me' 
-                  ? 'bg-rose-500 text-white rounded-tr-none shadow-md shadow-rose-100' 
-                  : 'bg-white text-slate-800 rounded-tl-none border border-slate-100 shadow-sm'
-              }`}
-            >
-              {msg.text}
+        {messages.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-full text-center py-8">
+            <div className="w-16 h-16 bg-gradient-to-br from-rose-400 to-pink-500 rounded-full flex items-center justify-center mb-4">
+              <Send className="text-white" size={24} />
             </div>
+            <h3 className="text-lg font-bold text-slate-800 mb-2">¡Nuevo Match!</h3>
+            <p className="text-slate-600 text-sm mb-4">Envía el primer mensaje a {match.user.name}</p>
           </div>
-        ))}
+        ) : (
+          messages.map((msg) => (
+            <div 
+              key={msg.id} 
+              className={`flex ${msg.senderId === 'me' ? 'justify-end' : 'justify-start'}`}
+            >
+              <div 
+                className={`max-w-[75%] px-4 py-2.5 rounded-2xl text-sm ${
+                  msg.senderId === 'me' 
+                    ? 'bg-rose-500 text-white rounded-tr-none shadow-md shadow-rose-100' 
+                    : 'bg-white text-slate-800 rounded-tl-none border border-slate-100 shadow-sm'
+                }`}
+              >
+                {msg.text}
+              </div>
+            </div>
+          ))
+        )}
 
         {/* AI Icebreakers Section */}
         <div className="pt-4 flex flex-col items-center">
@@ -142,21 +152,25 @@ const ChatView: React.FC<ChatViewProps> = ({ match, messages, onSendMessage, onB
 
       {/* Input */}
       <div className="p-4 bg-white border-t border-slate-100">
-        <div className="flex items-center gap-2 bg-slate-100 rounded-full px-4 py-1">
+        <div className="flex items-center gap-2 bg-slate-100 rounded-full px-4 py-1 focus-within:bg-white focus-within:ring-2 focus-within:ring-rose-500 focus-within:border-rose-500 transition-all">
           <Mic className="text-slate-400 cursor-pointer hover:text-slate-600 transition-colors" size={20} />
           <input 
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Escribe algo bacano..."
-            className="flex-1 bg-transparent border-none focus:ring-0 py-3 text-sm outline-none"
+            className="flex-1 bg-transparent border-none focus:ring-0 py-3 text-sm outline-none placeholder-slate-400"
           />
           <button 
             onClick={handleSendMessage}
             disabled={!inputValue.trim()}
-            className="text-rose-500 disabled:text-slate-300 hover:text-rose-600 transition-colors"
+            className={`p-1 rounded-full transition-all ${
+              inputValue.trim() 
+                ? 'text-white bg-rose-500 hover:bg-rose-600 shadow-md' 
+                : 'text-slate-300'
+            }`}
           >
-            <Send size={20} />
+            <Send size={18} />
           </button>
         </div>
       </div>

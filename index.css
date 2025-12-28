@@ -1,7 +1,4 @@
-@import "tailwindcss/preflight";
-@import "tailwindcss/utilities";
-
-/* Global styles for CitaRD */
+/* CitaRD - Estilos principales */
 * {
   box-sizing: border-box;
 }
@@ -60,4 +57,35 @@ body {
     rgba(0, 0, 0, 0.1) 50%,
     rgba(0, 0, 0, 0.8) 100%
   );
+}
+
+/* Swipe animations */
+@keyframes swipe-out-left {
+  to {
+    transform: translateX(-100vw) rotate(-30deg);
+    opacity: 0;
+  }
+}
+
+@keyframes swipe-out-right {
+  to {
+    transform: translateX(100vw) rotate(30deg);
+    opacity: 0;
+  }
+}
+
+.swipe-out-left {
+  animation: swipe-out-left 0.3s ease-in forwards;
+}
+
+.swipe-out-right {
+  animation: swipe-out-right 0.3s ease-in forwards;
+}
+
+/* Prevent text selection during swipe */
+.swipe-card * {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 }

@@ -2,50 +2,36 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     // ==============================
-    // Colección perfiles
-    // Cada usuario puede crear/editar su propio perfil
-    // Todos pueden leer perfiles públicos
+    // REGLAS DE DESARROLLO - MÁS PERMISIVAS
+    // Para producción, implementar autenticación adecuada
     // ==============================
+    
+    // Colección perfiles - acceso público para desarrollo
     match /perfiles/{userId} {
-      allow create: if request.auth != null && request.auth.uid == userId;
-      allow update, delete: if request.auth != null && request.auth.uid == userId;
-      allow read: if true; // lectura pública para explorar perfiles
+      allow read, write: if true;
     }
 
-    // ==============================
-    // Colección chats
-    // Solo participantes pueden leer o escribir mensajes
-    // ==============================
+    // Colección chats - acceso público para desarrollo
     match /chats/{chatId} {
-      allow read, write: if request.auth != null && 
-        request.auth.uid in resource.data.participants;
-
-      // ==============================
-      // Subcolección messages
-      // Solo participantes pueden enviar/leer mensajes
-      // ==============================
-      match /messages/{messageId} {
-        allow read, write: if request.auth != null && 
-          request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants;
-      }
-    }
-
-    // ==============================
-    // Colección matches (para compatibilidad con el código actual)
-    // ==============================
-    match /matches/{matchId} {
-      allow read, write: if request.auth != null;
+      allow read, write: if true;
       
       match /messages/{messageId} {
-        allow read, write: if request.auth != null;
+        allow read, write: if true;
       }
     }
 
-    // ==============================
-    // Default deny
-    // ==============================
+    // Colección matches - acceso público para desarrollo
+    match /matches/{matchId} {
+      allow read, write: if true;
+      
+      match /messages/{messageId} {
+        allow read, write: if true;
+      }
+    }
+
+    // Permitir acceso a todas las colecciones para desarrollo
     match /{document=**} {
-      allow read, write: if false;
+      allow read, write: if true;
     }
   }
 }

@@ -1,0 +1,36 @@
+rules_version = '2';
+
+// Firebase Storage Security Rules para CitaRD
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Reglas para fotos de perfil
+    match /profile-photos/{userId}_{photoIndex}_{timestamp}.jpg {
+      // Permitir lectura pública de fotos de perfil
+      allow read: if true;
+      
+      // Permitir escritura solo al propietario del perfil
+      allow write: if request.auth != null 
+                   && request.auth.uid == userId
+                   && resource == null // Solo crear nuevos archivos
+                   && request.resource.size < 5 * 1024 * 1024 // Máximo 5MB
+                   && request.resource.contentType.matches('image/.*'); // Solo imágenes
+      
+      // Permitir eliminación solo al propietario
+      allow delete: if request.auth != null 
+                    && request.auth.uid == userId;
+    }
+    
+    // Reglas para fotos de chat (futuro)
+    match /chat-photos/{chatId}/{messageId}_{timestamp}.jpg {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null
+                   && request.resource.size < 10 * 1024 * 1024 // Máximo 10MB para chat
+                   && request.resource.contentType.matches('image/.*');
+    }
+    
+    // Denegar acceso a cualquier otro archivo
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

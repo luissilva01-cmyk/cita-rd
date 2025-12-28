@@ -13,7 +13,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeView, onViewChange }) =
   return (
     <div className="flex flex-col h-screen max-w-md mx-auto bg-white shadow-2xl relative overflow-hidden">
       {/* Header */}
-      <header className="px-6 py-4 flex justify-between items-center bg-white/80 backdrop-blur-md z-10 sticky top-0 border-b border-slate-100">
+      <header className="px-6 py-4 flex justify-between items-center bg-white/80 backdrop-blur-md z-10 sticky top-0 border-b border-slate-100 flex-shrink-0">
         <div className="flex items-center gap-2">
           <div className="bg-gradient-to-tr from-orange-500 to-rose-600 p-1.5 rounded-lg">
             <Flame className="text-white" size={20} />
@@ -31,12 +31,12 @@ const Layout: React.FC<LayoutProps> = ({ children, activeView, onViewChange }) =
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto no-scrollbar pb-20">
+      <main className="flex-1 overflow-y-auto no-scrollbar" style={{ height: 'calc(100vh - 140px)' }}>
         {children}
       </main>
 
       {/* Bottom Nav */}
-      <nav className="fixed bottom-0 w-full max-w-md bg-white border-t border-slate-100 px-6 py-3 flex justify-between items-center z-10">
+      <nav className="flex-shrink-0 bg-white border-t border-slate-100 px-6 py-3 flex justify-between items-center z-10">
         <NavItem 
           icon={<Heart size={24} />} 
           active={activeView === 'discovery'} 

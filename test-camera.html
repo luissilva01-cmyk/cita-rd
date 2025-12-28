@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Cámara Simple</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        video { width: 100%; max-width: 640px; height: 480px; background: black; border: 2px solid #ccc; }
+        button { padding: 10px 20px; margin: 10px; font-size: 16px; }
+        .success { background: green; color: white; }
+        .error { background: red; color: white; }
+    </style>
+</head>
+<body>
+    <h1>🎥 Test de Cámara Simple</h1>
+    <p>Esta es una prueba básica para verificar que tu cámara funciona.</p>
+    
+    <video id="video" autoplay muted playsinline></video>
+    <br>
+    
+    <button onclick="startCamera()">🚀 Iniciar Cámara</button>
+    <button onclick="stopCamera()">⏹️ Detener Cámara</button>
+    
+    <div id="status"></div>
+    <div id="logs"></div>
+
+    <script>
+        let stream = null;
+        const video = document.getElementById('video');
+        const status = document.getElementById('status');
+        const logs = document.getElementById('logs');
+        
+        function log(message) {
+            console.log(message);
+            logs.innerHTML += '<div>' + message + '</div>';
+        }
+        
+        async function startCamera() {
+            try {
+                log('🎥 Solicitando acceso a cámara...');
+                status.innerHTML = '<span style="color: orange;">Conectando...</span>';
+                
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: 'user' } 
+                });
+                
+                log('✅ Stream obtenido: ' + stream.active);
+                log('📹 Tracks: ' + stream.getTracks().length);
+                
+                video.srcObject = stream;
+                
+                video.onloadedmetadata = () => {
+                    log('📊 Video metadata cargada');
+                    log('📐 Dimensiones: ' + video.videoWidth + 'x' + video.videoHeight);
+                };
+                
+                video.oncanplay = () => {
+                    log('▶️ Video listo para reproducir');
+                    status.innerHTML = '<span class="success">✅ FUNCIONANDO</span>';
+                };
+                
+                video.onerror = (error) => {
+                    log('❌ Error en video: ' + error);
+                    status.innerHTML = '<span class="error">❌ ERROR</span>';
+                };
+                
+            } catch (error) {
+                log('❌ Error: ' + error.name + ' - ' + error.message);
+                status.innerHTML = '<span class="error">❌ ERROR: ' + error.message + '</span>';
+            }
+        }
+        
+        function stopCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                video.srcObject = null;
+                status.innerHTML = '<span style="color: gray;">Detenido</span>';
+                log('⏹️ Cámara detenida');
+            }
+        }
+    </script>
+</body>
+</html>

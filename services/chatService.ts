@@ -38,17 +38,27 @@ export const createChat = async (currentUserId: string, otherUserId: string): Pr
 
 // Obtener chats del usuario actual
 export const getUserChats = (userId: string, callback: (chats: Chat[]) => void) => {
+  console.log('🔍 Buscando chats para userId:', userId);
+  
   const q = query(
     collection(db, "chats"), 
-    where("participants", "array-contains", userId),
-    orderBy("timestamp", "desc")
+    where("participants", "array-contains", userId)
+    // Removemos orderBy temporalmente para evitar problemas de índices
   );
   
   return onSnapshot(q, (querySnapshot) => {
+    console.log('📊 Documentos encontrados:', querySnapshot.size);
+    
     const chats: Chat[] = [];
     querySnapshot.forEach((doc) => {
+      console.log('📄 Chat encontrado:', doc.id, doc.data());
       chats.push({ id: doc.id, ...doc.data() } as Chat);
     });
+    
+    // Ordenar manualmente por timestamp
+    chats.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+    
+    console.log('✅ Chats procesados:', chats.length);
     callback(chats);
   });
 };
@@ -107,6 +117,8 @@ export const getUserProfile = async (userId: string): Promise<UserProfile | null
 
 // Buscar o crear chat entre dos usuarios
 export const findOrCreateChat = async (currentUserId: string, otherUserId: string): Promise<string> => {
+  console.log('🔍 Buscando chat existente entre:', currentUserId, 'y', otherUserId);
+  
   // Buscar chat existente
   const q = query(
     collection(db, "chats"),
@@ -114,14 +126,21 @@ export const findOrCreateChat = async (currentUserId: string, otherUserId: strin
   );
   
   const querySnapshot = await getDocs(q);
+  console.log('📊 Chats encontrados para buscar:', querySnapshot.size);
   
   for (const doc of querySnapshot.docs) {
     const chatData = doc.data();
+    console.log('🔍 Revisando chat:', doc.id, 'participants:', chatData.participants);
+    
     if (chatData.participants.includes(otherUserId)) {
+      console.log('✅ Chat existente encontrado:', doc.id);
       return doc.id; // Chat ya existe
     }
   }
   
   // Si no existe, crear nuevo chat
-  return await createChat(currentUserId, otherUserId);
+  console.log('➕ Creando nuevo chat...');
+  const newChatId = await createChat(currentUserId, otherUserId);
+  console.log('✅ Nuevo chat creado:', newChatId);
+  return newChatId;
 };

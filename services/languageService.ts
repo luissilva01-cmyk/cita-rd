@@ -178,7 +178,6 @@ export interface Translations {
   // Messages & Matches
   noMatchesYet: string;
   whenYouMatch: string;
-  newMatch: string;
   matchesCount: string;
   
   // Profile
@@ -206,7 +205,6 @@ export interface Translations {
   icebreakers: string;
   copyBio: string;
   copied: string;
-  tryAgain: string;
   
   // Account Settings - Missing translations
   yourStory: string;
@@ -224,6 +222,11 @@ export interface Translations {
   controlWhoSees: string;
   currentLanguage: string;
   changeLanguage: string;
+  
+  // Discovery Action Buttons - Missing translations
+  passButton: string;
+  likeButton: string;
+  keepSwiping: string;
 }
 
 const translations: Record<Language, Translations> = {
@@ -404,7 +407,6 @@ const translations: Record<Language, Translations> = {
     // Messages & Matches
     noMatchesYet: 'No tienes matches aún',
     whenYouMatch: 'Cuando hagas match con alguien, podrás chatear aquí.',
-    newMatch: 'Nuevo match',
     matchesCount: '{count} matches',
     
     // Profile
@@ -432,7 +434,6 @@ const translations: Record<Language, Translations> = {
     icebreakers: 'Rompehielos',
     copyBio: 'Copiar Biografía',
     copied: '¡Copiado!',
-    tryAgain: 'Intentar de nuevo',
     
     // Account Settings - Missing translations
     yourStory: 'Tu Story',
@@ -449,7 +450,12 @@ const translations: Record<Language, Translations> = {
     testVerificationCleared: '✅ Verificación de prueba limpiada exitosamente',
     controlWhoSees: 'Controla quién puede ver tu contenido',
     currentLanguage: 'Idioma actual',
-    changeLanguage: 'Cambiar Idioma'
+    changeLanguage: 'Cambiar Idioma',
+    
+    // Discovery Action Buttons - Missing translations
+    passButton: 'Pasar',
+    likeButton: 'Me gusta',
+    keepSwiping: 'Seguir viendo'
   },
   
   en: {
@@ -629,7 +635,6 @@ const translations: Record<Language, Translations> = {
     // Messages & Matches
     noMatchesYet: 'No matches yet',
     whenYouMatch: 'When you match with someone, you can chat here.',
-    newMatch: 'New match',
     matchesCount: '{count} matches',
     
     // Profile
@@ -657,7 +662,6 @@ const translations: Record<Language, Translations> = {
     icebreakers: 'Icebreakers',
     copyBio: 'Copy Bio',
     copied: 'Copied!',
-    tryAgain: 'Try Again',
     
     // Account Settings - Missing translations
     yourStory: 'Your Story',
@@ -674,7 +678,12 @@ const translations: Record<Language, Translations> = {
     testVerificationCleared: '✅ Test verification cleared successfully',
     controlWhoSees: 'Control who can see your content',
     currentLanguage: 'Current language',
-    changeLanguage: 'Change Language'
+    changeLanguage: 'Change Language',
+    
+    // Discovery Action Buttons - Missing translations
+    passButton: 'Pass',
+    likeButton: 'Like',
+    keepSwiping: 'Keep swiping'
   },
   
   pt: {
@@ -854,7 +863,6 @@ const translations: Record<Language, Translations> = {
     // Messages & Matches
     noMatchesYet: 'Ainda não há matches',
     whenYouMatch: 'Quando você der match com alguém, poderá conversar aqui.',
-    newMatch: 'Novo match',
     matchesCount: '{count} matches',
     
     // Profile
@@ -882,7 +890,6 @@ const translations: Record<Language, Translations> = {
     icebreakers: 'Quebra-gelos',
     copyBio: 'Copiar Bio',
     copied: 'Copiado!',
-    tryAgain: 'Tentar Novamente',
     
     // Account Settings - Missing translations
     yourStory: 'Sua Story',
@@ -899,7 +906,12 @@ const translations: Record<Language, Translations> = {
     testVerificationCleared: '✅ Verificação de teste limpa com sucesso',
     controlWhoSees: 'Controle quem pode ver seu conteúdo',
     currentLanguage: 'Idioma atual',
-    changeLanguage: 'Alterar Idioma'
+    changeLanguage: 'Alterar Idioma',
+    
+    // Discovery Action Buttons - Missing translations
+    passButton: 'Passar',
+    likeButton: 'Curtir',
+    keepSwiping: 'Continuar vendo'
   },
   
   fr: {
@@ -1079,7 +1091,6 @@ const translations: Record<Language, Translations> = {
     // Messages & Matches
     noMatchesYet: 'Pas encore de matches',
     whenYouMatch: 'Quand vous matcherez avec quelqu\'un, vous pourrez discuter ici.',
-    newMatch: 'Nouveau match',
     matchesCount: '{count} matches',
     
     // Profile
@@ -1107,7 +1118,6 @@ const translations: Record<Language, Translations> = {
     icebreakers: 'Brise-glaces',
     copyBio: 'Copier la Bio',
     copied: 'Copié!',
-    tryAgain: 'Réessayer',
     
     // Account Settings - Missing translations
     yourStory: 'Votre Story',
@@ -1124,7 +1134,12 @@ const translations: Record<Language, Translations> = {
     testVerificationCleared: '✅ Vérification de test effacée avec succès',
     controlWhoSees: 'Contrôlez qui peut voir votre contenu',
     currentLanguage: 'Langue actuelle',
-    changeLanguage: 'Changer de Langue'
+    changeLanguage: 'Changer de Langue',
+    
+    // Discovery Action Buttons - Missing translations
+    passButton: 'Passer',
+    likeButton: 'J\'aime',
+    keepSwiping: 'Continuer à regarder'
   }
 };
 

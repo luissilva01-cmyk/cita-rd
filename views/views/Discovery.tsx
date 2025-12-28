@@ -353,7 +353,7 @@ const Discovery: React.FC<DiscoveryProps> = ({
         <button
           onClick={() => handleAction('pass')}
           className="w-16 h-16 bg-white rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-transform border border-gray-200 relative"
-          title="Pasar"
+          title={t('passButton')}
         >
           <X className="text-slate-500" size={32} />
           <div className="absolute inset-0 rounded-full bg-slate-100 opacity-0 hover:opacity-100 transition-opacity"></div>
@@ -371,7 +371,7 @@ const Discovery: React.FC<DiscoveryProps> = ({
         <button
           onClick={() => handleAction('like')}
           className="w-16 h-16 bg-red-500 rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-transform relative hover:bg-red-600"
-          title="Me gusta"
+          title={t('likeButton')}
         >
           <svg 
             width="32" 
@@ -390,14 +390,14 @@ const Discovery: React.FC<DiscoveryProps> = ({
         <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-3xl p-8 mx-6 text-center max-w-sm w-full">
             <div className="text-6xl mb-4">🎉</div>
-            <h3 className="text-2xl font-bold text-slate-800 mb-2">¡Es un Match!</h3>
-            <p className="text-slate-600 mb-6">A ti y a {matchedUser.name} se gustaron mutuamente.</p>
+            <h3 className="text-2xl font-bold text-slate-800 mb-2">{t('itsAMatch')}</h3>
+            <p className="text-slate-600 mb-6">{t('youAndUserLikedEachOther', { user: matchedUser.name })}</p>
             <div className="flex gap-3">
               <button
                 onClick={handleMatchClose}
                 className="flex-1 py-3 px-6 border border-slate-200 rounded-full text-slate-600 font-medium hover:bg-slate-50 transition-colors"
               >
-                Seguir viendo
+                {t('keepSwiping')}
               </button>
               <button
                 onClick={() => {
@@ -409,7 +409,7 @@ const Discovery: React.FC<DiscoveryProps> = ({
                 }}
                 className="flex-1 py-3 px-6 bg-red-500 text-white rounded-full font-medium hover:bg-red-600 transition-all"
               >
-                Enviar mensaje
+                {t('sendMessage')}
               </button>
             </div>
           </div>

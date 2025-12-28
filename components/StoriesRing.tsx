@@ -5,6 +5,7 @@ import { StoryGroup, storiesService } from '../services/storiesService';
 import AccountSettings from './AccountSettings';
 import VerificationBadge from './VerificationBadge';
 import { verificationService } from '../services/verificationService';
+import { useTranslation } from '../hooks/useTranslation';
 
 interface StoriesRingProps {
   currentUserId: string;
@@ -17,6 +18,7 @@ const StoriesRing: React.FC<StoriesRingProps> = ({
   onStoryClick, 
   onCreateStory 
 }) => {
+  const { t } = useTranslation();
   const [storyGroups, setStoryGroups] = useState<StoryGroup[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAccountSettings, setShowAccountSettings] = useState(false);
@@ -123,7 +125,7 @@ const StoriesRing: React.FC<StoriesRingProps> = ({
             )}
           </button>
           <p className="text-xs font-semibold text-rose-600 mt-1 truncate w-16">
-            Tu Story
+            {t('yourStory')}
           </p>
         </div>
 
@@ -192,7 +194,7 @@ const StoriesRing: React.FC<StoriesRingProps> = ({
             )}
           </button>
           <p className="text-xs font-semibold text-slate-700 mt-1 truncate w-16">
-            Cuenta
+            {t('account')}
           </p>
         </div>
       </div>

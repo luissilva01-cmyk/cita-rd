@@ -10,6 +10,7 @@ import { View, UserProfile, Message } from './types';
 import { getUserChats, sendMessage, listenToMessages, findOrCreateChat, Chat } from './services/chatService';
 import { getDiscoveryProfiles, createOrUpdateProfile } from './services/profileService';
 import { privacyService } from './services/privacyService';
+import { LanguageProvider } from './contexts/LanguageContext';
 
 // Mock user ID - En producción esto vendría de la autenticación
 const CURRENT_USER_ID = 'KU5ZalR92QcPV7RGbLFTjEjTXZm2'; // Tu ID de usuario real
@@ -322,9 +323,11 @@ const App: React.FC = () => {
   };
 
   return (
-    <Layout activeView={activeView === 'chat' ? 'messages' : activeView} onViewChange={setActiveView}>
-      {renderView()}
-    </Layout>
+    <LanguageProvider>
+      <Layout activeView={activeView === 'chat' ? 'messages' : activeView} onViewChange={setActiveView}>
+        {renderView()}
+      </Layout>
+    </LanguageProvider>
   );
 };
 

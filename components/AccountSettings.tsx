@@ -7,6 +7,7 @@ import StoriesPrivacySettings from './StoriesPrivacySettings';
 import VerificationBadge from './VerificationBadge';
 import { verificationService } from '../services/verificationService';
 import { languageService } from '../services/languageService';
+import { useTranslation } from '../hooks/useTranslation';
 
 interface AccountSettingsProps {
   isOpen: boolean;
@@ -21,6 +22,7 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({
   onClose,
   onSettingsUpdated
 }) => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<'verification' | 'privacy' | 'language'>('verification');
   const [isVerified, setIsVerified] = useState(false);
   const [currentLanguage, setCurrentLanguage] = useState('es');
@@ -70,7 +72,7 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({
           
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-100">
-            <h2 className="text-xl font-bold text-gray-900">Configuración de Cuenta</h2>
+            <h2 className="text-xl font-bold text-gray-900">{t('accountSettings')}</h2>
             <button
               onClick={onClose}
               className="p-2 hover:bg-gray-100 rounded-full transition-colors"
@@ -90,9 +92,9 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({
                     <Shield size={20} className="text-white" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900">Verificación de Identidad</h3>
+                    <h3 className="font-semibold text-gray-900">{t('identityVerification')}</h3>
                     <p className="text-sm text-gray-600">
-                      {isVerified ? 'Tu cuenta está verificada' : 'Verifica tu identidad para mayor confianza'}
+                      {isVerified ? t('yourAccountVerified') : t('verifyForTrust')}
                     </p>
                   </div>
                 </div>
@@ -110,12 +112,12 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({
                 {isVerified ? (
                   <div className="flex items-center justify-center gap-2">
                     <CheckCircle size={16} />
-                    Ver Verificación
+                    {t('seeVerification')}
                   </div>
                 ) : (
                   <div className="flex items-center justify-center gap-2">
                     <AlertCircle size={16} />
-                    Verificar Ahora
+                    {t('verifyNow')}
                   </div>
                 )}
               </button>
@@ -124,15 +126,15 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({
               {isVerified && (
                 <button
                   onClick={() => {
-                    if (confirm('¿Estás seguro de que quieres limpiar la verificación de prueba?')) {
+                    if (confirm(t('clearTestConfirm'))) {
                       verificationService.resetUserVerification(currentUserId);
                       setIsVerified(false);
-                      alert('✅ Verificación de prueba limpiada exitosamente');
+                      alert(t('testVerificationCleared'));
                     }
                   }}
                   className="w-full py-2 px-4 bg-red-100 text-red-700 rounded-xl text-sm font-medium hover:bg-red-200 transition-all border border-red-200"
                 >
-                  🧪 Limpiar Verificación de Prueba
+                  🧪 {t('clearTestVerification')}
                 </button>
               )}
             </div>
@@ -144,8 +146,8 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({
                   <Lock size={20} className="text-white" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900">Privacidad y Seguridad</h3>
-                  <p className="text-sm text-gray-600">Controla quién puede ver tu contenido</p>
+                  <h3 className="font-semibold text-gray-900">{t('privacyAndSecurity')}</h3>
+                  <p className="text-sm text-gray-600">{t('controlWhoSees')}</p>
                 </div>
               </div>
               
@@ -155,7 +157,7 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({
               >
                 <div className="flex items-center justify-center gap-2">
                   <Settings size={16} />
-                  Configurar Privacidad
+                  {t('configurePrivacy')}
                 </div>
               </button>
             </div>
@@ -167,9 +169,9 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({
                   <Globe size={20} className="text-white" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900">Idioma</h3>
+                  <h3 className="font-semibold text-gray-900">{t('language')}</h3>
                   <p className="text-sm text-gray-600">
-                    Idioma actual: {languageService.getLanguageName(currentLanguage as any)}
+                    {t('currentLanguage')}: {languageService.getLanguageName(currentLanguage as any)}
                   </p>
                 </div>
               </div>
@@ -180,26 +182,26 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({
               >
                 <div className="flex items-center justify-center gap-2">
                   <Globe size={16} />
-                  Cambiar Idioma
+                  {t('changeLanguage')}
                 </div>
               </button>
             </div>
 
             {/* Información adicional */}
             <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200">
-              <h4 className="font-medium text-gray-900 mb-2">¿Por qué es importante?</h4>
+              <h4 className="font-medium text-gray-900 mb-2">{t('whyImportant')}</h4>
               <ul className="space-y-2 text-sm text-gray-600">
                 <li className="flex items-start gap-2">
                   <CheckCircle size={16} className="text-green-500 mt-0.5 flex-shrink-0" />
-                  <span>La verificación aumenta tu visibilidad y confianza</span>
+                  <span>{t('verificationIncreases')}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle size={16} className="text-green-500 mt-0.5 flex-shrink-0" />
-                  <span>La privacidad te permite controlar tu experiencia</span>
+                  <span>{t('privacyControls')}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle size={16} className="text-green-500 mt-0.5 flex-shrink-0" />
-                  <span>El idioma personaliza la interfaz a tu preferencia</span>
+                  <span>{t('languagePersonalizes')}</span>
                 </li>
               </ul>
             </div>

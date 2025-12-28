@@ -2,6 +2,7 @@
 import React from 'react';
 import { Heart, MessageCircle, Sparkles, User, Flame } from 'lucide-react';
 import { View } from '../../types';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -10,6 +11,8 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children, activeView, onViewChange }) => {
+  const { t } = useLanguage();
+  
   return (
     <div className="flex flex-col h-screen max-w-md mx-auto bg-white shadow-2xl relative overflow-hidden">
       {/* Header */}
@@ -41,19 +44,19 @@ const Layout: React.FC<LayoutProps> = ({ children, activeView, onViewChange }) =
           icon={<Heart size={24} />} 
           active={activeView === 'discovery'} 
           onClick={() => onViewChange('discovery')} 
-          label="Descubrir"
+          label={t('discover')}
         />
         <NavItem 
           icon={<MessageCircle size={24} />} 
           active={activeView === 'messages'} 
           onClick={() => onViewChange('messages')} 
-          label="Chats"
+          label={t('messages')}
         />
         <NavItem 
           icon={<User size={24} />} 
           active={activeView === 'profile'} 
           onClick={() => onViewChange('profile')} 
-          label="Perfil"
+          label={t('profile')}
         />
       </nav>
     </div>

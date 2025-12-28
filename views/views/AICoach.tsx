@@ -3,12 +3,14 @@ import React, { useState } from 'react';
 import { Sparkles, Wand2, Lightbulb, MessageSquareQuote, Loader2, RefreshCw, Copy, CheckCircle } from 'lucide-react';
 import { getAIProfileFeedback } from '../../services/geminiService';
 import { UserProfile } from '../../types';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 interface AICoachProps {
   profile: UserProfile;
 }
 
 const AICoach: React.FC<AICoachProps> = ({ profile }) => {
+  const { t } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [copied, setCopied] = useState(false);
@@ -52,10 +54,10 @@ const AICoach: React.FC<AICoachProps> = ({ profile }) => {
             <div className="p-2 bg-white/20 rounded-xl backdrop-blur-md">
               <Sparkles className="text-yellow-300" size={24} />
             </div>
-            <h2 className="text-2xl font-black tracking-tight">AI Coach RD</h2>
+            <h2 className="text-2xl font-black tracking-tight">{t('aiCoachTitle')}</h2>
           </div>
           <p className="text-sm text-indigo-100 opacity-90 leading-relaxed max-w-[240px]">
-            Hagamos que tu perfil sea lo más bacano de todo el país.
+            {t('makeProfileAwesome')}
           </p>
         </div>
         <Sparkles className="absolute -bottom-6 -right-6 opacity-10 text-white group-hover:scale-110 transition-transform duration-700" size={160} />
@@ -78,7 +80,7 @@ const AICoach: React.FC<AICoachProps> = ({ profile }) => {
           className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black shadow-xl flex items-center justify-center gap-3 hover:bg-slate-800 transition-all disabled:opacity-50 active:scale-95"
         >
           {loading ? <RefreshCw className="animate-spin" size={20} /> : <Wand2 size={20} />}
-          {loading ? 'Consultando expertos...' : 'Optimizar Perfil'}
+          {loading ? t('analyzing') : t('improveProfile')}
         </button>
       </div>
 
@@ -89,7 +91,7 @@ const AICoach: React.FC<AICoachProps> = ({ profile }) => {
               <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg">
                 <Lightbulb size={20} />
               </div>
-              <h3 className="font-black text-xs uppercase tracking-widest text-slate-800">El Análisis</h3>
+              <h3 className="font-black text-xs uppercase tracking-widest text-slate-800">{t('feedback')}</h3>
             </div>
             <p className="text-slate-600 text-sm leading-relaxed">{result.feedback}</p>
           </section>
@@ -100,7 +102,7 @@ const AICoach: React.FC<AICoachProps> = ({ profile }) => {
                 <div className="p-2 bg-emerald-50 text-emerald-600 rounded-lg">
                   <Sparkles size={20} />
                 </div>
-                <h3 className="font-black text-xs uppercase tracking-widest text-slate-800">Bio Mejorada</h3>
+                <h3 className="font-black text-xs uppercase tracking-widest text-slate-800">{t('improvedBio')}</h3>
               </div>
               <button 
                 onClick={copyToClipboard}
@@ -119,7 +121,7 @@ const AICoach: React.FC<AICoachProps> = ({ profile }) => {
               <div className="p-2 bg-rose-50 text-rose-600 rounded-lg">
                 <MessageSquareQuote size={20} />
               </div>
-              <h3 className="font-black text-xs uppercase tracking-widest text-slate-800">Icebreakers</h3>
+              <h3 className="font-black text-xs uppercase tracking-widest text-slate-800">{t('icebreakers')}</h3>
             </div>
             <div className="space-y-3">
               {result.icebreakers.map((ice: string, i: number) => (

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, Send, Phone, Video, Mic, Sparkles, Loader2, MoreHorizontal } from 'lucide-react';
 import { Match, Message } from '../../types';
 import { getIcebreakerSuggestions } from '../../services/geminiService';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 interface ChatViewProps {
   match: Match;
@@ -11,6 +12,7 @@ interface ChatViewProps {
 }
 
 const ChatView: React.FC<ChatViewProps> = ({ match, messages, onSendMessage, onBack }) => {
+  const { t } = useLanguage();
   const [inputValue, setInputValue] = useState('');
   const [icebreakers, setIcebreakers] = useState<string[]>([]);
   const [loadingIce, setLoadingIce] = useState(false);
@@ -89,8 +91,8 @@ const ChatView: React.FC<ChatViewProps> = ({ match, messages, onSendMessage, onB
             <div className="w-16 h-16 bg-gradient-to-br from-rose-400 to-pink-500 rounded-full flex items-center justify-center mb-4">
               <Send className="text-white" size={24} />
             </div>
-            <h3 className="text-lg font-bold text-slate-800 mb-2">¡Nuevo Match!</h3>
-            <p className="text-slate-600 text-sm mb-4">Envía el primer mensaje a {match.user.name}</p>
+            <h3 className="text-lg font-bold text-slate-800 mb-2">{t('newMatchExclamation')}</h3>
+            <p className="text-slate-600 text-sm mb-4">{t('sendFirstMessage', { name: match.user.name })}</p>
           </div>
         ) : (
           messages.map((msg) => (
@@ -158,7 +160,7 @@ const ChatView: React.FC<ChatViewProps> = ({ match, messages, onSendMessage, onB
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Escribe algo bacano..."
+            placeholder={t('typeSomethingCool')}
             className="flex-1 bg-transparent border-none focus:ring-0 py-3 text-sm outline-none placeholder-slate-400"
           />
           <button 

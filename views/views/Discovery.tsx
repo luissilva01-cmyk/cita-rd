@@ -8,6 +8,7 @@ import StoriesRing from '../../components/StoriesRing';
 import StoriesViewer from '../../components/StoriesViewer';
 import CreateStoryModal from '../../components/CreateStoryModal';
 import { StoryGroup } from '../../services/storiesService';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 interface DiscoveryProps {
   users?: UserProfile[];
@@ -100,6 +101,8 @@ const Discovery: React.FC<DiscoveryProps> = ({
   onOpenChat,
   currentUserId = 'demo-user'
 }) => {
+  const { t } = useLanguage();
+  
   // Usar los usuarios pasados como prop, o fallback a MOCK_USERS
   const availableUsers = users && users.length > 0 ? users : MOCK_USERS;
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -268,8 +271,8 @@ const Discovery: React.FC<DiscoveryProps> = ({
     return (
       <div className="flex flex-col items-center justify-center h-full text-center px-6">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-rose-500 mb-4"></div>
-        <h2 className="text-xl font-semibold text-slate-800 mb-2">Optimizando perfiles...</h2>
-        <p className="text-slate-600">Calculando compatibilidad y calidad de perfiles</p>
+        <h2 className="text-xl font-semibold text-slate-800 mb-2">{t('optimizingProfiles')}</h2>
+        <p className="text-slate-600">{t('calculatingCompatibility')}</p>
       </div>
     );
   }
@@ -282,8 +285,8 @@ const Discovery: React.FC<DiscoveryProps> = ({
         <div className="w-24 h-24 bg-linear-to-br from-orange-400 to-rose-500 rounded-full flex items-center justify-center mb-6">
           <Heart className="text-white" size={40} />
         </div>
-        <h2 className="text-2xl font-bold text-slate-800 mb-4">¡No hay perfiles disponibles!</h2>
-        <p className="text-slate-600 mb-6">Vuelve más tarde para descubrir nuevas personas.</p>
+        <h2 className="text-2xl font-bold text-slate-800 mb-4">{t('noProfilesAvailable')}</h2>
+        <p className="text-slate-600 mb-6">{t('comeBackLater')}</p>
       </div>
     );
   }
@@ -295,13 +298,13 @@ const Discovery: React.FC<DiscoveryProps> = ({
         <div className="w-24 h-24 bg-linear-to-br from-orange-400 to-rose-500 rounded-full flex items-center justify-center mb-6">
           <Heart className="text-white" size={40} />
         </div>
-        <h2 className="text-2xl font-bold text-slate-800 mb-4">Error cargando perfil</h2>
-        <p className="text-slate-600 mb-6">Hay un problema técnico.</p>
+        <h2 className="text-2xl font-bold text-slate-800 mb-4">{t('errorLoadingProfile')}</h2>
+        <p className="text-slate-600 mb-6">{t('technicalProblem')}</p>
         <button
           onClick={handleRestart}
           className="px-6 py-3 bg-linear-to-r from-rose-500 to-pink-600 text-white rounded-full font-medium hover:shadow-lg transition-all"
         >
-          Reiniciar
+          {t('restart')}
         </button>
       </div>
     );
@@ -359,7 +362,7 @@ const Discovery: React.FC<DiscoveryProps> = ({
         <button
           onClick={handleRestart}
           className="w-14 h-14 bg-white rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-transform border border-gray-200 relative"
-          title="Reiniciar perfiles"
+          title={t('restartProfiles')}
         >
           <Star className="text-blue-500" size={26} />
           <div className="absolute inset-0 rounded-full bg-blue-50 opacity-0 hover:opacity-100 transition-opacity"></div>

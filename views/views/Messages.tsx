@@ -1,6 +1,7 @@
 import React from 'react';
 import { MessageCircle, Clock } from 'lucide-react';
 import { Match } from '../../types';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 interface MessagesProps {
   matches: Match[];
@@ -8,6 +9,8 @@ interface MessagesProps {
 }
 
 const Messages: React.FC<MessagesProps> = ({ matches, onSelectMatch }) => {
+  const { t } = useLanguage();
+  
   const formatTime = (timestamp: number) => {
     const date = new Date(timestamp);
     const now = new Date();
@@ -26,8 +29,8 @@ const Messages: React.FC<MessagesProps> = ({ matches, onSelectMatch }) => {
         <div className="w-24 h-24 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center mb-6">
           <MessageCircle className="text-white" size={40} />
         </div>
-        <h2 className="text-2xl font-bold text-slate-800 mb-4">No tienes matches aún</h2>
-        <p className="text-slate-600">Cuando hagas match con alguien, podrás chatear aquí.</p>
+        <h2 className="text-2xl font-bold text-slate-800 mb-4">{t('noMatchesYet')}</h2>
+        <p className="text-slate-600">{t('whenYouMatch')}</p>
       </div>
     );
   }
@@ -36,8 +39,8 @@ const Messages: React.FC<MessagesProps> = ({ matches, onSelectMatch }) => {
     <div className="h-full">
       {/* Header */}
       <div className="px-6 py-4 border-b border-slate-100">
-        <h2 className="text-2xl font-bold text-slate-800">Mensajes</h2>
-        <p className="text-slate-600 text-sm">{matches.length} matches</p>
+        <h2 className="text-2xl font-bold text-slate-800">{t('messages')}</h2>
+        <p className="text-slate-600 text-sm">{t('matchesCount', { count: matches.length.toString() })}</p>
       </div>
 
       {/* Matches List */}
@@ -72,7 +75,7 @@ const Messages: React.FC<MessagesProps> = ({ matches, onSelectMatch }) => {
                 </div>
               </div>
               <p className="text-sm text-slate-600 truncate">
-                {match.lastMessage || 'Nuevo match'}
+                {match.lastMessage || t('newMatch')}
               </p>
             </div>
           </button>

@@ -3,6 +3,7 @@ import { Edit3, MapPin, Briefcase, Heart, Settings, Camera, BarChart3 } from 'lu
 import { UserProfile } from '../../types';
 import PhotoUploader from '../../components/PhotoUploader';
 import ProfileScore from '../../components/ProfileScore';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 interface ProfileViewProps {
   user: UserProfile;
@@ -10,6 +11,7 @@ interface ProfileViewProps {
 }
 
 const ProfileView: React.FC<ProfileViewProps> = ({ user, onUpdate }) => {
+  const { t } = useLanguage();
   const [isEditing, setIsEditing] = useState(false);
   const [editedUser, setEditedUser] = useState(user);
   const [showPhotoUploader, setShowPhotoUploader] = useState(false);
@@ -41,7 +43,7 @@ const ProfileView: React.FC<ProfileViewProps> = ({ user, onUpdate }) => {
     <div className="h-full overflow-y-auto">
       {/* Header */}
       <div className="px-6 py-4 flex justify-between items-center border-b border-slate-100">
-        <h2 className="text-2xl font-bold text-slate-800">Mi Perfil</h2>
+        <h2 className="text-2xl font-bold text-slate-800">{t('myProfile')}</h2>
         <button
           onClick={() => setIsEditing(!isEditing)}
           className="p-2 rounded-full hover:bg-slate-100 transition-colors"
@@ -77,13 +79,13 @@ const ProfileView: React.FC<ProfileViewProps> = ({ user, onUpdate }) => {
         {/* Profile Photos Section */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-slate-800">Mis Fotos</h3>
+            <h3 className="text-lg font-semibold text-slate-800">{t('myPhotos')}</h3>
             <button
               onClick={() => setShowPhotoUploader(!showPhotoUploader)}
               className="flex items-center gap-2 px-4 py-2 bg-rose-500 text-white rounded-lg hover:bg-rose-600 transition-colors"
             >
               <Camera size={16} />
-              Gestionar Fotos
+              {t('managePhotos')}
             </button>
           </div>
 
@@ -139,7 +141,7 @@ const ProfileView: React.FC<ProfileViewProps> = ({ user, onUpdate }) => {
                 className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
               />
             ) : (
-              <p className="text-lg text-slate-800">{user.age} años</p>
+              <p className="text-lg text-slate-800">{t('yearsOld', { age: user.age.toString() })}</p>
             )}
           </div>
 
@@ -164,7 +166,7 @@ const ProfileView: React.FC<ProfileViewProps> = ({ user, onUpdate }) => {
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">
                 <Briefcase className="inline w-4 h-4 mr-1" />
-                Trabajo
+                {t('job')}
               </label>
               <p className="text-slate-600">{user.job}</p>
             </div>
@@ -188,7 +190,7 @@ const ProfileView: React.FC<ProfileViewProps> = ({ user, onUpdate }) => {
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-2">
               <Heart className="inline w-4 h-4 mr-1" />
-              Intereses
+              {t('interests')}
             </label>
             <div className="flex flex-wrap gap-2">
               {user.interests.map((interest, index) => (
@@ -210,13 +212,13 @@ const ProfileView: React.FC<ProfileViewProps> = ({ user, onUpdate }) => {
               onClick={handleCancel}
               className="flex-1 py-3 px-6 border border-slate-200 rounded-lg text-slate-600 font-medium hover:bg-slate-50 transition-colors"
             >
-              Cancelar
+              {t('cancel')}
             </button>
             <button
               onClick={handleSave}
               className="flex-1 py-3 px-6 bg-gradient-to-r from-rose-500 to-pink-600 text-white rounded-lg font-medium hover:shadow-lg transition-all"
             >
-              Guardar
+              {t('save')}
             </button>
           </div>
         )}

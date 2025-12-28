@@ -119,6 +119,111 @@ export interface Translations {
   tryAgain: string;
   tooManyAttempts: string;
   tryLater: string;
+  
+  // Navigation & Main Views
+  discover: string;
+  matches: string;
+  messages: string;
+  profile: string;
+  account: string;
+  settings: string;
+  
+  // Profile & Account
+  editProfile: string;
+  myProfile: string;
+  accountSettings: string;
+  privacyAndSecurity: string;
+  configurePrivacy: string;
+  
+  // Chat & Messages
+  typeMessage: string;
+  sendPhoto: string;
+  sendGif: string;
+  online: string;
+  offline: string;
+  lastSeen: string;
+  typing: string;
+  
+  // Swipe Actions
+  superLike: string;
+  rewind: string;
+  boost: string;
+  
+  // Common Actions
+  edit: string;
+  delete: string;
+  report: string;
+  block: string;
+  unblock: string;
+  
+  // Time & Date
+  now: string;
+  today: string;
+  yesterday: string;
+  minutesAgo: string;
+  hoursAgo: string;
+  daysAgo: string;
+  
+  // Notifications
+  newMatch: string;
+  newMessage: string;
+  profileVisit: string;
+  
+  // Errors & Status
+  connectionError: string;
+  tryAgainLater: string;
+  somethingWentWrong: string;
+  noInternetConnection: string;
+  
+  // Messages & Matches
+  noMatchesYet: string;
+  whenYouMatch: string;
+  newMatch: string;
+  matchesCount: string;
+  
+  // Profile
+  myPhotos: string;
+  managePhotos: string;
+  yearsOld: string;
+  job: string;
+  interests: string;
+  bio: string;
+  location: string;
+  age: string;
+  
+  // Chat
+  newMatchExclamation: string;
+  sendFirstMessage: string;
+  typeSomethingCool: string;
+  
+  // AI Coach
+  aiCoachTitle: string;
+  makeProfileAwesome: string;
+  improveProfile: string;
+  analyzing: string;
+  feedback: string;
+  improvedBio: string;
+  icebreakers: string;
+  copyBio: string;
+  copied: string;
+  tryAgain: string;
+  
+  // Account Settings - Missing translations
+  yourStory: string;
+  whyImportant: string;
+  verificationIncreases: string;
+  privacyControls: string;
+  languagePersonalizes: string;
+  yourAccountVerified: string;
+  verifyForTrust: string;
+  seeVerification: string;
+  verifyNow: string;
+  clearTestVerification: string;
+  clearTestConfirm: string;
+  testVerificationCleared: string;
+  controlWhoSees: string;
+  currentLanguage: string;
+  changeLanguage: string;
 }
 
 const translations: Record<Language, Translations> = {
@@ -239,7 +344,112 @@ const translations: Record<Language, Translations> = {
     followRecommendations: 'Asegúrate de seguir las recomendaciones para obtener una mejor foto',
     tryAgain: 'Intentar de nuevo',
     tooManyAttempts: 'Demasiados intentos. Inténtalo más tarde.',
-    tryLater: 'Vuelve más tarde'
+    tryLater: 'Vuelve más tarde',
+    
+    // Navigation & Main Views
+    discover: 'Descubrir',
+    matches: 'Matches',
+    messages: 'Mensajes',
+    profile: 'Perfil',
+    account: 'Cuenta',
+    settings: 'Configuración',
+    
+    // Profile & Account
+    editProfile: 'Editar Perfil',
+    myProfile: 'Mi Perfil',
+    accountSettings: 'Configuración de Cuenta',
+    privacyAndSecurity: 'Privacidad y Seguridad',
+    configurePrivacy: 'Configurar Privacidad',
+    
+    // Chat & Messages
+    typeMessage: 'Escribe un mensaje...',
+    sendPhoto: 'Enviar foto',
+    sendGif: 'Enviar GIF',
+    online: 'En línea',
+    offline: 'Desconectado',
+    lastSeen: 'Visto por última vez',
+    typing: 'escribiendo...',
+    
+    // Swipe Actions
+    superLike: 'Super Like',
+    rewind: 'Rebobinar',
+    boost: 'Impulsar',
+    
+    // Common Actions
+    edit: 'Editar',
+    delete: 'Eliminar',
+    report: 'Reportar',
+    block: 'Bloquear',
+    unblock: 'Desbloquear',
+    
+    // Time & Date
+    now: 'ahora',
+    today: 'hoy',
+    yesterday: 'ayer',
+    minutesAgo: 'hace {minutes} min',
+    hoursAgo: 'hace {hours}h',
+    daysAgo: 'hace {days}d',
+    
+    // Notifications
+    newMatch: 'Nuevo match',
+    newMessage: 'Nuevo mensaje',
+    profileVisit: 'Visitó tu perfil',
+    
+    // Errors & Status
+    connectionError: 'Error de conexión',
+    tryAgainLater: 'Inténtalo más tarde',
+    somethingWentWrong: 'Algo salió mal',
+    noInternetConnection: 'Sin conexión a internet',
+    
+    // Messages & Matches
+    noMatchesYet: 'No tienes matches aún',
+    whenYouMatch: 'Cuando hagas match con alguien, podrás chatear aquí.',
+    newMatch: 'Nuevo match',
+    matchesCount: '{count} matches',
+    
+    // Profile
+    myPhotos: 'Mis Fotos',
+    managePhotos: 'Gestionar Fotos',
+    yearsOld: '{age} años',
+    job: 'Trabajo',
+    interests: 'Intereses',
+    bio: 'Biografía',
+    location: 'Ubicación',
+    age: 'Edad',
+    
+    // Chat
+    newMatchExclamation: '¡Nuevo Match!',
+    sendFirstMessage: 'Envía el primer mensaje a {name}',
+    typeSomethingCool: 'Escribe algo bacano...',
+    
+    // AI Coach
+    aiCoachTitle: 'AI Coach RD',
+    makeProfileAwesome: 'Hagamos que tu perfil sea lo más bacano de todo el país.',
+    improveProfile: 'Mejorar Perfil',
+    analyzing: 'Analizando...',
+    feedback: 'Retroalimentación',
+    improvedBio: 'Biografía Mejorada',
+    icebreakers: 'Rompehielos',
+    copyBio: 'Copiar Biografía',
+    copied: '¡Copiado!',
+    tryAgain: 'Intentar de nuevo',
+    
+    // Account Settings - Missing translations
+    yourStory: 'Tu Story',
+    whyImportant: '¿Por qué es importante?',
+    verificationIncreases: 'La verificación aumenta tu visibilidad y confianza',
+    privacyControls: 'La privacidad te permite controlar tu experiencia',
+    languagePersonalizes: 'El idioma personaliza la interfaz a tu preferencia',
+    yourAccountVerified: 'Tu cuenta está verificada',
+    verifyForTrust: 'Verifica tu identidad para mayor confianza',
+    seeVerification: 'Ver Verificación',
+    verifyNow: 'Verificar Ahora',
+    clearTestVerification: 'Limpiar Verificación de Prueba',
+    clearTestConfirm: '¿Estás seguro de que quieres limpiar la verificación de prueba?',
+    testVerificationCleared: '✅ Verificación de prueba limpiada exitosamente',
+    controlWhoSees: 'Controla quién puede ver tu contenido',
+    currentLanguage: 'Idioma actual',
+    changeLanguage: 'Cambiar Idioma'
   },
   
   en: {
@@ -359,7 +569,112 @@ const translations: Record<Language, Translations> = {
     followRecommendations: 'Make sure to follow the recommendations to get a better photo',
     tryAgain: 'Try again',
     tooManyAttempts: 'Too many attempts. Try again later.',
-    tryLater: 'Come back later'
+    tryLater: 'Come back later',
+    
+    // Navigation & Main Views
+    discover: 'Discover',
+    matches: 'Matches',
+    messages: 'Messages',
+    profile: 'Profile',
+    account: 'Account',
+    settings: 'Settings',
+    
+    // Profile & Account
+    editProfile: 'Edit Profile',
+    myProfile: 'My Profile',
+    accountSettings: 'Account Settings',
+    privacyAndSecurity: 'Privacy and Security',
+    configurePrivacy: 'Configure Privacy',
+    
+    // Chat & Messages
+    typeMessage: 'Type a message...',
+    sendPhoto: 'Send photo',
+    sendGif: 'Send GIF',
+    online: 'Online',
+    offline: 'Offline',
+    lastSeen: 'Last seen',
+    typing: 'typing...',
+    
+    // Swipe Actions
+    superLike: 'Super Like',
+    rewind: 'Rewind',
+    boost: 'Boost',
+    
+    // Common Actions
+    edit: 'Edit',
+    delete: 'Delete',
+    report: 'Report',
+    block: 'Block',
+    unblock: 'Unblock',
+    
+    // Time & Date
+    now: 'now',
+    today: 'today',
+    yesterday: 'yesterday',
+    minutesAgo: '{minutes}m ago',
+    hoursAgo: '{hours}h ago',
+    daysAgo: '{days}d ago',
+    
+    // Notifications
+    newMatch: 'New match',
+    newMessage: 'New message',
+    profileVisit: 'Visited your profile',
+    
+    // Errors & Status
+    connectionError: 'Connection error',
+    tryAgainLater: 'Try again later',
+    somethingWentWrong: 'Something went wrong',
+    noInternetConnection: 'No internet connection',
+    
+    // Messages & Matches
+    noMatchesYet: 'No matches yet',
+    whenYouMatch: 'When you match with someone, you can chat here.',
+    newMatch: 'New match',
+    matchesCount: '{count} matches',
+    
+    // Profile
+    myPhotos: 'My Photos',
+    managePhotos: 'Manage Photos',
+    yearsOld: '{age} years old',
+    job: 'Job',
+    interests: 'Interests',
+    bio: 'Bio',
+    location: 'Location',
+    age: 'Age',
+    
+    // Chat
+    newMatchExclamation: 'New Match!',
+    sendFirstMessage: 'Send the first message to {name}',
+    typeSomethingCool: 'Type something cool...',
+    
+    // AI Coach
+    aiCoachTitle: 'AI Coach RD',
+    makeProfileAwesome: 'Let\'s make your profile the most awesome in the whole country.',
+    improveProfile: 'Improve Profile',
+    analyzing: 'Analyzing...',
+    feedback: 'Feedback',
+    improvedBio: 'Improved Bio',
+    icebreakers: 'Icebreakers',
+    copyBio: 'Copy Bio',
+    copied: 'Copied!',
+    tryAgain: 'Try Again',
+    
+    // Account Settings - Missing translations
+    yourStory: 'Your Story',
+    whyImportant: 'Why is it important?',
+    verificationIncreases: 'Verification increases your visibility and trust',
+    privacyControls: 'Privacy allows you to control your experience',
+    languagePersonalizes: 'Language personalizes the interface to your preference',
+    yourAccountVerified: 'Your account is verified',
+    verifyForTrust: 'Verify your identity for greater trust',
+    seeVerification: 'See Verification',
+    verifyNow: 'Verify Now',
+    clearTestVerification: 'Clear Test Verification',
+    clearTestConfirm: 'Are you sure you want to clear the test verification?',
+    testVerificationCleared: '✅ Test verification cleared successfully',
+    controlWhoSees: 'Control who can see your content',
+    currentLanguage: 'Current language',
+    changeLanguage: 'Change Language'
   },
   
   pt: {
@@ -479,7 +794,112 @@ const translations: Record<Language, Translations> = {
     followRecommendations: 'Certifique-se de seguir as recomendações para obter uma foto melhor',
     tryAgain: 'Tentar novamente',
     tooManyAttempts: 'Muitas tentativas. Tente mais tarde.',
-    tryLater: 'Volte mais tarde'
+    tryLater: 'Volte mais tarde',
+    
+    // Navigation & Main Views
+    discover: 'Descobrir',
+    matches: 'Matches',
+    messages: 'Mensagens',
+    profile: 'Perfil',
+    account: 'Conta',
+    settings: 'Configurações',
+    
+    // Profile & Account
+    editProfile: 'Editar Perfil',
+    myProfile: 'Meu Perfil',
+    accountSettings: 'Configurações da Conta',
+    privacyAndSecurity: 'Privacidade e Segurança',
+    configurePrivacy: 'Configurar Privacidade',
+    
+    // Chat & Messages
+    typeMessage: 'Digite uma mensagem...',
+    sendPhoto: 'Enviar foto',
+    sendGif: 'Enviar GIF',
+    online: 'Online',
+    offline: 'Offline',
+    lastSeen: 'Visto por último',
+    typing: 'digitando...',
+    
+    // Swipe Actions
+    superLike: 'Super Like',
+    rewind: 'Rebobinar',
+    boost: 'Impulsionar',
+    
+    // Common Actions
+    edit: 'Editar',
+    delete: 'Excluir',
+    report: 'Denunciar',
+    block: 'Bloquear',
+    unblock: 'Desbloquear',
+    
+    // Time & Date
+    now: 'agora',
+    today: 'hoje',
+    yesterday: 'ontem',
+    minutesAgo: '{minutes}min atrás',
+    hoursAgo: '{hours}h atrás',
+    daysAgo: '{days}d atrás',
+    
+    // Notifications
+    newMatch: 'Novo match',
+    newMessage: 'Nova mensagem',
+    profileVisit: 'Visitou seu perfil',
+    
+    // Errors & Status
+    connectionError: 'Erro de conexão',
+    tryAgainLater: 'Tente mais tarde',
+    somethingWentWrong: 'Algo deu errado',
+    noInternetConnection: 'Sem conexão com a internet',
+    
+    // Messages & Matches
+    noMatchesYet: 'Ainda não há matches',
+    whenYouMatch: 'Quando você der match com alguém, poderá conversar aqui.',
+    newMatch: 'Novo match',
+    matchesCount: '{count} matches',
+    
+    // Profile
+    myPhotos: 'Minhas Fotos',
+    managePhotos: 'Gerenciar Fotos',
+    yearsOld: '{age} anos',
+    job: 'Trabalho',
+    interests: 'Interesses',
+    bio: 'Bio',
+    location: 'Localização',
+    age: 'Idade',
+    
+    // Chat
+    newMatchExclamation: 'Novo Match!',
+    sendFirstMessage: 'Envie a primeira mensagem para {name}',
+    typeSomethingCool: 'Digite algo legal...',
+    
+    // AI Coach
+    aiCoachTitle: 'AI Coach RD',
+    makeProfileAwesome: 'Vamos fazer seu perfil ser o mais incrível de todo o país.',
+    improveProfile: 'Melhorar Perfil',
+    analyzing: 'Analisando...',
+    feedback: 'Feedback',
+    improvedBio: 'Bio Melhorada',
+    icebreakers: 'Quebra-gelos',
+    copyBio: 'Copiar Bio',
+    copied: 'Copiado!',
+    tryAgain: 'Tentar Novamente',
+    
+    // Account Settings - Missing translations
+    yourStory: 'Sua Story',
+    whyImportant: 'Por que é importante?',
+    verificationIncreases: 'A verificação aumenta sua visibilidade e confiança',
+    privacyControls: 'A privacidade permite controlar sua experiência',
+    languagePersonalizes: 'O idioma personaliza a interface à sua preferência',
+    yourAccountVerified: 'Sua conta está verificada',
+    verifyForTrust: 'Verifique sua identidade para maior confiança',
+    seeVerification: 'Ver Verificação',
+    verifyNow: 'Verificar Agora',
+    clearTestVerification: 'Limpar Verificação de Teste',
+    clearTestConfirm: 'Tem certeza de que deseja limpar a verificação de teste?',
+    testVerificationCleared: '✅ Verificação de teste limpa com sucesso',
+    controlWhoSees: 'Controle quem pode ver seu conteúdo',
+    currentLanguage: 'Idioma atual',
+    changeLanguage: 'Alterar Idioma'
   },
   
   fr: {
@@ -599,7 +1019,112 @@ const translations: Record<Language, Translations> = {
     followRecommendations: 'Assurez-vous de suivre les recommandations pour obtenir une meilleure photo',
     tryAgain: 'Réessayer',
     tooManyAttempts: 'Trop de tentatives. Réessayez plus tard.',
-    tryLater: 'Revenez plus tard'
+    tryLater: 'Revenez plus tard',
+    
+    // Navigation & Main Views
+    discover: 'Découvrir',
+    matches: 'Matches',
+    messages: 'Messages',
+    profile: 'Profil',
+    account: 'Compte',
+    settings: 'Paramètres',
+    
+    // Profile & Account
+    editProfile: 'Modifier le Profil',
+    myProfile: 'Mon Profil',
+    accountSettings: 'Paramètres du Compte',
+    privacyAndSecurity: 'Confidentialité et Sécurité',
+    configurePrivacy: 'Configurer la Confidentialité',
+    
+    // Chat & Messages
+    typeMessage: 'Tapez un message...',
+    sendPhoto: 'Envoyer photo',
+    sendGif: 'Envoyer GIF',
+    online: 'En ligne',
+    offline: 'Hors ligne',
+    lastSeen: 'Vu pour la dernière fois',
+    typing: 'en train d\'écrire...',
+    
+    // Swipe Actions
+    superLike: 'Super Like',
+    rewind: 'Rembobiner',
+    boost: 'Booster',
+    
+    // Common Actions
+    edit: 'Modifier',
+    delete: 'Supprimer',
+    report: 'Signaler',
+    block: 'Bloquer',
+    unblock: 'Débloquer',
+    
+    // Time & Date
+    now: 'maintenant',
+    today: 'aujourd\'hui',
+    yesterday: 'hier',
+    minutesAgo: 'il y a {minutes}min',
+    hoursAgo: 'il y a {hours}h',
+    daysAgo: 'il y a {days}j',
+    
+    // Notifications
+    newMatch: 'Nouveau match',
+    newMessage: 'Nouveau message',
+    profileVisit: 'A visité votre profil',
+    
+    // Errors & Status
+    connectionError: 'Erreur de connexion',
+    tryAgainLater: 'Réessayez plus tard',
+    somethingWentWrong: 'Quelque chose s\'est mal passé',
+    noInternetConnection: 'Pas de connexion internet',
+    
+    // Messages & Matches
+    noMatchesYet: 'Pas encore de matches',
+    whenYouMatch: 'Quand vous matcherez avec quelqu\'un, vous pourrez discuter ici.',
+    newMatch: 'Nouveau match',
+    matchesCount: '{count} matches',
+    
+    // Profile
+    myPhotos: 'Mes Photos',
+    managePhotos: 'Gérer les Photos',
+    yearsOld: '{age} ans',
+    job: 'Travail',
+    interests: 'Intérêts',
+    bio: 'Bio',
+    location: 'Localisation',
+    age: 'Âge',
+    
+    // Chat
+    newMatchExclamation: 'Nouveau Match!',
+    sendFirstMessage: 'Envoyez le premier message à {name}',
+    typeSomethingCool: 'Tapez quelque chose de cool...',
+    
+    // AI Coach
+    aiCoachTitle: 'AI Coach RD',
+    makeProfileAwesome: 'Rendons votre profil le plus génial de tout le pays.',
+    improveProfile: 'Améliorer le Profil',
+    analyzing: 'Analyse...',
+    feedback: 'Commentaires',
+    improvedBio: 'Bio Améliorée',
+    icebreakers: 'Brise-glaces',
+    copyBio: 'Copier la Bio',
+    copied: 'Copié!',
+    tryAgain: 'Réessayer',
+    
+    // Account Settings - Missing translations
+    yourStory: 'Votre Story',
+    whyImportant: 'Pourquoi est-ce important?',
+    verificationIncreases: 'La vérification augmente votre visibilité et confiance',
+    privacyControls: 'La confidentialité vous permet de contrôler votre expérience',
+    languagePersonalizes: 'La langue personnalise l\'interface selon votre préférence',
+    yourAccountVerified: 'Votre compte est vérifié',
+    verifyForTrust: 'Vérifiez votre identité pour plus de confiance',
+    seeVerification: 'Voir la Vérification',
+    verifyNow: 'Vérifier Maintenant',
+    clearTestVerification: 'Effacer la Vérification de Test',
+    clearTestConfirm: 'Êtes-vous sûr de vouloir effacer la vérification de test?',
+    testVerificationCleared: '✅ Vérification de test effacée avec succès',
+    controlWhoSees: 'Contrôlez qui peut voir votre contenu',
+    currentLanguage: 'Langue actuelle',
+    changeLanguage: 'Changer de Langue'
   }
 };
 

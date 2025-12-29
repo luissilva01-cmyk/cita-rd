@@ -193,9 +193,15 @@ const App: React.FC = () => {
     }
   };
 
-  const handleSendMessage = async (chatId: string, text: string) => {
+  const handleSendMessage = async (
+    chatId: string, 
+    text?: string, 
+    type: Message['type'] = 'text', 
+    content?: string, 
+    duration?: number
+  ) => {
     try {
-      await sendMessage(chatId, CURRENT_USER_ID, text);
+      await sendMessage(chatId, CURRENT_USER_ID, text, type, content, duration);
     } catch (error) {
       console.error('Error sending message:', error);
     }
@@ -313,8 +319,11 @@ const App: React.FC = () => {
               timestamp: currentChat.timestamp
             }}
             messages={chatMessages[currentChat.id] || []} 
-            onSendMessage={(text) => handleSendMessage(currentChat.id, text)} 
+            onSendMessage={(text, type, content, duration) => 
+              handleSendMessage(currentChat.id, text, type, content, duration)
+            } 
             onBack={() => setActiveView('messages')} 
+            currentUserId={CURRENT_USER_ID}
           />
         );
       default:

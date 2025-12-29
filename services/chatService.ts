@@ -63,20 +63,46 @@ export const getUserChats = (userId: string, callback: (chats: Chat[]) => void) 
   });
 };
 
-// Enviar mensaje a un chat
-export const sendMessage = async (chatId: string, senderId: string, text: string) => {
-  const messageData = {
+// Enviar mensaje a un chat (actualizado para soportar diferentes tipos)
+export const sendMessage = async (
+  chatId: string, 
+  senderId: string, 
+  text?: string,
+  type: Message['type'] = 'text',
+  content?: string,
+  duration?: number
+) => {
+  const messageData: any = {
     senderId,
-    text,
+    type,
     timestamp: Date.now(),
-    serverTimestamp: serverTimestamp()
+    serverTimestamp: serverTimestamp(),
+    isRead: false
   };
+
+  // Agregar contenido según el tipo
+  if (type === 'text' && text) {
+    messageData.text = text;
+  } else if (type === 'emoji' && content) {
+    messageData.content = content;
+  } else if (type === 'voice' && content && duration) {
+    messageData.content = content; // URL del archivo de audio
+    messageData.duration = duration;
+  } else if ((type === 'image' || type === 'video') && content) {
+    messageData.content = content; // URL del archivo
+  }
 
   await addDoc(collection(db, "chats", chatId, "messages"), messageData);
   
   // Actualizar último mensaje del chat
+  const lastMessageText = type === 'text' ? text : 
+                         type === 'emoji' ? content :
+                         type === 'voice' ? '🎤 Mensaje de voz' :
+                         type === 'image' ? '📷 Imagen' :
+                         type === 'video' ? '🎥 Video' : 'Mensaje';
+  
   await updateDoc(doc(db, "chats", chatId), {
-    lastMessage: text,
+    lastMessage: lastMessageText,
     timestamp: Date.now(),
     serverTimestamp: serverTimestamp()
   });

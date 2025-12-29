@@ -1,28 +1,95 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronLeft, Send, Phone, Video, Mic, Sparkles, Loader2, MoreHorizontal } from 'lucide-react';
-import { Match, Message } from '../../types';
+import { 
+  ChevronLeft, 
+  Send, 
+  Phone, 
+  Video, 
+  Mic, 
+  MicOff,
+  Sparkles, 
+  Loader2, 
+  Smile,
+  Image,
+  Camera,
+  StopCircle
+} from 'lucide-react';
+import { Match, Message, Call } from '../../types';
 import { getIcebreakerSuggestions } from '../../services/geminiService';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { sendMessage } from '../../services/chatService';
+import { callManager, listenToIncomingCalls } from '../../services/callService';
+import { VoiceRecorder, uploadVoiceMessage } from '../../services/voiceMessageService';
+import EmojiPicker from '../../components/EmojiPicker';
+import CallInterface from '../../components/CallInterface';
+import VoiceMessage from '../../components/VoiceMessage';
 
 interface ChatViewProps {
   match: Match;
   messages: Message[];
-  onSendMessage: (text: string) => void;
+  onSendMessage: (text?: string, type?: Message['type'], content?: string, duration?: number) => void;
   onBack: () => void;
+  currentUserId: string;
 }
 
-const ChatView: React.FC<ChatViewProps> = ({ match, messages, onSendMessage, onBack }) => {
+const ChatView: React.FC<ChatViewProps> = ({ 
+  match, 
+  messages, 
+  onSendMessage, 
+  onBack, 
+  currentUserId 
+}) => {
   const { t } = useLanguage();
   const [inputValue, setInputValue] = useState('');
   const [icebreakers, setIcebreakers] = useState<string[]>([]);
   const [loadingIce, setLoadingIce] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  
+  // Estados para nuevas funcionalidades
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingDuration, setRecordingDuration] = useState(0);
+  const [voiceRecorder] = useState(() => new VoiceRecorder(
+    undefined, // onDataAvailable se configurará después
+    undefined  // onError se configurará después
+  ));
+  const [currentCall, setCurrentCall] = useState<Call | null>(null);
+  const [incomingCalls, setIncomingCalls] = useState<Call[]>([]);
+  const recordingIntervalRef = useRef<NodeJS.Timeout>();
 
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages]);
+
+  // Escuchar llamadas entrantes
+  useEffect(() => {
+    const unsubscribe = listenToIncomingCalls(currentUserId, (calls) => {
+      setIncomingCalls(calls);
+      // Si hay una llamada entrante para este chat, mostrarla
+      const incomingCall = calls.find(call => 
+        call.chatId === match.id && call.status === 'ringing'
+      );
+      if (incomingCall) {
+        setCurrentCall(incomingCall);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [currentUserId, match.id]);
+
+  // Configurar call manager
+  useEffect(() => {
+    const handleCallStateChange = (call: Call | null) => {
+      setCurrentCall(call);
+    };
+
+    callManager.onCallStateChange = handleCallStateChange;
+
+    return () => {
+      callManager.onCallStateChange = undefined;
+    };
+  }, []);
 
   const loadIcebreakers = async () => {
     setLoadingIce(true);
@@ -43,9 +110,86 @@ const ChatView: React.FC<ChatViewProps> = ({ match, messages, onSendMessage, onB
 
   const handleSendMessage = () => {
     if (inputValue.trim()) {
-      onSendMessage(inputValue);
+      onSendMessage(inputValue, 'text');
       setInputValue('');
     }
+  };
+
+  const handleSendEmoji = (emoji: string) => {
+    onSendMessage(undefined, 'emoji', emoji);
+  };
+
+  const handleStartVoiceRecording = async () => {
+    try {
+      setIsRecording(true);
+      setRecordingDuration(0);
+      
+      // Configurar grabador de voz
+      voiceRecorder.onDataAvailable = async (duration, audioBlob) => {
+        try {
+          console.log('🎤 Subiendo mensaje de voz...');
+          const audioUrl = await uploadVoiceMessage(audioBlob, match.id, currentUserId);
+          onSendMessage(undefined, 'voice', audioUrl, duration);
+          console.log('✅ Mensaje de voz enviado');
+        } catch (error) {
+          console.error('❌ Error enviando mensaje de voz:', error);
+        }
+      };
+
+      voiceRecorder.onError = (error) => {
+        console.error('❌ Error en grabación:', error);
+        setIsRecording(false);
+        setRecordingDuration(0);
+      };
+
+      await voiceRecorder.startRecording();
+      
+      // Contador de duración
+      recordingIntervalRef.current = setInterval(() => {
+        setRecordingDuration(prev => prev + 1);
+      }, 1000);
+      
+    } catch (error) {
+      console.error('❌ Error iniciando grabación:', error);
+      setIsRecording(false);
+    }
+  };
+
+  const handleStopVoiceRecording = () => {
+    if (voiceRecorder.isRecording()) {
+      voiceRecorder.stopRecording();
+    }
+    setIsRecording(false);
+    setRecordingDuration(0);
+    
+    if (recordingIntervalRef.current) {
+      clearInterval(recordingIntervalRef.current);
+    }
+  };
+
+  const handleCancelVoiceRecording = () => {
+    voiceRecorder.cancelRecording();
+    setIsRecording(false);
+    setRecordingDuration(0);
+    
+    if (recordingIntervalRef.current) {
+      clearInterval(recordingIntervalRef.current);
+    }
+  };
+
+  const handleStartCall = async (type: 'voice' | 'video') => {
+    try {
+      console.log('📞 Iniciando llamada:', type);
+      await callManager.startCall(match.id, currentUserId, match.user.id, type);
+    } catch (error) {
+      console.error('❌ Error iniciando llamada:', error);
+    }
+  };
+
+  const formatRecordingDuration = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -76,8 +220,18 @@ const ChatView: React.FC<ChatViewProps> = ({ match, messages, onSendMessage, onB
           </div>
         </div>
         <div className="flex gap-2 text-slate-400">
-          <Phone size={20} className="cursor-pointer hover:text-slate-600 transition-colors" />
-          <Video size={20} className="cursor-pointer hover:text-slate-600 transition-colors" />
+          <button 
+            onClick={() => handleStartCall('voice')}
+            className="p-2 hover:bg-slate-100 rounded-full transition-colors"
+          >
+            <Phone size={20} className="cursor-pointer hover:text-slate-600 transition-colors" />
+          </button>
+          <button 
+            onClick={() => handleStartCall('video')}
+            className="p-2 hover:bg-slate-100 rounded-full transition-colors"
+          >
+            <Video size={20} className="cursor-pointer hover:text-slate-600 transition-colors" />
+          </button>
         </div>
       </div>
 
@@ -98,17 +252,43 @@ const ChatView: React.FC<ChatViewProps> = ({ match, messages, onSendMessage, onB
           messages.map((msg) => (
             <div 
               key={msg.id} 
-              className={`flex ${msg.senderId === 'me' ? 'justify-end' : 'justify-start'}`}
+              className={`flex ${msg.senderId === currentUserId ? 'justify-end' : 'justify-start'}`}
             >
-              <div 
-                className={`max-w-[75%] px-4 py-2.5 rounded-2xl text-sm ${
-                  msg.senderId === 'me' 
-                    ? 'bg-rose-500 text-white rounded-tr-none shadow-md shadow-rose-100' 
-                    : 'bg-white text-slate-800 rounded-tl-none border border-slate-100 shadow-sm'
-                }`}
-              >
-                {msg.text}
-              </div>
+              {/* Mensaje de texto */}
+              {msg.type === 'text' && (
+                <div 
+                  className={`max-w-[75%] px-4 py-2.5 rounded-2xl text-sm ${
+                    msg.senderId === currentUserId 
+                      ? 'bg-rose-500 text-white rounded-tr-none shadow-md shadow-rose-100' 
+                      : 'bg-white text-slate-800 rounded-tl-none border border-slate-100 shadow-sm'
+                  }`}
+                >
+                  {msg.text}
+                </div>
+              )}
+
+              {/* Mensaje de emoji */}
+              {msg.type === 'emoji' && (
+                <div 
+                  className={`max-w-[75%] px-4 py-2.5 rounded-2xl text-3xl ${
+                    msg.senderId === currentUserId 
+                      ? 'bg-rose-500 rounded-tr-none shadow-md shadow-rose-100' 
+                      : 'bg-white rounded-tl-none border border-slate-100 shadow-sm'
+                  }`}
+                >
+                  {msg.content}
+                </div>
+              )}
+
+              {/* Mensaje de voz */}
+              {msg.type === 'voice' && msg.content && msg.duration && (
+                <VoiceMessage
+                  audioUrl={msg.content}
+                  duration={msg.duration}
+                  isOwn={msg.senderId === currentUserId}
+                  timestamp={msg.timestamp}
+                />
+              )}
             </div>
           ))
         )}
@@ -154,20 +334,69 @@ const ChatView: React.FC<ChatViewProps> = ({ match, messages, onSendMessage, onB
 
       {/* Input */}
       <div className="p-4 bg-white border-t border-slate-100">
+        
+        {/* Grabación de voz activa */}
+        {isRecording && (
+          <div className="mb-4 bg-red-50 border border-red-200 rounded-2xl p-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+              <span className="text-red-700 font-medium">Grabando...</span>
+              <span className="text-red-600 text-sm">{formatRecordingDuration(recordingDuration)}</span>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={handleCancelVoiceRecording}
+                className="px-3 py-1 text-red-600 text-sm hover:bg-red-100 rounded-lg transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleStopVoiceRecording}
+                className="px-3 py-1 bg-red-500 text-white text-sm rounded-lg hover:bg-red-600 transition-colors flex items-center gap-1"
+              >
+                <StopCircle size={14} />
+                Enviar
+              </button>
+            </div>
+          </div>
+        )}
+
         <div className="flex items-center gap-2 bg-slate-100 rounded-full px-4 py-1 focus-within:bg-white focus-within:ring-2 focus-within:ring-rose-500 focus-within:border-rose-500 transition-all">
-          <Mic className="text-slate-400 cursor-pointer hover:text-slate-600 transition-colors" size={20} />
+          
+          {/* Botón de emoji */}
+          <button
+            onClick={() => setShowEmojiPicker(true)}
+            className="text-slate-400 hover:text-slate-600 transition-colors"
+          >
+            <Smile size={20} />
+          </button>
+
+          {/* Botón de micrófono */}
+          <button
+            onClick={isRecording ? handleStopVoiceRecording : handleStartVoiceRecording}
+            className={`transition-colors ${
+              isRecording 
+                ? 'text-red-500 hover:text-red-600' 
+                : 'text-slate-400 hover:text-slate-600'
+            }`}
+          >
+            {isRecording ? <MicOff size={20} /> : <Mic size={20} />}
+          </button>
+
           <input 
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={t('typeSomethingCool')}
             className="flex-1 bg-transparent border-none focus:ring-0 py-3 text-sm outline-none placeholder-slate-400"
+            disabled={isRecording}
           />
+          
           <button 
             onClick={handleSendMessage}
-            disabled={!inputValue.trim()}
+            disabled={!inputValue.trim() || isRecording}
             className={`p-1 rounded-full transition-all ${
-              inputValue.trim() 
+              inputValue.trim() && !isRecording
                 ? 'text-white bg-rose-500 hover:bg-rose-600 shadow-md' 
                 : 'text-slate-300'
             }`}
@@ -176,6 +405,24 @@ const ChatView: React.FC<ChatViewProps> = ({ match, messages, onSendMessage, onB
           </button>
         </div>
       </div>
+
+      {/* Emoji Picker */}
+      <EmojiPicker
+        isOpen={showEmojiPicker}
+        onEmojiSelect={handleSendEmoji}
+        onClose={() => setShowEmojiPicker(false)}
+      />
+
+      {/* Call Interface */}
+      <CallInterface
+        call={currentCall}
+        isIncoming={currentCall?.receiverId === currentUserId}
+        onAnswer={() => console.log('Llamada respondida')}
+        onDecline={() => setCurrentCall(null)}
+        onEnd={() => setCurrentCall(null)}
+        otherUserName={match.user.name}
+        otherUserImage={match.user.images[0]}
+      />
     </div>
   );
 };

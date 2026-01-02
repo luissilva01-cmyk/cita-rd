@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Simple - Story Messages</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 0;
+            width: 100%;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .result {
+            margin: 15px 0;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test Simple - Story Messages</h1>
+        <p>Prueba básica para verificar que los mensajes de historias funcionen correctamente.</p>
+        
+        <button onclick="testApp()">🔍 Verificar Estado de la App</button>
+        <div id="app-status"></div>
+        
+        <button onclick="testConsole()">📝 Test de Console</button>
+        <div id="console-test"></div>
+        
+        <button onclick="testLocalStorage()">💾 Test de LocalStorage</button>
+        <div id="storage-test"></div>
+        
+        <button onclick="openApp()">🚀 Abrir App Principal</button>
+        
+        <div class="result info">
+            <strong>Instrucciones:</strong><br>
+            1. Verifica que la app esté funcionando<br>
+            2. Abre la app principal<br>
+            3. Ve a Discovery → Historias<br>
+            4. Intenta enviar una reacción<br>
+            5. Revisa la consola del navegador para errores
+        </div>
+    </div>
+
+    <script>
+        function testApp() {
+            const result = document.getElementById('app-status');
+            result.innerHTML = '⏳ Verificando...';
+            
+            fetch('http://localhost:3000')
+                .then(response => {
+                    if (response.ok) {
+                        result.innerHTML = '<div class="result success">✅ App funcionando correctamente en localhost:3000</div>';
+                    } else {
+                        result.innerHTML = `<div class="result error">❌ Error HTTP: ${response.status}</div>`;
+                    }
+                })
+                .catch(error => {
+                    result.innerHTML = `<div class="result error">❌ No se puede conectar: ${error.message}</div>`;
+                });
+        }
+
+        function testConsole() {
+            const result = document.getElementById('console-test');
+            
+            try {
+                console.log('🧪 Test de console funcionando');
+                console.error('🧪 Test de console.error funcionando');
+                console.warn('🧪 Test de console.warn funcionando');
+                
+                result.innerHTML = '<div class="result success">✅ Console funcionando correctamente</div>';
+            } catch (error) {
+                result.innerHTML = `<div class="result error">❌ Error en console: ${error.message}</div>`;
+            }
+        }
+
+        function testLocalStorage() {
+            const result = document.getElementById('storage-test');
+            
+            try {
+                const testKey = 'test-story-messages';
+                const testValue = 'test-value-' + Date.now();
+                
+                localStorage.setItem(testKey, testValue);
+                const retrieved = localStorage.getItem(testKey);
+                localStorage.removeItem(testKey);
+                
+                if (retrieved === testValue) {
+                    result.innerHTML = '<div class="result success">✅ LocalStorage funcionando correctamente</div>';
+                } else {
+                    result.innerHTML = '<div class="result error">❌ LocalStorage no funciona correctamente</div>';
+                }
+            } catch (error) {
+                result.innerHTML = `<div class="result error">❌ Error en LocalStorage: ${error.message}</div>`;
+            }
+        }
+
+        function openApp() {
+            window.open('http://localhost:3000', '_blank');
+        }
+
+        // Auto-verificar al cargar
+        window.onload = function() {
+            testApp();
+        };
+
+        // Capturar errores globales
+        window.addEventListener('error', function(e) {
+            console.error('🚨 Error global capturado:', e.error);
+        });
+
+        window.addEventListener('unhandledrejection', function(e) {
+            console.error('🚨 Promise rejection capturada:', e.reason);
+        });
+    </script>
+</body>
+</html>

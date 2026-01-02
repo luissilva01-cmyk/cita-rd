@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { X, Camera, Shield, CheckCircle, AlertCircle, Clock, Star } from 'lucide-react';
 import { verificationService, VerificationAttempt, UserVerification } from '../services/verificationService';
 import { useTranslation } from '../hooks/useTranslation';
-import SimpleCamera, { SimpleCameraRef } from './SimpleCamera';
+import ReliableCamera, { ReliableCameraRef } from './ReliableCamera';
 
 interface IdentityVerificationProps {
   isOpen: boolean;
@@ -35,7 +35,7 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const cameraRef = useRef<SimpleCameraRef>(null);
+  const cameraRef = useRef<ReliableCameraRef>(null);
 
   // Cargar información de verificación al abrir
   useEffect(() => {
@@ -71,77 +71,25 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
 
   const startCamera = async () => {
     try {
-      console.log('🎥 Iniciando cámara - método simple...');
+      console.log('🎥 Iniciando cámara - método directo...');
       setCameraError(null);
       setIsVideoReady(false);
       
-      // Limpiar stream anterior si existe
-      if (cameraStream) {
-        cameraStream.getTracks().forEach(track => track.stop());
-        setCameraStream(null);
-      }
-
-      // Método simple como test-camera.html
-      console.log('📋 Solicitando acceso a cámara...');
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: 'user' } 
-      });
-      
-      console.log('✅ Stream obtenido:', stream.active);
-      console.log('📹 Tracks:', stream.getTracks().length);
-      
-      setCameraStream(stream);
-      
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        
-        videoRef.current.onloadedmetadata = () => {
-          console.log('📊 Video metadata cargada');
-          console.log('📐 Dimensiones:', videoRef.current?.videoWidth + 'x' + videoRef.current?.videoHeight);
-        };
-        
-        videoRef.current.oncanplay = () => {
-          console.log('▶️ Video listo para reproducir');
-          setIsVideoReady(true);
-        };
-        
-        videoRef.current.onerror = (error) => {
-          console.log('❌ Error en video:', error);
-          setCameraError('Error en elemento de video');
-        };
-        
-        // FORZAR REPRODUCCIÓN INMEDIATA - Como en test-camera.html
-        setTimeout(() => {
-          if (videoRef.current && stream.active) {
-            console.log('🎬 Forzando reproducción...');
-            videoRef.current.play().then(() => {
-              console.log('✅ Video reproduciendo exitosamente');
-              setIsVideoReady(true);
-            }).catch(error => {
-              console.error('❌ Error reproduciendo:', error);
-              // Si falla el play(), aún así marcar como listo
-              setIsVideoReady(true);
-            });
-          }
-        }, 200);
-        
-        // BACKUP: Forzar isVideoReady después de 1 segundo si no se disparan los eventos
-        setTimeout(() => {
-          if (stream.active && !isVideoReady) {
-            console.log('⏰ Timeout - Forzando video ready');
-            setIsVideoReady(true);
-          }
-        }, 1000);
-      }
-      
+      // Cambiar al paso de captura inmediatamente
       setCurrentStep('capture');
       
+      console.log('✅ Cambiado a paso capture, el componente ReliableCamera se renderizará ahora');
+      
     } catch (error) {
-      console.error('❌ Error:', error);
+      console.error('❌ Error en startCamera:', error);
       
       let errorMessage = 'Error desconocido';
       
       if (error instanceof Error) {
+        console.error('❌ Error name:', error.name);
+        console.error('❌ Error message:', error.message);
+        console.error('❌ Error stack:', error.stack);
+        
         switch (error.name) {
           case 'NotAllowedError':
             errorMessage = 'Acceso a la cámara denegado. Haz clic en el candado 🔒 junto a la URL y permite el acceso.';
@@ -155,6 +103,9 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
           default:
             errorMessage = `Error: ${error.message}`;
         }
+      } else {
+        console.error('❌ Error no es instancia de Error:', typeof error, error);
+        errorMessage = 'Error desconocido en la cámara';
       }
       
       setCameraError(errorMessage);
@@ -243,7 +194,7 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
   const resetVerification = () => {
     console.log('🧹 Limpiando verificación...');
     
-    // Detener cámara usando el método del SimpleCamera
+    // Detener cámara usando el método del ReliableCamera
     if (cameraRef.current) {
       cameraRef.current.stopCamera();
     }
@@ -281,7 +232,7 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
           </div>
           
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            ¡Ya estás verificado!
+            {t('alreadyVerified')}
           </h2>
           
           <p className="text-gray-600 mb-4">
@@ -291,7 +242,7 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
           <div className="flex items-center justify-center gap-2 mb-6">
             <Shield className="text-blue-500" size={20} />
             <span className="font-semibold text-blue-600">
-              {userVerification.verificationLevel === 'premium' ? 'Verificación Premium' : 'Verificado'}
+              {userVerification.verificationLevel === 'premium' ? 'Verificación Premium' : t('verified')}
             </span>
             {userVerification.verificationLevel === 'premium' && (
               <Star className="text-yellow-500" size={16} />
@@ -302,7 +253,7 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
             onClick={handleClose}
             className="w-full py-3 px-4 bg-blue-500 text-white rounded-xl font-semibold hover:bg-blue-600 transition-colors"
           >
-            Cerrar
+            {t('close')}
           </button>
         </div>
       </div>
@@ -317,7 +268,7 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div className="flex items-center gap-3">
             <Shield className="text-blue-500" size={24} />
-            <h2 className="text-xl font-bold text-gray-900">Verificación de Identidad</h2>
+            <h2 className="text-xl font-bold text-gray-900">{t('identityVerification')}</h2>
           </div>
           <button
             onClick={handleClose}
@@ -338,30 +289,29 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
               </div>
               
               <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                Verifica tu identidad
+                {t('verifyIdentity')}
               </h3>
               
               <p className="text-gray-600 mb-6">
-                Toma una selfie para confirmar que eres una persona real. 
-                Esto aumentará tu confiabilidad y visibilidad en la app.
+                {t('takeASelfie')}
               </p>
               
               <div className="space-y-4 mb-6">
                 <div className="flex items-center gap-3 text-left">
                   <CheckCircle className="text-green-500" size={20} />
-                  <span className="text-sm text-gray-700">Aumenta tu visibilidad en un 300%</span>
+                  <span className="text-sm text-gray-700">{t('increasesVisibility')}</span>
                 </div>
                 <div className="flex items-center gap-3 text-left">
                   <CheckCircle className="text-green-500" size={20} />
-                  <span className="text-sm text-gray-700">Badge de verificación visible</span>
+                  <span className="text-sm text-gray-700">{t('verificationBadge')}</span>
                 </div>
                 <div className="flex items-center gap-3 text-left">
                   <CheckCircle className="text-green-500" size={20} />
-                  <span className="text-sm text-gray-700">Mayor confianza de otros usuarios</span>
+                  <span className="text-sm text-gray-700">{t('greaterTrust')}</span>
                 </div>
                 <div className="flex items-center gap-3 text-left">
                   <CheckCircle className="text-green-500" size={20} />
-                  <span className="text-sm text-gray-700">Proceso rápido y seguro</span>
+                  <span className="text-sm text-gray-700">{t('quickAndSecure')}</span>
                 </div>
               </div>
               
@@ -375,7 +325,7 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
                   onClick={() => setCurrentStep('camera')}
                   className="w-full py-3 px-4 bg-blue-500 text-white rounded-xl font-semibold hover:bg-blue-600 transition-colors"
                 >
-                  Comenzar verificación
+                  {t('startVerification')}
                 </button>
               )}
             </div>
@@ -389,7 +339,7 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
               </div>
               
               <h3 className="text-xl font-bold text-gray-900 mb-4">
-                Acceso a la cámara
+                {t('cameraAccess')}
               </h3>
               
               <p className="text-gray-600 mb-6">
@@ -398,29 +348,43 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
               </p>
               
               <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
-                <h4 className="font-semibold text-blue-900 mb-2">Consejos para una buena selfie:</h4>
+                <h4 className="font-semibold text-blue-900 mb-2">{t('goodSelfieTitle')}</h4>
                 <ul className="text-sm text-blue-700 space-y-1 text-left">
-                  <li>• Asegúrate de tener buena iluminación</li>
-                  <li>• Mira directamente a la cámara</li>
-                  <li>• Mantén una expresión neutral</li>
-                  <li>• No uses lentes oscuros o sombreros</li>
+                  <li>• {t('goodLighting')}</li>
+                  <li>• {t('lookDirectly')}</li>
+                  <li>• {t('neutralExpression')}</li>
+                  <li>• {t('noSunglasses')}</li>
                 </ul>
               </div>
               
-              <button
-                onClick={startCamera}
-                className="w-full py-3 px-4 bg-blue-500 text-white rounded-xl font-semibold hover:bg-blue-600 transition-colors mb-3"
-              >
-                Activar cámara
-              </button>
+              {/* BOTÓN HORIZONTAL MEJORADO - SIN COMPONENTE OCULTO */}
+              <div className="w-full">
+                <button
+                  onClick={startCamera}
+                  className="w-full py-4 px-6 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-2xl font-bold text-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center gap-3"
+                >
+                  <Camera size={24} />
+                  <span>{t('activateCamera')}</span>
+                  <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                </button>
+              </div>
               
               {cameraError && (
-                <div className="bg-red-50 border border-red-200 rounded-xl p-4 mt-4">
+                <div className="bg-red-50 border border-red-200 rounded-xl p-4 mt-6">
                   <AlertCircle className="text-red-500 mx-auto mb-2" size={24} />
                   <p className="text-red-700 text-sm mb-3">{cameraError}</p>
                   <p className="text-red-600 text-xs">
                     💡 Solución: Haz clic en el candado 🔒 junto a la URL, permite acceso a la cámara y recarga la página.
                   </p>
+                  <button
+                    onClick={() => {
+                      setCameraError(null);
+                      startCamera();
+                    }}
+                    className="mt-3 w-full py-2 px-4 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600 transition-colors"
+                  >
+                    Intentar de nuevo
+                  </button>
                 </div>
               )}
             </div>
@@ -430,7 +394,7 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
           {currentStep === 'capture' && (
             <div className="text-center">
               <h3 className="text-xl font-bold text-gray-900 mb-4">
-                Toma tu selfie
+                {t('takeASelfie')}
               </h3>
               
               {/* Error de cámara */}
@@ -445,27 +409,29 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
                     }}
                     className="mt-2 px-4 py-2 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600"
                   >
-                    Intentar de nuevo
+                    {t('tryAgain')}
                   </button>
                 </div>
               )}
               
               <div className="relative mb-6">
-                {/* Componente de cámara simple */}
-                <SimpleCamera
+                {/* Componente de cámara confiable - SE INICIA AUTOMÁTICAMENTE */}
+                <ReliableCamera
                   ref={cameraRef}
                   onStreamReady={(stream) => {
                     setCameraStream(stream);
-                    console.log('🎯 Stream listo desde SimpleCamera');
+                    console.log('🎯 Stream listo desde ReliableCamera');
                   }}
                   onVideoReady={() => {
                     setIsVideoReady(true);
-                    console.log('🎯 Video listo desde SimpleCamera');
+                    console.log('🎯 Video listo desde ReliableCamera');
                   }}
                   onError={(error) => {
                     setCameraError(error);
-                    console.error('🎯 Error desde SimpleCamera:', error);
+                    console.error('🎯 Error desde ReliableCamera:', error);
                   }}
+                  className="w-full h-64 object-cover rounded-xl bg-gray-900"
+                  autoStart={true}
                 />
                 
                 {/* Loading overlay simplificado */}
@@ -514,10 +480,10 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
               
               <p className="text-gray-600 mb-6">
                 {isVideoReady 
-                  ? 'Posiciona tu rostro dentro del círculo y presiona capturar'
+                  ? t('positionYourFace')
                   : cameraError
-                  ? 'Hay un problema con la cámara. Revisa los permisos e intenta de nuevo.'
-                  : 'Esperando acceso a la cámara...'
+                  ? t('cameraProblems')
+                  : t('waitingCamera')
                 }
               </p>
               
@@ -526,7 +492,7 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
                   onClick={() => {
                     console.log('❌ Cancelando captura, deteniendo cámara...');
                     
-                    // Detener cámara usando SimpleCamera
+                    // Detener cámara usando ReliableCamera
                     if (cameraRef.current) {
                       cameraRef.current.stopCamera();
                     }
@@ -543,14 +509,14 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
                   }}
                   className="flex-1 py-3 px-4 border border-gray-300 rounded-xl text-gray-700 font-semibold hover:bg-gray-50 transition-colors"
                 >
-                  Cancelar
+                  {t('cancel')}
                 </button>
                 <button
                   onClick={capturePhoto}
                   disabled={!isVideoReady || !!cameraError}
                   className="flex-1 py-3 px-4 bg-blue-500 text-white rounded-xl font-semibold hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
-                  {isVideoReady ? 'Capturar' : 'Esperando...'}
+                  {isVideoReady ? t('capture') : t('loading')}
                 </button>
               </div>
             </div>
@@ -564,7 +530,7 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
               </div>
               
               <h3 className="text-xl font-bold text-gray-900 mb-4">
-                Procesando verificación
+                {t('processingVerification')}
               </h3>
               
               {capturedImage && (
@@ -578,8 +544,7 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
               )}
               
               <p className="text-gray-600 mb-6">
-                Estamos analizando tu foto y comparándola con tu perfil. 
-                Esto puede tomar unos segundos...
+                {t('analyzingPhoto')}
               </p>
               
               {/* Progress Steps */}
@@ -597,10 +562,10 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
                         {step.status === 'pending' && <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>}
                       </div>
                       <span className="text-sm text-gray-700">
-                        {step.step === 'face_detection' && 'Detectando rostro'}
-                        {step.step === 'quality_check' && 'Verificando calidad'}
-                        {step.step === 'liveness_check' && 'Verificando autenticidad'}
-                        {step.step === 'face_comparison' && 'Comparando con perfil'}
+                        {step.step === 'face_detection' && t('detectingFace')}
+                        {step.step === 'quality_check' && t('verifyingQuality')}
+                        {step.step === 'liveness_check' && t('verifyingAuthenticity')}
+                        {step.step === 'face_comparison' && t('comparingWithProfile')}
                       </span>
                       {step.confidence > 0 && (
                         <span className="text-xs text-gray-500 ml-auto">
@@ -628,36 +593,35 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
               </div>
               
               <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                {currentAttempt.status === 'approved' ? '¡Verificación exitosa!' : 'Verificación fallida'}
+                {currentAttempt.status === 'approved' ? t('verificationSuccessful') : t('verificationFailed')}
               </h3>
               
               {currentAttempt.status === 'approved' ? (
                 <div>
                   <p className="text-gray-600 mb-6">
-                    ¡Felicidades! Tu identidad ha sido verificada exitosamente. 
-                    Ahora tienes un badge de verificación y mayor visibilidad.
+                    {t('congratulations')} {t('identityVerified')}. 
+                    {t('verificationBadgeEarned')}.
                   </p>
                   
                   <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6">
                     <div className="flex items-center justify-center gap-2 mb-2">
                       <Shield className="text-green-600" size={20} />
-                      <span className="font-semibold text-green-800">Verificado</span>
+                      <span className="font-semibold text-green-800">{t('verified')}</span>
                     </div>
                     <p className="text-sm text-green-700">
-                      Confianza: {currentAttempt.confidence}%
+                      {t('confidence')}: {currentAttempt.confidence}%
                     </p>
                   </div>
                 </div>
               ) : (
                 <div>
                   <p className="text-gray-600 mb-4">
-                    {currentAttempt.rejectionReason || 'No se pudo verificar tu identidad en este momento.'}
+                    {currentAttempt.rejectionReason || t('canTryAgain')}
                   </p>
                   
                   <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
                     <p className="text-sm text-red-700">
-                      Puedes intentar nuevamente. Asegúrate de seguir las recomendaciones 
-                      para obtener una mejor foto.
+                      {t('followRecommendations')}
                     </p>
                   </div>
                 </div>
@@ -669,14 +633,14 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
                     onClick={resetVerification}
                     className="flex-1 py-3 px-4 border border-gray-300 rounded-xl text-gray-700 font-semibold hover:bg-gray-50 transition-colors"
                   >
-                    Intentar de nuevo
+                    {t('tryAgain')}
                   </button>
                 )}
                 <button
                   onClick={handleClose}
                   className="flex-1 py-3 px-4 bg-blue-500 text-white rounded-xl font-semibold hover:bg-blue-600 transition-colors"
                 >
-                  Cerrar
+                  {t('close')}
                 </button>
               </div>
             </div>

@@ -10,13 +10,23 @@ export interface UserProfile {
   job?: string;
   distance?: string;
   isVerified?: boolean;
+  
+  // Propiedades de análisis de perfil
+  visibilityBoost?: number;
+  profileScore?: number;
+  
+  // Propiedades de IA de matching
+  aiCompatibility?: number;
+  aiPriority?: 'high' | 'medium' | 'low';
+  aiRecommendation?: string;
+  matchLikelihood?: number;
 }
 
 export interface Message {
   id: string;
   senderId: string;
   text?: string;
-  type: 'text' | 'emoji' | 'voice' | 'image' | 'video';
+  type: 'text' | 'emoji' | 'voice' | 'image' | 'video' | 'story_reaction';
   content?: string; // Para emojis, URLs de archivos, etc.
   duration?: number; // Para mensajes de voz en segundos
   timestamp: number;

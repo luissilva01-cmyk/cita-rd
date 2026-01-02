@@ -56,13 +56,13 @@ const ProfileView: React.FC<ProfileViewProps> = ({ user, onUpdate }) => {
         {/* Profile Score Section */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-slate-800">Score del Perfil</h3>
+            <h3 className="text-lg font-semibold text-slate-800">{t('profileScore')}</h3>
             <button
               onClick={() => setShowProfileScore(!showProfileScore)}
               className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
             >
               <BarChart3 size={16} />
-              {showProfileScore ? 'Ocultar' : 'Ver Score'}
+              {showProfileScore ? t('hide') : t('viewScore')}
             </button>
           </div>
 
@@ -98,7 +98,7 @@ const ProfileView: React.FC<ProfileViewProps> = ({ user, onUpdate }) => {
                 className="w-32 h-32 rounded-full object-cover mx-auto border-4 border-white shadow-lg"
               />
             </div>
-            <p className="text-sm text-slate-600 mt-2">Foto principal</p>
+            <p className="text-sm text-slate-600 mt-2">{t('mainPhoto')}</p>
           </div>
 
           {/* Photo uploader */}
@@ -118,7 +118,7 @@ const ProfileView: React.FC<ProfileViewProps> = ({ user, onUpdate }) => {
         {/* Basic Info */}
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">Nombre</label>
+            <label className="block text-sm font-medium text-slate-700 mb-2">{t('name')}</label>
             {isEditing ? (
               <input
                 type="text"
@@ -132,7 +132,7 @@ const ProfileView: React.FC<ProfileViewProps> = ({ user, onUpdate }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">Edad</label>
+            <label className="block text-sm font-medium text-slate-700 mb-2">{t('age')}</label>
             {isEditing ? (
               <input
                 type="number"
@@ -148,7 +148,7 @@ const ProfileView: React.FC<ProfileViewProps> = ({ user, onUpdate }) => {
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-2">
               <MapPin className="inline w-4 h-4 mr-1" />
-              Ubicación
+              {t('location')}
             </label>
             {isEditing ? (
               <input
@@ -173,14 +173,14 @@ const ProfileView: React.FC<ProfileViewProps> = ({ user, onUpdate }) => {
           )}
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">Biografía</label>
+            <label className="block text-sm font-medium text-slate-700 mb-2">{t('bio')}</label>
             {isEditing ? (
               <textarea
                 value={editedUser.bio}
                 onChange={(e) => setEditedUser({ ...editedUser, bio: e.target.value })}
                 rows={4}
                 className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent resize-none"
-                placeholder="Cuéntanos sobre ti..."
+                placeholder={t('tellUsAboutYou')}
               />
             ) : (
               <p className="text-slate-600 leading-relaxed">{user.bio}</p>

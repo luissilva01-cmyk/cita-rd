@@ -87,11 +87,11 @@ const CreateStoryModal: React.FC<CreateStoryModalProps> = ({
       onClose();
       
       // Mostrar feedback
-      alert('✅ ¡Story creada exitosamente!\n\n🎉 Tu story estará visible por 24 horas.');
+      alert(`✅ ${t('storyCreatedSuccessfully')}\n\n🎉 ${t('storyVisibleFor24Hours')}`);
       
     } catch (error) {
       console.error('❌ Error creando story:', error);
-      alert('❌ Error creando la story. Inténtalo de nuevo.');
+      alert(`❌ ${t('errorCreatingStory')}`);
     } finally {
       setIsCreating(false);
     }

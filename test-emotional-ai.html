@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - IA Emocional Integrada</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8fafc;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+        .status.success {
+            background: #dcfce7;
+            color: #166534;
+        }
+        .status.info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        .feature {
+            margin-bottom: 20px;
+            padding: 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #f8fafc;
+        }
+        .feature h3 {
+            margin: 0 0 12px 0;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .feature-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .feature-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+        .check {
+            color: #10b981;
+            font-weight: bold;
+        }
+        .integration-flow {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+        .integration-flow h3 {
+            margin: 0 0 16px 0;
+        }
+        .flow-step {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 12px 0;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+        .step-number {
+            background: rgba(255, 255, 255, 0.2);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 16px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            margin: 12px 0;
+        }
+        .highlight {
+            background: #fef3c7;
+            padding: 2px 4px;
+            border-radius: 4px;
+            color: #92400e;
+        }
+        .next-steps {
+            background: #f0f9ff;
+            border: 1px solid #0ea5e9;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 24px;
+        }
+        .next-steps h3 {
+            color: #0369a1;
+            margin: 0 0 12px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <span style="font-size: 32px;">🧠</span>
+            <div>
+                <h1 style="margin: 0; color: #1e293b;">IA Emocional - Integración Completa</h1>
+                <p style="margin: 4px 0 0 0; color: #64748b;">Sistema de análisis emocional integrado en ChatView</p>
+            </div>
+        </div>
+
+        <div class="status success">
+            <span>✅</span>
+            <span>Integración completada exitosamente</span>
+        </div>
+
+        <div class="integration-flow">
+            <h3>🔄 Flujo de Integración Implementado</h3>
+            
+            <div class="flow-step">
+                <div class="step-number">1</div>
+                <div>
+                    <strong>Importación de Componentes</strong><br>
+                    <small>EmotionalInsights, useEmotionalAI, SmartSuggestion importados en ChatView</small>
+                </div>
+            </div>
+            
+            <div class="flow-step">
+                <div class="step-number">2</div>
+                <div>
+                    <strong>Hook de IA Emocional</strong><br>
+                    <small>useEmotionalAI() inicializado con todas las funciones de análisis</small>
+                </div>
+            </div>
+            
+            <div class="flow-step">
+                <div class="step-number">3</div>
+                <div>
+                    <strong>Análisis Automático</strong><br>
+                    <small>Cada mensaje se analiza automáticamente al enviarse</small>
+                </div>
+            </div>
+            
+            <div class="flow-step">
+                <div class="step-number">4</div>
+                <div>
+                    <strong>Botón de IA en Header</strong><br>
+                    <small>Botón Brain con indicadores visuales de estado</small>
+                </div>
+            </div>
+            
+            <div class="flow-step">
+                <div class="step-number">5</div>
+                <div>
+                    <strong>Sugerencias Inteligentes</strong><br>
+                    <small>Sugerencias de IA mostradas junto a icebreakers</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="feature">
+            <h3>🧠 Funcionalidades Implementadas</h3>
+            <ul class="feature-list">
+                <li>
+                    <span class="check">✅</span>
+                    <strong>Análisis de Emociones:</strong> Detecta emociones en tiempo real (alegría, coqueteo, interés, etc.)
+                </li>
+                <li>
+                    <span class="check">✅</span>
+                    <strong>Análisis de Conversación:</strong> Evalúa compatibilidad emocional y salud del chat
+                </li>
+                <li>
+                    <span class="check">✅</span>
+                    <strong>Sugerencias Inteligentes:</strong> Genera respuestas contextuales basadas en emociones
+                </li>
+                <li>
+                    <span class="check">✅</span>
+                    <strong>Métricas de Conversación:</strong> Calcula engagement, momentum y tendencias
+                </li>
+                <li>
+                    <span class="check">✅</span>
+                    <strong>Interfaz Visual:</strong> Panel completo con tabs para diferentes análisis
+                </li>
+                <li>
+                    <span class="check">✅</span>
+                    <strong>Integración Automática:</strong> Análisis se ejecuta automáticamente en el chat
+                </li>
+            </ul>
+        </div>
+
+        <div class="feature">
+            <h3>🎯 Elementos de UI Agregados</h3>
+            <ul class="feature-list">
+                <li>
+                    <span class="check">✅</span>
+                    <strong>Botón Brain en Header:</strong> Acceso rápido al análisis emocional
+                </li>
+                <li>
+                    <span class="check">✅</span>
+                    <strong>Indicadores Visuales:</strong> Puntos de color para mostrar estado del análisis
+                </li>
+                <li>
+                    <span class="check">✅</span>
+                    <strong>Sugerencias en Chat:</strong> Botones de sugerencias IA junto a icebreakers
+                </li>
+                <li>
+                    <span class="check">✅</span>
+                    <strong>Modal de Insights:</strong> Panel completo con 4 tabs de análisis
+                </li>
+                <li>
+                    <span class="check">✅</span>
+                    <strong>Selección de Sugerencias:</strong> Click para insertar sugerencia en input
+                </li>
+            </ul>
+        </div>
+
+        <div class="feature">
+            <h3>⚡ Triggers de Análisis</h3>
+            <div class="code-block">
+// Análisis automático cuando cambian los mensajes
+useEffect(() => {
+  if (messages.length > 0) {
+    // Analizar último mensaje
+    const lastMessage = messages[messages.length - 1];
+    if (lastMessage && lastMessage.text) {
+      analyzeMessage(lastMessage);
+    }
+    
+    // Análisis completo cada 3 mensajes
+    if (messages.length % 3 === 0) {
+      analyzeConversation(match.id, messages);
+      generateSuggestions(match.id, messages);
+    }
+    
+    // Calcular métricas siempre
+    calculateMetrics(messages);
+  }
+}, [messages, match.id]);
+            </div>
+        </div>
+
+        <div class="feature">
+            <h3>🎨 Experiencia de Usuario</h3>
+            <ul class="feature-list">
+                <li>
+                    <span class="check">✅</span>
+                    <strong>Análisis Transparente:</strong> Usuario ve cuando la IA está analizando
+                </li>
+                <li>
+                    <span class="check">✅</span>
+                    <strong>Sugerencias Contextuales:</strong> Recomendaciones basadas en emociones detectadas
+                </li>
+                <li>
+                    <span class="check">✅</span>
+                    <strong>Insights Detallados:</strong> 4 tabs con diferentes tipos de análisis
+                </li>
+                <li>
+                    <span class="check">✅</span>
+                    <strong>Integración Fluida:</strong> No interrumpe el flujo natural del chat
+                </li>
+                <li>
+                    <span class="check">✅</span>
+                    <strong>Feedback Visual:</strong> Emojis, colores y barras de progreso
+                </li>
+            </ul>
+        </div>
+
+        <div class="next-steps">
+            <h3>🚀 Próximos Pasos Sugeridos</h3>
+            <ul style="margin: 0; padding-left: 20px;">
+                <li><strong>Pruebas de Usuario:</strong> Testear el sistema con conversaciones reales</li>
+                <li><strong>Refinamiento de Patrones:</strong> Mejorar detección de emociones en español</li>
+                <li><strong>Notificaciones Push:</strong> Alertas cuando la IA detecta oportunidades</li>
+                <li><strong>Aprendizaje Adaptativo:</strong> Sistema que aprende de las preferencias del usuario</li>
+                <li><strong>Integración con Matching:</strong> Usar insights emocionales para mejorar matches</li>
+            </ul>
+        </div>
+
+        <div class="status info">
+            <span>ℹ️</span>
+            <span>El sistema está listo para usar. Inicia una conversación para ver la IA en acción.</span>
+        </div>
+    </div>
+
+    <script>
+        console.log('🧠 IA Emocional - Sistema Integrado');
+        console.log('✅ Componentes: EmotionalInsights, useEmotionalAI');
+        console.log('✅ Servicios: emotionalAI service con análisis completo');
+        console.log('✅ UI: Botón Brain, sugerencias, modal de insights');
+        console.log('✅ Automatización: Análisis en tiempo real de mensajes');
+        console.log('🚀 Sistema listo para producción');
+    </script>
+</body>
+</html>

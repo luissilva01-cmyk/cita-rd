@@ -11,7 +11,8 @@ import {
   Smile,
   Image,
   Camera,
-  StopCircle
+  StopCircle,
+  Brain
 } from 'lucide-react';
 import { Match, Message, Call } from '../../types';
 import { getIcebreakerSuggestions } from '../../services/geminiService';
@@ -22,6 +23,9 @@ import { VoiceRecorder, uploadVoiceMessage } from '../../services/voiceMessageSe
 import EmojiPicker from '../../components/EmojiPicker';
 import CallInterface from '../../components/CallInterface';
 import VoiceMessage from '../../components/VoiceMessage';
+import EmotionalInsights from '../../components/EmotionalInsights';
+import { useEmotionalAI } from '../../hooks/useEmotionalAI';
+import { SmartSuggestion } from '../../services/emotionalAI';
 
 interface ChatViewProps {
   match: Match;
@@ -48,13 +52,43 @@ const ChatView: React.FC<ChatViewProps> = ({
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [recordingDuration, setRecordingDuration] = useState(0);
-  const [voiceRecorder] = useState(() => new VoiceRecorder(
-    undefined, // onDataAvailable se configurará después
-    undefined  // onError se configurará después
-  ));
   const [currentCall, setCurrentCall] = useState<Call | null>(null);
   const [incomingCalls, setIncomingCalls] = useState<Call[]>([]);
-  const recordingIntervalRef = useRef<NodeJS.Timeout>();
+  const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Estados para IA Emocional
+  const [showEmotionalInsights, setShowEmotionalInsights] = useState(false);
+  
+  // Hook de IA Emocional
+  const {
+    currentEmotion,
+    conversationInsights,
+    smartSuggestions,
+    conversationMetrics,
+    isAnalyzing,
+    error: emotionalError,
+    analyzeMessage,
+    analyzeConversation,
+    generateSuggestions,
+    calculateMetrics
+  } = useEmotionalAI();
+
+  // Cleanup al desmontar componente
+  useEffect(() => {
+    return () => {
+      // Limpiar interval de grabación
+      if (recordingIntervalRef.current) {
+        clearInterval(recordingIntervalRef.current);
+      }
+      
+      // Cancelar grabación si está activa
+      const recorder = (window as any).currentVoiceRecorder;
+      if (recorder) {
+        recorder.cancelRecording();
+        (window as any).currentVoiceRecorder = null;
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -62,20 +96,53 @@ const ChatView: React.FC<ChatViewProps> = ({
     }
   }, [messages]);
 
+  // Analizar conversación cuando cambian los mensajes
+  useEffect(() => {
+    if (messages.length > 0) {
+      console.log('🧠 Analizando conversación con', messages.length, 'mensajes');
+      
+      // Analizar el último mensaje si es nuevo
+      const lastMessage = messages[messages.length - 1];
+      if (lastMessage && lastMessage.text) {
+        analyzeMessage(lastMessage);
+      }
+      
+      // Analizar conversación completa cada 3 mensajes
+      if (messages.length % 3 === 0) {
+        analyzeConversation(match.id, messages);
+        generateSuggestions(match.id, messages);
+      }
+      
+      // Calcular métricas
+      calculateMetrics(messages);
+    }
+  }, [messages, match.id, analyzeMessage, analyzeConversation, generateSuggestions, calculateMetrics]);
+
   // Escuchar llamadas entrantes
   useEffect(() => {
+    if (!currentUserId) {
+      console.log('❌ currentUserId no está definido');
+      return;
+    }
+    
+    console.log('📞 Configurando listener para llamadas entrantes:', currentUserId);
     const unsubscribe = listenToIncomingCalls(currentUserId, (calls) => {
+      console.log('📞 Llamadas entrantes recibidas:', calls);
       setIncomingCalls(calls);
       // Si hay una llamada entrante para este chat, mostrarla
       const incomingCall = calls.find(call => 
         call.chatId === match.id && call.status === 'ringing'
       );
       if (incomingCall) {
+        console.log('📞 Llamada entrante para este chat:', incomingCall);
         setCurrentCall(incomingCall);
       }
     });
 
-    return () => unsubscribe();
+    return () => {
+      console.log('📞 Limpiando listener de llamadas');
+      unsubscribe();
+    };
   }, [currentUserId, match.id]);
 
   // Configurar call manager
@@ -119,70 +186,203 @@ const ChatView: React.FC<ChatViewProps> = ({
     onSendMessage(undefined, 'emoji', emoji);
   };
 
+  // Manejar selección de sugerencia de IA
+  const handleSuggestionSelect = (suggestion: SmartSuggestion) => {
+    console.log('💡 Sugerencia seleccionada:', suggestion.text);
+    setInputValue(suggestion.text);
+    setShowEmotionalInsights(false);
+  };
+
   const handleStartVoiceRecording = async () => {
     try {
-      setIsRecording(true);
-      setRecordingDuration(0);
+      console.log('🎤 Iniciando grabación de voz...');
       
-      // Configurar grabador de voz
-      voiceRecorder.onDataAvailable = async (duration, audioBlob) => {
-        try {
-          console.log('🎤 Subiendo mensaje de voz...');
-          const audioUrl = await uploadVoiceMessage(audioBlob, match.id, currentUserId);
-          onSendMessage(undefined, 'voice', audioUrl, duration);
-          console.log('✅ Mensaje de voz enviado');
-        } catch (error) {
-          console.error('❌ Error enviando mensaje de voz:', error);
+      // Crear nuevo recorder con logs detallados
+      const recorder = new VoiceRecorder(
+        // onDataAvailable - cuando termina la grabación
+        async (duration: number, audioBlob: Blob) => {
+          try {
+            console.log('🎤 ✅ Callback onDataAvailable ejecutado!');
+            console.log('🎤 Duración:', duration, 'segundos');
+            console.log('🎤 Blob size:', audioBlob.size, 'bytes');
+            console.log('🎤 Blob type:', audioBlob.type);
+            
+            // Mostrar estado antes de subir
+            console.log('☁️ Iniciando subida a Firebase...');
+            console.log('☁️ Chat ID:', match.id);
+            console.log('☁️ Sender ID:', currentUserId);
+            
+            // Subir a Firebase Storage
+            const audioUrl = await uploadVoiceMessage(audioBlob, match.id, currentUserId);
+            console.log('☁️ ✅ Audio subido exitosamente:', audioUrl);
+            
+            // Enviar mensaje de voz
+            console.log('📤 Enviando mensaje de voz...');
+            onSendMessage(undefined, 'voice', audioUrl, duration);
+            console.log('📤 ✅ Mensaje de voz enviado');
+            
+            setIsRecording(false);
+            setRecordingDuration(0);
+            
+          } catch (error) {
+            console.error('❌ Error procesando mensaje de voz:', error);
+            console.error('❌ Error stack:', (error as Error).stack);
+            // TODO: Mostrar notificación de error más elegante
+            console.error('Error enviando mensaje de voz:', (error as Error).message);
+            setIsRecording(false);
+            setRecordingDuration(0);
+          }
+        },
+        // onError
+        (error: Error) => {
+          console.error('❌ Error en grabación:', error);
+          console.error('❌ Error stack:', error.stack);
+          // TODO: Mostrar notificación de error más elegante
+          console.error('Error grabando:', error.message);
+          setIsRecording(false);
+          setRecordingDuration(0);
         }
-      };
-
-      voiceRecorder.onError = (error) => {
-        console.error('❌ Error en grabación:', error);
-        setIsRecording(false);
-        setRecordingDuration(0);
-      };
-
-      await voiceRecorder.startRecording();
+      );
+      
+      console.log('🎤 VoiceRecorder creado, iniciando grabación...');
+      
+      // Iniciar grabación
+      await recorder.startRecording();
+      console.log('🎤 ✅ Grabación iniciada exitosamente');
+      
+      setIsRecording(true);
       
       // Contador de duración
       recordingIntervalRef.current = setInterval(() => {
-        setRecordingDuration(prev => prev + 1);
+        setRecordingDuration(prev => {
+          const newDuration = prev + 1;
+          console.log('🎤 Duración actual:', newDuration, 'segundos');
+          return newDuration;
+        });
       }, 1000);
+      
+      // Guardar referencia del recorder para poder detenerlo
+      (window as any).currentVoiceRecorder = recorder;
+      console.log('🎤 Recorder guardado en window.currentVoiceRecorder');
       
     } catch (error) {
       console.error('❌ Error iniciando grabación:', error);
-      setIsRecording(false);
+      console.error('❌ Error stack:', (error as Error).stack);
+      
+      let errorMessage = 'Error desconocido';
+      if (error instanceof Error) {
+        if (error.name === 'NotAllowedError') {
+          errorMessage = 'Permisos de micrófono denegados. Por favor, permite el acceso al micrófono.';
+        } else if (error.name === 'NotFoundError') {
+          errorMessage = 'No se encontró micrófono disponible.';
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      console.error('Error iniciando grabación:', errorMessage);
     }
   };
 
   const handleStopVoiceRecording = () => {
-    if (voiceRecorder.isRecording()) {
-      voiceRecorder.stopRecording();
-    }
-    setIsRecording(false);
-    setRecordingDuration(0);
+    console.log('🎤 🛑 Deteniendo grabación...');
     
+    // Detener contador
     if (recordingIntervalRef.current) {
       clearInterval(recordingIntervalRef.current);
+      recordingIntervalRef.current = null;
+      console.log('🎤 ✅ Contador detenido');
+    }
+    
+    // Detener grabación
+    const recorder = (window as any).currentVoiceRecorder;
+    if (recorder) {
+      console.log('🎤 Recorder encontrado, llamando stopRecording...');
+      recorder.stopRecording();
+      (window as any).currentVoiceRecorder = null;
+      console.log('🎤 ✅ stopRecording() llamado, esperando callback...');
+    } else {
+      console.error('❌ No se encontró recorder en window.currentVoiceRecorder');
+      setIsRecording(false);
+      setRecordingDuration(0);
     }
   };
 
   const handleCancelVoiceRecording = () => {
-    voiceRecorder.cancelRecording();
-    setIsRecording(false);
-    setRecordingDuration(0);
+    console.log('🎤 Cancelando grabación...');
     
+    // Detener contador
     if (recordingIntervalRef.current) {
       clearInterval(recordingIntervalRef.current);
+      recordingIntervalRef.current = null;
     }
+    
+    // Cancelar grabación
+    const recorder = (window as any).currentVoiceRecorder;
+    if (recorder) {
+      recorder.cancelRecording();
+      (window as any).currentVoiceRecorder = null;
+    }
+    
+    setIsRecording(false);
+    setRecordingDuration(0);
   };
 
   const handleStartCall = async (type: 'voice' | 'video') => {
     try {
       console.log('📞 Iniciando llamada:', type);
-      await callManager.startCall(match.id, currentUserId, match.user.id, type);
+      console.log('📞 Match ID:', match.id);
+      console.log('📞 Current User ID:', currentUserId);
+      console.log('📞 Other User ID:', match.user.id);
+      
+      // Verificar permisos primero
+      const constraints = {
+        audio: true,
+        video: type === 'video'
+      };
+      
+      console.log('📞 Solicitando permisos:', constraints);
+      
+      // Solicitar permisos antes de crear la llamada
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      console.log('📞 Permisos obtenidos:', stream);
+      console.log('📞 Video tracks:', stream.getVideoTracks());
+      console.log('📞 Audio tracks:', stream.getAudioTracks());
+      
+      // Crear llamada simulada (en producción usar callManager.startCall)
+      const mockCall: Call = {
+        id: 'test-call-' + Date.now(),
+        chatId: match.id,
+        callerId: currentUserId,
+        receiverId: match.user.id,
+        type,
+        status: 'active', // Directamente activa para pruebas
+        startTime: Date.now()
+      };
+      
+      console.log('📞 Creando llamada:', mockCall);
+      setCurrentCall(mockCall);
+      
+      // No limpiar el stream inmediatamente, dejarlo para CallInterface
+      console.log('📞 Llamada iniciada correctamente');
+      
     } catch (error) {
       console.error('❌ Error iniciando llamada:', error);
+      
+      let errorMessage = 'Error desconocido';
+      if (error instanceof Error) {
+        if (error.name === 'NotAllowedError') {
+          errorMessage = 'Permisos denegados. Por favor, permite el acceso a la cámara y micrófono.';
+        } else if (error.name === 'NotFoundError') {
+          errorMessage = 'No se encontró cámara o micrófono disponible.';
+        } else if (error.name === 'NotReadableError') {
+          errorMessage = 'La cámara está siendo usada por otra aplicación.';
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      console.error('Error iniciando llamada:', errorMessage);
     }
   };
 
@@ -220,14 +420,39 @@ const ChatView: React.FC<ChatViewProps> = ({
           </div>
         </div>
         <div className="flex gap-2 text-slate-400">
+          {/* Botón de IA Emocional */}
           <button 
-            onClick={() => handleStartCall('voice')}
+            onClick={() => setShowEmotionalInsights(true)}
+            className={`p-2 hover:bg-slate-100 rounded-full transition-colors relative ${
+              currentEmotion || conversationInsights ? 'text-purple-500' : ''
+            }`}
+            title="Análisis Emocional IA"
+          >
+            <Brain size={20} />
+            {/* Indicador de actividad */}
+            {isAnalyzing && (
+              <div className="absolute -top-1 -right-1 w-3 h-3 bg-purple-500 rounded-full animate-pulse"></div>
+            )}
+            {/* Indicador de insights disponibles */}
+            {(currentEmotion || conversationInsights) && !isAnalyzing && (
+              <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full"></div>
+            )}
+          </button>
+          
+          <button 
+            onClick={() => {
+              console.log('📞 Botón de llamada de voz presionado');
+              handleStartCall('voice');
+            }}
             className="p-2 hover:bg-slate-100 rounded-full transition-colors"
           >
             <Phone size={20} className="cursor-pointer hover:text-slate-600 transition-colors" />
           </button>
           <button 
-            onClick={() => handleStartCall('video')}
+            onClick={() => {
+              console.log('📹 Botón de videollamada presionado');
+              handleStartCall('video');
+            }}
             className="p-2 hover:bg-slate-100 rounded-full transition-colors"
           >
             <Video size={20} className="cursor-pointer hover:text-slate-600 transition-colors" />
@@ -289,6 +514,23 @@ const ChatView: React.FC<ChatViewProps> = ({
                   timestamp={msg.timestamp}
                 />
               )}
+
+              {/* Reacción a historia */}
+              {msg.type === 'story_reaction' && (() => {
+                console.log('🔍 Mensaje story_reaction:', msg.text, 'Longitud:', msg.text?.length);
+                return (
+                  <div 
+                    className={`max-w-[75%] px-4 py-3 rounded-2xl text-sm flex flex-col items-center gap-2 ${
+                      msg.senderId === currentUserId 
+                        ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-tr-none shadow-md shadow-purple-100' 
+                        : 'bg-gradient-to-r from-purple-50 to-pink-50 text-purple-800 rounded-tl-none border border-purple-200 shadow-sm'
+                    }`}
+                  >
+                    <span className="text-3xl">{msg.text}</span>
+                    <span className="text-xs opacity-70">Reaccionó a tu historia</span>
+                  </div>
+                );
+              })()}
             </div>
           ))
         )}
@@ -324,6 +566,41 @@ const ChatView: React.FC<ChatViewProps> = ({
                     className="shrink-0 bg-white border border-indigo-100 text-[11px] px-4 py-3 rounded-2xl text-slate-700 shadow-sm hover:bg-indigo-50 transition-colors"
                   >
                     {ice}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Sugerencias de IA Emocional */}
+          {smartSuggestions.length > 0 && (
+            <div className="w-full space-y-2 mt-4">
+              <p className="text-[10px] font-black text-purple-400 uppercase tracking-widest ml-2 flex items-center gap-1">
+                <Brain size={10} />
+                IA Emocional sugiere
+              </p>
+              <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2">
+                {smartSuggestions.slice(0, 3).map((suggestion) => (
+                  <button 
+                    key={suggestion.id}
+                    onClick={() => handleSuggestionSelect(suggestion)}
+                    className="shrink-0 bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 text-[11px] px-4 py-3 rounded-2xl text-purple-700 shadow-sm hover:from-purple-100 hover:to-pink-100 transition-all"
+                  >
+                    <div className="flex items-center gap-1 mb-1">
+                      <span className="text-xs opacity-70">{Math.round(suggestion.confidence * 100)}%</span>
+                      <div className="flex">
+                        {suggestion.emotionalContext.slice(0, 2).map((emotion, i) => (
+                          <span key={i} className="text-xs">
+                            {emotion === 'joy' ? '😊' : 
+                             emotion === 'flirtation' ? '😏' :
+                             emotion === 'interest' ? '🤔' :
+                             emotion === 'love' ? '❤️' :
+                             emotion === 'playfulness' ? '😄' : '🙂'}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    {suggestion.text}
                   </button>
                 ))}
               </div>
@@ -379,6 +656,7 @@ const ChatView: React.FC<ChatViewProps> = ({
                 ? 'text-red-500 hover:text-red-600' 
                 : 'text-slate-400 hover:text-slate-600'
             }`}
+            title={isRecording ? 'Detener grabación' : 'Iniciar grabación de voz'}
           >
             {isRecording ? <MicOff size={20} /> : <Mic size={20} />}
           </button>
@@ -413,16 +691,40 @@ const ChatView: React.FC<ChatViewProps> = ({
         onClose={() => setShowEmojiPicker(false)}
       />
 
-      {/* Call Interface */}
-      <CallInterface
-        call={currentCall}
-        isIncoming={currentCall?.receiverId === currentUserId}
-        onAnswer={() => console.log('Llamada respondida')}
-        onDecline={() => setCurrentCall(null)}
-        onEnd={() => setCurrentCall(null)}
-        otherUserName={match.user.name}
-        otherUserImage={match.user.images[0]}
+      {/* Emotional AI Insights */}
+      <EmotionalInsights
+        isOpen={showEmotionalInsights}
+        onClose={() => setShowEmotionalInsights(false)}
+        currentEmotion={currentEmotion}
+        conversationInsights={conversationInsights}
+        smartSuggestions={smartSuggestions}
+        conversationMetrics={conversationMetrics}
+        onSuggestionSelect={handleSuggestionSelect}
       />
+
+      {/* Call Interface */}
+      {(() => {
+        console.log('🎬 Renderizando CallInterface:', { currentCall, isIncoming: currentCall?.receiverId === currentUserId });
+        return (
+          <CallInterface
+            call={currentCall}
+            isIncoming={currentCall?.receiverId === currentUserId}
+            onAnswer={() => {
+              console.log('📞 Llamada respondida');
+            }}
+            onDecline={() => {
+              console.log('📞 Llamada rechazada');
+              setCurrentCall(null);
+            }}
+            onEnd={() => {
+              console.log('📞 Llamada terminada');
+              setCurrentCall(null);
+            }}
+            otherUserName={match.user.name}
+            otherUserImage={match.user.images[0]}
+          />
+        );
+      })()}
     </div>
   );
 };

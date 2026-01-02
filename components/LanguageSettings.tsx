@@ -16,12 +16,15 @@ const LanguageSettings: React.FC<LanguageSettingsProps> = ({
   const { currentLanguage, t, changeLanguage, availableLanguages } = useTranslation();
 
   const handleLanguageChange = (language: Language) => {
+    console.log('🌍 LanguageSettings - Cambiando idioma de', currentLanguage, 'a', language);
     changeLanguage(language);
     // Cerrar modal después de un breve delay para mostrar el cambio
     setTimeout(() => {
       onClose();
     }, 300);
   };
+
+  console.log('🌍 LanguageSettings - Idioma actual:', currentLanguage);
 
   if (!isOpen) return null;
 
@@ -86,16 +89,10 @@ const LanguageSettings: React.FC<LanguageSettingsProps> = ({
               <Globe className="text-blue-500 mt-0.5" size={20} />
               <div>
                 <h4 className="font-semibold text-blue-900 mb-1">
-                  {currentLanguage === 'es' ? 'Cambio instantáneo' : 
-                   currentLanguage === 'en' ? 'Instant change' :
-                   currentLanguage === 'pt' ? 'Mudança instantânea' :
-                   'Changement instantané'}
+                  {t('instantChange')}
                 </h4>
                 <p className="text-sm text-blue-700">
-                  {currentLanguage === 'es' ? 'El idioma se cambia inmediatamente en toda la aplicación.' :
-                   currentLanguage === 'en' ? 'The language changes immediately throughout the app.' :
-                   currentLanguage === 'pt' ? 'O idioma muda imediatamente em todo o aplicativo.' :
-                   'La langue change immédiatement dans toute l\'application.'}
+                  {t('languageChangesImmediately')}
                 </p>
               </div>
             </div>

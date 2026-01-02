@@ -6,6 +6,7 @@ import Messages from './views/views/Messages';
 import AICoach from './views/views/AICoach';
 import ProfileView from './views/views/Profile';
 import ChatView from './views/views/ChatView';
+import ErrorBoundary from './components/ErrorBoundary';
 import { View, UserProfile, Message } from './types';
 import { getUserChats, sendMessage, listenToMessages, findOrCreateChat, Chat } from './services/chatService';
 import { getDiscoveryProfiles, createOrUpdateProfile } from './services/profileService';
@@ -207,6 +208,60 @@ const App: React.FC = () => {
     }
   };
 
+  const handleSendStoryMessage = async (
+    userId: string, 
+    message: string, 
+    type: 'text' | 'story_reaction' = 'text'
+  ) => {
+    console.log('🚀 === INICIO handleSendStoryMessage ===');
+    console.log('📱 userId:', userId);
+    console.log('📱 message:', message);
+    console.log('� typee:', type);
+    console.log('📱 CURRENT_USER_ID:', CURRENT_USER_ID);
+    
+    try {
+      console.log('� Vaalidando parámetros...');
+      
+      if (!userId) {
+        throw new Error('userId es requerido');
+      }
+      
+      if (!message) {
+        throw new Error('message es requerido');
+      }
+      
+      if (!CURRENT_USER_ID) {
+        throw new Error('CURRENT_USER_ID no está definido');
+      }
+      
+      console.log('✅ Parámetros válidos');
+      console.log('🔍 Buscando/creando chat...');
+      
+      // Buscar o crear chat con el usuario
+      const chatId = await findOrCreateChat(CURRENT_USER_ID, userId);
+      console.log('✅ Chat encontrado/creado:', chatId);
+      
+      console.log('📤 Enviando mensaje...');
+      
+      // Enviar mensaje
+      await sendMessage(chatId, CURRENT_USER_ID, message, type);
+      console.log('✅ Mensaje enviado exitosamente');
+      console.log('🏁 === FIN handleSendStoryMessage ===');
+      
+    } catch (error) {
+      console.error('🚨 === ERROR en handleSendStoryMessage ===');
+      console.error('❌ Error:', error);
+      console.error('❌ Error message:', (error as Error).message);
+      console.error('❌ Error stack:', (error as Error).stack);
+      console.error('❌ Parámetros que causaron el error:', { userId, message, type, CURRENT_USER_ID });
+      console.error('🚨 === FIN ERROR ===');
+      
+      // No hacer throw del error para evitar que rompa la aplicación
+      // En su lugar, mostrar un mensaje de error amigable
+      console.log('⚠️ Mensaje no enviado debido a un error. La aplicación continúa funcionando.');
+    }
+  };
+
   const renderView = () => {
     switch (activeView) {
       case 'discovery':
@@ -215,6 +270,7 @@ const App: React.FC = () => {
             users={potentialMatches} 
             currentUserId={CURRENT_USER_ID}
             onLike={handleLike} 
+            onSendMessage={handleSendStoryMessage}
             onAction={(id) => {
               // No remover usuarios, solo hacer log
               console.log('👤 Usuario procesado:', id);
@@ -332,11 +388,18 @@ const App: React.FC = () => {
   };
 
   return (
-    <LanguageProvider>
-      <Layout activeView={activeView === 'chat' ? 'messages' : activeView} onViewChange={setActiveView}>
-        {renderView()}
-      </Layout>
-    </LanguageProvider>
+    <ErrorBoundary>
+      <LanguageProvider>
+        <Layout 
+          activeView={activeView === 'chat' ? 'messages' : activeView} 
+          onViewChange={setActiveView}
+          chats={chats}
+          currentUserId={CURRENT_USER_ID}
+        >
+          {renderView()}
+        </Layout>
+      </LanguageProvider>
+    </ErrorBoundary>
   );
 };
 

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Story Messages - CitaRD</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .error-box {
+            background: #fee;
+            border: 1px solid #fcc;
+            color: #c33;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .success-box {
+            background: #efe;
+            border: 1px solid #cfc;
+            color: #3c3;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+        .log-box {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐛 Debug Story Messages</h1>
+        <p>Esta página ayuda a diagnosticar problemas con el envío de mensajes desde historias.</p>
+
+        <div class="test-section">
+            <h3>🔍 Test de Conexión</h3>
+            <button onclick="testConnection()">Probar Conexión con App</button>
+            <div id="connection-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📱 Simular Envío de Mensaje</h3>
+            <button onclick="simulateStoryMessage()">Simular Reacción ❤️</button>
+            <button onclick="simulateTextMessage()">Simular Mensaje de Texto</button>
+            <div id="message-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🚨 Monitor de Errores</h3>
+            <button onclick="clearLogs()">Limpiar Logs</button>
+            <div id="error-log" class="log-box">Esperando errores...</div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔧 Información del Sistema</h3>
+            <div id="system-info"></div>
+        </div>
+    </div>
+
+    <script>
+        // Capturar todos los errores
+        let errorLog = [];
+        
+        window.addEventListener('error', function(e) {
+            const error = {
+                message: e.message,
+                filename: e.filename,
+                lineno: e.lineno,
+                colno: e.colno,
+                stack: e.error ? e.error.stack : 'No stack trace',
+                timestamp: new Date().toISOString()
+            };
+            errorLog.push(error);
+            updateErrorLog();
+        });
+
+        window.addEventListener('unhandledrejection', function(e) {
+            const error = {
+                message: 'Unhandled Promise Rejection: ' + e.reason,
+                stack: e.reason && e.reason.stack ? e.reason.stack : 'No stack trace',
+                timestamp: new Date().toISOString()
+            };
+            errorLog.push(error);
+            updateErrorLog();
+        });
+
+        function updateErrorLog() {
+            const logElement = document.getElementById('error-log');
+            if (errorLog.length === 0) {
+                logElement.innerHTML = 'No hay errores registrados ✅';
+                logElement.className = 'log-box success-box';
+            } else {
+                logElement.innerHTML = errorLog.map(error => 
+                    `[${error.timestamp}] ${error.message}\n${error.stack || ''}`
+                ).join('\n\n');
+                logElement.className = 'log-box error-box';
+            }
+        }
+
+        function clearLogs() {
+            errorLog = [];
+            updateErrorLog();
+        }
+
+        async function testConnection() {
+            const result = document.getElementById('connection-result');
+            result.innerHTML = '⏳ Probando conexión...';
+            
+            try {
+                const response = await fetch('http://localhost:3000');
+                if (response.ok) {
+                    result.innerHTML = '<div class="success-box">✅ Conexión exitosa con la app</div>';
+                } else {
+                    result.innerHTML = `<div class="error-box">❌ Error HTTP: ${response.status}</div>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<div class="error-box">❌ Error de conexión: ${error.message}</div>`;
+            }
+        }
+
+        async function simulateStoryMessage() {
+            const result = document.getElementById('message-result');
+            result.innerHTML = '⏳ Simulando envío de reacción...';
+            
+            try {
+                // Simular el flujo completo que ocurre en la app
+                console.log('🧪 Iniciando simulación de reacción a historia');
+                
+                // Datos de prueba
+                const testData = {
+                    currentUserId: 'KU5ZalR92QcPV7RGbLFTjEjTXZm2',
+                    otherUserId: '1',
+                    emoji: '❤️',
+                    type: 'story_reaction'
+                };
+                
+                console.log('🧪 Datos de prueba:', testData);
+                
+                // Simular la llamada a handleSendStoryMessage
+                const simulatedResult = await simulateHandleSendStoryMessage(
+                    testData.otherUserId, 
+                    testData.emoji, 
+                    testData.type
+                );
+                
+                result.innerHTML = `<div class="success-box">✅ Simulación exitosa: ${JSON.stringify(simulatedResult)}</div>`;
+                
+            } catch (error) {
+                console.error('❌ Error en simulación:', error);
+                result.innerHTML = `<div class="error-box">❌ Error en simulación: ${error.message}\n${error.stack || ''}</div>`;
+            }
+        }
+
+        async function simulateTextMessage() {
+            const result = document.getElementById('message-result');
+            result.innerHTML = '⏳ Simulando envío de mensaje de texto...';
+            
+            try {
+                const testData = {
+                    currentUserId: 'KU5ZalR92QcPV7RGbLFTjEjTXZm2',
+                    otherUserId: '1',
+                    message: 'Hola desde las historias!',
+                    type: 'text'
+                };
+                
+                const simulatedResult = await simulateHandleSendStoryMessage(
+                    testData.otherUserId, 
+                    testData.message, 
+                    testData.type
+                );
+                
+                result.innerHTML = `<div class="success-box">✅ Simulación exitosa: ${JSON.stringify(simulatedResult)}</div>`;
+                
+            } catch (error) {
+                console.error('❌ Error en simulación:', error);
+                result.innerHTML = `<div class="error-box">❌ Error en simulación: ${error.message}\n${error.stack || ''}</div>`;
+            }
+        }
+
+        // Simular la función handleSendStoryMessage
+        async function simulateHandleSendStoryMessage(userId, message, type = 'text') {
+            console.log('📱 Simulando envío de mensaje de story a usuario:', userId);
+            console.log('📱 Mensaje:', message, 'Tipo:', type);
+            console.log('🔍 Mensaje recibido:', message, 'Longitud:', message.length);
+            
+            // Simular búsqueda/creación de chat
+            const chatId = 'simulated-chat-' + Date.now();
+            console.log('📱 Chat simulado:', chatId);
+            
+            // Simular envío de mensaje
+            const messageData = {
+                senderId: 'KU5ZalR92QcPV7RGbLFTjEjTXZm2',
+                type: type,
+                text: type === 'story_reaction' ? message : (type === 'text' ? message : undefined),
+                content: type === 'emoji' ? message : undefined,
+                timestamp: Date.now(),
+                isRead: false
+            };
+            
+            console.log('💾 Datos del mensaje simulado:', messageData);
+            console.log('✅ Mensaje de story simulado exitosamente');
+            
+            return {
+                success: true,
+                chatId: chatId,
+                messageData: messageData,
+                timestamp: new Date().toISOString()
+            };
+        }
+
+        // Mostrar información del sistema
+        function showSystemInfo() {
+            const info = {
+                userAgent: navigator.userAgent,
+                url: window.location.href,
+                timestamp: new Date().toISOString(),
+                localStorage: !!window.localStorage,
+                sessionStorage: !!window.sessionStorage,
+                fetch: !!window.fetch,
+                console: !!window.console
+            };
+            
+            document.getElementById('system-info').innerHTML = `
+                <div class="log-box">
+                    <strong>User Agent:</strong> ${info.userAgent}<br>
+                    <strong>URL:</strong> ${info.url}<br>
+                    <strong>Timestamp:</strong> ${info.timestamp}<br>
+                    <strong>LocalStorage:</strong> ${info.localStorage ? '✅' : '❌'}<br>
+                    <strong>SessionStorage:</strong> ${info.sessionStorage ? '✅' : '❌'}<br>
+                    <strong>Fetch API:</strong> ${info.fetch ? '✅' : '❌'}<br>
+                    <strong>Console:</strong> ${info.console ? '✅' : '❌'}
+                </div>
+            `;
+        }
+
+        // Inicializar al cargar
+        window.onload = function() {
+            showSystemInfo();
+            testConnection();
+        };
+    </script>
+</body>
+</html>

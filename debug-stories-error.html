@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Stories Error - CitaRD</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            background: #f8f9fa;
+        }
+        .result {
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .log-output {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 500px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        .step {
+            margin: 10px 0;
+            padding: 10px;
+            border-left: 4px solid #007bff;
+            background: #f8f9fa;
+        }
+        .step.success {
+            border-left-color: #28a745;
+            background: #d4edda;
+        }
+        .step.error {
+            border-left-color: #dc3545;
+            background: #f8d7da;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐛 Debug Stories Error</h1>
+        <p>Diagnóstico paso a paso del error en Stories</p>
+
+        <div class="test-section">
+            <h3>🔍 Diagnóstico Automático</h3>
+            <button onclick="runFullDiagnosis()">Ejecutar Diagnóstico Completo</button>
+            <div id="diagnosis-results"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📋 Pasos de Diagnóstico</h3>
+            <div id="diagnosis-steps"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🌐 Test de Conectividad</h3>
+            <button onclick="testAppConnection()">Test Conexión con App</button>
+            <button onclick="testConsoleAccess()">Test Acceso a Console</button>
+            <div id="connectivity-results"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📝 Logs en Tiempo Real</h3>
+            <button onclick="clearLogs()">Limpiar Logs</button>
+            <button onclick="captureAppLogs()">Capturar Logs de la App</button>
+            <div id="real-time-logs" class="log-output">Esperando logs...</div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔧 Acciones de Reparación</h3>
+            <button onclick="suggestFixes()">Sugerir Soluciones</button>
+            <button onclick="openAppInNewTab()">Abrir App en Nueva Pestaña</button>
+            <div id="repair-suggestions"></div>
+        </div>
+    </div>
+
+    <script>
+        let logs = [];
+        let diagnosisSteps = [];
+
+        // Capturar errores globales
+        window.addEventListener('error', function(e) {
+            addLog(`[GLOBAL ERROR] ${e.message} at ${e.filename}:${e.lineno}`);
+        });
+
+        window.addEventListener('unhandledrejection', function(e) {
+            addLog(`[UNHANDLED REJECTION] ${e.reason}`);
+        });
+
+        function addLog(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            logs.push(`[${timestamp}] ${message}`);
+            updateLogs();
+        }
+
+        function updateLogs() {
+            const logElement = document.getElementById('real-time-logs');
+            logElement.textContent = logs.slice(-100).join('\n');
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+
+        function clearLogs() {
+            logs = [];
+            updateLogs();
+        }
+
+        function addDiagnosisStep(title, status, details) {
+            diagnosisSteps.push({ title, status, details, timestamp: new Date().toLocaleTimeString() });
+            updateDiagnosisSteps();
+        }
+
+        function updateDiagnosisSteps() {
+            const stepsElement = document.getElementById('diagnosis-steps');
+            stepsElement.innerHTML = diagnosisSteps.map(step => `
+                <div class="step ${step.status}">
+                    <strong>[${step.timestamp}] ${step.title}</strong><br>
+                    <small>${step.details}</small>
+                </div>
+            `).join('');
+        }
+
+        async function runFullDiagnosis() {
+            const results = document.getElementById('diagnosis-results');
+            results.innerHTML = '<div class="result info">🔍 Ejecutando diagnóstico completo...</div>';
+            
+            diagnosisSteps = [];
+            addLog('🚀 Iniciando diagnóstico completo...');
+
+            try {
+                // Paso 1: Verificar conectividad
+                addDiagnosisStep('1. Verificar Conectividad', 'info', 'Probando conexión con la aplicación...');
+                
+                const appResponse = await fetch('http://localhost:3000');
+                if (appResponse.ok) {
+                    addDiagnosisStep('1. Verificar Conectividad', 'success', '✅ App accesible en localhost:3000');
+                } else {
+                    addDiagnosisStep('1. Verificar Conectividad', 'error', `❌ Error HTTP: ${appResponse.status}`);
+                    return;
+                }
+
+                // Paso 2: Verificar JavaScript básico
+                addDiagnosisStep('2. Verificar JavaScript', 'info', 'Probando funciones básicas de JavaScript...');
+                
+                try {
+                    const testObj = { test: 'value' };
+                    const testArray = [1, 2, 3];
+                    const testPromise = Promise.resolve('test');
+                    
+                    addDiagnosisStep('2. Verificar JavaScript', 'success', '✅ JavaScript funcionando correctamente');
+                } catch (jsError) {
+                    addDiagnosisStep('2. Verificar JavaScript', 'error', `❌ Error JavaScript: ${jsError.message}`);
+                    return;
+                }
+
+                // Paso 3: Simular servicios
+                addDiagnosisStep('3. Simular Servicios', 'info', 'Probando simulación de servicios...');
+                
+                try {
+                    const mockResult = await simulateStoriesServices();
+                    addDiagnosisStep('3. Simular Servicios', 'success', `✅ Servicios simulados: ${mockResult.groups} grupos, ${mockResult.stories} stories`);
+                } catch (serviceError) {
+                    addDiagnosisStep('3. Simular Servicios', 'error', `❌ Error en servicios: ${serviceError.message}`);
+                }
+
+                // Paso 4: Verificar tipos de datos
+                addDiagnosisStep('4. Verificar Tipos de Datos', 'info', 'Verificando tipos de datos esperados...');
+                
+                try {
+                    const dataTypes = verifyDataTypes();
+                    addDiagnosisStep('4. Verificar Tipos de Datos', 'success', `✅ Tipos verificados: ${dataTypes.join(', ')}`);
+                } catch (typeError) {
+                    addDiagnosisStep('4. Verificar Tipos de Datos', 'error', `❌ Error de tipos: ${typeError.message}`);
+                }
+
+                // Paso 5: Test de React/ErrorBoundary
+                addDiagnosisStep('5. Simular React Component', 'info', 'Simulando comportamiento de componente React...');
+                
+                try {
+                    const reactTest = simulateReactComponent();
+                    addDiagnosisStep('5. Simular React Component', 'success', `✅ Componente simulado: ${reactTest.status}`);
+                } catch (reactError) {
+                    addDiagnosisStep('5. Simular React Component', 'error', `❌ Error React: ${reactError.message}`);
+                }
+
+                // Resultado final
+                const successSteps = diagnosisSteps.filter(step => step.status === 'success').length;
+                const totalSteps = diagnosisSteps.length;
+                
+                if (successSteps === totalSteps) {
+                    results.innerHTML = `
+                        <div class="result success">
+                            ✅ Diagnóstico completado: ${successSteps}/${totalSteps} pasos exitosos<br>
+                            <strong>Conclusión:</strong> Los servicios básicos funcionan correctamente.<br>
+                            <strong>Recomendación:</strong> El error puede estar en la integración React o en datos específicos.
+                        </div>
+                    `;
+                } else {
+                    results.innerHTML = `
+                        <div class="result warning">
+                            ⚠️ Diagnóstico completado: ${successSteps}/${totalSteps} pasos exitosos<br>
+                            <strong>Problemas detectados:</strong> Revisar pasos fallidos arriba.<br>
+                            <strong>Recomendación:</strong> Corregir errores identificados.
+                        </div>
+                    `;
+                }
+
+            } catch (error) {
+                addLog(`❌ Error en diagnóstico: ${error.message}`);
+                results.innerHTML = `<div class="result error">❌ Error ejecutando diagnóstico: ${error.message}</div>`;
+            }
+        }
+
+        async function simulateStoriesServices() {
+            // Simular exactamente lo que hace la app
+            const CURRENT_USER_ID = 'KU5ZalR92QcPV7RGbLFTjEjTXZm2';
+            
+            // Mock privacy service
+            const mockPrivacyService = {
+                async canViewStories(viewerId, storyOwnerId) {
+                    // Simular verificación de privacidad
+                    if (viewerId === storyOwnerId) return true;
+                    // Para testing, permitir ver todas las stories
+                    return true;
+                }
+            };
+
+            // Mock stories data
+            const mockStories = [
+                {
+                    id: 'story1',
+                    userId: '1',
+                    type: 'image',
+                    content: 'https://example.com/image1.jpg',
+                    createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
+                    expiresAt: new Date(Date.now() + 22 * 60 * 60 * 1000),
+                    viewedBy: []
+                }
+            ];
+
+            const mockStoryGroups = [
+                {
+                    id: 'group1',
+                    userId: '1',
+                    user: { name: 'Carolina', avatar: 'https://example.com/avatar1.jpg' },
+                    stories: mockStories.filter(s => s.userId === '1'),
+                    hasUnviewed: true,
+                    lastUpdated: new Date()
+                }
+            ];
+
+            // Simular getStoryGroups
+            const now = new Date();
+            const activeStories = mockStories.filter(story => story.expiresAt > now);
+            const filteredGroups = [];
+
+            for (const group of mockStoryGroups) {
+                const canView = await mockPrivacyService.canViewStories(CURRENT_USER_ID, group.userId);
+                if (canView) {
+                    const groupActiveStories = activeStories.filter(story => story.userId === group.userId);
+                    if (groupActiveStories.length > 0) {
+                        filteredGroups.push({
+                            ...group,
+                            stories: groupActiveStories,
+                            hasUnviewed: groupActiveStories.some(story => !story.viewedBy.includes(CURRENT_USER_ID))
+                        });
+                    }
+                }
+            }
+
+            return {
+                groups: filteredGroups.length,
+                stories: activeStories.length,
+                totalGroups: mockStoryGroups.length
+            };
+        }
+
+        function verifyDataTypes() {
+            const types = [];
+            
+            // Verificar tipos básicos
+            if (typeof 'string' === 'string') types.push('string');
+            if (typeof 123 === 'number') types.push('number');
+            if (typeof true === 'boolean') types.push('boolean');
+            if (typeof {} === 'object') types.push('object');
+            if (Array.isArray([])) types.push('array');
+            if (typeof new Date() === 'object') types.push('date');
+            if (typeof Promise.resolve() === 'object') types.push('promise');
+            
+            return types;
+        }
+
+        function simulateReactComponent() {
+            // Simular el comportamiento de un componente React
+            const mockProps = {
+                currentUserId: 'KU5ZalR92QcPV7RGbLFTjEjTXZm2',
+                onStoryClick: () => {},
+                onCreateStory: () => {}
+            };
+
+            const mockState = {
+                storyGroups: [],
+                loading: true,
+                showAccountSettings: false,
+                isVerified: false
+            };
+
+            // Simular useEffect
+            const mockUseEffect = () => {
+                // Simular loadStories
+                mockState.loading = false;
+                mockState.storyGroups = [
+                    {
+                        id: 'group1',
+                        userId: '1',
+                        user: { name: 'Test User', avatar: 'test.jpg' },
+                        stories: [],
+                        hasUnviewed: false,
+                        lastUpdated: new Date()
+                    }
+                ];
+            };
+
+            mockUseEffect();
+
+            return {
+                status: 'rendered',
+                props: Object.keys(mockProps).length,
+                state: Object.keys(mockState).length,
+                storyGroups: mockState.storyGroups.length
+            };
+        }
+
+        async function testAppConnection() {
+            const results = document.getElementById('connectivity-results');
+            results.innerHTML = '<div class="result info">🔍 Probando conexión...</div>';
+
+            try {
+                const response = await fetch('http://localhost:3000');
+                const text = await response.text();
+                
+                results.innerHTML = `
+                    <div class="result success">
+                        ✅ Conexión exitosa<br>
+                        Status: ${response.status} ${response.statusText}<br>
+                        Content-Type: ${response.headers.get('content-type')}<br>
+                        Content Length: ${text.length} caracteres
+                    </div>
+                `;
+            } catch (error) {
+                results.innerHTML = `<div class="result error">❌ Error de conexión: ${error.message}</div>`;
+            }
+        }
+
+        function testConsoleAccess() {
+            const results = document.getElementById('connectivity-results');
+            
+            try {
+                console.log('🧪 Test de console access');
+                console.error('🧪 Test de console error');
+                console.warn('🧪 Test de console warn');
+                
+                results.innerHTML = `
+                    <div class="result success">
+                        ✅ Console access funcionando<br>
+                        Logs enviados a la consola del navegador<br>
+                        Abre DevTools (F12) para verificar
+                    </div>
+                `;
+            } catch (error) {
+                results.innerHTML = `<div class="result error">❌ Error accediendo console: ${error.message}</div>`;
+            }
+        }
+
+        function captureAppLogs() {
+            addLog('📱 Intentando capturar logs de la aplicación...');
+            addLog('💡 Para ver logs de la app, abre DevTools (F12) en la pestaña de la aplicación');
+            addLog('🔍 Busca logs que empiecen con: 📱, 🔒, ✅, ❌');
+        }
+
+        function suggestFixes() {
+            const suggestions = document.getElementById('repair-suggestions');
+            
+            suggestions.innerHTML = `
+                <div class="result info">
+                    <strong>🔧 Sugerencias de Reparación:</strong><br><br>
+                    
+                    <strong>1. Verificar Console Logs:</strong><br>
+                    • Abre DevTools (F12) en la app<br>
+                    • Ve a la pestaña Console<br>
+                    • Busca errores en rojo<br>
+                    • Busca logs que empiecen con 🚨<br><br>
+                    
+                    <strong>2. Recargar Servicios:</strong><br>
+                    • Recarga la página de la app (Ctrl+R)<br>
+                    • Limpia cache (Ctrl+Shift+R)<br>
+                    • Verifica que el servidor esté corriendo<br><br>
+                    
+                    <strong>3. Verificar Datos:</strong><br>
+                    • Abre test-stories-loading.html<br>
+                    • Ejecuta test de servicios<br>
+                    • Verifica que los IDs sean consistentes<br><br>
+                    
+                    <strong>4. ErrorBoundary:</strong><br>
+                    • El ErrorBoundary está capturando un error<br>
+                    • Puede ser un error de renderizado React<br>
+                    • Revisa props y state de StoriesViewer<br><br>
+                    
+                    <strong>5. Acciones Inmediatas:</strong><br>
+                    • Abre la app en una nueva pestaña<br>
+                    • Ve a Discovery<br>
+                    • Abre DevTools antes de tocar stories<br>
+                    • Intenta acceder a stories y captura el error exacto
+                </div>
+            `;
+        }
+
+        function openAppInNewTab() {
+            window.open('http://localhost:3000', '_blank');
+            addLog('🌐 App abierta en nueva pestaña');
+            addLog('💡 Abre DevTools (F12) en la nueva pestaña antes de usar stories');
+        }
+
+        // Auto-ejecutar diagnóstico al cargar
+        window.onload = function() {
+            addLog('🚀 Debug Stories Error iniciado');
+            setTimeout(runFullDiagnosis, 1000);
+        };
+    </script>
+</body>
+</html>

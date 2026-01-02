@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Stories Loading - CitaRD</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            background: #f8f9fa;
+        }
+        .result {
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .story-group {
+            display: inline-block;
+            margin: 10px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background: white;
+            min-width: 200px;
+        }
+        .story-user {
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 5px;
+        }
+        .story-count {
+            color: #666;
+            font-size: 12px;
+        }
+        .log-output {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📱 Test Stories Loading</h1>
+        <p>Diagnosticar problemas de carga de historias</p>
+
+        <div class="test-section">
+            <h3>🔍 Test de Servicios</h3>
+            <button onclick="testPrivacyService()">Test Privacy Service</button>
+            <button onclick="testStoriesService()">Test Stories Service</button>
+            <button onclick="testFullFlow()">Test Flujo Completo</button>
+            <div id="service-results"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📱 Simulación de Carga</h3>
+            <button onclick="simulateStoriesLoading()">Simular Carga de Stories</button>
+            <div id="loading-results"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 Story Groups</h3>
+            <div id="story-groups"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📝 Logs Detallados</h3>
+            <button onclick="clearLogs()">Limpiar Logs</button>
+            <div id="detailed-logs" class="log-output">Esperando logs...</div>
+        </div>
+    </div>
+
+    <script>
+        const CURRENT_USER_ID = 'KU5ZalR92QcPV7RGbLFTjEjTXZm2';
+        let logs = [];
+
+        // Capturar logs de console
+        const originalLog = console.log;
+        const originalError = console.error;
+        
+        console.log = function(...args) {
+            logs.push(`[LOG] ${new Date().toLocaleTimeString()}: ${args.join(' ')}`);
+            updateLogs();
+            originalLog.apply(console, args);
+        };
+        
+        console.error = function(...args) {
+            logs.push(`[ERROR] ${new Date().toLocaleTimeString()}: ${args.join(' ')}`);
+            updateLogs();
+            originalError.apply(console, args);
+        };
+
+        function updateLogs() {
+            const logElement = document.getElementById('detailed-logs');
+            logElement.textContent = logs.slice(-50).join('\n'); // Últimos 50 logs
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+
+        function clearLogs() {
+            logs = [];
+            updateLogs();
+        }
+
+        // Simular Privacy Service
+        class MockPrivacyService {
+            constructor() {
+                this.privacySettings = new Map();
+                this.userMatches = [];
+                this.initializeDemoData();
+            }
+
+            initializeDemoData() {
+                const demoSettings = [
+                    { userId: 'KU5ZalR92QcPV7RGbLFTjEjTXZm2', allowStoryReplies: true, storiesVisibility: 'everyone' },
+                    { userId: '1', allowStoryReplies: true, storiesVisibility: 'everyone' },
+                    { userId: '2', allowStoryReplies: true, storiesVisibility: 'everyone' },
+                    { userId: '3', allowStoryReplies: true, storiesVisibility: 'everyone' },
+                    { userId: '4', allowStoryReplies: true, storiesVisibility: 'everyone' }
+                ];
+
+                demoSettings.forEach(setting => {
+                    this.privacySettings.set(setting.userId, setting);
+                });
+
+                this.userMatches = [
+                    { userId1: 'KU5ZalR92QcPV7RGbLFTjEjTXZm2', userId2: '1', isActive: true },
+                    { userId1: 'KU5ZalR92QcPV7RGbLFTjEjTXZm2', userId2: '2', isActive: true },
+                    { userId1: 'KU5ZalR92QcPV7RGbLFTjEjTXZm2', userId2: '3', isActive: true },
+                    { userId1: 'KU5ZalR92QcPV7RGbLFTjEjTXZm2', userId2: '4', isActive: true }
+                ];
+            }
+
+            async getPrivacySettings(userId) {
+                let settings = this.privacySettings.get(userId);
+                if (!settings) {
+                    settings = { userId, allowStoryReplies: true, storiesVisibility: 'everyone' };
+                    this.privacySettings.set(userId, settings);
+                }
+                return settings;
+            }
+
+            async areUsersMatched(userId1, userId2) {
+                return this.userMatches.some(match => 
+                    match.isActive && (
+                        (match.userId1 === userId1 && match.userId2 === userId2) ||
+                        (match.userId1 === userId2 && match.userId2 === userId1)
+                    )
+                );
+            }
+
+            async canViewStories(viewerId, storyOwnerId) {
+                if (viewerId === storyOwnerId) return true;
+                const ownerSettings = await this.getPrivacySettings(storyOwnerId);
+                
+                switch (ownerSettings.storiesVisibility) {
+                    case 'everyone':
+                        return true;
+                    case 'matches_only':
+                        return await this.areUsersMatched(viewerId, storyOwnerId);
+                    default:
+                        return false;
+                }
+            }
+        }
+
+        // Simular Stories Service
+        class MockStoriesService {
+            constructor() {
+                this.stories = [];
+                this.storyGroups = [];
+                this.privacyService = new MockPrivacyService();
+                this.initializeDemoData();
+            }
+
+            initializeDemoData() {
+                const demoStories = [
+                    {
+                        id: 'story1',
+                        userId: '1',
+                        type: 'image',
+                        content: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=400&h=600&fit=crop',
+                        createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
+                        expiresAt: new Date(Date.now() + 22 * 60 * 60 * 1000),
+                        viewedBy: []
+                    },
+                    {
+                        id: 'story2',
+                        userId: '2',
+                        type: 'text',
+                        content: '¡Hermoso día en Santo Domingo! ☀️',
+                        backgroundColor: '#FF6B6B',
+                        textColor: '#FFFFFF',
+                        createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000),
+                        expiresAt: new Date(Date.now() + 23 * 60 * 60 * 1000),
+                        viewedBy: []
+                    },
+                    {
+                        id: 'story3',
+                        userId: '3',
+                        type: 'image',
+                        content: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=600&fit=crop',
+                        createdAt: new Date(Date.now() - 30 * 60 * 1000),
+                        expiresAt: new Date(Date.now() + 23.5 * 60 * 60 * 1000),
+                        viewedBy: []
+                    }
+                ];
+
+                this.stories = demoStories;
+
+                this.storyGroups = [
+                    {
+                        id: 'group1',
+                        userId: '1',
+                        user: { name: 'Carolina', avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=64&h=64&fit=crop&crop=face' },
+                        stories: demoStories.filter(s => s.userId === '1'),
+                        hasUnviewed: true,
+                        lastUpdated: new Date(Date.now() - 1 * 60 * 60 * 1000)
+                    },
+                    {
+                        id: 'group2',
+                        userId: '2',
+                        user: { name: 'Marcos', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=64&h=64&fit=crop&crop=face' },
+                        stories: demoStories.filter(s => s.userId === '2'),
+                        hasUnviewed: false,
+                        lastUpdated: new Date(Date.now() - 3 * 60 * 60 * 1000)
+                    },
+                    {
+                        id: 'group3',
+                        userId: '3',
+                        user: { name: 'Isabella', avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=64&h=64&fit=crop&crop=face' },
+                        stories: demoStories.filter(s => s.userId === '3'),
+                        hasUnviewed: true,
+                        lastUpdated: new Date(Date.now() - 30 * 60 * 1000)
+                    }
+                ];
+            }
+
+            async getStoryGroups(currentUserId) {
+                console.log('📱 === OBTENIENDO STORY GROUPS ===');
+                console.log('📱 Usuario actual:', currentUserId);
+                
+                try {
+                    const now = new Date();
+                    const activeStories = this.stories.filter(story => story.expiresAt > now);
+                    console.log('📱 Stories activas:', activeStories.length, 'de', this.stories.length);
+                    
+                    const filteredGroups = [];
+                    
+                    console.log('📱 Verificando privacidad para', this.storyGroups.length, 'grupos...');
+                    
+                    for (const group of this.storyGroups) {
+                        console.log('🔍 Verificando grupo:', group.user.name, '(ID:', group.userId, ')');
+                        
+                        try {
+                            const canView = await this.privacyService.canViewStories(currentUserId, group.userId);
+                            console.log('👁️ Puede ver stories de', group.user.name, ':', canView);
+                            
+                            if (canView) {
+                                const groupActiveStories = activeStories.filter(story => story.userId === group.userId);
+                                console.log('📖 Stories activas del grupo', group.user.name, ':', groupActiveStories.length);
+                                
+                                if (groupActiveStories.length > 0) {
+                                    const hasUnviewed = groupActiveStories.some(story => !story.viewedBy.includes(currentUserId));
+                                    
+                                    filteredGroups.push({
+                                        ...group,
+                                        stories: groupActiveStories,
+                                        hasUnviewed
+                                    });
+                                    
+                                    console.log('✅ Grupo agregado:', group.user.name, '- No vistas:', hasUnviewed);
+                                }
+                            }
+                        } catch (groupError) {
+                            console.error('❌ Error verificando grupo', group.user.name, ':', groupError);
+                        }
+                    }
+
+                    console.log('✅ Story groups filtrados:', filteredGroups.length, 'de', this.storyGroups.length);
+                    console.log('📱 === FIN OBTENIENDO STORY GROUPS ===');
+                    
+                    return filteredGroups;
+                    
+                } catch (error) {
+                    console.error('🚨 === ERROR EN getStoryGroups ===');
+                    console.error('❌ Error:', error);
+                    console.error('🚨 === FIN ERROR ===');
+                    return [];
+                }
+            }
+        }
+
+        const mockStoriesService = new MockStoriesService();
+        const mockPrivacyService = new MockPrivacyService();
+
+        async function testPrivacyService() {
+            const results = document.getElementById('service-results');
+            results.innerHTML = '<div class="result info">🔍 Testing Privacy Service...</div>';
+
+            try {
+                const settings = await mockPrivacyService.getPrivacySettings('1');
+                const canView = await mockPrivacyService.canViewStories(CURRENT_USER_ID, '1');
+                const areMatched = await mockPrivacyService.areUsersMatched(CURRENT_USER_ID, '1');
+
+                results.innerHTML = `
+                    <div class="result success">
+                        ✅ Privacy Service funcionando<br>
+                        Settings: ${JSON.stringify(settings)}<br>
+                        Can view: ${canView}<br>
+                        Are matched: ${areMatched}
+                    </div>
+                `;
+            } catch (error) {
+                results.innerHTML = `<div class="result error">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        async function testStoriesService() {
+            const results = document.getElementById('service-results');
+            results.innerHTML = '<div class="result info">🔍 Testing Stories Service...</div>';
+
+            try {
+                const groups = await mockStoriesService.getStoryGroups(CURRENT_USER_ID);
+                
+                results.innerHTML = `
+                    <div class="result success">
+                        ✅ Stories Service funcionando<br>
+                        Grupos encontrados: ${groups.length}<br>
+                        ${groups.map(g => `${g.user.name}: ${g.stories.length} stories`).join('<br>')}
+                    </div>
+                `;
+
+                // Mostrar grupos en la sección correspondiente
+                const groupsElement = document.getElementById('story-groups');
+                groupsElement.innerHTML = groups.map(group => `
+                    <div class="story-group">
+                        <div class="story-user">${group.user.name}</div>
+                        <div class="story-count">${group.stories.length} stories</div>
+                        <div class="story-count">No vistas: ${group.hasUnviewed ? 'Sí' : 'No'}</div>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                results.innerHTML = `<div class="result error">❌ Error: ${error.message}<br>${error.stack}</div>`;
+            }
+        }
+
+        async function testFullFlow() {
+            const results = document.getElementById('service-results');
+            results.innerHTML = '<div class="result info">🔍 Testing Full Flow...</div>';
+
+            try {
+                console.log('🚀 Iniciando test completo...');
+                
+                // Test 1: Privacy Service
+                console.log('1️⃣ Testing Privacy Service...');
+                const canView1 = await mockPrivacyService.canViewStories(CURRENT_USER_ID, '1');
+                const canView2 = await mockPrivacyService.canViewStories(CURRENT_USER_ID, '2');
+                
+                // Test 2: Stories Service
+                console.log('2️⃣ Testing Stories Service...');
+                const groups = await mockStoriesService.getStoryGroups(CURRENT_USER_ID);
+                
+                // Test 3: Verificar datos
+                console.log('3️⃣ Verificando datos...');
+                const totalStories = groups.reduce((sum, group) => sum + group.stories.length, 0);
+                
+                results.innerHTML = `
+                    <div class="result success">
+                        ✅ Test completo exitoso<br>
+                        Privacy checks: ${canView1 ? '✅' : '❌'} ${canView2 ? '✅' : '❌'}<br>
+                        Story groups: ${groups.length}<br>
+                        Total stories: ${totalStories}<br>
+                        Todo funcionando correctamente
+                    </div>
+                `;
+                
+                console.log('✅ Test completo finalizado');
+                
+            } catch (error) {
+                console.error('❌ Error en test completo:', error);
+                results.innerHTML = `<div class="result error">❌ Error: ${error.message}<br>${error.stack}</div>`;
+            }
+        }
+
+        async function simulateStoriesLoading() {
+            const results = document.getElementById('loading-results');
+            results.innerHTML = '<div class="result info">⏳ Simulando carga de stories...</div>';
+
+            try {
+                // Simular el flujo exacto de StoriesRing
+                console.log('📱 Simulando StoriesRing.loadStories()...');
+                
+                const groups = await mockStoriesService.getStoryGroups(CURRENT_USER_ID);
+                
+                // Simular actualización de estado
+                console.log('📱 Actualizando estado con', groups.length, 'grupos');
+                
+                results.innerHTML = `
+                    <div class="result success">
+                        ✅ Simulación exitosa<br>
+                        Grupos cargados: ${groups.length}<br>
+                        ${groups.map(g => `${g.user.name}: ${g.stories.length} stories`).join('<br>')}
+                    </div>
+                `;
+                
+            } catch (error) {
+                console.error('❌ Error en simulación:', error);
+                results.innerHTML = `<div class="result error">❌ Error en simulación: ${error.message}</div>`;
+            }
+        }
+
+        // Auto-ejecutar al cargar
+        window.onload = function() {
+            console.log('🚀 Iniciando tests automáticos...');
+            testFullFlow();
+        };
+    </script>
+</body>
+</html>

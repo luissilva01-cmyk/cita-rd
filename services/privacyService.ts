@@ -28,47 +28,74 @@ class PrivacyService {
     // Configuraciones de privacidad demo
     const demoSettings: PrivacySettings[] = [
       {
+        userId: 'KU5ZalR92QcPV7RGbLFTjEjTXZm2', // Usuario actual
+        storiesVisibility: 'everyone',
+        allowStoryReplies: true,
+        showOnlineStatus: true,
+        allowProfileViews: 'everyone',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        userId: '1', // Carolina
+        storiesVisibility: 'everyone',
+        allowStoryReplies: true,
+        showOnlineStatus: true,
+        allowProfileViews: 'everyone',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        userId: '2', // Marcos
+        storiesVisibility: 'everyone',
+        allowStoryReplies: true,
+        showOnlineStatus: true,
+        allowProfileViews: 'everyone',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        userId: '3', // Isabella
+        storiesVisibility: 'everyone',
+        allowStoryReplies: true,
+        showOnlineStatus: true,
+        allowProfileViews: 'everyone',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        userId: '4', // Rafael
+        storiesVisibility: 'everyone',
+        allowStoryReplies: true,
+        showOnlineStatus: true,
+        allowProfileViews: 'everyone',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        userId: '5', // Sofía
+        storiesVisibility: 'everyone',
+        allowStoryReplies: true,
+        showOnlineStatus: true,
+        allowProfileViews: 'everyone',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        userId: '6', // Diego
+        storiesVisibility: 'everyone',
+        allowStoryReplies: true,
+        showOnlineStatus: true,
+        allowProfileViews: 'everyone',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
         userId: 'demo-user',
         storiesVisibility: 'everyone',
         allowStoryReplies: true,
         showOnlineStatus: true,
         allowProfileViews: 'everyone',
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
-      {
-        userId: 'user1',
-        storiesVisibility: 'matches_only',
-        allowStoryReplies: true,
-        showOnlineStatus: false,
-        allowProfileViews: 'matches_only',
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
-      {
-        userId: 'user2',
-        storiesVisibility: 'everyone',
-        allowStoryReplies: false,
-        showOnlineStatus: true,
-        allowProfileViews: 'everyone',
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
-      {
-        userId: 'user3',
-        storiesVisibility: 'everyone',
-        allowStoryReplies: true,
-        showOnlineStatus: true,
-        allowProfileViews: 'everyone',
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
-      {
-        userId: 'user4',
-        storiesVisibility: 'matches_only',
-        allowStoryReplies: true,
-        showOnlineStatus: false,
-        allowProfileViews: 'matches_only',
         createdAt: new Date(),
         updatedAt: new Date()
       }
@@ -78,24 +105,42 @@ class PrivacyService {
       this.privacySettings.set(setting.userId, setting);
     });
 
-    // Matches demo - simular que el usuario actual tiene matches con algunos usuarios
+    // Matches demo - simular que el usuario actual tiene matches con todos los usuarios
     this.userMatches = [
       {
-        userId1: 'demo-user',
-        userId2: 'user1',
-        matchedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 días atrás
+        userId1: 'KU5ZalR92QcPV7RGbLFTjEjTXZm2',
+        userId2: '1', // Carolina
+        matchedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
         isActive: true
       },
       {
-        userId1: 'demo-user',
-        userId2: 'user3',
-        matchedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 día atrás
+        userId1: 'KU5ZalR92QcPV7RGbLFTjEjTXZm2',
+        userId2: '2', // Marcos
+        matchedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
         isActive: true
       },
       {
-        userId1: 'user2',
-        userId2: 'user4',
-        matchedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 días atrás
+        userId1: 'KU5ZalR92QcPV7RGbLFTjEjTXZm2',
+        userId2: '3', // Isabella
+        matchedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
+        isActive: true
+      },
+      {
+        userId1: 'KU5ZalR92QcPV7RGbLFTjEjTXZm2',
+        userId2: '4', // Rafael
+        matchedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+        isActive: true
+      },
+      {
+        userId1: 'KU5ZalR92QcPV7RGbLFTjEjTXZm2',
+        userId2: '5', // Sofía
+        matchedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+        isActive: true
+      },
+      {
+        userId1: 'KU5ZalR92QcPV7RGbLFTjEjTXZm2',
+        userId2: '6', // Diego
+        matchedAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000),
         isActive: true
       }
     ];
@@ -193,10 +238,14 @@ class PrivacyService {
 
   // Verificar si un usuario puede responder a stories
   async canReplyToStories(viewerId: string, storyOwnerId: string): Promise<boolean> {
-    console.log('💬 Verificando si', viewerId, 'puede responder a stories de', storyOwnerId);
+    console.log('💬 === VERIFICANDO PERMISOS DE RESPUESTA ===');
+    console.log('💬 Viewer ID:', viewerId);
+    console.log('💬 Story Owner ID:', storyOwnerId);
     
     // Primero verificar si puede ver las stories
     const canView = await this.canViewStories(viewerId, storyOwnerId);
+    console.log('👁️ Puede ver stories:', canView);
+    
     if (!canView) {
       console.log('❌ No puede ver las stories, por lo tanto no puede responder');
       return false;
@@ -204,8 +253,11 @@ class PrivacyService {
 
     // Obtener configuración del dueño
     const ownerSettings = await this.getPrivacySettings(storyOwnerId);
+    console.log('⚙️ Configuración del dueño:', ownerSettings);
     
     console.log('💬 Respuestas permitidas:', ownerSettings.allowStoryReplies);
+    console.log('💬 === RESULTADO FINAL ===', ownerSettings.allowStoryReplies);
+    
     return ownerSettings.allowStoryReplies;
   }
 

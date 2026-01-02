@@ -11,6 +11,7 @@ interface StoriesViewerProps {
   onClose: () => void;
   onNext?: () => void;
   onPrevious?: () => void;
+  onSendMessage?: (userId: string, message: string, type?: 'text' | 'story_reaction') => void;
 }
 
 const StoriesViewer: React.FC<StoriesViewerProps> = ({
@@ -19,7 +20,8 @@ const StoriesViewer: React.FC<StoriesViewerProps> = ({
   currentUserId,
   onClose,
   onNext,
-  onPrevious
+  onPrevious,
+  onSendMessage
 }) => {
   const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
   const [progress, setProgress] = useState(0);
@@ -121,30 +123,88 @@ const StoriesViewer: React.FC<StoriesViewerProps> = ({
     }
   };
 
-  const handleReaction = (emoji: string) => {
-    console.log('❤️ Reacción enviada:', emoji, 'a story de', storyGroup?.user.name);
-    // Aquí se enviaría la reacción al backend
+  const handleReaction = async (emoji: string) => {
+    console.log('🚀 === INICIO handleReaction ===');
+    console.log('❤️ emoji:', emoji);
+    console.log('❤️ storyGroup:', storyGroup);
+    console.log('❤️ onSendMessage:', !!onSendMessage);
     
-    // Mostrar feedback visual
-    const reactionElement = document.createElement('div');
-    reactionElement.textContent = emoji;
-    reactionElement.className = 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-6xl z-50 pointer-events-none animate-ping';
-    document.body.appendChild(reactionElement);
+    if (!storyGroup || !onSendMessage) {
+      console.log('⚠️ Condiciones no cumplidas para enviar reacción');
+      console.log('⚠️ storyGroup existe:', !!storyGroup);
+      console.log('⚠️ onSendMessage existe:', !!onSendMessage);
+      return;
+    }
     
-    setTimeout(() => {
-      document.body.removeChild(reactionElement);
-    }, 1000);
+    console.log('✅ Condiciones cumplidas, enviando reacción...');
+    console.log('🔍 Emoji a enviar:', emoji, 'Longitud:', emoji.length, 'Código:', emoji.charCodeAt(0));
+    console.log('🔍 Usuario destino:', storyGroup.userId, storyGroup.user.name);
+    
+    try {
+      console.log('📤 Llamando onSendMessage...');
+      
+      // Enviar solo el emoji como reacción a la historia
+      await onSendMessage(storyGroup.userId, emoji, 'story_reaction');
+      
+      console.log('✅ onSendMessage completado exitosamente');
+      
+      // Mostrar feedback visual
+      console.log('🎨 Mostrando feedback visual...');
+      const reactionElement = document.createElement('div');
+      reactionElement.textContent = emoji;
+      reactionElement.className = 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-6xl z-50 pointer-events-none animate-ping';
+      document.body.appendChild(reactionElement);
+      
+      setTimeout(() => {
+        try {
+          document.body.removeChild(reactionElement);
+          console.log('🎨 Feedback visual removido');
+        } catch (e) {
+          // Ignorar error si el elemento ya fue removido
+          console.log('🎨 Elemento de reacción ya removido');
+        }
+      }, 1000);
+      
+      console.log('🏁 === FIN handleReaction EXITOSO ===');
+      
+    } catch (error) {
+      console.error('🚨 === ERROR en handleReaction ===');
+      console.error('❌ Error:', error);
+      console.error('❌ Error message:', (error as Error).message);
+      console.error('❌ Error stack:', (error as Error).stack);
+      console.error('❌ Datos que causaron el error:', {
+        emoji,
+        storyGroupUserId: storyGroup?.userId,
+        storyGroupUserName: storyGroup?.user?.name
+      });
+      console.error('🚨 === FIN ERROR ===');
+      
+      // Mostrar feedback de error al usuario
+      console.log('❌ No se pudo enviar la reacción. Inténtalo de nuevo.');
+    }
   };
 
-  const handleSendMessage = () => {
-    if (reactionText.trim()) {
-      console.log('💬 Mensaje enviado:', reactionText, 'a', storyGroup?.user.name);
-      // Aquí se enviaría el mensaje al chat
+  const handleSendMessage = async () => {
+    if (!reactionText.trim() || !storyGroup || !onSendMessage) return;
+    
+    console.log('💬 Enviando mensaje:', reactionText, 'a', storyGroup.user.name);
+    
+    try {
+      // Enviar mensaje al chat
+      await onSendMessage(storyGroup.userId, reactionText, 'text');
+      
+      console.log('✅ Mensaje enviado al chat');
+      
       setReactionText('');
       setShowReactionInput(false);
       
-      // Mostrar feedback
-      alert(`💬 Mensaje enviado a ${storyGroup?.user.name}: "${reactionText}"`);
+      // Mostrar feedback más sutil
+      console.log(`💬 Mensaje enviado a ${storyGroup.user.name}: "${reactionText}"`);
+      
+    } catch (error) {
+      console.error('❌ Error enviando mensaje:', error);
+      // Mostrar feedback de error al usuario
+      console.log('❌ No se pudo enviar el mensaje. Inténtalo de nuevo.');
     }
   };
 

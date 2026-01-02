@@ -6,6 +6,9 @@ export interface Translations {
   createStory: string;
   privacy: string;
   stories: string;
+  storyCreatedSuccessfully: string;
+  storyVisibleFor24Hours: string;
+  errorCreatingStory: string;
   
   // Create Story Modal
   createStoryTitle: string;
@@ -119,6 +122,8 @@ export interface Translations {
   tryAgain: string;
   tooManyAttempts: string;
   tryLater: string;
+  waitingCamera: string;
+  cameraProblems: string;
   
   // Navigation & Main Views
   discover: string;
@@ -155,6 +160,7 @@ export interface Translations {
   report: string;
   block: string;
   unblock: string;
+  reload: string;
   
   // Time & Date
   now: string;
@@ -189,6 +195,12 @@ export interface Translations {
   bio: string;
   location: string;
   age: string;
+  name: string;
+  profileScore: string;
+  hide: string;
+  viewScore: string;
+  mainPhoto: string;
+  tellUsAboutYou: string;
   
   // Chat
   newMatchExclamation: string;
@@ -227,6 +239,10 @@ export interface Translations {
   passButton: string;
   likeButton: string;
   keepSwiping: string;
+  
+  // Language Settings - Missing translations
+  instantChange: string;
+  languageChangesImmediately: string;
 }
 
 const translations: Record<Language, Translations> = {
@@ -235,6 +251,9 @@ const translations: Record<Language, Translations> = {
     createStory: 'Crear Story',
     privacy: 'Privacidad',
     stories: 'Stories',
+    storyCreatedSuccessfully: '¡Story creada exitosamente!',
+    storyVisibleFor24Hours: 'Tu story estará visible por 24 horas.',
+    errorCreatingStory: 'Error creando la story. Inténtalo de nuevo.',
     
     // Create Story Modal
     createStoryTitle: 'Crear Story',
@@ -348,6 +367,8 @@ const translations: Record<Language, Translations> = {
     tryAgain: 'Intentar de nuevo',
     tooManyAttempts: 'Demasiados intentos. Inténtalo más tarde.',
     tryLater: 'Vuelve más tarde',
+    waitingCamera: 'Esperando acceso a la cámara...',
+    cameraProblems: 'Hay un problema con la cámara. Revisa los permisos e intenta de nuevo.',
     
     // Navigation & Main Views
     discover: 'Descubrir',
@@ -384,6 +405,7 @@ const translations: Record<Language, Translations> = {
     report: 'Reportar',
     block: 'Bloquear',
     unblock: 'Desbloquear',
+    reload: 'Recargar',
     
     // Time & Date
     now: 'ahora',
@@ -418,6 +440,12 @@ const translations: Record<Language, Translations> = {
     bio: 'Biografía',
     location: 'Ubicación',
     age: 'Edad',
+    name: 'Nombre',
+    profileScore: 'Score del Perfil',
+    hide: 'Ocultar',
+    viewScore: 'Ver Score',
+    mainPhoto: 'Foto principal',
+    tellUsAboutYou: 'Cuéntanos sobre ti...',
     
     // Chat
     newMatchExclamation: '¡Nuevo Match!',
@@ -455,7 +483,11 @@ const translations: Record<Language, Translations> = {
     // Discovery Action Buttons - Missing translations
     passButton: 'Pasar',
     likeButton: 'Me gusta',
-    keepSwiping: 'Seguir viendo'
+    keepSwiping: 'Seguir viendo',
+    
+    // Language Settings - Missing translations
+    instantChange: 'Cambio instantáneo',
+    languageChangesImmediately: 'El idioma se cambia inmediatamente en toda la aplicación.'
   },
   
   en: {
@@ -463,6 +495,9 @@ const translations: Record<Language, Translations> = {
     createStory: 'Create Story',
     privacy: 'Privacy',
     stories: 'Stories',
+    storyCreatedSuccessfully: 'Story created successfully!',
+    storyVisibleFor24Hours: 'Your story will be visible for 24 hours.',
+    errorCreatingStory: 'Error creating story. Please try again.',
     
     // Create Story Modal
     createStoryTitle: 'Create Story',
@@ -576,6 +611,8 @@ const translations: Record<Language, Translations> = {
     tryAgain: 'Try again',
     tooManyAttempts: 'Too many attempts. Try again later.',
     tryLater: 'Come back later',
+    waitingCamera: 'Waiting for camera access...',
+    cameraProblems: 'There\'s a camera problem. Check permissions and try again.',
     
     // Navigation & Main Views
     discover: 'Discover',
@@ -612,6 +649,7 @@ const translations: Record<Language, Translations> = {
     report: 'Report',
     block: 'Block',
     unblock: 'Unblock',
+    reload: 'Reload',
     
     // Time & Date
     now: 'now',
@@ -646,6 +684,12 @@ const translations: Record<Language, Translations> = {
     bio: 'Bio',
     location: 'Location',
     age: 'Age',
+    name: 'Name',
+    profileScore: 'Profile Score',
+    hide: 'Hide',
+    viewScore: 'View Score',
+    mainPhoto: 'Main photo',
+    tellUsAboutYou: 'Tell us about you...',
     
     // Chat
     newMatchExclamation: 'New Match!',
@@ -683,7 +727,11 @@ const translations: Record<Language, Translations> = {
     // Discovery Action Buttons - Missing translations
     passButton: 'Pass',
     likeButton: 'Like',
-    keepSwiping: 'Keep swiping'
+    keepSwiping: 'Keep swiping',
+    
+    // Language Settings - Missing translations
+    instantChange: 'Instant change',
+    languageChangesImmediately: 'The language changes immediately throughout the app.'
   },
   
   pt: {
@@ -691,6 +739,9 @@ const translations: Record<Language, Translations> = {
     createStory: 'Criar Story',
     privacy: 'Privacidade',
     stories: 'Stories',
+    storyCreatedSuccessfully: 'Story criada com sucesso!',
+    storyVisibleFor24Hours: 'Sua story estará visível por 24 horas.',
+    errorCreatingStory: 'Erro ao criar story. Tente novamente.',
     
     // Create Story Modal
     createStoryTitle: 'Criar Story',
@@ -804,6 +855,8 @@ const translations: Record<Language, Translations> = {
     tryAgain: 'Tentar novamente',
     tooManyAttempts: 'Muitas tentativas. Tente mais tarde.',
     tryLater: 'Volte mais tarde',
+    waitingCamera: 'Aguardando acesso à câmera...',
+    cameraProblems: 'Há um problema com a câmera. Verifique as permissões e tente novamente.',
     
     // Navigation & Main Views
     discover: 'Descobrir',
@@ -840,6 +893,7 @@ const translations: Record<Language, Translations> = {
     report: 'Denunciar',
     block: 'Bloquear',
     unblock: 'Desbloquear',
+    reload: 'Recarregar',
     
     // Time & Date
     now: 'agora',
@@ -874,6 +928,12 @@ const translations: Record<Language, Translations> = {
     bio: 'Bio',
     location: 'Localização',
     age: 'Idade',
+    name: 'Nome',
+    profileScore: 'Score do Perfil',
+    hide: 'Ocultar',
+    viewScore: 'Ver Score',
+    mainPhoto: 'Foto principal',
+    tellUsAboutYou: 'Conte-nos sobre você...',
     
     // Chat
     newMatchExclamation: 'Novo Match!',
@@ -911,7 +971,11 @@ const translations: Record<Language, Translations> = {
     // Discovery Action Buttons - Missing translations
     passButton: 'Passar',
     likeButton: 'Curtir',
-    keepSwiping: 'Continuar vendo'
+    keepSwiping: 'Continuar vendo',
+    
+    // Language Settings - Missing translations
+    instantChange: 'Mudança instantânea',
+    languageChangesImmediately: 'O idioma muda imediatamente em todo o aplicativo.'
   },
   
   fr: {
@@ -919,6 +983,9 @@ const translations: Record<Language, Translations> = {
     createStory: 'Créer Story',
     privacy: 'Confidentialité',
     stories: 'Stories',
+    storyCreatedSuccessfully: 'Story créée avec succès!',
+    storyVisibleFor24Hours: 'Votre story sera visible pendant 24 heures.',
+    errorCreatingStory: 'Erreur lors de la création de la story. Veuillez réessayer.',
     
     // Create Story Modal
     createStoryTitle: 'Créer Story',
@@ -1032,6 +1099,8 @@ const translations: Record<Language, Translations> = {
     tryAgain: 'Réessayer',
     tooManyAttempts: 'Trop de tentatives. Réessayez plus tard.',
     tryLater: 'Revenez plus tard',
+    waitingCamera: 'En attente d\'accès à la caméra...',
+    cameraProblems: 'Il y a un problème avec la caméra. Vérifiez les permissions et réessayez.',
     
     // Navigation & Main Views
     discover: 'Découvrir',
@@ -1068,6 +1137,7 @@ const translations: Record<Language, Translations> = {
     report: 'Signaler',
     block: 'Bloquer',
     unblock: 'Débloquer',
+    reload: 'Recharger',
     
     // Time & Date
     now: 'maintenant',
@@ -1102,6 +1172,12 @@ const translations: Record<Language, Translations> = {
     bio: 'Bio',
     location: 'Localisation',
     age: 'Âge',
+    name: 'Nom',
+    profileScore: 'Score du Profil',
+    hide: 'Masquer',
+    viewScore: 'Voir Score',
+    mainPhoto: 'Photo principale',
+    tellUsAboutYou: 'Parlez-nous de vous...',
     
     // Chat
     newMatchExclamation: 'Nouveau Match!',
@@ -1139,7 +1215,11 @@ const translations: Record<Language, Translations> = {
     // Discovery Action Buttons - Missing translations
     passButton: 'Passer',
     likeButton: 'J\'aime',
-    keepSwiping: 'Continuer à regarder'
+    keepSwiping: 'Continuer à regarder',
+    
+    // Language Settings - Missing translations
+    instantChange: 'Changement instantané',
+    languageChangesImmediately: 'La langue change immédiatement dans toute l\'application.'
   }
 };
 

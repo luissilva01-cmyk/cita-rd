@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Story Reactions - CitaRD</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px solid #f0f0f0;
+            border-radius: 15px;
+        }
+        .emoji-test {
+            font-size: 2rem;
+            margin: 10px;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 10px;
+            transition: all 0.2s;
+        }
+        .emoji-test:hover {
+            background: #f0f0f0;
+            transform: scale(1.1);
+        }
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 5px;
+            transition: all 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test Story Reactions</h1>
+        
+        <div class="test-section">
+            <h3>📱 Emoji Encoding Test</h3>
+            <p>Click en los emojis para probar su codificación:</p>
+            <div id="emoji-container">
+                <span class="emoji-test" onclick="testEmoji('❤️')">❤️</span>
+                <span class="emoji-test" onclick="testEmoji('😍')">😍</span>
+                <span class="emoji-test" onclick="testEmoji('😂')">😂</span>
+                <span class="emoji-test" onclick="testEmoji('😮')">😮</span>
+                <span class="emoji-test" onclick="testEmoji('👏')">👏</span>
+            </div>
+            <div id="emoji-result" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔄 Firebase Simulation</h3>
+            <p>Simular el flujo completo de reacción a historia:</p>
+            <button onclick="simulateStoryReaction('❤️')">Enviar ❤️</button>
+            <button onclick="simulateStoryReaction('😍')">Enviar 😍</button>
+            <button onclick="simulateStoryReaction('🔥')">Enviar 🔥</button>
+            <div id="firebase-result" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 Character Analysis</h3>
+            <input type="text" id="custom-emoji" placeholder="Pega un emoji aquí..." style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-bottom: 10px;">
+            <button onclick="analyzeCustomEmoji()">Analizar Emoji</button>
+            <div id="analysis-result" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🌐 App Status</h3>
+            <button onclick="checkAppStatus()">Verificar Estado de la App</button>
+            <div id="status-result" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        function testEmoji(emoji) {
+            const result = document.getElementById('emoji-result');
+            
+            const analysis = {
+                emoji: emoji,
+                length: emoji.length,
+                charCodes: Array.from(emoji).map(char => char.charCodeAt(0)),
+                unicode: Array.from(emoji).map(char => '\\u' + char.charCodeAt(0).toString(16).padStart(4, '0')),
+                bytes: new TextEncoder().encode(emoji),
+                isValid: emoji.length > 0
+            };
+            
+            result.innerHTML = `
+                <strong>Emoji:</strong> ${analysis.emoji}<br>
+                <strong>Longitud:</strong> ${analysis.length} caracteres<br>
+                <strong>Códigos:</strong> ${analysis.charCodes.join(', ')}<br>
+                <strong>Unicode:</strong> ${analysis.unicode.join(' ')}<br>
+                <strong>Bytes UTF-8:</strong> [${Array.from(analysis.bytes).join(', ')}]<br>
+                <strong>Válido:</strong> ${analysis.isValid ? '✅' : '❌'}
+            `;
+            
+            result.className = analysis.isValid ? 'result success' : 'result error';
+        }
+
+        function simulateStoryReaction(emoji) {
+            const result = document.getElementById('firebase-result');
+            result.innerHTML = '⏳ Simulando envío...';
+            
+            // Simular el flujo completo
+            setTimeout(() => {
+                const messageData = {
+                    senderId: 'KU5ZalR92QcPV7RGbLFTjEjTXZm2',
+                    type: 'story_reaction',
+                    text: emoji,
+                    timestamp: Date.now(),
+                    isRead: false
+                };
+                
+                const lastMessageText = `${emoji} Reaccionó a tu historia`;
+                
+                result.innerHTML = `
+                    <strong>✅ Simulación Exitosa</strong><br>
+                    <strong>Datos del mensaje:</strong><br>
+                    ${JSON.stringify(messageData, null, 2)}<br><br>
+                    <strong>Último mensaje del chat:</strong><br>
+                    "${lastMessageText}"<br><br>
+                    <strong>Emoji preservado:</strong> ${emoji === messageData.text ? '✅' : '❌'}
+                `;
+                
+                result.className = 'result success';
+            }, 1000);
+        }
+
+        function analyzeCustomEmoji() {
+            const input = document.getElementById('custom-emoji');
+            const emoji = input.value.trim();
+            const result = document.getElementById('analysis-result');
+            
+            if (!emoji) {
+                result.innerHTML = '❌ Por favor ingresa un emoji';
+                result.className = 'result error';
+                return;
+            }
+            
+            testEmoji(emoji);
+            
+            // Copiar resultado al análisis
+            const emojiResult = document.getElementById('emoji-result').innerHTML;
+            result.innerHTML = emojiResult;
+            result.className = 'result success';
+        }
+
+        function checkAppStatus() {
+            const result = document.getElementById('status-result');
+            result.innerHTML = '🔍 Verificando estado...';
+            
+            // Verificar si la app está corriendo
+            fetch('http://localhost:3000')
+                .then(response => {
+                    if (response.ok) {
+                        result.innerHTML = `
+                            <strong>✅ App funcionando correctamente</strong><br>
+                            <strong>URL:</strong> http://localhost:3000<br>
+                            <strong>Estado:</strong> ${response.status} ${response.statusText}<br>
+                            <strong>Timestamp:</strong> ${new Date().toLocaleString()}
+                        `;
+                        result.className = 'result success';
+                    } else {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                })
+                .catch(error => {
+                    result.innerHTML = `
+                        <strong>❌ Error conectando con la app</strong><br>
+                        <strong>Error:</strong> ${error.message}<br>
+                        <strong>Sugerencia:</strong> Verifica que la app esté corriendo en localhost:3000
+                    `;
+                    result.className = 'result error';
+                });
+        }
+
+        // Auto-verificar estado al cargar
+        window.onload = function() {
+            checkAppStatus();
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test ReliableCamera - Diagnóstico</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .video-container {
+            position: relative;
+            margin: 20px 0;
+            background: #000;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        video {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            transform: scaleX(-1);
+        }
+        .status {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 5px 10px;
+            border-radius: 15px;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .status.loading { background: #ffa500; }
+        .status.ready { background: #4CAF50; }
+        .status.error { background: #f44336; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 16px;
+        }
+        button:hover { background: #0056b3; }
+        button:disabled { 
+            background: #ccc; 
+            cursor: not-allowed; 
+        }
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .error-msg {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎥 Test ReliableCamera - Diagnóstico</h1>
+        <p>Esta página simula exactamente lo que hace el componente ReliableCamera para diagnosticar problemas.</p>
+        
+        <div class="video-container">
+            <video id="video" autoplay muted playsinline></video>
+            <div id="status" class="status loading">⏳ ESPERANDO</div>
+        </div>
+        
+        <div>
+            <button id="startBtn" onclick="startCamera()">🎥 Iniciar Cámara</button>
+            <button id="captureBtn" onclick="capturePhoto()" disabled>📸 Capturar Foto</button>
+            <button id="stopBtn" onclick="stopCamera()" disabled>🛑 Detener Cámara</button>
+        </div>
+        
+        <div id="error" class="error-msg" style="display: none;"></div>
+        
+        <div>
+            <h3>📋 Log de Eventos:</h3>
+            <div id="log" class="log"></div>
+        </div>
+        
+        <canvas id="canvas" style="display: none;"></canvas>
+    </div>
+
+    <script>
+        let stream = null;
+        let isActive = false;
+        
+        const video = document.getElementById('video');
+        const status = document.getElementById('status');
+        const startBtn = document.getElementById('startBtn');
+        const captureBtn = document.getElementById('captureBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const errorDiv = document.getElementById('error');
+        const logDiv = document.getElementById('log');
+        const canvas = document.getElementById('canvas');
+        
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}`;
+            console.log(logEntry);
+            logDiv.innerHTML += logEntry + '<br>';
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        function showError(message) {
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            status.textContent = '❌ ERROR';
+            status.className = 'status error';
+        }
+        
+        function hideError() {
+            errorDiv.style.display = 'none';
+        }
+        
+        async function startCamera() {
+            try {
+                log('🎥 Iniciando cámara - método de diagnóstico...');
+                hideError();
+                
+                status.textContent = '⏳ INICIANDO';
+                status.className = 'status loading';
+                
+                startBtn.disabled = true;
+                
+                // Limpiar stream anterior
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                    stream = null;
+                }
+                
+                log('📋 Solicitando acceso a cámara...');
+                
+                // Configuración exacta como ReliableCamera
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        facingMode: 'user',
+                        width: { ideal: 640 },
+                        height: { ideal: 480 }
+                    } 
+                });
+                
+                log('✅ Stream obtenido: ' + stream.active);
+                log('📹 Tracks: ' + stream.getTracks().length);
+                
+                // Configurar video
+                video.srcObject = stream;
+                
+                video.onloadedmetadata = () => {
+                    log('📊 Video metadata cargada');
+                    log('📐 Dimensiones: ' + video.videoWidth + 'x' + video.videoHeight);
+                };
+                
+                video.oncanplay = () => {
+                    log('▶️ Video listo para reproducir');
+                    isActive = true;
+                    status.textContent = '✅ LISTO';
+                    status.className = 'status ready';
+                    captureBtn.disabled = false;
+                    stopBtn.disabled = false;
+                };
+                
+                video.onerror = (error) => {
+                    log('❌ Error en video: ' + error);
+                    showError('Error en elemento de video');
+                };
+                
+                // Intentar reproducir
+                try {
+                    await video.play();
+                    log('🎬 Video reproduciendo exitosamente');
+                } catch (playError) {
+                    log('⚠️ Error en play (puede ser normal): ' + playError.message);
+                    // Aún así marcar como activo si el stream funciona
+                    if (stream.active) {
+                        setTimeout(() => {
+                            isActive = true;
+                            status.textContent = '✅ LISTO';
+                            status.className = 'status ready';
+                            captureBtn.disabled = false;
+                            stopBtn.disabled = false;
+                            log('✅ Marcado como listo a pesar del error de play');
+                        }, 1000);
+                    }
+                }
+                
+            } catch (error) {
+                log('❌ Error: ' + error.name + ' - ' + error.message);
+                
+                let errorMessage = 'Error desconocido';
+                switch (error.name) {
+                    case 'NotAllowedError':
+                        errorMessage = 'Acceso a la cámara denegado. Haz clic en el candado 🔒 junto a la URL y permite el acceso.';
+                        break;
+                    case 'NotFoundError':
+                        errorMessage = 'No se encontró cámara disponible.';
+                        break;
+                    case 'NotReadableError':
+                        errorMessage = 'Cámara en uso por otra aplicación.';
+                        break;
+                    default:
+                        errorMessage = error.message;
+                }
+                
+                showError(errorMessage);
+                startBtn.disabled = false;
+            }
+        }
+        
+        function capturePhoto() {
+            if (!isActive || !video || !canvas) {
+                log('❌ No se puede capturar: no activo o elementos faltantes');
+                return;
+            }
+            
+            const context = canvas.getContext('2d');
+            if (!context) {
+                log('❌ No se pudo obtener contexto 2D');
+                return;
+            }
+            
+            try {
+                canvas.width = video.videoWidth || 640;
+                canvas.height = video.videoHeight || 480;
+                
+                log('📸 Capturando foto: ' + canvas.width + 'x' + canvas.height);
+                
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                
+                canvas.toBlob((blob) => {
+                    if (blob) {
+                        log('✅ Foto capturada exitosamente (' + blob.size + ' bytes)');
+                        
+                        // Mostrar preview
+                        const url = URL.createObjectURL(blob);
+                        const img = document.createElement('img');
+                        img.src = url;
+                        img.style.width = '100px';
+                        img.style.height = '100px';
+                        img.style.objectFit = 'cover';
+                        img.style.borderRadius = '10px';
+                        img.style.margin = '10px';
+                        document.body.appendChild(img);
+                        
+                    } else {
+                        log('❌ Error creando blob');
+                    }
+                }, 'image/jpeg', 0.8);
+                
+            } catch (error) {
+                log('❌ Error en captura: ' + error.message);
+            }
+        }
+        
+        function stopCamera() {
+            log('🛑 Deteniendo cámara...');
+            
+            if (stream) {
+                stream.getTracks().forEach(track => {
+                    track.stop();
+                    log('🔴 Track detenido: ' + track.kind);
+                });
+                stream = null;
+            }
+            
+            video.srcObject = null;
+            isActive = false;
+            
+            status.textContent = '⏹️ DETENIDO';
+            status.className = 'status loading';
+            
+            startBtn.disabled = false;
+            captureBtn.disabled = true;
+            stopBtn.disabled = true;
+            
+            log('✅ Cámara detenida completamente');
+        }
+        
+        // Auto-start para testing
+        log('🚀 Página cargada - Lista para testing');
+        log('💡 Haz clic en "Iniciar Cámara" para comenzar');
+    </script>
+</body>
+</html>

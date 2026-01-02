@@ -38,7 +38,7 @@ class StoriesService {
     const demoStories: Story[] = [
       {
         id: 'story1',
-        userId: 'user1',
+        userId: '1', // Carolina
         type: 'image',
         content: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=400&h=600&fit=crop',
         createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 horas atrás
@@ -47,7 +47,7 @@ class StoriesService {
       },
       {
         id: 'story2',
-        userId: 'user1',
+        userId: '1', // Carolina
         type: 'text',
         content: '¡Hermoso día en Santo Domingo! ☀️',
         backgroundColor: '#FF6B6B',
@@ -58,7 +58,7 @@ class StoriesService {
       },
       {
         id: 'story3',
-        userId: 'user2',
+        userId: '2', // Marcos
         type: 'image',
         content: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=600&fit=crop',
         createdAt: new Date(Date.now() - 3 * 60 * 60 * 1000), // 3 horas atrás
@@ -67,7 +67,7 @@ class StoriesService {
       },
       {
         id: 'story4',
-        userId: 'user3',
+        userId: '3', // Isabella
         type: 'image',
         content: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=600&fit=crop',
         createdAt: new Date(Date.now() - 30 * 60 * 1000), // 30 minutos atrás
@@ -76,7 +76,7 @@ class StoriesService {
       },
       {
         id: 'story5',
-        userId: 'user3',
+        userId: '3', // Isabella
         type: 'text',
         content: 'Explorando la Zona Colonial 🏛️',
         backgroundColor: '#4ECDC4',
@@ -87,7 +87,7 @@ class StoriesService {
       },
       {
         id: 'story6',
-        userId: 'user4',
+        userId: '4', // Rafael
         type: 'image',
         content: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=600&fit=crop',
         createdAt: new Date(Date.now() - 4 * 60 * 60 * 1000), // 4 horas atrás
@@ -102,45 +102,45 @@ class StoriesService {
     this.storyGroups = [
       {
         id: 'group1',
-        userId: 'user1',
+        userId: '1', // Carolina
         user: {
-          name: 'Ana',
+          name: 'Carolina',
           avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=64&h=64&fit=crop&crop=face'
         },
-        stories: demoStories.filter(s => s.userId === 'user1'),
+        stories: demoStories.filter(s => s.userId === '1'),
         hasUnviewed: true,
         lastUpdated: new Date(Date.now() - 1 * 60 * 60 * 1000)
       },
       {
         id: 'group2',
-        userId: 'user2',
+        userId: '2', // Marcos
         user: {
-          name: 'Carlos',
+          name: 'Marcos',
           avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=64&h=64&fit=crop&crop=face'
         },
-        stories: demoStories.filter(s => s.userId === 'user2'),
+        stories: demoStories.filter(s => s.userId === '2'),
         hasUnviewed: false,
         lastUpdated: new Date(Date.now() - 3 * 60 * 60 * 1000)
       },
       {
         id: 'group3',
-        userId: 'user3',
+        userId: '3', // Isabella
         user: {
-          name: 'Sofia',
+          name: 'Isabella',
           avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=64&h=64&fit=crop&crop=face'
         },
-        stories: demoStories.filter(s => s.userId === 'user3'),
+        stories: demoStories.filter(s => s.userId === '3'),
         hasUnviewed: true,
         lastUpdated: new Date(Date.now() - 30 * 60 * 1000)
       },
       {
         id: 'group4',
-        userId: 'user4',
+        userId: '4', // Rafael
         user: {
-          name: 'Miguel',
+          name: 'Rafael',
           avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=face'
         },
-        stories: demoStories.filter(s => s.userId === 'user4'),
+        stories: demoStories.filter(s => s.userId === '4'),
         hasUnviewed: false,
         lastUpdated: new Date(Date.now() - 4 * 60 * 60 * 1000)
       }
@@ -149,37 +149,70 @@ class StoriesService {
 
   // Obtener todos los grupos de stories (con filtrado de privacidad)
   async getStoryGroups(currentUserId: string): Promise<StoryGroup[]> {
-    console.log('📱 Obteniendo story groups para usuario:', currentUserId);
+    console.log('📱 === OBTENIENDO STORY GROUPS ===');
+    console.log('📱 Usuario actual:', currentUserId);
     
-    // Filtrar stories expiradas
-    const now = new Date();
-    const activeStories = this.stories.filter(story => story.expiresAt > now);
-    
-    // Filtrar grupos según configuración de privacidad
-    const filteredGroups: StoryGroup[] = [];
-    
-    for (const group of this.storyGroups) {
-      // Verificar si el usuario actual puede ver las stories de este grupo
-      const canView = await privacyService.canViewStories(currentUserId, group.userId);
+    try {
+      // Filtrar stories expiradas
+      const now = new Date();
+      const activeStories = this.stories.filter(story => story.expiresAt > now);
+      console.log('📱 Stories activas:', activeStories.length, 'de', this.stories.length);
       
-      if (canView) {
-        // Filtrar stories activas del grupo
-        const groupActiveStories = activeStories.filter(story => story.userId === group.userId);
+      // Filtrar grupos según configuración de privacidad
+      const filteredGroups: StoryGroup[] = [];
+      
+      console.log('📱 Verificando privacidad para', this.storyGroups.length, 'grupos...');
+      
+      for (const group of this.storyGroups) {
+        console.log('🔍 Verificando grupo:', group.user.name, '(ID:', group.userId, ')');
         
-        if (groupActiveStories.length > 0) {
-          filteredGroups.push({
-            ...group,
-            stories: groupActiveStories,
-            hasUnviewed: groupActiveStories.some(story => !story.viewedBy.includes(currentUserId))
-          });
+        try {
+          // Verificar si el usuario actual puede ver las stories de este grupo
+          const canView = await privacyService.canViewStories(currentUserId, group.userId);
+          console.log('👁️ Puede ver stories de', group.user.name, ':', canView);
+          
+          if (canView) {
+            // Filtrar stories activas del grupo
+            const groupActiveStories = activeStories.filter(story => story.userId === group.userId);
+            console.log('📖 Stories activas del grupo', group.user.name, ':', groupActiveStories.length);
+            
+            if (groupActiveStories.length > 0) {
+              const hasUnviewed = groupActiveStories.some(story => !story.viewedBy.includes(currentUserId));
+              
+              filteredGroups.push({
+                ...group,
+                stories: groupActiveStories,
+                hasUnviewed
+              });
+              
+              console.log('✅ Grupo agregado:', group.user.name, '- No vistas:', hasUnviewed);
+            } else {
+              console.log('⚠️ Grupo sin stories activas:', group.user.name);
+            }
+          } else {
+            console.log('🔒 Usuario', currentUserId, 'no puede ver stories de', group.user.name);
+          }
+        } catch (groupError) {
+          console.error('❌ Error verificando grupo', group.user.name, ':', groupError);
+          // Continuar con el siguiente grupo en caso de error
         }
-      } else {
-        console.log('🔒 Usuario', currentUserId, 'no puede ver stories de', group.user.name);
       }
-    }
 
-    console.log('✅ Story groups filtrados:', filteredGroups.length, 'de', this.storyGroups.length);
-    return filteredGroups;
+      console.log('✅ Story groups filtrados:', filteredGroups.length, 'de', this.storyGroups.length);
+      console.log('📱 === FIN OBTENIENDO STORY GROUPS ===');
+      
+      return filteredGroups;
+      
+    } catch (error) {
+      console.error('🚨 === ERROR EN getStoryGroups ===');
+      console.error('❌ Error:', error);
+      console.error('❌ Error message:', (error as Error).message);
+      console.error('❌ Error stack:', (error as Error).stack);
+      console.error('🚨 === FIN ERROR ===');
+      
+      // Retornar array vacío en caso de error para evitar crashes
+      return [];
+    }
   }
 
   // Obtener stories de un usuario específico

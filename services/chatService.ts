@@ -72,6 +72,8 @@ export const sendMessage = async (
   content?: string,
   duration?: number
 ) => {
+  console.log('💾 sendMessage llamado con:', { chatId, senderId, text, type, content, duration });
+  
   const messageData: any = {
     senderId,
     type,
@@ -90,22 +92,35 @@ export const sendMessage = async (
     messageData.duration = duration;
   } else if ((type === 'image' || type === 'video') && content) {
     messageData.content = content; // URL del archivo
+  } else if (type === 'story_reaction' && text) {
+    // Para reacciones a historias, el emoji viene en el parámetro text
+    messageData.text = text;
+    console.log('📱 Guardando reacción a historia:', text, 'Longitud:', text.length);
   }
 
+  console.log('💾 Datos del mensaje a guardar:', messageData);
+
   await addDoc(collection(db, "chats", chatId, "messages"), messageData);
+  console.log('✅ Mensaje guardado en Firebase:', messageData);
   
   // Actualizar último mensaje del chat
   const lastMessageText = type === 'text' ? text : 
                          type === 'emoji' ? content :
                          type === 'voice' ? '🎤 Mensaje de voz' :
                          type === 'image' ? '📷 Imagen' :
-                         type === 'video' ? '🎥 Video' : 'Mensaje';
+                         type === 'video' ? '🎥 Video' : 
+                         type === 'story_reaction' ? `${text} Reaccionó a tu historia` :
+                         'Mensaje';
+  
+  console.log('💾 Actualizando último mensaje del chat:', lastMessageText);
   
   await updateDoc(doc(db, "chats", chatId), {
     lastMessage: lastMessageText,
     timestamp: Date.now(),
     serverTimestamp: serverTimestamp()
   });
+  
+  console.log('✅ Chat actualizado exitosamente');
 };
 
 // Escuchar mensajes de un chat en tiempo real

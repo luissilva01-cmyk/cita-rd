@@ -3,15 +3,20 @@ import React from 'react';
 import { Heart, MessageCircle, Sparkles, User, Flame } from 'lucide-react';
 import { View } from '../../types';
 import { useLanguage } from '../../contexts/LanguageContext';
+import NotificationBadge from '../NotificationBadge';
+import { useNotifications } from '../../hooks/useNotifications';
 
 interface LayoutProps {
   children: React.ReactNode;
   activeView: View;
   onViewChange: (view: View) => void;
+  chats?: any[];
+  currentUserId?: string;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children, activeView, onViewChange }) => {
+const Layout: React.FC<LayoutProps> = ({ children, activeView, onViewChange, chats = [], currentUserId = '' }) => {
   const { t } = useLanguage();
+  const { notifications, clearNotifications } = useNotifications(chats, currentUserId);
   
   return (
     <div className="flex flex-col h-screen max-w-md mx-auto bg-white shadow-2xl relative overflow-hidden">
@@ -45,12 +50,17 @@ const Layout: React.FC<LayoutProps> = ({ children, activeView, onViewChange }) =
           active={activeView === 'discovery'} 
           onClick={() => onViewChange('discovery')} 
           label={t('discover')}
+          notificationCount={notifications.totalStories}
         />
         <NavItem 
           icon={<MessageCircle size={24} />} 
           active={activeView === 'messages'} 
-          onClick={() => onViewChange('messages')} 
+          onClick={() => {
+            clearNotifications('totalMessages');
+            onViewChange('messages');
+          }} 
           label={t('messages')}
+          notificationCount={notifications.totalMessages}
         />
         <NavItem 
           icon={<User size={24} />} 
@@ -63,12 +73,31 @@ const Layout: React.FC<LayoutProps> = ({ children, activeView, onViewChange }) =
   );
 };
 
-const NavItem = ({ icon, active, onClick, label }: { icon: React.ReactNode, active: boolean, onClick: () => void, label: string }) => (
+const NavItem = ({ 
+  icon, 
+  active, 
+  onClick, 
+  label, 
+  notificationCount = 0 
+}: { 
+  icon: React.ReactNode, 
+  active: boolean, 
+  onClick: () => void, 
+  label: string,
+  notificationCount?: number
+}) => (
   <button 
     onClick={onClick}
-    className={`flex flex-col items-center gap-1 transition-all ${active ? 'text-rose-600' : 'text-slate-400 hover:text-slate-600'}`}
+    className={`relative flex flex-col items-center gap-1 transition-all ${active ? 'text-rose-600' : 'text-slate-400 hover:text-slate-600'}`}
   >
-    {icon}
+    <div className="relative">
+      {icon}
+      {notificationCount > 0 && (
+        <div className="absolute -top-2 -right-2">
+          <NotificationBadge count={notificationCount} size="sm" />
+        </div>
+      )}
+    </div>
     <span className="text-[10px] font-medium uppercase tracking-wider">{label}</span>
   </button>
 );

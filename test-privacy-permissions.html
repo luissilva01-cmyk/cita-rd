@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Privacy Permissions - CitaRD</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            background: #f8f9fa;
+        }
+        .result {
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .user-card {
+            display: inline-block;
+            margin: 10px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background: white;
+            min-width: 200px;
+        }
+        .user-id {
+            font-weight: bold;
+            color: #007bff;
+        }
+        .user-name {
+            color: #333;
+            margin: 5px 0;
+        }
+        .permission {
+            font-size: 12px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin: 2px;
+            display: inline-block;
+        }
+        .permission.allowed {
+            background: #d4edda;
+            color: #155724;
+        }
+        .permission.denied {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔒 Test Privacy Permissions</h1>
+        <p>Verificar permisos de privacidad para respuestas a historias</p>
+
+        <div class="test-section">
+            <h3>👤 Usuario Actual</h3>
+            <div class="user-card">
+                <div class="user-id">KU5ZalR92QcPV7RGbLFTjEjTXZm2</div>
+                <div class="user-name">Juan Pérez (Tú)</div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>👥 Usuarios de Prueba</h3>
+            <div id="users-list">
+                <div class="user-card">
+                    <div class="user-id">1</div>
+                    <div class="user-name">Carolina</div>
+                    <div class="permission" id="perm-1">Verificando...</div>
+                </div>
+                <div class="user-card">
+                    <div class="user-id">2</div>
+                    <div class="user-name">Marcos</div>
+                    <div class="permission" id="perm-2">Verificando...</div>
+                </div>
+                <div class="user-card">
+                    <div class="user-id">3</div>
+                    <div class="user-name">Isabella</div>
+                    <div class="permission" id="perm-3">Verificando...</div>
+                </div>
+                <div class="user-card">
+                    <div class="user-id">4</div>
+                    <div class="user-name">Rafael</div>
+                    <div class="permission" id="perm-4">Verificando...</div>
+                </div>
+                <div class="user-card">
+                    <div class="user-id">5</div>
+                    <div class="user-name">Sofía</div>
+                    <div class="permission" id="perm-5">Verificando...</div>
+                </div>
+                <div class="user-card">
+                    <div class="user-id">6</div>
+                    <div class="user-name">Diego</div>
+                    <div class="permission" id="perm-6">Verificando...</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>🧪 Tests de Permisos</h3>
+            <button onclick="testAllPermissions()">Verificar Todos los Permisos</button>
+            <button onclick="testSpecificUser()">Test Usuario Específico</button>
+            <button onclick="simulatePrivacyService()">Simular Servicio de Privacidad</button>
+            <div id="test-results"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 Configuraciones de Privacidad</h3>
+            <div id="privacy-settings"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>💕 Matches</h3>
+            <div id="matches-info"></div>
+        </div>
+    </div>
+
+    <script>
+        const CURRENT_USER_ID = 'KU5ZalR92QcPV7RGbLFTjEjTXZm2';
+        const TEST_USERS = [
+            { id: '1', name: 'Carolina' },
+            { id: '2', name: 'Marcos' },
+            { id: '3', name: 'Isabella' },
+            { id: '4', name: 'Rafael' },
+            { id: '5', name: 'Sofía' },
+            { id: '6', name: 'Diego' }
+        ];
+
+        // Simular el servicio de privacidad
+        class MockPrivacyService {
+            constructor() {
+                this.privacySettings = new Map();
+                this.userMatches = [];
+                this.initializeDemoData();
+            }
+
+            initializeDemoData() {
+                // Configuraciones de privacidad demo
+                const demoSettings = [
+                    {
+                        userId: 'KU5ZalR92QcPV7RGbLFTjEjTXZm2',
+                        storiesVisibility: 'everyone',
+                        allowStoryReplies: true,
+                        showOnlineStatus: true,
+                        allowProfileViews: 'everyone'
+                    },
+                    {
+                        userId: '1',
+                        storiesVisibility: 'everyone',
+                        allowStoryReplies: true,
+                        showOnlineStatus: true,
+                        allowProfileViews: 'everyone'
+                    },
+                    {
+                        userId: '2',
+                        storiesVisibility: 'everyone',
+                        allowStoryReplies: true,
+                        showOnlineStatus: true,
+                        allowProfileViews: 'everyone'
+                    },
+                    {
+                        userId: '3',
+                        storiesVisibility: 'everyone',
+                        allowStoryReplies: true,
+                        showOnlineStatus: true,
+                        allowProfileViews: 'everyone'
+                    },
+                    {
+                        userId: '4',
+                        storiesVisibility: 'everyone',
+                        allowStoryReplies: true,
+                        showOnlineStatus: true,
+                        allowProfileViews: 'everyone'
+                    },
+                    {
+                        userId: '5',
+                        storiesVisibility: 'everyone',
+                        allowStoryReplies: true,
+                        showOnlineStatus: true,
+                        allowProfileViews: 'everyone'
+                    },
+                    {
+                        userId: '6',
+                        storiesVisibility: 'everyone',
+                        allowStoryReplies: true,
+                        showOnlineStatus: true,
+                        allowProfileViews: 'everyone'
+                    }
+                ];
+
+                demoSettings.forEach(setting => {
+                    this.privacySettings.set(setting.userId, setting);
+                });
+
+                // Matches demo
+                this.userMatches = [
+                    { userId1: 'KU5ZalR92QcPV7RGbLFTjEjTXZm2', userId2: '1', isActive: true },
+                    { userId1: 'KU5ZalR92QcPV7RGbLFTjEjTXZm2', userId2: '2', isActive: true },
+                    { userId1: 'KU5ZalR92QcPV7RGbLFTjEjTXZm2', userId2: '3', isActive: true },
+                    { userId1: 'KU5ZalR92QcPV7RGbLFTjEjTXZm2', userId2: '4', isActive: true },
+                    { userId1: 'KU5ZalR92QcPV7RGbLFTjEjTXZm2', userId2: '5', isActive: true },
+                    { userId1: 'KU5ZalR92QcPV7RGbLFTjEjTXZm2', userId2: '6', isActive: true }
+                ];
+            }
+
+            async getPrivacySettings(userId) {
+                let settings = this.privacySettings.get(userId);
+                
+                if (!settings) {
+                    settings = {
+                        userId,
+                        storiesVisibility: 'everyone',
+                        allowStoryReplies: true,
+                        showOnlineStatus: true,
+                        allowProfileViews: 'everyone'
+                    };
+                    this.privacySettings.set(userId, settings);
+                }
+
+                return settings;
+            }
+
+            async areUsersMatched(userId1, userId2) {
+                return this.userMatches.some(match => 
+                    match.isActive && (
+                        (match.userId1 === userId1 && match.userId2 === userId2) ||
+                        (match.userId1 === userId2 && match.userId2 === userId1)
+                    )
+                );
+            }
+
+            async canViewStories(viewerId, storyOwnerId) {
+                if (viewerId === storyOwnerId) return true;
+
+                const ownerSettings = await this.getPrivacySettings(storyOwnerId);
+                
+                switch (ownerSettings.storiesVisibility) {
+                    case 'everyone':
+                        return true;
+                    case 'matches_only':
+                        return await this.areUsersMatched(viewerId, storyOwnerId);
+                    case 'close_friends':
+                        return await this.areUsersMatched(viewerId, storyOwnerId);
+                    default:
+                        return false;
+                }
+            }
+
+            async canReplyToStories(viewerId, storyOwnerId) {
+                const canView = await this.canViewStories(viewerId, storyOwnerId);
+                if (!canView) return false;
+
+                const ownerSettings = await this.getPrivacySettings(storyOwnerId);
+                return ownerSettings.allowStoryReplies;
+            }
+        }
+
+        const mockPrivacyService = new MockPrivacyService();
+
+        async function testAllPermissions() {
+            const results = document.getElementById('test-results');
+            results.innerHTML = '<div class="result info">🔍 Verificando permisos...</div>';
+
+            let allResults = [];
+
+            for (const user of TEST_USERS) {
+                try {
+                    const canReply = await mockPrivacyService.canReplyToStories(CURRENT_USER_ID, user.id);
+                    const canView = await mockPrivacyService.canViewStories(CURRENT_USER_ID, user.id);
+                    const areMatched = await mockPrivacyService.areUsersMatched(CURRENT_USER_ID, user.id);
+                    const settings = await mockPrivacyService.getPrivacySettings(user.id);
+
+                    allResults.push({
+                        user,
+                        canReply,
+                        canView,
+                        areMatched,
+                        settings
+                    });
+
+                    // Actualizar UI individual
+                    const permElement = document.getElementById(`perm-${user.id}`);
+                    if (canReply) {
+                        permElement.textContent = '✅ Puede responder';
+                        permElement.className = 'permission allowed';
+                    } else {
+                        permElement.textContent = '❌ No puede responder';
+                        permElement.className = 'permission denied';
+                    }
+
+                } catch (error) {
+                    console.error(`Error testing user ${user.id}:`, error);
+                    allResults.push({
+                        user,
+                        error: error.message
+                    });
+                }
+            }
+
+            // Mostrar resultados detallados
+            let resultsHtml = '<div class="result success">✅ Verificación completada</div>';
+            
+            allResults.forEach(result => {
+                if (result.error) {
+                    resultsHtml += `<div class="result error">❌ ${result.user.name}: ${result.error}</div>`;
+                } else {
+                    resultsHtml += `
+                        <div class="result ${result.canReply ? 'success' : 'warning'}">
+                            <strong>${result.user.name} (${result.user.id})</strong><br>
+                            Puede ver stories: ${result.canView ? '✅' : '❌'}<br>
+                            Puede responder: ${result.canReply ? '✅' : '❌'}<br>
+                            Tienen match: ${result.areMatched ? '✅' : '❌'}<br>
+                            Permite respuestas: ${result.settings.allowStoryReplies ? '✅' : '❌'}
+                        </div>
+                    `;
+                }
+            });
+
+            results.innerHTML = resultsHtml;
+        }
+
+        async function testSpecificUser() {
+            const userId = prompt('Ingresa el ID del usuario a probar:', '1');
+            if (!userId) return;
+
+            const results = document.getElementById('test-results');
+            results.innerHTML = '<div class="result info">🔍 Verificando usuario específico...</div>';
+
+            try {
+                const canReply = await mockPrivacyService.canReplyToStories(CURRENT_USER_ID, userId);
+                const canView = await mockPrivacyService.canViewStories(CURRENT_USER_ID, userId);
+                const areMatched = await mockPrivacyService.areUsersMatched(CURRENT_USER_ID, userId);
+                const settings = await mockPrivacyService.getPrivacySettings(userId);
+
+                results.innerHTML = `
+                    <div class="result ${canReply ? 'success' : 'warning'}">
+                        <strong>Test para usuario ${userId}</strong><br>
+                        Puede ver stories: ${canView ? '✅' : '❌'}<br>
+                        Puede responder: ${canReply ? '✅' : '❌'}<br>
+                        Tienen match: ${areMatched ? '✅' : '❌'}<br>
+                        Configuración: ${JSON.stringify(settings, null, 2)}
+                    </div>
+                `;
+            } catch (error) {
+                results.innerHTML = `<div class="result error">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        async function simulatePrivacyService() {
+            const settings = document.getElementById('privacy-settings');
+            const matches = document.getElementById('matches-info');
+
+            // Mostrar configuraciones
+            let settingsHtml = '<h4>⚙️ Configuraciones de Privacidad</h4>';
+            for (const user of TEST_USERS) {
+                const userSettings = await mockPrivacyService.getPrivacySettings(user.id);
+                settingsHtml += `
+                    <div class="result info">
+                        <strong>${user.name} (${user.id})</strong><br>
+                        Stories: ${userSettings.storiesVisibility}<br>
+                        Respuestas: ${userSettings.allowStoryReplies ? '✅' : '❌'}
+                    </div>
+                `;
+            }
+            settings.innerHTML = settingsHtml;
+
+            // Mostrar matches
+            let matchesHtml = '<h4>💕 Matches del Usuario Actual</h4>';
+            for (const user of TEST_USERS) {
+                const areMatched = await mockPrivacyService.areUsersMatched(CURRENT_USER_ID, user.id);
+                matchesHtml += `
+                    <div class="result ${areMatched ? 'success' : 'warning'}">
+                        ${user.name}: ${areMatched ? '✅ Match' : '❌ No match'}
+                    </div>
+                `;
+            }
+            matches.innerHTML = matchesHtml;
+        }
+
+        // Auto-ejecutar al cargar
+        window.onload = function() {
+            testAllPermissions();
+            simulatePrivacyService();
+        };
+    </script>
+</body>
+</html>

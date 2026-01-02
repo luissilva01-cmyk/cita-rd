@@ -48,16 +48,30 @@ export class VoiceRecorder {
       };
 
       this.mediaRecorder.onstop = () => {
+        console.log('🎤 📋 MediaRecorder.onstop evento disparado');
         const duration = Math.floor((Date.now() - this.startTime) / 1000);
         const audioBlob = new Blob(this.audioChunks, { type: 'audio/webm' });
         
-        console.log('🎤 Grabación completada:', duration, 'segundos');
+        console.log('🎤 ✅ Grabación completada:');
+        console.log('🎤   - Duración:', duration, 'segundos');
+        console.log('🎤   - Chunks:', this.audioChunks.length);
+        console.log('🎤   - Blob size:', audioBlob.size, 'bytes');
+        console.log('🎤   - Blob type:', audioBlob.type);
+        
+        // Ejecutar callback
+        console.log('🎤 📞 Ejecutando callback onDataAvailable...');
         this.onDataAvailable?.(duration, audioBlob);
+        console.log('🎤 ✅ Callback ejecutado');
         
         // Limpiar stream
         if (this.stream) {
-          this.stream.getTracks().forEach(track => track.stop());
+          console.log('🎤 🧹 Limpiando stream...');
+          this.stream.getTracks().forEach(track => {
+            track.stop();
+            console.log('🎤   - Track detenido:', track.kind);
+          });
           this.stream = null;
+          console.log('🎤 ✅ Stream limpiado');
         }
       };
 
@@ -80,8 +94,14 @@ export class VoiceRecorder {
   // Detener grabación
   stopRecording(): void {
     if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
-      console.log('🎤 Deteniendo grabación...');
+      console.log('🎤 🛑 VoiceRecorder.stopRecording() - MediaRecorder encontrado');
+      console.log('🎤 Estado actual:', this.mediaRecorder.state);
       this.mediaRecorder.stop();
+      console.log('🎤 ✅ MediaRecorder.stop() llamado');
+    } else {
+      console.error('❌ MediaRecorder no disponible o no está grabando');
+      console.log('🎤 MediaRecorder:', this.mediaRecorder);
+      console.log('🎤 Estado:', this.mediaRecorder?.state);
     }
   }
 
@@ -121,7 +141,22 @@ export const uploadVoiceMessage = async (
 ): Promise<string> => {
   try {
     console.log('☁️ Subiendo mensaje de voz...');
+    console.log('☁️ Blob size:', audioBlob.size, 'bytes');
+    console.log('☁️ Chat ID:', chatId);
+    console.log('☁️ Sender ID:', senderId);
     
+    // TEMPORAL: Crear URL local para desarrollo
+    // En producción, usar Firebase Storage real
+    const localUrl = URL.createObjectURL(audioBlob);
+    console.log('☁️ ✅ URL local creada:', localUrl);
+    
+    // Simular delay de subida
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    console.log('☁️ ✅ Mensaje de voz "subido" (modo desarrollo)');
+    return localUrl;
+    
+    /* CÓDIGO ORIGINAL PARA PRODUCCIÓN:
     const fileName = `voice_messages/${chatId}/${senderId}_${Date.now()}.webm`;
     const storageRef = ref(storage, fileName);
     
@@ -133,6 +168,7 @@ export const uploadVoiceMessage = async (
     
     console.log('✅ Mensaje de voz subido:', downloadURL);
     return downloadURL;
+    */
     
   } catch (error) {
     console.error('❌ Error subiendo mensaje de voz:', error);

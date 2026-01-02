@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Video Call - CitaRD</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .video-container {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            background: #000;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1); /* Efecto espejo para video local */
+        }
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .start-btn {
+            background: #4CAF50;
+            color: white;
+        }
+        .stop-btn {
+            background: #f44336;
+            color: white;
+        }
+        .toggle-btn {
+            background: #2196F3;
+            color: white;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎥 Test de Videollamada - CitaRD</h1>
+        <p>Esta página prueba la funcionalidad de cámara para videollamadas.</p>
+        
+        <div id="status" class="status info">
+            ⏳ Listo para iniciar prueba de cámara
+        </div>
+        
+        <div class="video-container">
+            <video id="localVideo" autoplay playsinline muted></video>
+        </div>
+        
+        <div class="controls">
+            <button id="startBtn" class="start-btn">📹 Iniciar Cámara</button>
+            <button id="stopBtn" class="stop-btn" disabled>⏹️ Detener Cámara</button>
+            <button id="toggleBtn" class="toggle-btn" disabled>🔄 Alternar Cámara</button>
+        </div>
+        
+        <div id="info">
+            <h3>Información del Stream:</h3>
+            <ul id="streamInfo">
+                <li>Estado: <span id="streamStatus">No iniciado</span></li>
+                <li>Video Tracks: <span id="videoTracks">0</span></li>
+                <li>Audio Tracks: <span id="audioTracks">0</span></li>
+                <li>Resolución: <span id="resolution">N/A</span></li>
+            </ul>
+        </div>
+        
+        <div id="logs">
+            <h3>Logs:</h3>
+            <div id="logContainer" style="background: #f8f9fa; padding: 10px; border-radius: 5px; height: 200px; overflow-y: auto; font-family: monospace; font-size: 12px;"></div>
+        </div>
+    </div>
+
+    <script>
+        let localStream = null;
+        let isCameraOn = true;
+        
+        const localVideo = document.getElementById('localVideo');
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const toggleBtn = document.getElementById('toggleBtn');
+        const status = document.getElementById('status');
+        const logContainer = document.getElementById('logContainer');
+        
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}`;
+            console.log(logEntry);
+            logContainer.innerHTML += logEntry + '\n';
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+        
+        function updateStatus(message, type = 'info') {
+            status.textContent = message;
+            status.className = `status ${type}`;
+        }
+        
+        function updateStreamInfo() {
+            if (localStream) {
+                document.getElementById('streamStatus').textContent = 'Activo';
+                document.getElementById('videoTracks').textContent = localStream.getVideoTracks().length;
+                document.getElementById('audioTracks').textContent = localStream.getAudioTracks().length;
+                
+                const videoTrack = localStream.getVideoTracks()[0];
+                if (videoTrack) {
+                    const settings = videoTrack.getSettings();
+                    document.getElementById('resolution').textContent = `${settings.width}x${settings.height}`;
+                }
+            } else {
+                document.getElementById('streamStatus').textContent = 'Inactivo';
+                document.getElementById('videoTracks').textContent = '0';
+                document.getElementById('audioTracks').textContent = '0';
+                document.getElementById('resolution').textContent = 'N/A';
+            }
+        }
+        
+        async function startCamera() {
+            try {
+                log('🎥 Iniciando cámara...');
+                updateStatus('⏳ Solicitando permisos de cámara...', 'info');
+                
+                const constraints = {
+                    audio: true,
+                    video: {
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 },
+                        facingMode: 'user'
+                    }
+                };
+                
+                log('📋 Constraints: ' + JSON.stringify(constraints));
+                
+                localStream = await navigator.mediaDevices.getUserMedia(constraints);
+                
+                log('✅ Stream obtenido exitosamente');
+                log('📹 Video tracks: ' + localStream.getVideoTracks().length);
+                log('🎤 Audio tracks: ' + localStream.getAudioTracks().length);
+                
+                // Asignar al video element
+                localVideo.srcObject = localStream;
+                
+                log('📺 Stream asignado al video element');
+                
+                // Eventos del video
+                localVideo.onloadedmetadata = () => {
+                    log('📊 Metadata del video cargada');
+                    updateStreamInfo();
+                };
+                
+                localVideo.oncanplay = () => {
+                    log('▶️ Video listo para reproducir');
+                };
+                
+                localVideo.onerror = (e) => {
+                    log('❌ Error en video element: ' + e.message);
+                };
+                
+                updateStatus('✅ Cámara iniciada correctamente', 'success');
+                startBtn.disabled = true;
+                stopBtn.disabled = false;
+                toggleBtn.disabled = false;
+                
+            } catch (error) {
+                log('❌ Error iniciando cámara: ' + error.name + ' - ' + error.message);
+                
+                let errorMessage = 'Error desconocido';
+                if (error.name === 'NotAllowedError') {
+                    errorMessage = 'Permisos de cámara denegados';
+                } else if (error.name === 'NotFoundError') {
+                    errorMessage = 'No se encontró cámara disponible';
+                } else if (error.name === 'NotReadableError') {
+                    errorMessage = 'Cámara en uso por otra aplicación';
+                } else {
+                    errorMessage = error.message;
+                }
+                
+                updateStatus('❌ ' + errorMessage, 'error');
+            }
+        }
+        
+        function stopCamera() {
+            if (localStream) {
+                log('🛑 Deteniendo cámara...');
+                
+                localStream.getTracks().forEach(track => {
+                    track.stop();
+                    log('⏹️ Track detenido: ' + track.kind);
+                });
+                
+                localStream = null;
+                localVideo.srcObject = null;
+                
+                updateStatus('⏹️ Cámara detenida', 'info');
+                updateStreamInfo();
+                
+                startBtn.disabled = false;
+                stopBtn.disabled = true;
+                toggleBtn.disabled = true;
+            }
+        }
+        
+        function toggleCamera() {
+            if (localStream) {
+                const videoTrack = localStream.getVideoTracks()[0];
+                if (videoTrack) {
+                    videoTrack.enabled = !videoTrack.enabled;
+                    isCameraOn = videoTrack.enabled;
+                    
+                    log('🔄 Cámara ' + (isCameraOn ? 'activada' : 'desactivada'));
+                    updateStatus('🔄 Cámara ' + (isCameraOn ? 'activada' : 'desactivada'), 'info');
+                }
+            }
+        }
+        
+        // Event listeners
+        startBtn.addEventListener('click', startCamera);
+        stopBtn.addEventListener('click', stopCamera);
+        toggleBtn.addEventListener('click', toggleCamera);
+        
+        // Inicializar
+        log('🚀 Página de prueba cargada');
+        updateStreamInfo();
+        
+        // Verificar soporte de getUserMedia
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            log('❌ getUserMedia no soportado en este navegador');
+            updateStatus('❌ Navegador no compatible', 'error');
+            startBtn.disabled = true;
+        } else {
+            log('✅ getUserMedia soportado');
+        }
+    </script>
+</body>
+</html>

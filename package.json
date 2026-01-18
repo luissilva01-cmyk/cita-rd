@@ -1,7 +1,7 @@
 {
-  "name": "cita-rd",
-  "version": "1.2.0",
-  "description": "CitaRD - Dating con IA y Firebase",
+  "name": "tapati",
+  "version": "2.0.0",
+  "description": "Ta' Pa' Ti - Cuando alguien sí te elige",
   "type": "module",
   "scripts": {
     "start": "vite",
@@ -12,9 +12,12 @@
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
     "firebase": "^10.8.0",
+    "framer-motion": "^12.24.7",
     "lucide-react": "^0.460.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-firebase-hooks": "^5.1.1",
+    "react-router-dom": "^7.11.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.6.0",

@@ -6,7 +6,9 @@ export default defineConfig({
   server: {
     port: 3000,
     host: true,
-    strictPort: false
+    strictPort: false,
+    // Configuración para manejar rutas de React Router
+    historyApiFallback: true
   },
   build: {
     outDir: 'dist',

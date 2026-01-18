@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✅ Fix: Tracking Prevention Storage Issue</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        .fix-banner {
+            background: linear-gradient(135deg, #00b894, #00a085);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0, 184, 148, 0.3);
+        }
+        .test-section {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .test-link {
+            display: inline-block;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #ec4913, #d63f11);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            margin: 10px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(236, 73, 19, 0.3);
+        }
+        .test-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(236, 73, 19, 0.4);
+        }
+        .problem-box {
+            background: rgba(255, 193, 7, 0.2);
+            border: 2px solid #ffc107;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+        .solution-box {
+            background: rgba(40, 167, 69, 0.2);
+            border: 2px solid #28a745;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+        .code-block {
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .emoji {
+            font-size: 1.5em;
+            margin-right: 10px;
+        }
+        .browser-instructions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .browser-card {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #ffc107;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="fix-banner">
+            <h1><span class="emoji">🛠️</span>Fix: Tracking Prevention Storage Issue<span class="emoji">🛠️</span></h1>
+            <p>Solución implementada para el error "Tracking Prevention blocked access to storage"</p>
+        </div>
+
+        <div class="problem-box">
+            <h2><span class="emoji">⚠️</span>El Problema Identificado</h2>
+            <p><strong>Error:</strong> <code>Tracking Prevention blocked access to storage</code></p>
+            <p>Este error ocurre cuando el navegador bloquea el acceso al localStorage/sessionStorage que Firebase necesita para funcionar.</p>
+            
+            <h3>Navegadores Afectados:</h3>
+            <ul>
+                <li><strong>Safari:</strong> Con "Prevenir seguimiento entre sitios" activado</li>
+                <li><strong>Firefox:</strong> Con "Enhanced Tracking Protection" en modo estricto</li>
+                <li><strong>Chrome:</strong> Con extensiones de privacidad activas</li>
+                <li><strong>Edge:</strong> Con configuración de privacidad estricta</li>
+            </ul>
+        </div>
+
+        <div class="solution-box">
+            <h2><span class="emoji">✅</span>Solución Implementada</h2>
+            <p>Hemos agregado detección automática y manejo del problema:</p>
+            
+            <div class="code-block">
+                <strong>Archivos creados/modificados:</strong><br>
+                • src/utils/storageHelper.ts - Helper para detectar storage bloqueado<br>
+                • src/pages/Auth/Login.tsx - Manejo de errores mejorado<br>
+                • src/pages/Auth/ForgotPassword.tsx - Detección de storage bloqueado
+            </div>
+
+            <h3>Características de la Solución:</h3>
+            <ul>
+                <li>🔍 <strong>Detección automática</strong> del storage bloqueado</li>
+                <li>⚠️ <strong>Mensajes de error específicos</strong> para problemas de privacidad</li>
+                <li>📋 <strong>Instrucciones claras</strong> para cada navegador</li>
+                <li>🎨 <strong>UI diferenciada</strong> para errores de storage (naranja vs rojo)</li>
+                <li>💡 <strong>Sugerencias de solución</strong> automáticas</li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h2><span class="emoji">🧪</span>Probar la Solución</h2>
+            <p>Haz clic en los enlaces para probar las páginas con la nueva detección:</p>
+            
+            <div style="text-align: center;">
+                <a href="http://localhost:3001/login" class="test-link" target="_blank">
+                    📝 Probar Login con Fix
+                </a>
+                
+                <a href="http://localhost:3001/forgot-password" class="test-link" target="_blank">
+                    🔐 Probar Forgot Password con Fix
+                </a>
+                
+                <a href="http://localhost:3001/register" class="test-link" target="_blank">
+                    👤 Probar Register
+                </a>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2><span class="emoji">🔧</span>Instrucciones por Navegador</h2>
+            <div class="browser-instructions">
+                <div class="browser-card">
+                    <h3>🍎 Safari</h3>
+                    <ol>
+                        <li>Ve a <strong>Safari → Preferencias</strong></li>
+                        <li>Haz clic en <strong>Privacidad</strong></li>
+                        <li>Desactiva <strong>"Prevenir seguimiento entre sitios"</strong></li>
+                        <li>Recarga la página</li>
+                    </ol>
+                </div>
+                
+                <div class="browser-card">
+                    <h3>🦊 Firefox</h3>
+                    <ol>
+                        <li>Ve a <strong>Configuración → Privacidad y seguridad</strong></li>
+                        <li>En <strong>"Protección contra rastreo mejorada"</strong></li>
+                        <li>Selecciona <strong>"Estándar"</strong> en lugar de "Estricta"</li>
+                        <li>Recarga la página</li>
+                    </ol>
+                </div>
+                
+                <div class="browser-card">
+                    <h3>🌐 Chrome</h3>
+                    <ol>
+                        <li>Desactiva extensiones de privacidad temporalmente</li>
+                        <li>O ve a <strong>Configuración → Privacidad y seguridad</strong></li>
+                        <li>Ajusta <strong>"Cookies y otros datos de sitios"</strong></li>
+                        <li>Permite cookies de terceros para localhost</li>
+                    </ol>
+                </div>
+                
+                <div class="browser-card">
+                    <h3>🚀 Solución Rápida</h3>
+                    <ol>
+                        <li><strong>Usa modo incógnito/privado</strong></li>
+                        <li>Esto suele desactivar las restricciones</li>
+                        <li>Funciona en la mayoría de navegadores</li>
+                        <li>Solución temporal pero efectiva</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2><span class="emoji">📋</span>Cómo Probar</h2>
+            <ol>
+                <li><strong>Reproduce el error:</strong> Ve a Login o Forgot Password con tracking prevention activado</li>
+                <li><strong>Observa el mensaje:</strong> Deberías ver un mensaje naranja específico sobre privacidad</li>
+                <li><strong>Sigue las instrucciones:</strong> El mensaje incluye pasos específicos para tu navegador</li>
+                <li><strong>Verifica la solución:</strong> Después de ajustar la configuración, la funcionalidad debería funcionar</li>
+            </ol>
+        </div>
+
+        <div class="test-section">
+            <h2><span class="emoji">🎯</span>Estado Final</h2>
+            <div style="text-align: center; padding: 20px;">
+                <h3 style="color: #28a745;">✅ PROBLEMA DE TRACKING PREVENTION RESUELTO</h3>
+                <p>La aplicación ahora detecta automáticamente cuando el storage está bloqueado y proporciona instrucciones claras para solucionarlo.</p>
+                <p><strong>Los usuarios ya no se quedarán confundidos con errores crípticos de Firebase.</strong></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Test storage availability
+        function testStorageAvailability() {
+            try {
+                const testKey = '__storage_test__';
+                localStorage.setItem(testKey, 'test');
+                localStorage.removeItem(testKey);
+                console.log('✅ Storage disponible');
+                return true;
+            } catch (error) {
+                console.warn('❌ Storage bloqueado:', error);
+                return false;
+            }
+        }
+
+        // Run test
+        const isStorageAvailable = testStorageAvailability();
+        
+        if (!isStorageAvailable) {
+            console.log('🚨 Tracking Prevention detectado - La solución debería mostrar instrucciones');
+        } else {
+            console.log('✅ Storage funcionando correctamente');
+        }
+    </script>
+</body>
+</html>

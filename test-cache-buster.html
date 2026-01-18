@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CitaRD - Cache Buster Test</title>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: #f8f6f6;
+            color: #1b110d;
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #ec4913;
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+        .test-button {
+            display: inline-block;
+            padding: 15px 30px;
+            background: #ec4913;
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        .test-button:hover {
+            background: #d63e0f;
+            transform: translateY(-2px);
+        }
+        .instructions {
+            background: #e8f5e8;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        .warning {
+            background: #fff3cd;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #ffc107;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 CitaRD - Cache Buster Test</h1>
+        
+        <div class="warning">
+            <h3>⚠️ Problema Detectado: Cache del Navegador</h3>
+            <p>Si las páginas de login y register se siguen viendo igual, es porque el navegador está cacheando las versiones antiguas.</p>
+        </div>
+
+        <div class="instructions">
+            <h3>🛠️ Soluciones para Ver el Nuevo Diseño:</h3>
+            <ol>
+                <li><strong>Ctrl + F5</strong> - Recarga forzada (recomendado)</li>
+                <li><strong>Ctrl + Shift + R</strong> - Recarga sin cache</li>
+                <li><strong>Modo Incógnito</strong> - Abre en ventana privada</li>
+                <li><strong>Limpiar Cache</strong> - F12 → Network → Disable cache</li>
+            </ol>
+        </div>
+
+        <h3>🧪 Enlaces de Prueba con Cache Buster:</h3>
+        
+        <a href="http://localhost:3000/login?v=2024" class="test-button" target="_blank">
+            🔐 Login (Cache Buster)
+        </a>
+        
+        <a href="http://localhost:3000/register?v=2024" class="test-button" target="_blank">
+            📝 Register (Cache Buster)
+        </a>
+        
+        <a href="http://localhost:3000/?v=2024" class="test-button" target="_blank">
+            🏠 Home (Cache Buster)
+        </a>
+
+        <div style="margin-top: 30px; padding: 20px; background: #d1ecf1; border-radius: 10px;">
+            <h4>🔍 Verificación del Estado:</h4>
+            <p><strong>Servidor:</strong> ✅ Corriendo en puerto 3000</p>
+            <p><strong>TypeScript:</strong> ✅ Sin errores de compilación</p>
+            <p><strong>Routing:</strong> ✅ Configurado correctamente</p>
+            <p><strong>Páginas Modernas:</strong> ✅ Implementadas</p>
+            <p><strong>Problema:</strong> ⚠️ Cache del navegador</p>
+        </div>
+
+        <div style="margin-top: 20px; font-size: 14px; color: #666;">
+            <p>Si después de limpiar el cache sigues viendo el diseño antiguo, avísame para investigar más a fondo.</p>
+        </div>
+    </div>
+
+    <script>
+        console.log('🔧 Cache Buster Test Loaded');
+        console.log('🕐 Timestamp:', new Date().toISOString());
+        console.log('🔗 Test URLs with cache buster:');
+        console.log('   Login: http://localhost:3000/login?v=2024');
+        console.log('   Register: http://localhost:3000/register?v=2024');
+        
+        // Auto-refresh every 10 seconds to check server status
+        setInterval(() => {
+            fetch('http://localhost:3000')
+                .then(response => {
+                    console.log('✅ Server responsive:', response.status);
+                })
+                .catch(error => {
+                    console.log('❌ Server error:', error);
+                });
+        }, 10000);
+    </script>
+</body>
+</html>

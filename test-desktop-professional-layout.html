@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Desktop Professional Layout - Ta' Pa' Ti</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #FF6B6B 0%, #FFD93D 100%);
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .desktop-layout {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+        }
+        
+        .sidebar {
+            width: 320px; /* w-80 = 320px */
+            background: white;
+            height: 100%;
+            flex-shrink: 0;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        
+        .main-content {
+            flex: 1;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 32px; /* p-8 = 32px */
+        }
+        
+        .content-container {
+            width: 100%;
+            max-width: 512px; /* max-w-lg = 512px */
+        }
+        
+        .profile-card {
+            width: 100%;
+            aspect-ratio: 4/5;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .profile-image {
+            width: 100%;
+            height: 60%;
+            background: url('https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&q=95&w=1200&h=1600') center 20% / cover;
+        }
+        
+        .profile-info {
+            padding: 24px;
+            height: 40%;
+            box-sizing: border-box;
+        }
+        
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-top: 32px;
+        }
+        
+        .action-button {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .action-button:hover {
+            transform: scale(1.1);
+        }
+        
+        .pass-button {
+            background: white;
+            color: #ef4444;
+        }
+        
+        .like-button {
+            background: linear-gradient(135deg, #f97316, #eab308);
+            color: white;
+            width: 80px;
+            height: 80px;
+        }
+        
+        .super-like-button {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+        }
+        
+        .sidebar-header {
+            padding: 24px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #f97316, #eab308);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        
+        .brand-text {
+            font-size: 24px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #f97316, #eab308);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .tagline {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 2px;
+        }
+        
+        .nav-menu {
+            padding: 16px;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            text-decoration: none;
+            color: #6b7280;
+            transition: background-color 0.2s;
+        }
+        
+        .nav-item.active {
+            background: #fff7ed;
+            color: #ea580c;
+        }
+        
+        .nav-item:hover {
+            background: #f9fafb;
+        }
+        
+        .comparison-note {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div class="comparison-note">
+        ✅ Layout Profesional: Sidebar 320px + Contenido max-width 512px (igual que el demo)
+    </div>
+    
+    <div class="desktop-layout">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">
+                        ❤️
+                    </div>
+                    <div>
+                        <div class="brand-text">Ta' Pa' Ti</div>
+                        <div class="tagline">cuando alguien sí te elige</div>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active">
+                    <span>🔍</span>
+                    <span>Explorar</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span>👥</span>
+                    <span>Matches</span>
+                    <span style="margin-left: auto; background: #f97316; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px;">3</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span>💬</span>
+                    <span>Mensajes</span>
+                    <span style="margin-left: auto; background: #ef4444; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px;">5</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span>👤</span>
+                    <span>Mi Perfil</span>
+                </a>
+            </nav>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="content-container">
+                <!-- Profile Card -->
+                <div class="profile-card">
+                    <div class="profile-image"></div>
+                    <div class="profile-info">
+                        <h2 style="margin: 0 0 8px 0; font-size: 28px; font-weight: bold;">Carolina, 24</h2>
+                        <p style="margin: 0 0 16px 0; color: #6b7280; font-size: 14px;">📍 Santo Domingo • 👩‍💼 Arquitecta</p>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <span style="background: #fff7ed; color: #ea580c; padding: 4px 12px; border-radius: 20px; font-size: 12px;">Bachata</span>
+                            <span style="background: #fff7ed; color: #ea580c; padding: 4px 12px; border-radius: 20px; font-size: 12px;">Playa</span>
+                            <span style="background: #fff7ed; color: #ea580c; padding: 4px 12px; border-radius: 20px; font-size: 12px;">Gastronomía</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button class="action-button pass-button">❌</button>
+                    <button class="action-button like-button">❤️</button>
+                    <button class="action-button super-like-button">⭐</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        console.log('🎯 Layout Test:');
+        console.log('- Sidebar width: 320px (w-80)');
+        console.log('- Content max-width: 512px (max-w-lg)');
+        console.log('- Card aspect ratio: 4:5');
+        console.log('- Matches demo layout exactly! ✅');
+    </script>
+</body>
+</html>

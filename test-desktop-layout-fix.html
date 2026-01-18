@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ta' Pa' Ti - Desktop Layout Fix Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #FF6B6B 0%, #FFD93D 100%);
+        }
+    </style>
+</head>
+<body class="h-full">
+    <div class="w-full h-full gradient-bg overflow-auto">
+        
+        <!-- Desktop Layout Test -->
+        <div class="w-full h-full flex">
+            <!-- Sidebar -->
+            <div class="w-80 bg-white h-full flex flex-col shadow-2xl">
+                <!-- Header -->
+                <div class="p-6 border-b border-gray-200">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-gradient-to-br from-orange-500 to-yellow-500 rounded-full flex items-center justify-center">
+                            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h1 class="text-2xl font-bold bg-gradient-to-r from-orange-500 to-yellow-500 bg-clip-text text-transparent">Ta' Pa' Ti</h1>
+                            <p class="text-xs text-gray-500">cuando alguien sí te elige</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <nav class="p-4 space-y-2">
+                    <a href="#discover" class="flex items-center space-x-3 px-4 py-3 rounded-lg bg-orange-50 text-orange-700">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="M21 21l-4.35-4.35"></path>
+                        </svg>
+                        <span class="font-medium">Explorar</span>
+                    </a>
+                    
+                    <a href="#matches" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-50">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
+                        <span class="font-medium">Matches</span>
+                    </a>
+                    
+                    <a href="#messages" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-50">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                        </svg>
+                        <span class="font-medium">Mensajes</span>
+                    </a>
+                    
+                    <a href="#profile" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-50">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                        <span class="font-medium">Mi Perfil</span>
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Main Content - TRANSPARENT BACKGROUND -->
+            <div class="flex-1 h-full flex items-center justify-center p-8">
+                <div class="w-full max-w-lg">
+                    <!-- Test Content with Transparent Background -->
+                    <div class="bg-transparent p-8 rounded-2xl text-center">
+                        <h2 class="text-3xl font-bold text-white mb-4">✅ Desktop Layout Fixed!</h2>
+                        <p class="text-white/90 mb-6">
+                            El fondo gris ha sido eliminado. Ahora el gradiente Ta' Pa' Ti se muestra correctamente en toda la pantalla.
+                        </p>
+                        
+                        <!-- Test Card -->
+                        <div class="bg-white rounded-2xl p-6 shadow-xl">
+                            <h3 class="text-xl font-bold text-gray-800 mb-2">Tarjeta de Prueba</h3>
+                            <p class="text-gray-600 mb-4">
+                                Esta tarjeta tiene fondo blanco, pero el área principal es transparente para mostrar el gradiente.
+                            </p>
+                            <div class="flex gap-4 justify-center">
+                                <button class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors">
+                                    ❌ Pasar
+                                </button>
+                                <button class="px-4 py-2 bg-gradient-to-r from-rose-500 to-pink-600 text-white rounded-lg hover:shadow-lg transition-all">
+                                    ❤️ Me Gusta
+                                </button>
+                                <button class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                                    ⭐ Super Like
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 text-white/80 text-sm">
+                            <p>✅ Fondo principal: Transparente</p>
+                            <p>✅ Gradiente Ta' Pa' Ti: Visible</p>
+                            <p>✅ Componentes individuales: Fondo blanco cuando necesario</p>
+                            <p>✅ Sin barras grises interferentes</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -4,6 +4,7 @@ import { X, Shield, Globe, Lock, CheckCircle, AlertCircle, Settings } from 'luci
 import IdentityVerification from './IdentityVerification';
 import LanguageSettings from './LanguageSettings';
 import StoriesPrivacySettings from './StoriesPrivacySettings';
+import PrivacyDashboard from './PrivacyDashboard';
 import VerificationBadge from './VerificationBadge';
 import { verificationService } from '../services/verificationService';
 import { languageService } from '../services/languageService';
@@ -29,6 +30,7 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({
   const [showVerificationModal, setShowVerificationModal] = useState(false);
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+  const [showPrivacyDashboard, setShowPrivacyDashboard] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -68,21 +70,21 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({
     <>
       {/* Overlay */}
       <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center">
-        <div className="bg-white w-full max-w-md mx-4 rounded-t-3xl sm:rounded-3xl max-h-[90vh] overflow-hidden">
+        <div className="bg-white w-full max-w-md mx-2 sm:mx-4 rounded-t-3xl sm:rounded-3xl max-h-[95vh] sm:max-h-[90vh] overflow-hidden">
           
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-100">
-            <h2 className="text-xl font-bold text-gray-900">{t('accountSettings')}</h2>
+          <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-100">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900">{t('accountSettings')}</h2>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
             >
-              <X size={20} className="text-gray-500" />
+              <X size={18} className="text-gray-500" />
             </button>
           </div>
 
           {/* Content */}
-          <div className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+          <div className="p-3 sm:p-6 space-y-3 sm:space-y-4 max-h-[75vh] sm:max-h-[70vh] overflow-y-auto">
             
             {/* Verificación de Identidad */}
             <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4 border border-blue-100">
@@ -151,26 +153,38 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({
                 </div>
               </div>
               
-              <button
-                onClick={() => setShowPrivacyModal(true)}
-                className="w-full py-3 px-4 bg-purple-500 text-white rounded-xl font-medium hover:bg-purple-600 transition-all shadow-lg"
-              >
-                <div className="flex items-center justify-center gap-2">
-                  <Settings size={16} />
-                  {t('configurePrivacy')}
-                </div>
-              </button>
+              <div className="space-y-2">
+                <button
+                  onClick={() => setShowPrivacyDashboard(true)}
+                  className="w-full py-3 px-4 bg-purple-500 text-white rounded-xl font-medium hover:bg-purple-600 transition-all shadow-lg"
+                >
+                  <div className="flex items-center justify-center gap-2">
+                    <Shield size={16} />
+                    Dashboard de Privacidad
+                  </div>
+                </button>
+                
+                <button
+                  onClick={() => setShowPrivacyModal(true)}
+                  className="w-full py-2 px-4 bg-purple-100 text-purple-700 rounded-xl font-medium hover:bg-purple-200 transition-all border border-purple-200"
+                >
+                  <div className="flex items-center justify-center gap-2">
+                    <Settings size={14} />
+                    {t('configurePrivacy')} (Stories)
+                  </div>
+                </button>
+              </div>
             </div>
 
             {/* Idioma */}
-            <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-4 border border-green-100">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="p-2 bg-green-500 rounded-full">
-                  <Globe size={20} className="text-white" />
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-3 sm:p-4 border border-green-100">
+              <div className="flex items-center gap-2 sm:gap-3 mb-3">
+                <div className="p-1.5 sm:p-2 bg-green-500 rounded-full">
+                  <Globe size={16} className="text-white" />
                 </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900">{t('language')}</h3>
-                  <p className="text-sm text-gray-600">
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-semibold text-gray-900 text-sm sm:text-base">{t('language')}</h3>
+                  <p className="text-xs sm:text-sm text-gray-600 truncate">
                     {t('currentLanguage')}: {languageService.getLanguageName(currentLanguage as any)}
                   </p>
                 </div>
@@ -178,11 +192,11 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({
               
               <button
                 onClick={() => setShowLanguageModal(true)}
-                className="w-full py-3 px-4 bg-green-500 text-white rounded-xl font-medium hover:bg-green-600 transition-all shadow-lg"
+                className="w-full py-2.5 sm:py-3 px-3 sm:px-4 bg-green-500 text-white rounded-xl font-medium hover:bg-green-600 transition-all shadow-lg min-h-[44px]"
               >
                 <div className="flex items-center justify-center gap-2">
-                  <Globe size={16} />
-                  {t('changeLanguage')}
+                  <Globe size={14} />
+                  <span className="text-sm sm:text-base">{t('changeLanguage')}</span>
                 </div>
               </button>
             </div>
@@ -231,6 +245,12 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({
         currentUserId={currentUserId}
         onClose={() => setShowPrivacyModal(false)}
         onSettingsUpdated={handlePrivacyUpdate}
+      />
+
+      <PrivacyDashboard
+        isOpen={showPrivacyDashboard}
+        userId={currentUserId}
+        onClose={() => setShowPrivacyDashboard(false)}
       />
     </>
   );

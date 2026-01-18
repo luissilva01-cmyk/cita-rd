@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>📱 Test de Responsividad Móvil - CitaRD</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            min-height: 100dvh;
+            padding: 10px;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+        
+        .content {
+            padding: 20px;
+        }
+        
+        .test-section {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .test-section h3 {
+            color: #374151;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        
+        .viewport-info {
+            background: #e0f2fe;
+            border: 2px solid #0284c7;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .viewport-info h4 {
+            color: #0c4a6e;
+            margin-bottom: 10px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            font-size: 14px;
+        }
+        
+        .info-item {
+            background: white;
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+        }
+        
+        .test-button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+            margin: 8px 0;
+            font-size: 14px;
+        }
+        
+        .test-button:hover {
+            background: #2563eb;
+        }
+        
+        .test-button:active {
+            transform: scale(0.98);
+        }
+        
+        .responsive-demo {
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+            background: #f9fafb;
+        }
+        
+        .responsive-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+        
+        @media (min-width: 640px) {
+            .responsive-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .content {
+                padding: 30px;
+            }
+        }
+        
+        .demo-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .demo-card h5 {
+            color: #374151;
+            margin-bottom: 8px;
+        }
+        
+        .demo-card p {
+            color: #6b7280;
+            font-size: 12px;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-good {
+            background: #10b981;
+        }
+        
+        .status-warning {
+            background: #f59e0b;
+        }
+        
+        .status-error {
+            background: #ef4444;
+        }
+        
+        .results {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+        
+        /* Touch-friendly improvements */
+        button, .clickable {
+            min-height: 44px;
+            min-width: 44px;
+        }
+        
+        /* Prevent zoom on iOS */
+        input, select, textarea {
+            font-size: 16px;
+        }
+        
+        /* Safe area support */
+        @supports (padding: max(0px)) {
+            .container {
+                margin-left: max(10px, env(safe-area-inset-left));
+                margin-right: max(10px, env(safe-area-inset-right));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📱 Test de Responsividad</h1>
+            <p>Verificación de adaptabilidad móvil de CitaRD</p>
+        </div>
+        
+        <div class="content">
+            <div class="viewport-info">
+                <h4>📊 Información del Viewport</h4>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <strong>Ancho:</strong> <span id="viewportWidth">-</span>px
+                    </div>
+                    <div class="info-item">
+                        <strong>Alto:</strong> <span id="viewportHeight">-</span>px
+                    </div>
+                    <div class="info-item">
+                        <strong>Ratio:</strong> <span id="deviceRatio">-</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>Orientación:</strong> <span id="orientation">-</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="test-section">
+                <h3>🔍 Análisis de Responsividad</h3>
+                
+                <div id="responsiveStatus">
+                    <div style="margin: 10px 0;">
+                        <span class="status-indicator status-good"></span>
+                        <span>Cargando análisis...</span>
+                    </div>
+                </div>
+                
+                <button class="test-button" onclick="analyzeResponsiveness()">
+                    🔄 Analizar Responsividad
+                </button>
+                
+                <button class="test-button" onclick="testTouchTargets()">
+                    👆 Verificar Objetivos Táctiles
+                </button>
+                
+                <button class="test-button" onclick="testViewportUnits()">
+                    📐 Probar Unidades de Viewport
+                </button>
+                
+                <button class="test-button" onclick="simulatePrivacyDashboard()">
+                    🔒 Simular Privacy Dashboard
+                </button>
+            </div>
+            
+            <div class="responsive-demo">
+                <h4 style="color: #374151; margin-bottom: 15px;">🎛️ Demo de Elementos Responsivos</h4>
+                
+                <div class="responsive-grid">
+                    <div class="demo-card">
+                        <h5>Móvil (< 640px)</h5>
+                        <p>Una columna, elementos apilados</p>
+                    </div>
+                    <div class="demo-card">
+                        <h5>Tablet+ (≥ 640px)</h5>
+                        <p>Dos columnas, mejor uso del espacio</p>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 15px; padding: 10px; background: white; border-radius: 6px;">
+                    <strong>Breakpoint actual:</strong> <span id="currentBreakpoint">-</span>
+                </div>
+            </div>
+            
+            <div class="test-section">
+                <h3>📱 Simulador de Privacy Dashboard</h3>
+                <p style="color: #6b7280; font-size: 14px; margin-bottom: 15px;">
+                    Simula cómo se vería el Privacy Dashboard en tu dispositivo
+                </p>
+                
+                <div id="dashboardSimulator" style="display: none;">
+                    <div style="background: #f3f4f6; border: 1px solid #d1d5db; border-radius: 8px; padding: 15px;">
+                        <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 15px;">
+                            <h4 style="color: #374151; margin: 0;">🔒 Dashboard de Privacidad</h4>
+                            <button style="background: none; border: none; font-size: 18px; cursor: pointer;" onclick="closeDashboardSimulator()">×</button>
+                        </div>
+                        
+                        <div style="display: flex; gap: 5px; margin-bottom: 15px; overflow-x: auto;">
+                            <button class="tab-button active" onclick="switchTab(this, 'overview')">📊</button>
+                            <button class="tab-button" onclick="switchTab(this, 'visibility')">👁️</button>
+                            <button class="tab-button" onclick="switchTab(this, 'data')">📊</button>
+                            <button class="tab-button" onclick="switchTab(this, 'security')">🔐</button>
+                            <button class="tab-button" onclick="switchTab(this, 'audit')">📋</button>
+                        </div>
+                        
+                        <div id="tabContent">
+                            <div style="background: white; padding: 10px; border-radius: 6px; font-size: 12px;">
+                                <strong>Tab Resumen:</strong> Contenido adaptado para móvil
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="test-button" onclick="showDashboardSimulator()">
+                    📱 Mostrar Simulador
+                </button>
+            </div>
+            
+            <div class="results" id="results">
+                <div id="resultsContent">📱 Test de Responsividad Móvil - CitaRD
+✅ Sistema iniciado
+🔍 Analizando viewport y capacidades del dispositivo...
+
+Ejecuta las pruebas para verificar la responsividad.</div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .tab-button {
+            background: #e5e7eb;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-width: 44px;
+        }
+        
+        .tab-button.active {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .tab-button:hover:not(.active) {
+            background: #d1d5db;
+        }
+    </style>
+
+    <script>
+        // Variables globales
+        let currentBreakpoint = 'mobile';
+        
+        // Función para agregar logs
+        function addLog(message, type = 'info') {
+            const results = document.getElementById('resultsContent');
+            const timestamp = new Date().toLocaleTimeString();
+            const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'warning' ? '⚠️' : 'ℹ️';
+            results.textContent += `\n[${timestamp}] ${icon} ${message}`;
+            document.getElementById('results').scrollTop = document.getElementById('results').scrollHeight;
+        }
+
+        // Actualizar información del viewport
+        function updateViewportInfo() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            const ratio = window.devicePixelRatio || 1;
+            const orientation = width > height ? 'Horizontal' : 'Vertical';
+            
+            document.getElementById('viewportWidth').textContent = width;
+            document.getElementById('viewportHeight').textContent = height;
+            document.getElementById('deviceRatio').textContent = ratio.toFixed(2);
+            document.getElementById('orientation').textContent = orientation;
+            
+            // Determinar breakpoint
+            if (width < 640) {
+                currentBreakpoint = 'Móvil (< 640px)';
+            } else if (width < 768) {
+                currentBreakpoint = 'Tablet (640-767px)';
+            } else if (width < 1024) {
+                currentBreakpoint = 'Tablet Grande (768-1023px)';
+            } else {
+                currentBreakpoint = 'Desktop (≥ 1024px)';
+            }
+            
+            document.getElementById('currentBreakpoint').textContent = currentBreakpoint;
+        }
+
+        // Analizar responsividad
+        function analyzeResponsiveness() {
+            addLog('🔍 Iniciando análisis de responsividad...');
+            
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            const isMobile = width < 640;
+            const isTouch = 'ontouchstart' in window;
+            
+            let status = '';
+            let issues = [];
+            
+            // Verificar ancho mínimo
+            if (width < 320) {
+                issues.push('Ancho muy pequeño (< 320px)');
+            }
+            
+            // Verificar ratio de aspecto
+            const aspectRatio = width / height;
+            if (aspectRatio < 0.5 || aspectRatio > 3) {
+                issues.push('Ratio de aspecto extremo');
+            }
+            
+            // Verificar capacidades táctiles
+            if (isMobile && !isTouch) {
+                issues.push('Dispositivo móvil sin soporte táctil detectado');
+            }
+            
+            // Generar reporte
+            if (issues.length === 0) {
+                status = '<span class="status-indicator status-good"></span>Excelente: Sin problemas detectados';
+                addLog('✅ Análisis completado: Sin problemas');
+            } else if (issues.length <= 2) {
+                status = '<span class="status-indicator status-warning"></span>Advertencias: ' + issues.length + ' problema(s) menor(es)';
+                addLog('⚠️ Análisis completado: ' + issues.length + ' advertencia(s)');
+            } else {
+                status = '<span class="status-indicator status-error"></span>Problemas: ' + issues.length + ' problema(s) detectado(s)';
+                addLog('❌ Análisis completado: ' + issues.length + ' problema(s)');
+            }
+            
+            document.getElementById('responsiveStatus').innerHTML = `
+                <div style="margin: 10px 0;">${status}</div>
+                ${issues.length > 0 ? '<div style="font-size: 12px; color: #6b7280; margin-top: 8px;">Problemas: ' + issues.join(', ') + '</div>' : ''}
+            `;
+            
+            // Log detalles
+            addLog(`Viewport: ${width}x${height}`);
+            addLog(`Breakpoint: ${currentBreakpoint}`);
+            addLog(`Táctil: ${isTouch ? 'Sí' : 'No'}`);
+            addLog(`Ratio: ${aspectRatio.toFixed(2)}`);
+        }
+
+        // Verificar objetivos táctiles
+        function testTouchTargets() {
+            addLog('👆 Verificando objetivos táctiles...');
+            
+            const buttons = document.querySelectorAll('button');
+            let smallTargets = 0;
+            
+            buttons.forEach(button => {
+                const rect = button.getBoundingClientRect();
+                const minSize = Math.min(rect.width, rect.height);
+                
+                if (minSize < 44) {
+                    smallTargets++;
+                }
+            });
+            
+            if (smallTargets === 0) {
+                addLog('✅ Todos los objetivos táctiles son adecuados (≥44px)');
+            } else {
+                addLog(`⚠️ ${smallTargets} objetivos táctiles pequeños detectados`);
+            }
+            
+            addLog(`Total de botones analizados: ${buttons.length}`);
+        }
+
+        // Probar unidades de viewport
+        function testViewportUnits() {
+            addLog('📐 Probando unidades de viewport...');
+            
+            const testDiv = document.createElement('div');
+            testDiv.style.cssText = 'position: absolute; top: -9999px; width: 100vw; height: 100vh;';
+            document.body.appendChild(testDiv);
+            
+            const rect = testDiv.getBoundingClientRect();
+            const actualVW = rect.width;
+            const actualVH = rect.height;
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+            
+            document.body.removeChild(testDiv);
+            
+            addLog(`100vw = ${actualVW}px (window: ${windowWidth}px)`);
+            addLog(`100vh = ${actualVH}px (window: ${windowHeight}px)`);
+            
+            if (Math.abs(actualVW - windowWidth) < 1 && Math.abs(actualVH - windowHeight) < 1) {
+                addLog('✅ Unidades de viewport funcionando correctamente');
+            } else {
+                addLog('⚠️ Discrepancia en unidades de viewport detectada');
+            }
+        }
+
+        // Simular Privacy Dashboard
+        function simulatePrivacyDashboard() {
+            addLog('🔒 Simulando Privacy Dashboard...');
+            
+            const width = window.innerWidth;
+            const isMobile = width < 640;
+            
+            addLog(`Modo: ${isMobile ? 'Móvil' : 'Desktop'}`);
+            addLog(`Ancho disponible: ${width}px`);
+            
+            if (isMobile) {
+                addLog('📱 Aplicando optimizaciones móviles:');
+                addLog('  - Tabs con iconos solamente');
+                addLog('  - Padding reducido');
+                addLog('  - Grid de 1 columna');
+                addLog('  - Texto más pequeño');
+            } else {
+                addLog('💻 Aplicando diseño desktop:');
+                addLog('  - Tabs con texto completo');
+                addLog('  - Padding estándar');
+                addLog('  - Grid de múltiples columnas');
+                addLog('  - Texto tamaño normal');
+            }
+            
+            addLog('✅ Simulación completada');
+        }
+
+        // Mostrar simulador de dashboard
+        function showDashboardSimulator() {
+            document.getElementById('dashboardSimulator').style.display = 'block';
+            addLog('📱 Simulador de Privacy Dashboard mostrado');
+        }
+
+        // Cerrar simulador
+        function closeDashboardSimulator() {
+            document.getElementById('dashboardSimulator').style.display = 'none';
+            addLog('❌ Simulador cerrado');
+        }
+
+        // Cambiar tab en simulador
+        function switchTab(button, tabName) {
+            // Remover active de todos los tabs
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            
+            // Activar el tab seleccionado
+            button.classList.add('active');
+            
+            // Actualizar contenido
+            const content = {
+                'overview': 'Tab Resumen: Puntuación de privacidad y estadísticas',
+                'visibility': 'Tab Visibilidad: Configuraciones de perfil',
+                'data': 'Tab Datos: Exportación y uso de datos',
+                'security': 'Tab Seguridad: Eliminación de cuenta',
+                'audit': 'Tab Actividad: Registro de acciones'
+            };
+            
+            document.getElementById('tabContent').innerHTML = `
+                <div style="background: white; padding: 10px; border-radius: 6px; font-size: 12px;">
+                    <strong>${content[tabName]}</strong>
+                </div>
+            `;
+            
+            addLog(`🔄 Tab cambiado a: ${tabName}`);
+        }
+
+        // Event listeners
+        window.addEventListener('resize', updateViewportInfo);
+        window.addEventListener('orientationchange', () => {
+            setTimeout(updateViewportInfo, 100);
+        });
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            updateViewportInfo();
+            
+            setTimeout(() => {
+                addLog('🚀 Sistema de pruebas iniciado');
+                addLog('📱 Dispositivo detectado y analizado');
+                addLog('🔧 Listo para ejecutar pruebas de responsividad');
+                
+                // Análisis automático inicial
+                setTimeout(analyzeResponsiveness, 1000);
+            }, 500);
+        });
+    </script>
+</body>
+</html>

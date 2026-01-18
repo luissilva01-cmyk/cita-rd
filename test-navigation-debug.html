@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔍 Debug: Navegación Forgot Password</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .debug-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-frame {
+            width: 100%;
+            height: 600px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        .test-link {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #ec4913;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 10px;
+        }
+        .test-link:hover {
+            background: #d63f11;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        .code { background: #f8f9fa; padding: 10px; border-radius: 5px; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Debug: Navegación Forgot Password</h1>
+    
+    <div class="debug-section">
+        <h2>1. Pruebas de Navegación Directa</h2>
+        <p>Probando las rutas directamente:</p>
+        
+        <a href="http://localhost:3001/" class="test-link" target="_blank">
+            🏠 Root (/)
+        </a>
+        
+        <a href="http://localhost:3001/login" class="test-link" target="_blank">
+            📝 Login (/login)
+        </a>
+        
+        <a href="http://localhost:3001/forgot-password" class="test-link" target="_blank">
+            🔐 Forgot Password (/forgot-password)
+        </a>
+        
+        <a href="http://localhost:3001/register" class="test-link" target="_blank">
+            👤 Register (/register)
+        </a>
+    </div>
+
+    <div class="debug-section">
+        <h2>2. Test del Login con Iframe</h2>
+        <p>Cargando la página de login para probar el enlace:</p>
+        <iframe src="http://localhost:3001/login" class="test-frame" id="login-frame"></iframe>
+    </div>
+
+    <div class="debug-section">
+        <h2>3. Verificación de Rutas</h2>
+        <div id="route-status">
+            <p>Verificando rutas...</p>
+        </div>
+    </div>
+
+    <div class="debug-section">
+        <h2>4. Instrucciones de Prueba Manual</h2>
+        <div class="info">
+            <strong>Pasos para probar:</strong>
+            <ol>
+                <li>Haz clic en "Login (/login)" arriba</li>
+                <li>En la nueva pestaña, busca el enlace "¿Olvidaste tu contraseña?"</li>
+                <li>Haz clic en ese enlace</li>
+                <li>Observa si navega a /forgot-password</li>
+                <li>Si no funciona, abre F12 → Console para ver errores</li>
+            </ol>
+        </div>
+    </div>
+
+    <div class="debug-section">
+        <h2>5. Posibles Problemas</h2>
+        <div class="error">
+            <strong>Si el enlace no funciona:</strong>
+            <ul>
+                <li>🔄 <strong>Cache del navegador:</strong> Presiona Ctrl+F5</li>
+                <li>🚀 <strong>Hot reload:</strong> El servidor puede no haber recargado los cambios</li>
+                <li>📁 <strong>Compilación:</strong> TypeScript puede tener errores</li>
+                <li>🔗 <strong>React Router:</strong> Problema con la configuración de rutas</li>
+                <li>🎯 <strong>Componente:</strong> Error en el componente ForgotPassword</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="debug-section">
+        <h2>6. Logs del Navegador</h2>
+        <div class="code">
+            <strong>Abre F12 → Console y busca:</strong><br>
+            • Errores de compilación de React<br>
+            • Errores de importación de módulos<br>
+            • Errores de React Router<br>
+            • Mensajes de Firebase Auth<br>
+            • El mensaje "🔄 Auth state changed: null" es NORMAL
+        </div>
+    </div>
+
+    <script>
+        // Verificar rutas
+        const checkRoute = async (route, name) => {
+            try {
+                const response = await fetch(`http://localhost:3001${route}`);
+                const status = response.ok ? 'success' : 'error';
+                const icon = response.ok ? '✅' : '❌';
+                return `<div class="${status}">${icon} ${name}: ${response.status} ${response.statusText}</div>`;
+            } catch (error) {
+                return `<div class="error">❌ ${name}: Error - ${error.message}</div>`;
+            }
+        };
+
+        // Verificar todas las rutas
+        const checkAllRoutes = async () => {
+            const routeStatusDiv = document.getElementById('route-status');
+            
+            const routes = [
+                ['/', 'Root'],
+                ['/login', 'Login'],
+                ['/forgot-password', 'Forgot Password'],
+                ['/register', 'Register']
+            ];
+
+            let results = '';
+            for (const [route, name] of routes) {
+                results += await checkRoute(route, name);
+            }
+            
+            routeStatusDiv.innerHTML = results;
+        };
+
+        // Ejecutar verificaciones
+        checkAllRoutes();
+
+        // Monitorear el iframe
+        document.getElementById('login-frame').onload = function() {
+            console.log('✅ Login frame cargado correctamente');
+        };
+
+        document.getElementById('login-frame').onerror = function() {
+            console.error('❌ Error al cargar login frame');
+        };
+
+        // Instrucciones en consola
+        console.log('🔍 Debug de navegación iniciado');
+        console.log('📋 Pasos:');
+        console.log('1. Verifica que todas las rutas respondan con 200');
+        console.log('2. Haz clic en Login y busca el enlace "¿Olvidaste tu contraseña?"');
+        console.log('3. Si el enlace no funciona, revisa errores en Console');
+        console.log('4. El mensaje "Auth state changed: null" es NORMAL');
+    </script>
+</body>
+</html>

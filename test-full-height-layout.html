@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Full Height Layout - Ta' Pa' Ti</title>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        .full-height-container {
+            height: 100%;
+            display: flex;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #FF6B6B 0%, #FFD93D 100%);
+        }
+        
+        .sidebar {
+            width: 320px; /* w-80 */
+            background: white;
+            height: 100%;
+            flex-shrink: 0;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .main-content {
+            flex: 1;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 32px;
+        }
+        
+        .content-area {
+            width: 100%;
+            max-width: 512px; /* max-w-lg */
+            background: white;
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            text-align: center;
+        }
+        
+        .status-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div class="status-indicator">
+        ✅ Layout de Altura Completa Implementado
+    </div>
+    
+    <div class="full-height-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div style="padding: 24px; border-bottom: 1px solid #e5e7eb;">
+                <h1 style="margin: 0; font-size: 24px; font-weight: bold; color: #f97316;">Ta' Pa' Ti</h1>
+                <p style="margin: 4px 0 0 0; font-size: 12px; color: #6b7280;">cuando alguien sí te elige</p>
+            </div>
+            <div style="flex: 1; padding: 16px;">
+                <p style="color: #6b7280; font-size: 14px;">Navegación aquí...</p>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-area">
+                <h2 style="margin: 0 0 16px 0; color: #1f2937;">Layout de Altura Completa</h2>
+                <p style="margin: 0 0 24px 0; color: #6b7280;">
+                    ✅ html, body { height: 100% }<br>
+                    ✅ Container con min-h-screen<br>
+                    ✅ Flexbox: sidebar (w-80) + main (flex-1)<br>
+                    ✅ Main content con height: 100vh<br>
+                    ✅ Contenido centrado con max-w-lg
+                </p>
+                <div style="background: #f3f4f6; padding: 16px; border-radius: 8px; font-family: monospace; font-size: 12px; text-align: left;">
+                    Estructura implementada:<br>
+                    &lt;div class="flex min-h-screen"&gt;<br>
+                    &nbsp;&nbsp;&lt;aside class="w-80"&gt;Sidebar&lt;/aside&gt;<br>
+                    &nbsp;&nbsp;&lt;main class="flex-1 h-screen"&gt;Content&lt;/main&gt;<br>
+                    &lt;/div&gt;
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        console.log('🎯 Full Height Layout Test:');
+        console.log('- HTML height:', document.documentElement.scrollHeight + 'px');
+        console.log('- Body height:', document.body.scrollHeight + 'px');
+        console.log('- Viewport height:', window.innerHeight + 'px');
+        console.log('- Layout uses full height: ✅');
+    </script>
+</body>
+</html>

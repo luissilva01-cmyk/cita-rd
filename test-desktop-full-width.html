@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ta' Pa' Ti - Desktop Full Width Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #FF6B6B 0%, #FFD93D 100%);
+        }
+        
+        /* Debugging borders */
+        .debug-border {
+            border: 2px solid rgba(255, 255, 255, 0.5);
+        }
+    </style>
+</head>
+<body class="h-full">
+    <div class="w-full h-full gradient-bg overflow-auto">
+        
+        <!-- Desktop Layout Test - Full Width -->
+        <div class="w-full h-full flex">
+            <!-- Sidebar -->
+            <div class="w-80 bg-white h-full flex flex-col shadow-2xl">
+                <!-- Header -->
+                <div class="p-6 border-b border-gray-200">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-gradient-to-br from-orange-500 to-yellow-500 rounded-full flex items-center justify-center">
+                            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h1 class="text-2xl font-bold bg-gradient-to-r from-orange-500 to-yellow-500 bg-clip-text text-transparent">Ta' Pa' Ti</h1>
+                            <p class="text-xs text-gray-500">cuando alguien sí te elige</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <nav class="p-4 space-y-2">
+                    <a href="#discover" class="flex items-center space-x-3 px-4 py-3 rounded-lg bg-orange-50 text-orange-700">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="M21 21l-4.35-4.35"></path>
+                        </svg>
+                        <span class="font-medium">Explorar</span>
+                    </a>
+                    
+                    <a href="#matches" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-50">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
+                        <span class="font-medium">Matches</span>
+                    </a>
+                    
+                    <a href="#messages" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-50">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                        </svg>
+                        <span class="font-medium">Mensajes</span>
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Main Content - FULL WIDTH USAGE -->
+            <div class="flex-1 h-full p-8 debug-border">
+                <div class="w-full h-full debug-border">
+                    
+                    <!-- Test: Discovery View Layout -->
+                    <div class="h-full flex flex-col">
+                        
+                        <!-- Stories Section -->
+                        <div class="bg-white/10 backdrop-blur-sm rounded-lg p-4 mb-6">
+                            <h3 class="text-white font-bold mb-3">Stories Section</h3>
+                            <div class="flex gap-3 overflow-x-auto">
+                                <div class="w-16 h-16 bg-white/20 rounded-full flex-shrink-0"></div>
+                                <div class="w-16 h-16 bg-white/20 rounded-full flex-shrink-0"></div>
+                                <div class="w-16 h-16 bg-white/20 rounded-full flex-shrink-0"></div>
+                                <div class="w-16 h-16 bg-white/20 rounded-full flex-shrink-0"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Main Content Area -->
+                        <div class="flex-1 max-w-2xl mx-auto w-full">
+                            
+                            <!-- Profile Card with 3:4 aspect ratio -->
+                            <div class="relative w-full aspect-[3/4] bg-white rounded-2xl shadow-xl overflow-hidden">
+                                <img 
+                                    src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&q=95&w=1200&h=1600" 
+                                    alt="Profile"
+                                    class="w-full h-full object-cover"
+                                />
+                                
+                                <!-- Profile Info Overlay -->
+                                <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6 text-white">
+                                    <h2 class="text-3xl font-bold mb-2">Carolina, 24</h2>
+                                    <p class="text-sm opacity-90 mb-3">Arquitecta • Santo Domingo • 3km</p>
+                                    <div class="flex gap-2">
+                                        <span class="px-3 py-1 bg-white/20 rounded-full text-xs">Bachata</span>
+                                        <span class="px-3 py-1 bg-white/20 rounded-full text-xs">Playa</span>
+                                        <span class="px-3 py-1 bg-white/20 rounded-full text-xs">Gastronomía</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Action Buttons -->
+                            <div class="flex justify-center gap-6 mt-8">
+                                <button class="w-16 h-16 bg-white/70 backdrop-blur-md rounded-full shadow-xl flex items-center justify-center text-red-500 hover:scale-110 transition-transform">
+                                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                                
+                                <button class="w-20 h-20 bg-gradient-to-r from-rose-500 to-pink-600 rounded-full shadow-xl flex items-center justify-center text-white hover:scale-110 transition-transform">
+                                    <svg class="w-10 h-10" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                    </svg>
+                                </button>
+                                
+                                <button class="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full shadow-xl flex items-center justify-center text-white hover:scale-110 transition-transform">
+                                    <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Layout Info -->
+                        <div class="mt-6 bg-white/10 backdrop-blur-sm rounded-lg p-4">
+                            <h3 class="text-white font-bold mb-2">✅ Layout Desktop Optimizado</h3>
+                            <div class="text-white/80 text-sm space-y-1">
+                                <p>• Sidebar: 320px fijo</p>
+                                <p>• Área principal: flex-1 (usa todo el espacio restante)</p>
+                                <p>• Contenido: max-w-2xl centrado (768px máximo)</p>
+                                <p>• Aspect ratio: 3:4 (más ancho que móvil 4:5)</p>
+                                <p>• Sin limitaciones de max-w-lg (512px)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mostrar dimensiones en tiempo real
+        function updateDimensions() {
+            const sidebar = document.querySelector('.w-80');
+            const mainContent = document.querySelector('.flex-1');
+            const profileCard = document.querySelector('.aspect-\\[3\\/4\\]');
+            
+            console.log('Dimensiones actuales:');
+            console.log('- Ventana:', window.innerWidth + 'x' + window.innerHeight);
+            console.log('- Sidebar:', sidebar?.offsetWidth + 'px');
+            console.log('- Área principal:', mainContent?.offsetWidth + 'px');
+            console.log('- Tarjeta perfil:', profileCard?.offsetWidth + 'x' + profileCard?.offsetHeight);
+        }
+        
+        window.addEventListener('resize', updateDimensions);
+        updateDimensions();
+    </script>
+</body>
+</html>

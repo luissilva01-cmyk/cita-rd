@@ -12,6 +12,7 @@ import { StoryGroup } from '../../services/storiesService';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useMatchingAI } from '../../hooks/useMatchingAI';
 import { MatchPrediction } from '../../services/matchingAI';
+import { useToast } from '../../components/Toast';
 
 interface DiscoveryProps {
   users?: UserProfile[];
@@ -30,7 +31,7 @@ const CURRENT_USER_MOCK: UserProfile = {
   bio: 'Usuario de prueba para el sistema de matching IA',
   location: 'Santo Domingo',
   distance: '0km',
-  images: ['https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=600'],
+  images: ['https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=95&w=1200&h=1600'],
   interests: ['Tecnología', 'Música', 'Deportes'],
   job: 'Desarrollador',
   isVerified: true
@@ -43,10 +44,13 @@ const MOCK_USERS: UserProfile[] = [
     bio: 'Amo el mofongo y bailar bachata en la Zona Colonial. Busco a alguien para ir de aventura a Samaná.',
     location: 'Santo Domingo',
     distance: '3km',
-    images: ['https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&q=80&w=600'],
-    interests: ['Bachata', 'Playa', 'Gastronomía'],
+    images: ['https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&q=95&w=1200&h=1600'],
+    interests: ['Bachata', 'Playa', 'Gastronomía', 'Viajes', 'Fotografía'],
     job: 'Arquitecta',
-    isVerified: true
+    isVerified: true,
+    education: 'Universidad Autónoma de Santo Domingo',
+    height: '1.65m',
+    relationshipGoal: 'Relación seria'
   },
   {
     id: '2',
@@ -55,10 +59,13 @@ const MOCK_USERS: UserProfile[] = [
     bio: 'Emprendedor digital. Fanático de las Águilas Cibaeñas. Si no estamos viendo pelota, estamos en la playa.',
     location: 'Santiago de los Caballeros',
     distance: '15km',
-    images: ['https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=600'],
-    interests: ['Béisbol', 'Tecnología', 'Café'],
+    images: ['https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=95&w=1200&h=1600'],
+    interests: ['Béisbol', 'Tecnología', 'Café', 'Emprendimiento', 'Deportes'],
     job: 'Desarrollador',
-    isVerified: true
+    isVerified: true,
+    education: 'PUCMM',
+    height: '1.78m',
+    relationshipGoal: 'Conocer gente nueva'
   },
   {
     id: '3',
@@ -67,10 +74,13 @@ const MOCK_USERS: UserProfile[] = [
     bio: 'Doctora apasionada por ayudar a otros. Me encanta la salsa y los atardeceres en el Malecón.',
     location: 'Santo Domingo',
     distance: '5km',
-    images: ['https://images.unsplash.com/photo-1494790108755-2616b612b786?auto=format&fit=crop&q=80&w=600'],
-    interests: ['Medicina', 'Salsa', 'Fotografía'],
+    images: ['https://images.unsplash.com/photo-1494790108755-2616b612b786?auto=format&fit=crop&q=95&w=1200&h=1600'],
+    interests: ['Medicina', 'Salsa', 'Fotografía', 'Yoga', 'Lectura'],
     job: 'Doctora',
-    isVerified: true
+    isVerified: true,
+    education: 'UNPHU - Medicina',
+    height: '1.62m',
+    relationshipGoal: 'Relación seria'
   },
   {
     id: '4',
@@ -79,10 +89,13 @@ const MOCK_USERS: UserProfile[] = [
     bio: 'Chef profesional. Si quieres probar el mejor mangú de la ciudad, ya sabes a quién llamar.',
     location: 'Santiago',
     distance: '12km',
-    images: ['https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=600'],
-    interests: ['Cocina', 'Música', 'Viajes'],
+    images: ['https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=95&w=1200&h=1600'],
+    interests: ['Cocina', 'Música', 'Viajes', 'Gastronomía', 'Vino'],
     job: 'Chef',
-    isVerified: false
+    isVerified: false,
+    education: 'Instituto Culinario de América',
+    height: '1.75m',
+    relationshipGoal: 'Algo casual'
   },
   {
     id: '5',
@@ -91,10 +104,13 @@ const MOCK_USERS: UserProfile[] = [
     bio: 'Estudiante de arte. Me encanta pintar y explorar galerías en la Zona Colonial.',
     location: 'Santo Domingo',
     distance: '2km',
-    images: ['https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=600'],
-    interests: ['Arte', 'Pintura', 'Cultura'],
+    images: ['https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=95&w=1200&h=1600'],
+    interests: ['Arte', 'Pintura', 'Cultura', 'Museos', 'Cine'],
     job: 'Estudiante',
-    isVerified: false
+    isVerified: false,
+    education: 'Escuela de Diseño Altos de Chavón',
+    height: '1.60m',
+    relationshipGoal: 'Conocer gente nueva'
   },
   {
     id: '6',
@@ -103,10 +119,13 @@ const MOCK_USERS: UserProfile[] = [
     bio: 'Ingeniero y surfista. Los fines de semana me encuentras en las playas de Cabarete.',
     location: 'Puerto Plata',
     distance: '25km',
-    images: ['https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=600'],
-    interests: ['Surf', 'Ingeniería', 'Aventura'],
+    images: ['https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=95&w=1200&h=1600'],
+    interests: ['Surf', 'Ingeniería', 'Aventura', 'Naturaleza', 'Deportes extremos'],
     job: 'Ingeniero',
-    isVerified: true
+    isVerified: true,
+    education: 'INTEC - Ingeniería Civil',
+    height: '1.82m',
+    relationshipGoal: 'Relación seria'
   }
 ];
 
@@ -119,6 +138,7 @@ const Discovery: React.FC<DiscoveryProps> = ({
   currentUserId = 'demo-user'
 }) => {
   const { t } = useLanguage();
+  const { showToast, ToastContainer } = useToast();
   const { 
     predictions, 
     generatePredictions, 
@@ -143,6 +163,9 @@ const Discovery: React.FC<DiscoveryProps> = ({
   const [selectedStoryGroup, setSelectedStoryGroup] = useState<StoryGroup | null>(null);
   const [showCreateStoryModal, setShowCreateStoryModal] = useState(false);
   const [storiesKey, setStoriesKey] = useState(0); // Para forzar re-render de stories
+  
+  // Estados para Super Like
+  const [showSuperLikeAnimation, setShowSuperLikeAnimation] = useState(false);
 
   // Función para ordenar usuarios con IA
   const optimizeUsersWithAI = async (users: UserProfile[]): Promise<UserProfile[]> => {
@@ -255,21 +278,41 @@ const Discovery: React.FC<DiscoveryProps> = ({
   const currentUser = displayUsers && displayUsers.length > 0 ? displayUsers[currentIndex % displayUsers.length] : null;
   const nextUser = displayUsers && displayUsers.length > 1 ? displayUsers[(currentIndex + 1) % displayUsers.length] : null;
 
-  const handleAction = async (action: 'like' | 'pass') => {
+  const handleAction = async (action: 'like' | 'pass' | 'superlike') => {
     if (!currentUser) return;
     
     const timeSpent = Date.now() - swipeStartTime;
     console.log(`🎯 Acción: ${action} en usuario:`, currentUser.name, 'Tiempo:', timeSpent + 'ms');
     
+    // Si es super like, mostrar animación PRIMERO
+    if (action === 'superlike') {
+      console.log('⭐ SUPER LIKE enviado a:', currentUser.name);
+      
+      // Mostrar animación especial
+      setShowSuperLikeAnimation(true);
+      
+      // Mostrar toast de notificación
+      showToast({
+        type: 'info',
+        title: '⭐ Super Like enviado!',
+        message: `Le has enviado un Super Like a ${currentUser.name}. Serás priorizado en su lista.`,
+        duration: 4000
+      });
+      
+      // Esperar a que la animación termine antes de continuar
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      setShowSuperLikeAnimation(false);
+    }
+    
     // Registrar swipe en el sistema de IA
     try {
-      await recordSwipe(currentUserId, currentUser.id, action, currentUser, timeSpent);
+      await recordSwipe(currentUserId, currentUser.id, action === 'superlike' ? 'like' : action, currentUser, timeSpent);
       console.log('🤖 Swipe registrado en IA');
     } catch (error) {
       console.error('Error registrando swipe en IA:', error);
     }
     
-    if (action === 'like' && onLike) {
+    if ((action === 'like' || action === 'superlike') && onLike) {
       const isMatch = await onLike(currentUser);
       console.log('🎲 Resultado del like:', isMatch ? 'MATCH!' : 'No match');
       
@@ -398,10 +441,12 @@ const Discovery: React.FC<DiscoveryProps> = ({
   }
 
   return (
-    <div className="relative h-full flex flex-col">
+    <div className="relative h-full flex flex-col bg-gradient-to-br from-gray-50 to-gray-100">
+      {/* Toast Container */}
+      <ToastContainer />
 
-      {/* Stories Section */}
-      <div className="shrink-0 border-b border-gray-200">
+      {/* Stories Section - Responsive */}
+      <div className="shrink-0 border-b border-gray-200 safe-area-top">
         {/* Componente StoriesRingWorking - versión funcional */}
         <StoriesRingWorking
           currentUserId={currentUserId}
@@ -410,29 +455,31 @@ const Discovery: React.FC<DiscoveryProps> = ({
         />
       </div>
 
-      {/* Profile Cards Stack */}
-      <div className="flex-1 p-4 max-h-[calc(100vh-200px)]">
-        {/* AI Insights Toggle */}
+      {/* Profile Cards Stack - Full width desktop layout */}
+      <div className="flex-1 px-4 py-6 w-full space-y-6 flex flex-col items-center">
+        {/* AI Insights Toggle - Responsive */}
         {predictions.length > 0 && (
-          <div className="mb-4 flex justify-between items-center">
+          <div className="flex justify-between items-center w-full max-w-lg">
             <button
               onClick={() => setShowAIInsights(!showAIInsights)}
-              className="flex items-center gap-2 px-3 py-2 bg-purple-100 text-purple-700 rounded-full text-sm font-medium hover:bg-purple-200 transition-colors"
+              className="flex items-center gap-2 px-3 py-2 bg-purple-100 text-purple-700 rounded-full text-xs sm:text-sm font-medium hover:bg-purple-200 transition-colors min-h-[44px]"
             >
-              <Brain size={16} />
+              <Brain size={14} className="sm:w-4 sm:h-4" />
               IA Insights
-              <Zap size={14} />
+              <Zap size={12} className="sm:w-3.5 sm:h-3.5" />
             </button>
             
             {showAIInsights && currentUser && (
-              <div className="text-xs text-gray-600">
+              <div className="text-[10px] sm:text-xs text-gray-600 max-w-[60%] text-right">
                 {predictions.find(p => p.targetUserId === currentUser.id)?.recommendationReason || 'Analizando...'}
               </div>
             )}
           </div>
         )}
 
-        <div className="relative h-full max-h-[600px]">
+        {/* Main Card Container with aspect ratio 4:5 - Centered for optimal UX */}
+        <div className="relative group w-full max-w-lg">
+          <div className="relative w-full aspect-[4/5] rounded-2xl overflow-hidden shadow-2xl">
           {/* Next Card (Background) */}
           {nextUser && (
             <div className="absolute inset-0 z-10 opacity-50 scale-95 pointer-events-none">
@@ -453,58 +500,50 @@ const Discovery: React.FC<DiscoveryProps> = ({
             onSwipeLeft={handleSwipeLeft}
             onSwipeRight={handleSwipeRight}
             isTop={true}
+            showSuperLikeAnimation={showSuperLikeAnimation}
           />
+        </div>
+          
+          {/* Action Buttons - Glassmorphic Floating */}
+          <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-6 z-30">
+            <button
+              onClick={() => handleAction('pass')}
+              className="w-14 h-14 rounded-full bg-white/70 backdrop-blur-md shadow-xl flex items-center justify-center hover:scale-110 transition-transform border border-white/30 min-w-[48px] min-h-[48px]"
+              title={t('passButton')}
+            >
+              <X className="text-red-500" size={28} />
+            </button>
+            
+            <button
+              onClick={() => handleAction('like')}
+              className="w-18 h-18 bg-gradient-to-r from-rose-500 to-pink-600 rounded-full shadow-lg shadow-rose-500/40 flex items-center justify-center hover:scale-110 transition-transform p-4 min-w-[56px] min-h-[56px]"
+              title={t('likeButton')}
+            >
+              <Heart className="text-white fill-current" size={32} />
+            </button>
+            
+            <button
+              onClick={() => handleAction('superlike')}
+              className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 backdrop-blur-md shadow-xl shadow-blue-500/50 flex items-center justify-center hover:scale-110 transition-transform border border-blue-300 min-w-[48px] min-h-[48px]"
+              title="Super Like"
+            >
+              <Star className="text-white fill-current" size={24} />
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Action Buttons */}
-      <div className="flex justify-center items-center gap-6 pb-6 px-4 bg-white">
-        <button
-          onClick={() => handleAction('pass')}
-          className="w-16 h-16 bg-white rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-transform border border-gray-200 relative"
-          title={t('passButton')}
-        >
-          <X className="text-slate-500" size={32} />
-          <div className="absolute inset-0 rounded-full bg-slate-100 opacity-0 hover:opacity-100 transition-opacity"></div>
-        </button>
-        
-        <button
-          onClick={handleRestart}
-          className="w-14 h-14 bg-white rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-transform border border-gray-200 relative"
-          title={t('restartProfiles')}
-        >
-          <Star className="text-blue-500" size={26} />
-          <div className="absolute inset-0 rounded-full bg-blue-50 opacity-0 hover:opacity-100 transition-opacity"></div>
-        </button>
-        
-        <button
-          onClick={() => handleAction('like')}
-          className="w-16 h-16 bg-red-500 rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-transform relative hover:bg-red-600"
-          title={t('likeButton')}
-        >
-          <svg 
-            width="32" 
-            height="32" 
-            viewBox="0 0 24 24" 
-            fill="white" 
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-          </svg>
-        </button>
-      </div>
-
-      {/* Match Modal */}
+      {/* Match Modal - Responsive */}
       {showMatch && matchedUser && (
         <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl p-8 mx-6 text-center max-w-sm w-full">
-            <div className="text-6xl mb-4">🎉</div>
-            <h3 className="text-2xl font-bold text-slate-800 mb-2">{t('itsAMatch')}</h3>
-            <p className="text-slate-600 mb-6">{t('youAndUserLikedEachOther', { user: matchedUser.name })}</p>
-            <div className="flex gap-3">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 mx-4 sm:mx-6 text-center max-w-sm w-full">
+            <div className="text-4xl sm:text-6xl mb-3 sm:mb-4">🎉</div>
+            <h3 className="text-xl sm:text-2xl font-bold text-slate-800 mb-2">{t('itsAMatch')}</h3>
+            <p className="text-slate-600 mb-4 sm:mb-6 text-sm sm:text-base">{t('youAndUserLikedEachOther', { user: matchedUser.name })}</p>
+            <div className="flex flex-col sm:flex-row gap-3">
               <button
                 onClick={handleMatchClose}
-                className="flex-1 py-3 px-6 border border-slate-200 rounded-full text-slate-600 font-medium hover:bg-slate-50 transition-colors"
+                className="flex-1 py-3 px-6 border border-slate-200 rounded-full text-slate-600 font-medium hover:bg-slate-50 transition-colors min-h-[48px] text-sm sm:text-base"
               >
                 {t('keepSwiping')}
               </button>
@@ -516,7 +555,7 @@ const Discovery: React.FC<DiscoveryProps> = ({
                     onOpenChat(matchedUser.id);
                   }
                 }}
-                className="flex-1 py-3 px-6 bg-red-500 text-white rounded-full font-medium hover:bg-red-600 transition-all"
+                className="flex-1 py-3 px-6 bg-red-500 text-white rounded-full font-medium hover:bg-red-600 transition-all min-h-[48px] text-sm sm:text-base"
               >
                 {t('sendMessage')}
               </button>

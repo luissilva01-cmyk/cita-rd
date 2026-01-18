@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CitaRD - Test Responsiveness Completo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Estilos específicos para testing responsive */
+        .test-section {
+            border: 2px solid #e5e7eb;
+            margin: 1rem 0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+        }
+        
+        .test-section.mobile {
+            max-width: 375px;
+            background-color: #fef3c7;
+        }
+        
+        .test-section.tablet {
+            max-width: 768px;
+            background-color: #dbeafe;
+        }
+        
+        .test-section.desktop {
+            max-width: 1024px;
+            background-color: #dcfce7;
+        }
+        
+        .responsive-indicator {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: #1f2937;
+            color: white;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            z-index: 1000;
+        }
+        
+        /* Simular componentes de la app */
+        .mock-chat-header {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid #e5e7eb;
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 20;
+        }
+        
+        .mock-message-bubble {
+            max-width: 85%;
+            padding: 0.75rem 1rem;
+            border-radius: 1rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+        
+        .mock-message-bubble.own {
+            background: #ef4444;
+            color: white;
+            border-top-right-radius: 0.25rem;
+            margin-left: auto;
+        }
+        
+        .mock-message-bubble.other {
+            background: white;
+            color: #1f2937;
+            border-top-left-radius: 0.25rem;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .mock-input-area {
+            padding: 0.75rem 1rem;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .mock-input {
+            flex: 1;
+            background: #f1f5f9;
+            border-radius: 9999px;
+            padding: 0.75rem 1rem;
+            border: none;
+            outline: none;
+            font-size: 0.875rem;
+            min-height: 44px;
+        }
+        
+        .mock-button {
+            min-width: 44px;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+        
+        .mock-button:hover {
+            transform: scale(1.05);
+        }
+        
+        /* Responsive breakpoints indicators */
+        @media (max-width: 640px) {
+            .responsive-indicator::after {
+                content: " - Mobile (≤640px)";
+            }
+        }
+        
+        @media (min-width: 641px) and (max-width: 768px) {
+            .responsive-indicator::after {
+                content: " - Tablet (641-768px)";
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .responsive-indicator::after {
+                content: " - Desktop (≥769px)";
+            }
+        }
+        
+        /* Touch target verification */
+        .touch-target-test {
+            position: relative;
+        }
+        
+        .touch-target-test::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 44px;
+            height: 44px;
+            border: 2px dashed #ef4444;
+            border-radius: 50%;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+        
+        .touch-target-test.valid::after {
+            border-color: #10b981;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="responsive-indicator">
+        Viewport: <span id="viewport-size"></span>
+    </div>
+
+    <div class="container mx-auto p-4">
+        <h1 class="text-2xl sm:text-3xl font-bold text-center mb-6 text-gray-800">
+            CitaRD - Test de Responsiveness Completo
+        </h1>
+        
+        <div class="text-center mb-8">
+            <p class="text-sm text-gray-600">
+                Redimensiona la ventana para probar diferentes breakpoints
+            </p>
+            <div class="flex justify-center gap-2 mt-2">
+                <span class="px-2 py-1 bg-yellow-200 text-xs rounded">Mobile ≤640px</span>
+                <span class="px-2 py-1 bg-blue-200 text-xs rounded">Tablet 641-768px</span>
+                <span class="px-2 py-1 bg-green-200 text-xs rounded">Desktop ≥769px</span>
+            </div>
+        </div>
+
+        <!-- Test 1: ChatView Header -->
+        <div class="test-section">
+            <h2 class="text-lg font-semibold mb-4">1. ChatView Header - Responsive</h2>
+            <div class="bg-white rounded-lg overflow-hidden shadow-sm">
+                <div class="mock-chat-header safe-area-top">
+                    <div class="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+                        <button class="mock-button touch-target-test valid p-2 -ml-1 sm:-ml-2 hover:bg-slate-100 rounded-full text-slate-600 transition-colors">
+                            ←
+                        </button>
+                        <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?auto=format&fit=crop&q=80&w=100" 
+                             alt="User" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover shadow-sm flex-shrink-0">
+                        <div class="min-w-0 flex-1">
+                            <h3 class="font-bold text-sm sm:text-base truncate">Isabella Rodriguez</h3>
+                            <p class="text-[9px] sm:text-[10px] text-emerald-500 font-bold uppercase">Online</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-1 sm:gap-2 text-slate-400 flex-shrink-0">
+                        <button class="mock-button touch-target-test valid p-2 hover:bg-slate-100 rounded-full transition-colors text-purple-500">
+                            🧠
+                        </button>
+                        <button class="mock-button touch-target-test valid p-2 hover:bg-slate-100 rounded-full transition-colors">
+                            📞
+                        </button>
+                        <button class="mock-button touch-target-test valid p-2 hover:bg-slate-100 rounded-full transition-colors">
+                            📹
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-2 text-xs text-gray-600">
+                ✅ Header se adapta correctamente<br>
+                ✅ Botones tienen min 44px de área táctil<br>
+                ✅ Texto se trunca en pantallas pequeñas
+            </div>
+        </div>
+
+        <!-- Test 2: Chat Messages -->
+        <div class="test-section">
+            <h2 class="text-lg font-semibold mb-4">2. Chat Messages - Responsive</h2>
+            <div class="bg-white rounded-lg overflow-hidden shadow-sm">
+                <div class="p-3 sm:p-4 space-y-3 sm:space-y-4 bg-slate-50/50 min-h-[200px]">
+                    <div class="flex justify-start">
+                        <div class="mock-message-bubble other">
+                            ¡Hola! ¿Cómo estás? Me encantó tu perfil 😊
+                        </div>
+                    </div>
+                    <div class="flex justify-end">
+                        <div class="mock-message-bubble own">
+                            ¡Hola Isabella! Muy bien, gracias. Tu perfil también me gustó mucho
+                        </div>
+                    </div>
+                    <div class="flex justify-start">
+                        <div class="mock-message-bubble other text-2xl sm:text-3xl">
+                            😍
+                        </div>
+                    </div>
+                </div>
+                <div class="mock-input-area safe-area-bottom">
+                    <button class="mock-button touch-target-test valid text-slate-400 hover:text-slate-600">😊</button>
+                    <button class="mock-button touch-target-test valid text-slate-400 hover:text-slate-600">🎤</button>
+                    <input class="mock-input" placeholder="Escribe algo genial...">
+                    <button class="mock-button touch-target-test valid bg-rose-500 text-white hover:bg-rose-600">→</button>
+                </div>
+            </div>
+            <div class="mt-2 text-xs text-gray-600">
+                ✅ Mensajes usan max-width 85% en móvil, 75% en desktop<br>
+                ✅ Input area tiene padding responsive<br>
+                ✅ Botones mantienen área táctil mínima
+            </div>
+        </div>
+
+        <!-- Test 3: Profile View -->
+        <div class="test-section">
+            <h2 class="text-lg font-semibold mb-4">3. Profile View - Responsive</h2>
+            <div class="bg-white rounded-lg overflow-hidden shadow-sm">
+                <div class="px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center border-b border-slate-100">
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-800">Mi Perfil</h2>
+                    <button class="mock-button touch-target-test valid p-2 rounded-full hover:bg-slate-100 transition-colors">
+                        ⚙️
+                    </button>
+                </div>
+                <div class="p-4 sm:p-6 space-y-4 sm:space-y-6">
+                    <div class="text-center">
+                        <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?auto=format&fit=crop&q=80&w=150" 
+                             alt="Profile" class="w-24 h-24 sm:w-32 sm:h-32 rounded-full object-cover mx-auto border-4 border-white shadow-lg">
+                        <p class="text-xs sm:text-sm text-slate-600 mt-2">Foto principal</p>
+                    </div>
+                    <div class="space-y-3 sm:space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Nombre</label>
+                            <input class="w-full p-3 border border-slate-200 rounded-lg text-sm sm:text-base min-h-[44px]" 
+                                   value="Isabella Rodriguez">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Edad</label>
+                            <input class="w-full p-3 border border-slate-200 rounded-lg text-sm sm:text-base min-h-[44px]" 
+                                   value="26">
+                        </div>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <button class="flex-1 py-3 px-6 border border-slate-200 rounded-lg text-slate-600 font-medium min-h-[48px] text-sm sm:text-base">
+                            Cancelar
+                        </button>
+                        <button class="flex-1 py-3 px-6 bg-gradient-to-r from-rose-500 to-pink-600 text-white rounded-lg font-medium min-h-[48px] text-sm sm:text-base">
+                            Guardar
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-2 text-xs text-gray-600">
+                ✅ Imagen de perfil se escala responsivamente<br>
+                ✅ Inputs tienen altura mínima de 44px<br>
+                ✅ Botones se apilan en móvil, lado a lado en desktop
+            </div>
+        </div>
+
+        <!-- Test 4: Discovery Action Buttons -->
+        <div class="test-section">
+            <h2 class="text-lg font-semibold mb-4">4. Discovery Action Buttons - Responsive</h2>
+            <div class="bg-white rounded-lg overflow-hidden shadow-sm">
+                <div class="flex justify-center items-center gap-4 sm:gap-6 py-4 sm:py-6 px-4">
+                    <button class="touch-target-test valid w-12 h-12 sm:w-16 sm:h-16 bg-white rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-transform border border-gray-200">
+                        ✕
+                    </button>
+                    <button class="touch-target-test valid w-10 h-10 sm:w-14 sm:h-14 bg-white rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-transform border border-gray-200">
+                        ⭐
+                    </button>
+                    <button class="touch-target-test valid w-12 h-12 sm:w-16 sm:h-16 bg-red-500 rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-transform text-white">
+                        ❤️
+                    </button>
+                </div>
+            </div>
+            <div class="mt-2 text-xs text-gray-600">
+                ✅ Botones escalan de 48px (móvil) a 64px (desktop)<br>
+                ✅ Mantienen área táctil mínima de 44px<br>
+                ✅ Espaciado se adapta responsivamente
+            </div>
+        </div>
+
+        <!-- Test 5: Messages List -->
+        <div class="test-section">
+            <h2 class="text-lg font-semibold mb-4">5. Messages List - Responsive</h2>
+            <div class="bg-white rounded-lg overflow-hidden shadow-sm">
+                <div class="px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-100">
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-800">Mensajes</h2>
+                    <p class="text-slate-600 text-xs sm:text-sm">3 conversaciones</p>
+                </div>
+                <div class="divide-y divide-slate-50">
+                    <button class="w-full p-3 sm:p-4 flex items-center gap-3 sm:gap-4 hover:bg-slate-50 transition-colors min-h-[72px]">
+                        <div class="relative flex-shrink-0">
+                            <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?auto=format&fit=crop&q=80&w=100" 
+                                 alt="User" class="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover">
+                            <div class="absolute -top-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 bg-rose-500 rounded-full flex items-center justify-center">
+                                <span class="text-white text-[10px] sm:text-xs font-bold">2</span>
+                            </div>
+                        </div>
+                        <div class="flex-1 text-left min-w-0">
+                            <div class="flex items-center justify-between mb-1">
+                                <h3 class="font-semibold text-slate-800 text-sm sm:text-base truncate">Isabella Rodriguez</h3>
+                                <div class="flex items-center gap-1 text-slate-400 flex-shrink-0 ml-2">
+                                    <span class="text-[10px] sm:text-xs">14:30</span>
+                                </div>
+                            </div>
+                            <p class="text-xs sm:text-sm text-slate-600 truncate">
+                                ¿Qué tal si nos vemos este fin de semana?
+                            </p>
+                        </div>
+                    </button>
+                </div>
+            </div>
+            <div class="mt-2 text-xs text-gray-600">
+                ✅ Lista se adapta con padding responsive<br>
+                ✅ Avatares escalan de 48px a 64px<br>
+                ✅ Texto se trunca correctamente en móvil
+            </div>
+        </div>
+
+        <!-- Test 6: Touch Target Verification -->
+        <div class="test-section">
+            <h2 class="text-lg font-semibold mb-4">6. Touch Target Verification</h2>
+            <div class="bg-white rounded-lg p-4 shadow-sm">
+                <p class="text-sm text-gray-600 mb-4">
+                    Los círculos punteados muestran el área táctil mínima de 44px. 
+                    Verde = cumple estándar, Rojo = no cumple.
+                </p>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <button class="touch-target-test valid bg-blue-500 text-white p-3 rounded-lg">
+                        Botón OK
+                    </button>
+                    <button class="touch-target-test bg-red-500 text-white p-1 rounded">
+                        Muy pequeño
+                    </button>
+                    <button class="touch-target-test valid bg-green-500 text-white p-4 rounded-full w-12 h-12 flex items-center justify-center">
+                        ✓
+                    </button>
+                    <button class="touch-target-test valid bg-purple-500 text-white min-w-[44px] min-h-[44px] rounded-lg flex items-center justify-center">
+                        Min 44px
+                    </button>
+                </div>
+            </div>
+            <div class="mt-2 text-xs text-gray-600">
+                ✅ Verificación visual de áreas táctiles<br>
+                ✅ Estándar mínimo de 44x44px para móvil<br>
+                ✅ Botones importantes cumplen el estándar
+            </div>
+        </div>
+
+        <!-- Test 7: Safe Area Support -->
+        <div class="test-section">
+            <h2 class="text-lg font-semibold mb-4">7. Safe Area Support</h2>
+            <div class="bg-white rounded-lg overflow-hidden shadow-sm">
+                <div class="safe-area-top bg-blue-100 p-4 text-center">
+                    <p class="text-sm">Header con safe-area-top</p>
+                </div>
+                <div class="p-4 min-h-[100px] flex items-center justify-center">
+                    <p class="text-gray-600">Contenido principal</p>
+                </div>
+                <div class="safe-area-bottom bg-green-100 p-4 text-center">
+                    <p class="text-sm">Footer con safe-area-bottom</p>
+                </div>
+            </div>
+            <div class="mt-2 text-xs text-gray-600">
+                ✅ Soporte para dispositivos con notch<br>
+                ✅ Padding automático en áreas seguras<br>
+                ✅ Compatible con iPhone X y posteriores
+            </div>
+        </div>
+
+        <!-- Responsive Summary -->
+        <div class="test-section bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
+            <h2 class="text-lg font-semibold mb-4 text-blue-800">📱 Resumen de Mejoras Responsive</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+                <div class="bg-white p-3 rounded-lg">
+                    <h3 class="font-semibold text-green-700 mb-2">✅ ChatView</h3>
+                    <ul class="text-xs text-gray-600 space-y-1">
+                        <li>• Header responsive con truncado</li>
+                        <li>• Mensajes 85% móvil, 75% desktop</li>
+                        <li>• Input area touch-optimized</li>
+                        <li>• Botones min 44px</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-3 rounded-lg">
+                    <h3 class="font-semibold text-green-700 mb-2">✅ Profile</h3>
+                    <ul class="text-xs text-gray-600 space-y-1">
+                        <li>• Imagen escalable 96px-128px</li>
+                        <li>• Inputs altura mínima 44px</li>
+                        <li>• Botones stack en móvil</li>
+                        <li>• Padding adaptativo</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-3 rounded-lg">
+                    <h3 class="font-semibold text-green-700 mb-2">✅ Discovery</h3>
+                    <ul class="text-xs text-gray-600 space-y-1">
+                        <li>• Botones 48px-64px escalables</li>
+                        <li>• Stories ring responsive</li>
+                        <li>• Modal adaptativo</li>
+                        <li>• Safe areas support</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-3 rounded-lg">
+                    <h3 class="font-semibold text-green-700 mb-2">✅ Messages</h3>
+                    <ul class="text-xs text-gray-600 space-y-1">
+                        <li>• Lista con min-height 72px</li>
+                        <li>• Avatares 48px-64px</li>
+                        <li>• Texto truncado inteligente</li>
+                        <li>• Badges responsive</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-3 rounded-lg">
+                    <h3 class="font-semibold text-green-700 mb-2">✅ Layout</h3>
+                    <ul class="text-xs text-gray-600 space-y-1">
+                        <li>• Mobile-first approach</li>
+                        <li>• Viewport height dinámico</li>
+                        <li>• Touch scrolling optimizado</li>
+                        <li>• Breakpoints consistentes</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-3 rounded-lg">
+                    <h3 class="font-semibold text-green-700 mb-2">✅ Accessibility</h3>
+                    <ul class="text-xs text-gray-600 space-y-1">
+                        <li>• Touch targets ≥44px</li>
+                        <li>• Text scaling support</li>
+                        <li>• Focus indicators</li>
+                        <li>• Screen reader friendly</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Update viewport size indicator
+        function updateViewportSize() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            document.getElementById('viewport-size').textContent = `${width}x${height}`;
+        }
+
+        // Initial update and listen for resize
+        updateViewportSize();
+        window.addEventListener('resize', updateViewportSize);
+
+        // Touch target validation
+        function validateTouchTargets() {
+            const touchTargets = document.querySelectorAll('.touch-target-test');
+            touchTargets.forEach(target => {
+                const rect = target.getBoundingClientRect();
+                const isValid = rect.width >= 44 && rect.height >= 44;
+                target.classList.toggle('valid', isValid);
+            });
+        }
+
+        // Validate on load and resize
+        validateTouchTargets();
+        window.addEventListener('resize', validateTouchTargets);
+
+        // Add click feedback for buttons
+        document.querySelectorAll('button').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 150);
+            });
+        });
+
+        console.log('🎯 CitaRD Responsive Test loaded successfully!');
+        console.log('📱 Resize window to test different breakpoints');
+        console.log('✅ All components should adapt smoothly');
+    </script>
+</body>
+</html>

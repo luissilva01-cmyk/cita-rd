@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { MapPin, ShieldCheck, Heart, X, Brain } from 'lucide-react';
+import { MapPin, ShieldCheck, Heart, X, Brain, Star, Info, Briefcase, GraduationCap, Music } from 'lucide-react';
 import { UserProfile } from '../types';
 import { useSwipeGesture } from '../hooks/useSwipeGesture';
 import VerificationBadge from './VerificationBadge';
@@ -15,6 +15,7 @@ interface SwipeCardProps {
   onSwipeLeft: () => void;
   onSwipeRight: () => void;
   isTop?: boolean;
+  showSuperLikeAnimation?: boolean;
 }
 
 const SwipeCard: React.FC<SwipeCardProps> = ({ 
@@ -22,7 +23,8 @@ const SwipeCard: React.FC<SwipeCardProps> = ({
   currentUser,
   onSwipeLeft, 
   onSwipeRight, 
-  isTop = false 
+  isTop = false,
+  showSuperLikeAnimation = false
 }) => {
   const { t } = useLanguage();
   const { calculateCompatibility } = useMatchingAI();
@@ -31,6 +33,7 @@ const SwipeCard: React.FC<SwipeCardProps> = ({
   const [compatibility, setCompatibility] = useState<CompatibilityScore | null>(null);
   const [showCompatibility, setShowCompatibility] = useState(false);
   const [swipeStartTime, setSwipeStartTime] = useState<number>(Date.now());
+  const [showAboutMe, setShowAboutMe] = useState(false);
   
   const { handlers, transform, opacity, swipeDirection, isDragging } = useSwipeGesture({
     onSwipeLeft: () => {
@@ -80,7 +83,7 @@ const SwipeCard: React.FC<SwipeCardProps> = ({
     const colorIndex = user.name.length % colors.length;
     const bgColor = colors[colorIndex];
     
-    return `https://ui-avatars.com/api/?name=${encodeURIComponent(initials)}&size=600&background=${bgColor}&color=ffffff&bold=true&format=png`;
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(initials)}&size=1200&background=${bgColor}&color=ffffff&bold=true&format=png`;
   };
 
   return (
@@ -98,7 +101,35 @@ const SwipeCard: React.FC<SwipeCardProps> = ({
         transition: isDragging ? 'none' : 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
       }}
     >
-      <div className="relative h-full bg-white rounded-3xl shadow-xl overflow-hidden select-none">
+      <div className={`relative h-full bg-white rounded-2xl shadow-xl overflow-hidden select-none ${
+        showSuperLikeAnimation ? 'super-like-pulse' : ''
+      }`}>
+          {/* Super Like Animation Overlay */}
+          {showSuperLikeAnimation && (
+            <div className="absolute inset-0 z-40 flex items-center justify-center bg-blue-500/20 backdrop-blur-sm animate-super-like-flash pointer-events-none">
+              <div className="relative">
+                {/* Star burst effect */}
+                <div className="absolute inset-0 animate-star-burst">
+                  <Star className="text-yellow-300 fill-yellow-300 w-32 h-32 drop-shadow-2xl" />
+                </div>
+                {/* Main star */}
+                <Star className="text-blue-400 fill-blue-400 w-32 h-32 drop-shadow-2xl animate-super-like-bounce" />
+                {/* Particles */}
+                <div className="absolute top-0 left-0 w-full h-full">
+                  <div className="absolute top-1/4 left-1/4 w-3 h-3 bg-yellow-300 rounded-full animate-particle-1"></div>
+                  <div className="absolute top-1/3 right-1/4 w-2 h-2 bg-blue-300 rounded-full animate-particle-2"></div>
+                  <div className="absolute bottom-1/4 left-1/3 w-2.5 h-2.5 bg-yellow-400 rounded-full animate-particle-3"></div>
+                  <div className="absolute bottom-1/3 right-1/3 w-2 h-2 bg-blue-400 rounded-full animate-particle-4"></div>
+                </div>
+              </div>
+              <div className="absolute bottom-20 text-center">
+                <div className="text-white text-3xl font-bold drop-shadow-lg animate-super-like-text">
+                  ⭐ SUPER LIKE ⭐
+                </div>
+              </div>
+            </div>
+          )}
+          
           {/* Compatibility Indicator - Solo si hay compatibilidad calculada */}
           {compatibility && (
             <div className="absolute top-4 left-4 z-30">
@@ -158,11 +189,15 @@ const SwipeCard: React.FC<SwipeCardProps> = ({
           <img 
             src={imageError ? getAvatarUrl() : user.images[0]} 
             alt={user.name}
-            className="w-full h-full object-cover pointer-events-none"
+            className="w-full h-full pointer-events-none"
             draggable={false}
             onError={handleImageError}
             onLoad={handleImageLoad}
-            style={{ display: imageLoading ? 'none' : 'block' }}
+            style={{ 
+              display: imageLoading ? 'none' : 'block',
+              objectFit: 'cover',
+              objectPosition: 'center 20%'
+            }}
           />
           
           {/* Error state with custom avatar */}
@@ -219,10 +254,8 @@ const SwipeCard: React.FC<SwipeCardProps> = ({
               <span className="text-sm">{user.location} • {user.distance}</span>
             </div>
             
-            <p className="text-sm text-white/90 mb-4 line-clamp-3">{user.bio}</p>
-            
             {/* Interests */}
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 mb-3">
               {user.interests.slice(0, 3).map((interest, index) => (
                 <span 
                   key={index}
@@ -232,7 +265,104 @@ const SwipeCard: React.FC<SwipeCardProps> = ({
                 </span>
               ))}
             </div>
+            
+            {/* About Me Button */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowAboutMe(!showAboutMe);
+              }}
+              className="flex items-center gap-2 text-white/90 hover:text-white transition-colors text-sm font-medium"
+            >
+              <Info size={16} />
+              <span>{showAboutMe ? 'Ocultar información' : 'Sobre mí'}</span>
+            </button>
           </div>
+          
+          {/* About Me Expandable Section */}
+          {showAboutMe && (
+            <div 
+              className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/95 via-black/90 to-transparent p-6 pt-32 animate-slideUp overflow-y-auto max-h-[70%]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="space-y-4 text-white">
+                {/* Header */}
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-bold">Sobre {user.name}</h3>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowAboutMe(false);
+                    }}
+                    className="text-white/70 hover:text-white transition-colors"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+                
+                {/* Bio */}
+                <div>
+                  <h4 className="text-sm font-semibold text-white/70 mb-2">Biografía</h4>
+                  <p className="text-sm text-white/90">{user.bio}</p>
+                </div>
+                
+                {/* Job */}
+                {user.job && (
+                  <div className="flex items-start gap-3">
+                    <Briefcase size={18} className="text-white/70 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <h4 className="text-sm font-semibold text-white/70">Trabajo</h4>
+                      <p className="text-sm text-white/90">{user.job}</p>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Education (if available) */}
+                {(user as any).education && (
+                  <div className="flex items-start gap-3">
+                    <GraduationCap size={18} className="text-white/70 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <h4 className="text-sm font-semibold text-white/70">Educación</h4>
+                      <p className="text-sm text-white/90">{(user as any).education}</p>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Interests */}
+                <div>
+                  <h4 className="text-sm font-semibold text-white/70 mb-2 flex items-center gap-2">
+                    <Music size={16} />
+                    Intereses
+                  </h4>
+                  <div className="flex flex-wrap gap-2">
+                    {user.interests.map((interest, index) => (
+                      <span 
+                        key={index}
+                        className="px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-full text-xs font-medium"
+                      >
+                        {interest}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                
+                {/* Additional Info (if available) */}
+                {(user as any).height && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="text-white/70">Altura:</span>
+                    <span className="text-white/90">{(user as any).height}</span>
+                  </div>
+                )}
+                
+                {(user as any).relationshipGoal && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="text-white/70">Buscando:</span>
+                    <span className="text-white/90">{(user as any).relationshipGoal}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

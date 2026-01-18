@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - Ta' Pa' Ti Main Screen</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        .status.success { border-left: 4px solid #4CAF50; }
+        .status.info { border-left: 4px solid #2196F3; }
+        .status.warning { border-left: 4px solid #FF9800; }
+        .test-link {
+            display: inline-block;
+            background: linear-gradient(to right, #FF6B6B, #FFD93D);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        .test-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .instructions {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .brand-colors {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        .color-sample {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎉 Ta' Pa' Ti - Rebrand Verification</h1>
+            <p>Verificando que la pantalla principal muestre la nueva marca</p>
+        </div>
+
+        <div class="status success">
+            <span>✅</span>
+            <div>
+                <strong>Archivos Actualizados:</strong>
+                <ul style="margin: 5px 0 0 20px;">
+                    <li>App.tsx - Perfiles mock actualizados con frases "ta' pa' ti"</li>
+                    <li>UltraModernHome.jsx - Título y contenido rebrandeado</li>
+                    <li>App.jsx - Loading screen actualizado</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="status info">
+            <span>🎨</span>
+            <div>
+                <strong>Nueva Paleta de Colores:</strong>
+                <div class="brand-colors">
+                    <div class="color-sample" style="background: #FF6B6B;">Coral<br>Primary</div>
+                    <div class="color-sample" style="background: #FFD93D;">Gold<br>Secondary</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="instructions">
+            <h3>🔍 Qué Verificar:</h3>
+            <ol>
+                <li><strong>Pantalla de Bienvenida:</strong> Debe mostrar "¡Bienvenido a Ta' Pa' Ti!" en lugar de "CitaRD"</li>
+                <li><strong>Tagline:</strong> "Cuando alguien sí te elige" debe aparecer en la descripción</li>
+                <li><strong>Perfiles Mock:</strong> Los bios deben incluir frases como "ta' pa' ti" y "quien sí me elige"</li>
+                <li><strong>Colores:</strong> Gradientes coral (#FF6B6B) y dorado (#FFD93D)</li>
+                <li><strong>Loading Screen:</strong> "Cargando Ta' Pa' Ti..." en lugar de "CitaRD"</li>
+            </ol>
+        </div>
+
+        <div class="status info">
+            <span>🚀</span>
+            <div>
+                <strong>Servidor de Desarrollo:</strong> Ejecutándose en localhost:3000
+                <br><small>Los cambios se aplicaron automáticamente via Hot Module Replacement</small>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="http://localhost:3000" class="test-link" target="_blank">
+                🌟 Ver Ta' Pa' Ti en Vivo
+            </a>
+            <a href="http://localhost:3000/login" class="test-link" target="_blank">
+                🔐 Página de Login
+            </a>
+        </div>
+
+        <div class="status success">
+            <span>🎯</span>
+            <div>
+                <strong>Resultado Esperado:</strong>
+                <p>Al abrir la aplicación, deberías ver:</p>
+                <ul style="margin: 5px 0 0 20px;">
+                    <li>"Ta' Pa' Ti" como nombre principal de la app</li>
+                    <li>Colores coral y dorado en lugar de púrpura/azul</li>
+                    <li>Frases dominicanas auténticas en los perfiles</li>
+                    <li>Tagline "cuando alguien sí te elige"</li>
+                </ul>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 20px; font-size: 14px; opacity: 0.8;">
+            <p>💕 Ta' Pa' Ti - Cuando alguien sí te elige</p>
+            <p>Rebrand completado el 9 de enero, 2026</p>
+        </div>
+    </div>
+
+    <script>
+        // Auto-refresh para ver cambios en tiempo real
+        console.log('🎉 Ta\' Pa\' Ti Rebrand Test Page');
+        console.log('🔗 Servidor: http://localhost:3000');
+        console.log('✨ Verificando nueva marca...');
+        
+        // Verificar que el servidor esté corriendo
+        fetch('http://localhost:3000')
+            .then(response => {
+                if (response.ok) {
+                    console.log('✅ Servidor de desarrollo activo');
+                } else {
+                    console.log('⚠️ Servidor responde pero con errores');
+                }
+            })
+            .catch(error => {
+                console.log('❌ Servidor no disponible:', error);
+            });
+    </script>
+</body>
+</html>

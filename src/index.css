@@ -1,153 +1,85 @@
-@import "tailwindcss/preflight";
-@import "tailwindcss/utilities";
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
-
-/* Reset y base */
+/* CitaRD - Estilos principales */
 * {
   box-sizing: border-box;
 }
 
-html, body, #root {
-  height: 100%;
+body {
   margin: 0;
-  padding: 0;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #ffffff;
-  color: #1a202c;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f8fafc;
+  /* Prevent zoom on iOS */
+  -webkit-text-size-adjust: 100%;
+  /* Improve touch scrolling */
+  -webkit-overflow-scrolling: touch;
+}
+
+#root {
+  min-height: 100vh;
+  min-height: 100dvh; /* Dynamic viewport height for mobile */
+  width: 100%;
   overflow-x: hidden;
 }
 
-/* Glassmorphism utilities */
-.glass {
-  background: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+/* Mobile-first responsive design */
+@media (max-width: 640px) {
+  body {
+    font-size: 14px;
+  }
+  
+  /* Ensure full viewport usage on mobile */
+  #root {
+    height: 100vh;
+    height: 100dvh;
+  }
 }
 
-.glass-dark {
-  background: rgba(0, 0, 0, 0.25);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+/* Tablet and desktop */
+@media (min-width: 641px) {
+  body {
+    font-size: 16px;
+  }
 }
 
-/* Botones mejorados */
-.btn-primary {
-  padding: 1rem 2rem;
-  border-radius: 1rem;
-  font-weight: 600;
-  color: white;
-  transition: all 0.3s ease;
-  transform: scale(1);
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+/* Custom scrollbar */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 
-.btn-primary:hover {
-  transform: scale(1.05);
-  box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
-}
-
-.btn-secondary {
-  padding: 1rem 2rem;
-  border-radius: 1rem;
-  font-weight: 600;
-  color: white;
-  transition: all 0.3s ease;
-  transform: scale(1);
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-  box-shadow: 0 10px 30px rgba(240, 147, 251, 0.4);
-}
-
-.btn-secondary:hover {
-  transform: scale(1.05);
-}
-
-.btn-accent {
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.75rem;
-  font-weight: 500;
-  color: white;
-  transition: all 0.3s ease;
-  transform: scale(1);
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-  box-shadow: 0 8px 25px rgba(79, 172, 254, 0.4);
-}
-
-.btn-accent:hover {
-  transform: scale(1.05);
-}
-
-/* Cards mejoradas */
+/* Glass morphism effects */
 .card-glass {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-  border-radius: 1.5rem;
-  padding: 1.5rem;
-  transition: all 0.3s ease;
-}
-
-.card-glass:hover {
-  transform: scale(1.05);
-  box-shadow: 0 20px 40px rgba(31, 38, 135, 0.5);
-}
-
-.card-profile {
-  background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
-  border-radius: 1.5rem;
+  border-radius: 24px;
+  padding: 2rem;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  overflow: hidden;
-  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.card-profile:hover {
-  transform: scale(1.05);
-  box-shadow: 0 35px 60px -12px rgba(0, 0, 0, 0.35);
-}
-
-/* Inputs mejorados */
 .input-glass {
-  background: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 1rem;
-  padding: 1rem 1.5rem;
-  color: #374151;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 12px 16px;
+  color: white;
   transition: all 0.3s ease;
 }
 
 .input-glass::placeholder {
-  color: #6b7280;
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .input-glass:focus {
   outline: none;
-  border-color: #8b5cf6;
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+  border-color: rgba(147, 51, 234, 0.5);
+  box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.1);
+  background: rgba(255, 255, 255, 0.15);
 }
 
-/* Efectos de texto */
-.text-gradient {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.text-gradient-warm {
-  background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* Gradientes de fondo */
+/* Gradient backgrounds */
 .bg-gradient-primary {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
@@ -156,473 +88,36 @@ html, body, #root {
   background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
 }
 
-.bg-gradient-accent {
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-}
-
-.bg-gradient-warm {
-  background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-}
-
-/* Sombras personalizadas */
+/* Shadow effects */
 .shadow-glow {
-  box-shadow: 0 0 40px rgba(139, 92, 246, 0.3);
+  box-shadow: 0 0 30px rgba(147, 51, 234, 0.3);
 }
 
-.shadow-glow-pink {
-  box-shadow: 0 0 40px rgba(240, 147, 251, 0.4);
-}
-
-.shadow-glow-blue {
-  box-shadow: 0 0 40px rgba(79, 172, 254, 0.4);
-}
-
-/* Animaciones personalizadas */
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-20px); }
-}
-
-@keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(139, 92, 246, 0.4); }
-  50% { box-shadow: 0 0 40px rgba(139, 92, 246, 0.8); }
-}
-
-@keyframes gradient-shift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
-
-.animate-pulse-glow {
-  animation: pulse-glow 2s ease-in-out infinite;
-}
-
-.animate-gradient {
-  background-size: 200% 200%;
-  animation: gradient-shift 3s ease infinite;
-}
-
-/* Scrollbar personalizada */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
-}
-
-/* Modern Home Styles */
-.profile-card {
-  background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
-  border-radius: 1.5rem;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
-  overflow: hidden;
-  transition: all 0.3s ease;
-}
-
-.profile-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 35px 60px -12px rgba(0, 0, 0, 0.25);
-}
-
-.action-button {
-  background: white;
-  border-radius: 50%;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-  transition: all 0.3s ease;
-  border: none;
-  cursor: pointer;
-}
-
-.action-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
-}
-
-.quick-action-card {
-  background: linear-gradient(135deg, var(--color-start), var(--color-end));
-  border-radius: 1rem;
-  padding: 1rem;
-  color: white;
-  text-align: center;
-  transition: all 0.3s ease;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-}
-
-.quick-action-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0));
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.quick-action-card:hover::before {
-  opacity: 1;
-}
-
-.likes-carousel {
-  display: flex;
-  gap: 0.75rem;
-  overflow-x: auto;
-  padding-bottom: 0.5rem;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.likes-carousel::-webkit-scrollbar {
-  display: none;
-}
-
-.like-avatar {
-  flex-shrink: 0;
-  position: relative;
-  cursor: pointer;
-  transition: transform 0.3s ease;
-}
-
-.like-avatar:hover {
-  transform: scale(1.05);
-}
-
-.notification-badge {
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  background: #ef4444;
-  color: white;
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.75rem;
-  font-weight: 600;
-  border: 2px solid white;
-}
-
-/* Progress indicators */
-.progress-dots {
-  display: flex;
-  gap: 0.25rem;
-}
-
-.progress-dot {
-  width: 2rem;
-  height: 0.25rem;
-  border-radius: 9999px;
-  transition: all 0.3s ease;
-}
-
-.progress-dot.active {
-  background: #ec4899;
-}
-
-.progress-dot.inactive {
-  background: #e5e7eb;
-}
-
-/* Match Modal Animations */
-.match-confetti {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 9999;
-}
-
-.match-heart-float {
-  animation: heartFloat 4s ease-out forwards;
-}
-
-@keyframes heartFloat {
-  0% {
-    transform: translateY(100vh) scale(0) rotate(0deg);
-    opacity: 1;
-  }
-  25% {
-    transform: translateY(75vh) scale(1) rotate(90deg);
-    opacity: 1;
-  }
-  50% {
-    transform: translateY(50vh) scale(0.8) rotate(180deg);
-    opacity: 0.8;
-  }
-  75% {
-    transform: translateY(25vh) scale(0.6) rotate(270deg);
-    opacity: 0.6;
-  }
-  100% {
-    transform: translateY(-10vh) scale(0) rotate(360deg);
+/* Animation utilities */
+@keyframes fadeInUp {
+  from {
     opacity: 0;
+    transform: translateY(30px);
   }
-}
-
-.match-sparkle {
-  animation: sparkle 2s ease-in-out infinite;
-}
-
-@keyframes sparkle {
-  0%, 100% {
-    transform: scale(1) rotate(0deg);
+  to {
     opacity: 1;
-  }
-  50% {
-    transform: scale(1.2) rotate(180deg);
-    opacity: 0.7;
+    transform: translateY(0);
   }
 }
 
-/* Notification Toast */
-.notification-toast {
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+.animate-fadeInUp {
+  animation: fadeInUp 0.6s ease-out;
 }
 
-/* Action Button Ripple Effect */
-.action-button-ripple {
-  position: relative;
-  overflow: hidden;
-}
-
-.action-button-ripple::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.3);
-  transform: translate(-50%, -50%);
-  transition: width 0.6s, height 0.6s;
-}
-
-.action-button-ripple:active::before {
-  width: 300px;
-  height: 300px;
-}
-
-/* Swipe Indicators Enhancement */
-.swipe-indicator {
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-  font-weight: 900;
-  letter-spacing: 2px;
-}
-
-/* Match Modal Background Animation */
-.match-background {
-  background: linear-gradient(45deg, #ff6b9d, #c44569, #f8b500, #ff6b9d);
-  background-size: 400% 400%;
-  animation: gradientShift 3s ease infinite;
-}
-
-@keyframes gradientShift {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-/* Responsive utilities */
+/* Mobile touch improvements */
 @media (max-width: 640px) {
   .card-glass {
-    padding: 1rem;
-    border-radius: 1rem;
-  }
-  
-  .btn-primary, .btn-secondary {
-    padding: 0.75rem 1.5rem;
-    font-size: 0.875rem;
-  }
-
-  .profile-card {
-    margin: 0 0.5rem;
-  }
-
-  .action-button {
-    width: 3.5rem;
-    height: 3.5rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  .profile-card {
-    max-width: none;
-  }
-  
-  .action-button {
-    width: 4rem;
-    height: 4rem;
-  }
-  
-  .quick-action-card {
     padding: 1.5rem;
+    border-radius: 20px;
   }
-}
-/* Hide scrollbar for Chrome, Safari and Opera */
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
-/* Hide scrollbar for IE, Edge and Firefox */
-.no-scrollbar {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
-}
-/* Material Symbols filled style */
-.material-symbols-outlined.filled {
-  font-variation-settings: 'FILL' 1;
-}
-/* Scrollbar hide utility */
-.scrollbar-hide {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
-}
-
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;  /* Chrome, Safari and Opera */
-}
-/* Dating App Specific Styles */
-.dating-card {
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  will-change: transform;
-}
-
-.dating-card:hover {
-  transform: translateY(-2px);
-}
-
-/* Safe Area Support for iOS */
-.safe-area-bottom {
-  padding-bottom: env(safe-area-inset-bottom);
-}
-
-/* Custom Scrollbar */
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
-/* Responsive Container */
-@media (min-width: 768px) {
-  .mobile-container {
-    max-width: 430px;
-    margin: 0 auto;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-    border-radius: 1.5rem;
-    overflow: hidden;
-  }
-}
-
-/* Button Animations */
-.btn-swipe {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  will-change: transform;
-}
-
-.btn-swipe:active {
-  transform: scale(0.95);
-}
-
-.btn-swipe:hover {
-  transform: scale(1.1);
-}
-
-/* Gradient Backgrounds */
-.bg-dating-gradient {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-.bg-like-gradient {
-  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
-}
-
-.bg-pass-gradient {
-  background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
-}
-
-/* Material Icons Filled */
-.material-symbols-outlined.filled {
-  font-variation-settings: 'FILL' 1;
-}
-
-/* Profile Card Animations */
-.profile-card {
-  transform-style: preserve-3d;
-  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.profile-card.swiping-left {
-  transform: translateX(-100%) rotate(-30deg);
-  opacity: 0;
-}
-
-.profile-card.swiping-right {
-  transform: translateX(100%) rotate(30deg);
-  opacity: 0;
-}
-
-/* Loading Animation */
-@keyframes pulse-dating {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
-.pulse-dating {
-  animation: pulse-dating 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-/* Notification Badge */
-.notification-badge {
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.1);
-  }
-  100% {
-    transform: scale(1);
+  
+  .input-glass {
+    padding: 14px 16px;
+    font-size: 16px; /* Prevent zoom on iOS */
   }
 }

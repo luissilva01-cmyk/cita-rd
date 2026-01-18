@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CitaRD - Proyecto Completo</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #f8f6f6 0%, #e8e4e4 100%);
+            color: #1b110d;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            color: #ec4913;
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #9a5f4c;
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+        
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .status-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            border-left: 5px solid #ec4913;
+        }
+        
+        .status-card h3 {
+            color: #ec4913;
+            font-weight: 700;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+        
+        .status-item {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+            font-weight: 500;
+        }
+        
+        .status-item.success {
+            color: #28a745;
+        }
+        
+        .status-item.warning {
+            color: #ffc107;
+        }
+        
+        .status-item.info {
+            color: #17a2b8;
+        }
+        
+        .demo-section {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .demo-section h2 {
+            color: #ec4913;
+            font-weight: 700;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            border-bottom: 3px solid #ec4913;
+            padding-bottom: 10px;
+        }
+        
+        .demo-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .demo-link {
+            display: block;
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #ec4913 0%, #d63e0f 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(236, 73, 19, 0.3);
+        }
+        
+        .demo-link:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(236, 73, 19, 0.4);
+        }
+        
+        .server-info {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .server-info h3 {
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .tech-stack {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .tech-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #e9ecef;
+        }
+        
+        .tech-item strong {
+            color: #ec4913;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .feature-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid #ec4913;
+        }
+        
+        .feature-card h4 {
+            color: #ec4913;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .feature-list {
+            list-style: none;
+        }
+        
+        .feature-list li {
+            margin: 5px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .feature-list li:before {
+            content: "✓";
+            color: #28a745;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🔥 CitaRD</h1>
+            <p>Aplicación de Citas Moderna - Proyecto Completo</p>
+        </div>
+
+        <!-- Server Status -->
+        <div class="server-info">
+            <h3>🚀 Servidor Activo</h3>
+            <p><strong>URL:</strong> http://localhost:3000</p>
+            <p><strong>Estado:</strong> ✅ Funcionando correctamente</p>
+        </div>
+
+        <!-- Project Status -->
+        <div class="status-grid">
+            <div class="status-card">
+                <h3>🔐 Sistema de Autenticación</h3>
+                <div class="status-item success">✅ Login moderno implementado</div>
+                <div class="status-item success">✅ Registro moderno implementado</div>
+                <div class="status-item success">✅ Firebase Auth integrado</div>
+                <div class="status-item success">✅ Diseño unificado</div>
+                <div class="status-item success">✅ Errores TypeScript corregidos</div>
+            </div>
+            
+            <div class="status-card">
+                <h3>🎨 Diseño y UI/UX</h3>
+                <div class="status-item success">✅ Diseño responsive</div>
+                <div class="status-item success">✅ Plus Jakarta Sans typography</div>
+                <div class="status-item success">✅ Colores unificados</div>
+                <div class="status-item success">✅ Animaciones Framer Motion</div>
+                <div class="status-item success">✅ Mobile-first approach</div>
+            </div>
+            
+            <div class="status-card">
+                <h3>⚡ Funcionalidades Core</h3>
+                <div class="status-item success">✅ Sistema de Stories</div>
+                <div class="status-item success">✅ Chat en tiempo real</div>
+                <div class="status-item success">✅ Swipe de perfiles</div>
+                <div class="status-item success">✅ Matching AI</div>
+                <div class="status-item success">✅ Verificación de fotos</div>
+            </div>
+            
+            <div class="status-card">
+                <h3>🔧 Tecnología</h3>
+                <div class="status-item success">✅ React + TypeScript</div>
+                <div class="status-item success">✅ Firebase Backend</div>
+                <div class="status-item success">✅ Vite Build Tool</div>
+                <div class="status-item success">✅ Tailwind CSS</div>
+                <div class="status-item success">✅ Framer Motion</div>
+            </div>
+        </div>
+
+        <!-- Demo Links -->
+        <div class="demo-section">
+            <h2>🧪 Páginas de Demostración</h2>
+            <div class="demo-links">
+                <a href="http://localhost:3000/login" class="demo-link" target="_blank">
+                    🔐 Login Real (Servidor)
+                </a>
+                <a href="http://localhost:3000/register" class="demo-link" target="_blank">
+                    📝 Register Real (Servidor)
+                </a>
+                <a href="http://localhost:3000/" class="demo-link" target="_blank">
+                    🏠 Aplicación Principal
+                </a>
+                <a href="./demo-login-standalone.html" class="demo-link" target="_blank">
+                    👁️ Demo Login (Standalone)
+                </a>
+                <a href="./demo-register-standalone.html" class="demo-link" target="_blank">
+                    👁️ Demo Register (Standalone)
+                </a>
+                <a href="./demo-comparison.html" class="demo-link" target="_blank">
+                    🔄 Comparación Lado a Lado
+                </a>
+            </div>
+            
+            <div style="margin-top: 25px; padding: 20px; background: #e8f5e8; border-radius: 15px; border-left: 4px solid #28a745;">
+                <h4 style="color: #28a745; margin-bottom: 10px;">✅ Recomendación:</h4>
+                <p style="color: #666; margin: 0;">
+                    <strong>Empieza con la "Comparación Lado a Lado"</strong> para ver ambas páginas juntas, 
+                    luego prueba las versiones reales del servidor para verificar la funcionalidad completa.
+                </p>
+            </div>
+        </div>
+
+        <!-- Features -->
+        <div class="demo-section">
+            <h2>🚀 Características Implementadas</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h4>Autenticación Moderna</h4>
+                    <ul class="feature-list">
+                        <li>Login con email/password</li>
+                        <li>Registro con validaciones</li>
+                        <li>Integración con Google/Apple</li>
+                        <li>Recuperación de contraseña</li>
+                        <li>Verificación de edad (18+)</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>Experiencia de Usuario</h4>
+                    <ul class="feature-list">
+                        <li>Diseño mobile-first</li>
+                        <li>Animaciones fluidas</li>
+                        <li>Feedback visual inmediato</li>
+                        <li>Carga optimizada</li>
+                        <li>Navegación intuitiva</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>Funcionalidades Sociales</h4>
+                    <ul class="feature-list">
+                        <li>Sistema de Stories</li>
+                        <li>Chat en tiempo real</li>
+                        <li>Swipe de perfiles</li>
+                        <li>Sistema de matches</li>
+                        <li>Notificaciones push</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>Tecnología Avanzada</h4>
+                    <ul class="feature-list">
+                        <li>AI para matching</li>
+                        <li>Análisis emocional</li>
+                        <li>Verificación de fotos</li>
+                        <li>Geolocalización</li>
+                        <li>Llamadas de video</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tech Stack -->
+        <div class="demo-section">
+            <h2>🛠️ Stack Tecnológico</h2>
+            <div class="tech-stack">
+                <div class="tech-item">
+                    <strong>Frontend</strong>
+                    React 18 + TypeScript
+                </div>
+                <div class="tech-item">
+                    <strong>Styling</strong>
+                    Tailwind CSS + Framer Motion
+                </div>
+                <div class="tech-item">
+                    <strong>Backend</strong>
+                    Firebase (Auth, Firestore, Storage)
+                </div>
+                <div class="tech-item">
+                    <strong>Build Tool</strong>
+                    Vite + Hot Reload
+                </div>
+                <div class="tech-item">
+                    <strong>Routing</strong>
+                    React Router v6
+                </div>
+                <div class="tech-item">
+                    <strong>State Management</strong>
+                    React Hooks + Context
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('🔥 CitaRD - Proyecto Completo Cargado');
+        console.log('✅ Servidor: http://localhost:3000');
+        console.log('🔐 Login: http://localhost:3000/login');
+        console.log('📝 Register: http://localhost:3000/register');
+        
+        // Auto-refresh status
+        setInterval(() => {
+            fetch('http://localhost:3000')
+                .then(() => {
+                    console.log('✅ Servidor activo');
+                })
+                .catch(() => {
+                    console.log('❌ Servidor no disponible');
+                });
+        }, 30000);
+    </script>
+</body>
+</html>

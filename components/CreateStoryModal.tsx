@@ -9,13 +9,15 @@ interface CreateStoryModalProps {
   currentUserId: string;
   onClose: () => void;
   onStoryCreated?: () => void;
+  userProfile?: { name: string; avatar: string };
 }
 
 const CreateStoryModal: React.FC<CreateStoryModalProps> = ({
   isOpen,
   currentUserId,
   onClose,
-  onStoryCreated
+  onStoryCreated,
+  userProfile
 }) => {
   const { t } = useTranslation();
   const [mode, setMode] = useState<'select' | 'text' | 'image'>('select');
@@ -55,7 +57,8 @@ const CreateStoryModal: React.FC<CreateStoryModalProps> = ({
           currentUserId,
           'text',
           textContent.trim(),
-          { backgroundColor, textColor }
+          { backgroundColor, textColor },
+          userProfile
         );
         
         console.log('✅ Story de texto creada');
@@ -64,7 +67,9 @@ const CreateStoryModal: React.FC<CreateStoryModalProps> = ({
         await storiesService.createStory(
           currentUserId,
           'image',
-          selectedImage
+          selectedImage,
+          undefined,
+          userProfile
         );
         
         console.log('✅ Story de imagen creada');

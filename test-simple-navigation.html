@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 Test: Navegación Simple</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/react-router-dom@6/dist/umd/react-router-dom.development.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin: 20px 0;
+        }
+        .nav-link {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #ec4913;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            margin: 10px;
+            font-weight: bold;
+        }
+        .nav-link:hover {
+            background: #d63f11;
+        }
+        .forgot-link {
+            color: #ec4913;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .forgot-link:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Test: Navegación Simple</h1>
+        <p>Probando la navegación de React Router de forma aislada:</p>
+        
+        <div id="react-app"></div>
+    </div>
+
+    <div class="test-container">
+        <h2>Enlaces HTML Directos (para comparar)</h2>
+        <a href="http://localhost:3001/login" class="nav-link" target="_blank">
+            📝 Login (HTML directo)
+        </a>
+        
+        <a href="http://localhost:3001/forgot-password" class="nav-link" target="_blank">
+            🔐 Forgot Password (HTML directo)
+        </a>
+    </div>
+
+    <script type="text/babel">
+        const { BrowserRouter, Routes, Route, Link, useNavigate, Navigate } = ReactRouterDOM;
+        const { useState } = React;
+
+        // Componente Login simplificado
+        function SimpleLogin() {
+            const navigate = useNavigate();
+            
+            return (
+                <div style={{ padding: '20px', border: '2px solid #ddd', borderRadius: '8px', margin: '10px 0' }}>
+                    <h2>Login Page (Simulado)</h2>
+                    <form>
+                        <div style={{ marginBottom: '15px' }}>
+                            <label>Email:</label><br/>
+                            <input type="email" style={{ width: '100%', padding: '8px', marginTop: '5px' }} />
+                        </div>
+                        <div style={{ marginBottom: '15px' }}>
+                            <label>Password:</label><br/>
+                            <input type="password" style={{ width: '100%', padding: '8px', marginTop: '5px' }} />
+                        </div>
+                        <div style={{ textAlign: 'right', marginBottom: '15px' }}>
+                            <Link to="/forgot-password" className="forgot-link">
+                                ¿Olvidaste tu contraseña?
+                            </Link>
+                        </div>
+                        <button type="button" style={{ 
+                            width: '100%', 
+                            padding: '12px', 
+                            background: '#ec4913', 
+                            color: 'white', 
+                            border: 'none', 
+                            borderRadius: '6px',
+                            fontWeight: 'bold'
+                        }}>
+                            Iniciar Sesión
+                        </button>
+                    </form>
+                    
+                    <div style={{ marginTop: '20px', textAlign: 'center' }}>
+                        <button 
+                            onClick={() => navigate('/forgot-password')}
+                            style={{ 
+                                padding: '8px 16px', 
+                                background: '#6c757d', 
+                                color: 'white', 
+                                border: 'none', 
+                                borderRadius: '4px' 
+                            }}
+                        >
+                            Test Navigate (programático)
+                        </button>
+                    </div>
+                </div>
+            );
+        }
+
+        // Componente ForgotPassword simplificado
+        function SimpleForgotPassword() {
+            const navigate = useNavigate();
+            
+            return (
+                <div style={{ padding: '20px', border: '2px solid #ddd', borderRadius: '8px', margin: '10px 0' }}>
+                    <h2>Forgot Password Page (Simulado)</h2>
+                    <p style={{ color: '#28a745', fontWeight: 'bold' }}>
+                        ✅ ¡Navegación exitosa! La ruta /forgot-password funciona.
+                    </p>
+                    <form>
+                        <div style={{ marginBottom: '15px' }}>
+                            <label>Email para recuperación:</label><br/>
+                            <input type="email" style={{ width: '100%', padding: '8px', marginTop: '5px' }} />
+                        </div>
+                        <button type="button" style={{ 
+                            width: '100%', 
+                            padding: '12px', 
+                            background: '#ec4913', 
+                            color: 'white', 
+                            border: 'none', 
+                            borderRadius: '6px',
+                            fontWeight: 'bold'
+                        }}>
+                            Enviar Enlace de Recuperación
+                        </button>
+                    </form>
+                    
+                    <div style={{ marginTop: '20px', textAlign: 'center' }}>
+                        <button 
+                            onClick={() => navigate('/login')}
+                            style={{ 
+                                padding: '8px 16px', 
+                                background: '#6c757d', 
+                                color: 'white', 
+                                border: 'none', 
+                                borderRadius: '4px' 
+                            }}
+                        >
+                            Volver al Login
+                        </button>
+                    </div>
+                </div>
+            );
+        }
+
+        // Componente principal
+        function TestApp() {
+            return (
+                <BrowserRouter>
+                    <div>
+                        <nav style={{ marginBottom: '20px', padding: '10px', background: '#f8f9fa', borderRadius: '6px' }}>
+                            <Link to="/test-login" className="nav-link">
+                                📝 Test Login
+                            </Link>
+                            <Link to="/test-forgot" className="nav-link">
+                                🔐 Test Forgot Password
+                            </Link>
+                        </nav>
+                        
+                        <Routes>
+                            <Route path="/test-login" element={<SimpleLogin />} />
+                            <Route path="/test-forgot" element={<SimpleForgotPassword />} />
+                            <Route path="/forgot-password" element={<SimpleForgotPassword />} />
+                            <Route path="/" element={<Navigate to="/test-login" replace />} />
+                        </Routes>
+                        
+                        <div style={{ marginTop: '20px', padding: '15px', background: '#e9ecef', borderRadius: '6px' }}>
+                            <h3>Instrucciones:</h3>
+                            <ol>
+                                <li>Haz clic en "Test Login" arriba</li>
+                                <li>En la página de login, haz clic en "¿Olvidaste tu contraseña?"</li>
+                                <li>Deberías navegar a la página de recuperación</li>
+                                <li>También puedes probar el botón "Test Navigate (programático)"</li>
+                            </ol>
+                            <p><strong>Si esto funciona pero la app real no, el problema está en la configuración de Firebase o en los componentes reales.</strong></p>
+                        </div>
+                    </div>
+                </BrowserRouter>
+            );
+        }
+
+        // Renderizar la aplicación
+        ReactDOM.render(<TestApp />, document.getElementById('react-app'));
+        
+        // Log para debug
+        console.log('🧪 Test de navegación simple iniciado');
+        console.log('📋 Si este test funciona pero la app real no, el problema está en:');
+        console.log('   • Configuración de Firebase Auth');
+        console.log('   • Errores en los componentes reales');
+        console.log('   • Conflictos con otras dependencias');
+    </script>
+</body>
+</html>

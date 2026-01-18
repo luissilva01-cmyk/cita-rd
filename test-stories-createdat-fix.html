@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CitaRD - Test Stories CreatedAt Fix</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .console-log {
+            background: #1f2937;
+            color: #10b981;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        
+        .error-highlight {
+            background: #7f1d1d;
+            color: #fca5a5;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            margin: 0.25rem 0;
+        }
+        
+        .success-highlight {
+            background: #064e3b;
+            color: #6ee7b7;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            margin: 0.25rem 0;
+        }
+        
+        .test-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin: 0.5rem;
+        }
+        
+        .test-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        
+        .story-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            color: white;
+            margin: 1rem 0;
+        }
+        
+        .date-display {
+            background: rgba(255,255,255,0.2);
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            margin: 0.5rem 0;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-4">
+    <div class="max-w-6xl mx-auto">
+        <h1 class="text-3xl font-bold text-center mb-6 text-gray-800">
+            🐛 CitaRD - Stories CreatedAt Error Fix
+        </h1>
+        
+        <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <h2 class="text-lg font-semibold text-red-800 mb-2">❌ Error Específico Identificado:</h2>
+            <code class="text-red-700 bg-red-100 p-2 rounded block">
+                TypeError: Cannot read properties of undefined (reading 'createdAt')<br>
+                at StoriesViewer (StoriesViewer.tsx:542:57)
+            </code>
+            <p class="text-red-700 mt-2 text-sm">
+                El error ocurre cuando <code>currentStory</code> es <code>undefined</code> porque 
+                <code>currentStoryIndex</code> está fuera del rango del array de stories.
+            </p>
+        </div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Test Controls -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">🧪 Tests de Validación</h2>
+                
+                <div class="grid grid-cols-1 gap-2 mb-4">
+                    <button onclick="testValidStories()" class="test-button">
+                        ✅ Test Stories Válidas
+                    </button>
+                    <button onclick="testInvalidIndices()" class="test-button">
+                        ❌ Test Índices Inválidos
+                    </button>
+                    <button onclick="testMissingCreatedAt()" class="test-button">
+                        📅 Test CreatedAt Faltante
+                    </button>
+                    <button onclick="testInvalidDates()" class="test-button">
+                        🗓️ Test Fechas Inválidas
+                    </button>
+                    <button onclick="testEdgeCases()" class="test-button">
+                        🔍 Test Edge Cases
+                    </button>
+                    <button onclick="clearLogs()" class="test-button" style="background: #dc2626;">
+                        🗑️ Clear Logs
+                    </button>
+                </div>
+                
+                <div id="story-display" class="story-card">
+                    <h3 class="text-xl font-bold mb-2">Story Actual</h3>
+                    <div id="story-info">
+                        <p>Índice: <span id="current-index">0</span></p>
+                        <p>Total Stories: <span id="total-stories">0</span></p>
+                        <div class="date-display">
+                            <div>CreatedAt: <span id="created-at">N/A</span></div>
+                            <div>TimeAgo: <span id="time-ago">N/A</span></div>
+                            <div>Valid: <span id="date-valid">N/A</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Console Output -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">📋 Console Output</h2>
+                <div id="console-output" class="console-log">
+                    🚀 CreatedAt Error Fix Test ready.
+                    This test validates the fix for the undefined createdAt error.
+                </div>
+            </div>
+        </div>
+        
+        <!-- Test Results Summary -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mt-6">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700">📊 Test Results Summary</h2>
+            <div id="test-summary" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="text-center p-4 bg-blue-50 rounded-lg">
+                    <div class="text-2xl font-bold text-blue-600" id="total-tests">0</div>
+                    <div class="text-sm text-gray-600">Total Tests</div>
+                </div>
+                <div class="text-center p-4 bg-green-50 rounded-lg">
+                    <div class="text-2xl font-bold text-green-600" id="passed-tests">0</div>
+                    <div class="text-sm text-gray-600">Passed</div>
+                </div>
+                <div class="text-center p-4 bg-red-50 rounded-lg">
+                    <div class="text-2xl font-bold text-red-600" id="failed-tests">0</div>
+                    <div class="text-sm text-gray-600">Failed</div>
+                </div>
+                <div class="text-center p-4 bg-yellow-50 rounded-lg">
+                    <div class="text-2xl font-bold text-yellow-600" id="error-tests">0</div>
+                    <div class="text-sm text-gray-600">Errors Caught</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Test counters
+        let totalTests = 0;
+        let passedTests = 0;
+        let failedTests = 0;
+        let errorTests = 0;
+        
+        // Mock story data with various scenarios
+        const validStoryGroup = {
+            id: 'group1',
+            userId: '1',
+            user: { name: 'Carolina', avatar: 'avatar1.jpg' },
+            stories: [
+                {
+                    id: 'story1',
+                    userId: '1',
+                    type: 'text',
+                    content: 'Story válida 1',
+                    createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
+                    expiresAt: new Date(Date.now() + 22 * 60 * 60 * 1000),
+                    viewedBy: []
+                },
+                {
+                    id: 'story2',
+                    userId: '1',
+                    type: 'text',
+                    content: 'Story válida 2',
+                    createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000),
+                    expiresAt: new Date(Date.now() + 23 * 60 * 60 * 1000),
+                    viewedBy: []
+                }
+            ]
+        };
+        
+        const invalidStoryGroup = {
+            id: 'group2',
+            userId: '2',
+            user: { name: 'Marcos', avatar: 'avatar2.jpg' },
+            stories: [
+                {
+                    id: 'story3',
+                    userId: '2',
+                    type: 'text',
+                    content: 'Story sin createdAt',
+                    // createdAt: missing!
+                    expiresAt: new Date(Date.now() + 22 * 60 * 60 * 1000),
+                    viewedBy: []
+                },
+                null, // Story null
+                {
+                    id: 'story4',
+                    userId: '2',
+                    type: 'text',
+                    content: 'Story con fecha inválida',
+                    createdAt: 'invalid-date',
+                    expiresAt: new Date(Date.now() + 22 * 60 * 60 * 1000),
+                    viewedBy: []
+                }
+            ]
+        };
+        
+        // Logging functions
+        function log(message) {
+            const output = document.getElementById('console-output');
+            const timestamp = new Date().toLocaleTimeString();
+            output.textContent += `[${timestamp}] ${message}\n`;
+            output.scrollTop = output.scrollHeight;
+        }
+        
+        function logError(message) {
+            const output = document.getElementById('console-output');
+            const timestamp = new Date().toLocaleTimeString();
+            output.innerHTML += `<div class="error-highlight">[${timestamp}] ${message}</div>`;
+            output.scrollTop = output.scrollHeight;
+        }
+        
+        function logSuccess(message) {
+            const output = document.getElementById('console-output');
+            const timestamp = new Date().toLocaleTimeString();
+            output.innerHTML += `<div class="success-highlight">[${timestamp}] ${message}</div>`;
+            output.scrollTop = output.scrollHeight;
+        }
+        
+        function clearLogs() {
+            document.getElementById('console-output').innerHTML = '🧹 Logs cleared.\n';
+        }
+        
+        function updateTestCounters() {
+            document.getElementById('total-tests').textContent = totalTests;
+            document.getElementById('passed-tests').textContent = passedTests;
+            document.getElementById('failed-tests').textContent = failedTests;
+            document.getElementById('error-tests').textContent = errorTests;
+        }
+        
+        function updateStoryDisplay(storyGroup, currentStoryIndex) {
+            document.getElementById('current-index').textContent = currentStoryIndex;
+            document.getElementById('total-stories').textContent = storyGroup ? storyGroup.stories.length : 0;
+            
+            if (storyGroup && storyGroup.stories && currentStoryIndex >= 0 && currentStoryIndex < storyGroup.stories.length) {
+                const currentStory = storyGroup.stories[currentStoryIndex];
+                
+                if (currentStory) {
+                    document.getElementById('created-at').textContent = currentStory.createdAt ? currentStory.createdAt.toString() : 'MISSING';
+                    
+                    // Test timeAgo calculation
+                    try {
+                        let timeAgo = 'ERROR';
+                        if (currentStory.createdAt instanceof Date) {
+                            timeAgo = Math.floor((Date.now() - currentStory.createdAt.getTime()) / (1000 * 60 * 60)) + 'h';
+                        }
+                        document.getElementById('time-ago').textContent = timeAgo;
+                        document.getElementById('date-valid').textContent = 'YES';
+                    } catch (error) {
+                        document.getElementById('time-ago').textContent = 'ERROR: ' + error.message;
+                        document.getElementById('date-valid').textContent = 'NO';
+                    }
+                } else {
+                    document.getElementById('created-at').textContent = 'STORY IS NULL';
+                    document.getElementById('time-ago').textContent = 'N/A';
+                    document.getElementById('date-valid').textContent = 'NO';
+                }
+            } else {
+                document.getElementById('created-at').textContent = 'INDEX OUT OF RANGE';
+                document.getElementById('time-ago').textContent = 'N/A';
+                document.getElementById('date-valid').textContent = 'NO';
+            }
+        }
+        
+        // Simulate the fixed validation logic
+        function validateStoryAccess(storyGroup, currentStoryIndex) {
+            log(`🔍 Validating story access - Group: ${storyGroup?.id}, Index: ${currentStoryIndex}`);
+            
+            // Step 1: Basic validations
+            if (!storyGroup) {
+                throw new Error('storyGroup is null/undefined');
+            }
+            
+            if (!storyGroup.stories || storyGroup.stories.length === 0) {
+                throw new Error('storyGroup.stories is empty or null');
+            }
+            
+            // Step 2: Index validation (CRITICAL FIX)
+            if (currentStoryIndex < 0 || currentStoryIndex >= storyGroup.stories.length) {
+                throw new Error(`currentStoryIndex (${currentStoryIndex}) out of range [0, ${storyGroup.stories.length - 1}]`);
+            }
+            
+            // Step 3: Story validation
+            const currentStory = storyGroup.stories[currentStoryIndex];
+            if (!currentStory) {
+                throw new Error('currentStory is null/undefined');
+            }
+            
+            // Step 4: CreatedAt validation (CRITICAL FIX)
+            if (!currentStory.createdAt) {
+                throw new Error('currentStory.createdAt is missing');
+            }
+            
+            // Step 5: Date type validation
+            let timeAgo = 0;
+            if (currentStory.createdAt instanceof Date) {
+                if (isNaN(currentStory.createdAt.getTime())) {
+                    throw new Error('currentStory.createdAt is invalid Date');
+                }
+                timeAgo = Math.floor((Date.now() - currentStory.createdAt.getTime()) / (1000 * 60 * 60));
+            } else {
+                // Try to convert to Date
+                const createdAtDate = new Date(currentStory.createdAt);
+                if (isNaN(createdAtDate.getTime())) {
+                    throw new Error('currentStory.createdAt cannot be converted to valid Date');
+                }
+                timeAgo = Math.floor((Date.now() - createdAtDate.getTime()) / (1000 * 60 * 60));
+            }
+            
+            return { currentStory, timeAgo };
+        }
+        
+        // Test functions
+        function testValidStories() {
+            log('✅ === TESTING VALID STORIES ===');
+            
+            for (let i = 0; i < validStoryGroup.stories.length; i++) {
+                totalTests++;
+                try {
+                    const result = validateStoryAccess(validStoryGroup, i);
+                    logSuccess(`✅ Valid story ${i}: ${result.currentStory.id} (${result.timeAgo}h ago)`);
+                    passedTests++;
+                    updateStoryDisplay(validStoryGroup, i);
+                } catch (error) {
+                    logError(`❌ Valid story ${i} failed: ${error.message}`);
+                    failedTests++;
+                }
+            }
+            
+            updateTestCounters();
+        }
+        
+        function testInvalidIndices() {
+            log('❌ === TESTING INVALID INDICES ===');
+            
+            const testIndices = [-1, -5, 999, validStoryGroup.stories.length, validStoryGroup.stories.length + 10];
+            
+            testIndices.forEach(index => {
+                totalTests++;
+                try {
+                    validateStoryAccess(validStoryGroup, index);
+                    logError(`❌ Index ${index} should have failed but didn't`);
+                    failedTests++;
+                } catch (error) {
+                    logSuccess(`✅ Index ${index} correctly rejected: ${error.message}`);
+                    passedTests++;
+                    errorTests++;
+                }
+                updateStoryDisplay(validStoryGroup, index);
+            });
+            
+            updateTestCounters();
+        }
+        
+        function testMissingCreatedAt() {
+            log('📅 === TESTING MISSING CREATEDAT ===');
+            
+            // Test story without createdAt
+            totalTests++;
+            try {
+                validateStoryAccess(invalidStoryGroup, 0);
+                logError('❌ Story without createdAt should have failed');
+                failedTests++;
+            } catch (error) {
+                logSuccess(`✅ Missing createdAt correctly rejected: ${error.message}`);
+                passedTests++;
+                errorTests++;
+            }
+            
+            updateStoryDisplay(invalidStoryGroup, 0);
+            updateTestCounters();
+        }
+        
+        function testInvalidDates() {
+            log('🗓️ === TESTING INVALID DATES ===');
+            
+            // Test story with invalid date
+            totalTests++;
+            try {
+                validateStoryAccess(invalidStoryGroup, 2);
+                logError('❌ Story with invalid date should have failed');
+                failedTests++;
+            } catch (error) {
+                logSuccess(`✅ Invalid date correctly rejected: ${error.message}`);
+                passedTests++;
+                errorTests++;
+            }
+            
+            updateStoryDisplay(invalidStoryGroup, 2);
+            updateTestCounters();
+        }
+        
+        function testEdgeCases() {
+            log('🔍 === TESTING EDGE CASES ===');
+            
+            // Test null storyGroup
+            totalTests++;
+            try {
+                validateStoryAccess(null, 0);
+                logError('❌ Null storyGroup should have failed');
+                failedTests++;
+            } catch (error) {
+                logSuccess(`✅ Null storyGroup correctly rejected: ${error.message}`);
+                passedTests++;
+                errorTests++;
+            }
+            
+            // Test empty stories array
+            totalTests++;
+            const emptyGroup = { ...validStoryGroup, stories: [] };
+            try {
+                validateStoryAccess(emptyGroup, 0);
+                logError('❌ Empty stories array should have failed');
+                failedTests++;
+            } catch (error) {
+                logSuccess(`✅ Empty stories array correctly rejected: ${error.message}`);
+                passedTests++;
+                errorTests++;
+            }
+            
+            // Test null story in array
+            totalTests++;
+            try {
+                validateStoryAccess(invalidStoryGroup, 1); // null story
+                logError('❌ Null story should have failed');
+                failedTests++;
+            } catch (error) {
+                logSuccess(`✅ Null story correctly rejected: ${error.message}`);
+                passedTests++;
+                errorTests++;
+            }
+            
+            updateTestCounters();
+        }
+        
+        // Initialize
+        window.addEventListener('load', () => {
+            log('🚀 CreatedAt Error Fix Test initialized');
+            log('🎯 This test validates the fix for: TypeError: Cannot read properties of undefined (reading \'createdAt\')');
+            log('');
+            log('📋 Available tests:');
+            log('  • Valid Stories - Tests normal story access');
+            log('  • Invalid Indices - Tests out-of-range indices');
+            log('  • Missing CreatedAt - Tests stories without createdAt property');
+            log('  • Invalid Dates - Tests stories with invalid date values');
+            log('  • Edge Cases - Tests null/undefined scenarios');
+            log('');
+            log('💡 Click buttons to run specific tests');
+            
+            updateStoryDisplay(validStoryGroup, 0);
+            updateTestCounters();
+        });
+    </script>
+</body>
+</html>

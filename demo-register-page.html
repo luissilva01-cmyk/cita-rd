@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CitaRD - Registrarse</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet"/>
+    <style>
+        body {
+            font-family: "Plus Jakarta Sans", "Noto Sans", sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen flex items-center justify-center p-4">
+        <div class="max-w-md mx-auto">
+            <h1 class="text-2xl font-bold text-center mb-6 text-gray-800">
+                CitaRD - Página de Registro
+            </h1>
+            
+            <!-- REGISTER PAGE -->
+            <div 
+                class="relative flex h-full min-h-screen w-full max-w-md mx-auto flex-col overflow-x-hidden shadow-xl"
+                style="background-color: #f8f6f6; color: #1b110d; min-height: 800px;"
+            >
+                <!-- TopAppBar -->
+                <div 
+                    class="flex items-center px-4 py-4 justify-between sticky top-0 z-10 backdrop-blur-sm"
+                    style="background-color: rgba(248, 246, 246, 0.95);"
+                >
+                    <button 
+                        class="flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-black/5 transition-colors"
+                        style="color: #1b110d;"
+                        onclick="alert('Botón atrás presionado')"
+                    >
+                        ←
+                    </button>
+                    <h2 
+                        class="text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pr-10"
+                        style="color: #1b110d;"
+                    >
+                        Registrarse
+                    </h2>
+                </div>
+
+                <!-- Scrollable Content -->
+                <div class="flex-1 flex flex-col px-6 pb-8">
+                    <!-- HeadlineText -->
+                    <h1 
+                        class="tracking-tight text-[28px] md:text-[32px] font-extrabold leading-tight text-center pt-4 pb-2"
+                        style="color: #1b110d;"
+                    >
+                        Empieza tu historia
+                    </h1>
+                    
+                    <!-- BodyText -->
+                    <p 
+                        class="text-base font-medium leading-normal pb-8 text-center"
+                        style="color: #9a5f4c;"
+                    >
+                        Únete a CitaRD y encuentra tu match ideal hoy mismo.
+                    </p>
+
+                    <!-- Social Sign Up -->
+                    <div class="flex flex-col gap-3 mb-8">
+                        <button 
+                            class="flex items-center justify-center gap-3 w-full h-12 rounded-xl border hover:bg-gray-50 transition-colors"
+                            style="border-color: #e7d5cf; background-color: #ffffff;"
+                            onclick="alert('Registro con Google')"
+                        >
+                            <div class="w-5 h-5 bg-red-500 rounded text-white text-xs flex items-center justify-center font-bold">G</div>
+                            <span 
+                                class="text-sm font-semibold"
+                                style="color: #1b110d;"
+                            >
+                                Continuar con Google
+                            </span>
+                        </button>
+                        <button 
+                            class="flex items-center justify-center gap-3 w-full h-12 rounded-xl border hover:bg-gray-50 transition-colors"
+                            style="border-color: #e7d5cf; background-color: #ffffff;"
+                            onclick="alert('Registro con Facebook')"
+                        >
+                            <div 
+                                class="w-5 h-5 rounded flex items-center justify-center text-white text-xs font-bold"
+                                style="background-color: #1877F2;"
+                            >
+                                f
+                            </div>
+                            <span 
+                                class="text-sm font-semibold"
+                                style="color: #1b110d;"
+                            >
+                                Continuar con Facebook
+                            </span>
+                        </button>
+                    </div>
+
+                    <!-- Divider -->
+                    <div class="flex items-center gap-4 mb-6">
+                        <div 
+                            class="h-px flex-1"
+                            style="background-color: #e7d5cf;"
+                        ></div>
+                        <p 
+                            class="text-sm font-medium"
+                            style="color: #9a5f4c;"
+                        >
+                            o regístrate con email
+                        </p>
+                        <div 
+                            class="h-px flex-1"
+                            style="background-color: #e7d5cf;"
+                        ></div>
+                    </div>
+
+                    <!-- Error/Success Message -->
+                    <div id="message" class="hidden mb-4 p-4 rounded-xl text-center"></div>
+
+                    <!-- Form Fields -->
+                    <form class="flex flex-col gap-4" onsubmit="handleRegister(event)">
+                        <!-- Name Field -->
+                        <div class="flex flex-col gap-2">
+                            <label 
+                                class="text-sm font-semibold leading-normal"
+                                style="color: #1b110d;"
+                            >
+                                Nombre completo *
+                            </label>
+                            <input
+                                id="name"
+                                class="form-input flex w-full rounded-xl border h-12 px-4 text-base focus:outline-none focus:ring-2 transition-all"
+                                style="border-color: #e7d5cf; background-color: #ffffff; color: #1b110d;"
+                                placeholder="Ej. María Rodriguez"
+                                type="text"
+                                required
+                            />
+                        </div>
+
+                        <!-- Email Field -->
+                        <div class="flex flex-col gap-2">
+                            <label 
+                                class="text-sm font-semibold leading-normal"
+                                style="color: #1b110d;"
+                            >
+                                Correo electrónico *
+                            </label>
+                            <input
+                                id="email"
+                                class="form-input flex w-full rounded-xl border h-12 px-4 text-base focus:outline-none focus:ring-2 transition-all"
+                                style="border-color: #e7d5cf; background-color: #ffffff; color: #1b110d;"
+                                placeholder="ejemplo@correo.com"
+                                type="email"
+                                required
+                            />
+                        </div>
+
+                        <!-- Birth Date Field -->
+                        <div class="flex flex-col gap-2">
+                            <label 
+                                class="text-sm font-semibold leading-normal"
+                                style="color: #1b110d;"
+                            >
+                                Fecha de nacimiento *
+                            </label>
+                            <input
+                                id="birthDate"
+                                class="form-input flex w-full rounded-xl border h-12 px-4 text-base focus:outline-none focus:ring-2 transition-all"
+                                style="border-color: #e7d5cf; background-color: #ffffff; color: #1b110d;"
+                                type="date"
+                                required
+                            />
+                            <p 
+                                class="text-xs mt-1"
+                                style="color: #9a5f4c;"
+                            >
+                                Debes ser mayor de 18 años
+                            </p>
+                        </div>
+
+                        <!-- Password Field -->
+                        <div class="flex flex-col gap-2">
+                            <label 
+                                class="text-sm font-semibold leading-normal"
+                                style="color: #1b110d;"
+                            >
+                                Contraseña *
+                            </label>
+                            <div class="relative">
+                                <input
+                                    id="password"
+                                    class="form-input flex w-full rounded-xl border h-12 px-4 pr-12 text-base focus:outline-none focus:ring-2 transition-all"
+                                    style="border-color: #e7d5cf; background-color: #ffffff; color: #1b110d;"
+                                    placeholder="Mínimo 6 caracteres"
+                                    type="password"
+                                    required
+                                />
+                                <button
+                                    class="absolute right-4 top-1/2 -translate-y-1/2 hover:opacity-70"
+                                    style="color: #9a5f4c;"
+                                    type="button"
+                                    onclick="togglePassword('password', 'eyeIcon1')"
+                                >
+                                    <span id="eyeIcon1">👁</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Confirm Password Field -->
+                        <div class="flex flex-col gap-2">
+                            <label 
+                                class="text-sm font-semibold leading-normal"
+                                style="color: #1b110d;"
+                            >
+                                Confirmar contraseña *
+                            </label>
+                            <div class="relative">
+                                <input
+                                    id="confirmPassword"
+                                    class="form-input flex w-full rounded-xl border h-12 px-4 pr-12 text-base focus:outline-none focus:ring-2 transition-all"
+                                    style="border-color: #e7d5cf; background-color: #ffffff; color: #1b110d;"
+                                    placeholder="Repite tu contraseña"
+                                    type="password"
+                                    required
+                                />
+                                <button
+                                    class="absolute right-4 top-1/2 -translate-y-1/2 hover:opacity-70"
+                                    style="color: #9a5f4c;"
+                                    type="button"
+                                    onclick="togglePassword('confirmPassword', 'eyeIcon2')"
+                                >
+                                    <span id="eyeIcon2">👁</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Terms -->
+                        <div 
+                            class="mt-2 text-xs text-center px-2"
+                            style="color: #9a5f4c;"
+                        >
+                            Al crear una cuenta, aceptas nuestros{" "}
+                            <a 
+                                class="hover:underline"
+                                style="color: #ec4913;"
+                                href="#"
+                                onclick="alert('Términos de Servicio')"
+                            >
+                                Términos de Servicio
+                            </a>{" "}
+                            y{" "}
+                            <a 
+                                class="hover:underline"
+                                style="color: #ec4913;"
+                                href="#"
+                                onclick="alert('Política de Privacidad')"
+                            >
+                                Política de Privacidad
+                            </a>
+                            .
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button
+                            class="mt-4 w-full h-12 rounded-xl text-white font-bold text-base shadow-lg active:scale-[0.98] transition-all hover:bg-opacity-90"
+                            style="background-color: #ec4913; box-shadow: 0 10px 25px rgba(236, 73, 19, 0.3);"
+                            type="submit"
+                        >
+                            <span id="registerText">Crear Cuenta</span>
+                            <div id="registerSpinner" class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto hidden"></div>
+                        </button>
+                    </form>
+
+                    <!-- Login Link -->
+                    <div class="mt-8 text-center">
+                        <p 
+                            class="text-sm"
+                            style="color: #9a5f4c;"
+                        >
+                            ¿Ya tienes una cuenta?{" "}
+                            <a 
+                                class="font-bold hover:underline ml-1"
+                                style="color: #ec4913;"
+                                href="#"
+                                onclick="alert('Ir a login')"
+                            >
+                                Inicia sesión
+                            </a>
+                        </p>
+                    </div>
+                    <div class="h-10"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function togglePassword(inputId, iconId) {
+            const passwordInput = document.getElementById(inputId);
+            const eyeIcon = document.getElementById(iconId);
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeIcon.textContent = '🙈';
+            } else {
+                passwordInput.type = 'password';
+                eyeIcon.textContent = '👁';
+            }
+        }
+
+        function showMessage(text, isError = false) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = `mb-4 p-4 rounded-xl text-center ${isError ? 'bg-red-50 border border-red-200 text-red-700' : 'bg-green-50 border border-green-200 text-green-700'}`;
+            messageDiv.classList.remove('hidden');
+            
+            setTimeout(() => {
+                messageDiv.classList.add('hidden');
+            }, 5000);
+        }
+
+        function validateAge(birthDate) {
+            const today = new Date();
+            const birth = new Date(birthDate);
+            let age = today.getFullYear() - birth.getFullYear();
+            const monthDiff = today.getMonth() - birth.getMonth();
+            
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+                age--;
+            }
+            
+            return age >= 18;
+        }
+
+        function handleRegister(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const birthDate = document.getElementById('birthDate').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            // Validaciones
+            if (!name || !email || !birthDate || !password || !confirmPassword) {
+                showMessage('Por favor completa todos los campos obligatorios.', true);
+                return;
+            }
+            
+            if (name.length < 2) {
+                showMessage('El nombre debe tener al menos 2 caracteres.', true);
+                return;
+            }
+            
+            if (password.length < 6) {
+                showMessage('La contraseña debe tener al menos 6 caracteres.', true);
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                showMessage('Las contraseñas no coinciden.', true);
+                return;
+            }
+            
+            if (!validateAge(birthDate)) {
+                showMessage('Debes ser mayor de 18 años para registrarte.', true);
+                return;
+            }
+            
+            // Simular loading
+            const registerText = document.getElementById('registerText');
+            const registerSpinner = document.getElementById('registerSpinner');
+            
+            registerText.classList.add('hidden');
+            registerSpinner.classList.remove('hidden');
+            
+            setTimeout(() => {
+                registerText.classList.remove('hidden');
+                registerSpinner.classList.add('hidden');
+                showMessage(`¡Cuenta creada exitosamente para ${name}!`, false);
+            }, 2000);
+        }
+
+        // Efectos de focus para los inputs
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.style.borderColor = '#ec4913';
+                this.style.boxShadow = '0 0 0 2px rgba(236, 73, 19, 0.2)';
+            });
+            
+            input.addEventListener('blur', function() {
+                this.style.borderColor = '#e7d5cf';
+                this.style.boxShadow = 'none';
+            });
+        });
+    </script>
+</body>
+</html>

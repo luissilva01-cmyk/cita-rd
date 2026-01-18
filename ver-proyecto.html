@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CitaRD - Ver Proyecto</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: #f8f6f6;
+            color: #1b110d;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #ec4913;
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #9a5f4c;
+            font-size: 1.1rem;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .pages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .page-preview {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .page-preview:hover {
+            transform: translateY(-5px);
+        }
+        
+        .page-title {
+            background: #ec4913;
+            color: white;
+            padding: 15px 20px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+        
+        .page-iframe {
+            width: 100%;
+            height: 500px;
+            border: none;
+            display: block;
+        }
+        
+        .page-links {
+            padding: 15px 20px;
+            background: #f8f9fa;
+            text-align: center;
+        }
+        
+        .page-link {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #ec4913;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            margin: 0 5px;
+            transition: background 0.3s ease;
+        }
+        
+        .page-link:hover {
+            background: #d63e0f;
+        }
+        
+        .full-app {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .full-app-title {
+            background: linear-gradient(135deg, #ec4913 0%, #d63e0f 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-weight: 800;
+            font-size: 1.5rem;
+        }
+        
+        .full-app-iframe {
+            width: 100%;
+            height: 600px;
+            border: none;
+        }
+        
+        .app-links {
+            padding: 20px;
+            background: #f8f9fa;
+            text-align: center;
+        }
+        
+        .app-link {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #ec4913;
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 700;
+            margin: 0 10px 10px 0;
+            transition: all 0.3s ease;
+        }
+        
+        .app-link:hover {
+            background: #d63e0f;
+            transform: translateY(-2px);
+        }
+        
+        @media (max-width: 768px) {
+            .pages-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-iframe {
+                height: 400px;
+            }
+            
+            .full-app-iframe {
+                height: 500px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔥 CitaRD</h1>
+        <p>Aplicación de Citas - Diseño Moderno</p>
+    </div>
+
+    <div class="container">
+        <!-- Aplicación Principal -->
+        <div class="full-app">
+            <div class="full-app-title">
+                🏠 Aplicación Principal
+            </div>
+            <iframe src="http://localhost:3000/" class="full-app-iframe"></iframe>
+            <div class="app-links">
+                <a href="http://localhost:3000/" class="app-link" target="_blank">
+                    Abrir en Nueva Pestaña
+                </a>
+            </div>
+        </div>
+
+        <!-- Páginas de Autenticación -->
+        <div class="pages-grid">
+            <div class="page-preview">
+                <div class="page-title">🔐 Página de Login</div>
+                <iframe src="http://localhost:3000/login" class="page-iframe"></iframe>
+                <div class="page-links">
+                    <a href="http://localhost:3000/login" class="page-link" target="_blank">
+                        Abrir Login
+                    </a>
+                </div>
+            </div>
+
+            <div class="page-preview">
+                <div class="page-title">📝 Página de Register</div>
+                <iframe src="http://localhost:3000/register" class="page-iframe"></iframe>
+                <div class="page-links">
+                    <a href="http://localhost:3000/register" class="page-link" target="_blank">
+                        Abrir Register
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Auto-refresh iframes every 30 seconds to show latest changes
+        setInterval(() => {
+            const iframes = document.querySelectorAll('iframe');
+            iframes.forEach(iframe => {
+                const currentSrc = iframe.src;
+                iframe.src = '';
+                setTimeout(() => {
+                    iframe.src = currentSrc + (currentSrc.includes('?') ? '&' : '?') + 't=' + Date.now();
+                }, 100);
+            });
+        }, 30000);
+
+        console.log('🔥 CitaRD - Ver Proyecto');
+        console.log('📱 Aplicación: http://localhost:3000/');
+        console.log('🔐 Login: http://localhost:3000/login');
+        console.log('📝 Register: http://localhost:3000/register');
+    </script>
+</body>
+</html>

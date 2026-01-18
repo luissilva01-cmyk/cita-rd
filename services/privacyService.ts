@@ -242,23 +242,54 @@ class PrivacyService {
     console.log('💬 Viewer ID:', viewerId);
     console.log('💬 Story Owner ID:', storyOwnerId);
     
-    // Primero verificar si puede ver las stories
-    const canView = await this.canViewStories(viewerId, storyOwnerId);
-    console.log('👁️ Puede ver stories:', canView);
-    
-    if (!canView) {
-      console.log('❌ No puede ver las stories, por lo tanto no puede responder');
+    try {
+      // Validar parámetros de entrada
+      if (!viewerId) {
+        console.error('❌ viewerId es null, undefined o vacío:', viewerId);
+        return false;
+      }
+      
+      if (!storyOwnerId) {
+        console.error('❌ storyOwnerId es null, undefined o vacío:', storyOwnerId);
+        return false;
+      }
+      
+      // Primero verificar si puede ver las stories
+      console.log('👁️ Verificando permisos de visualización...');
+      const canView = await this.canViewStories(viewerId, storyOwnerId);
+      console.log('👁️ Puede ver stories:', canView);
+      
+      if (!canView) {
+        console.log('❌ No puede ver las stories, por lo tanto no puede responder');
+        return false;
+      }
+
+      // Obtener configuración del dueño
+      console.log('⚙️ Obteniendo configuración del dueño...');
+      const ownerSettings = await this.getPrivacySettings(storyOwnerId);
+      console.log('⚙️ Configuración del dueño:', ownerSettings);
+      
+      if (!ownerSettings) {
+        console.error('❌ No se pudo obtener configuración de privacidad para:', storyOwnerId);
+        return false;
+      }
+      
+      console.log('💬 Respuestas permitidas:', ownerSettings.allowStoryReplies);
+      console.log('💬 === RESULTADO FINAL ===', ownerSettings.allowStoryReplies);
+      
+      return ownerSettings.allowStoryReplies;
+      
+    } catch (error) {
+      console.error('🚨 === ERROR en canReplyToStories ===');
+      console.error('❌ Error:', error);
+      console.error('❌ Error message:', (error as Error).message);
+      console.error('❌ Error stack:', (error as Error).stack);
+      console.error('❌ Parámetros:', { viewerId, storyOwnerId });
+      console.error('🚨 === FIN ERROR ===');
+      
+      // En caso de error, denegar por seguridad
       return false;
     }
-
-    // Obtener configuración del dueño
-    const ownerSettings = await this.getPrivacySettings(storyOwnerId);
-    console.log('⚙️ Configuración del dueño:', ownerSettings);
-    
-    console.log('💬 Respuestas permitidas:', ownerSettings.allowStoryReplies);
-    console.log('💬 === RESULTADO FINAL ===', ownerSettings.allowStoryReplies);
-    
-    return ownerSettings.allowStoryReplies;
   }
 
   // Crear un match entre dos usuarios (para testing)

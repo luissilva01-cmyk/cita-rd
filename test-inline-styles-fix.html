@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test: Estilos Inline - Ta' Pa' Ti</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .card-container {
+            width: 100%;
+            max-width: 400px;
+            height: 600px;
+            margin: 0 auto;
+        }
+
+        @media (min-width: 1024px) {
+            .card-container {
+                max-width: 500px;
+                height: 700px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-4">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold text-center mb-8 text-gray-800">
+            🔧 Test: Estilos Inline Aplicados
+        </h1>
+        
+        <div class="bg-white rounded-lg p-6 mb-6 shadow-lg">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700">Cambio Implementado</h2>
+            <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                <h3 class="font-semibold text-green-800 mb-2">✅ Solución: Estilos Inline</h3>
+                <div class="text-green-700 text-sm space-y-2">
+                    <p><strong>Problema:</strong> Las clases CSS personalizadas no se aplicaban correctamente</p>
+                    <p><strong>Solución:</strong> Aplicar estilos directamente en el componente</p>
+                    <div class="bg-green-100 p-3 rounded mt-3 font-mono text-xs">
+                        <div>style={{</div>
+                        <div>&nbsp;&nbsp;objectFit: 'cover',</div>
+                        <div>&nbsp;&nbsp;objectPosition: 'center 20%'</div>
+                        <div>}}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Antes: Imagen cortada -->
+            <div class="bg-white rounded-lg p-6 shadow-lg">
+                <h3 class="text-lg font-semibold mb-4 text-red-600">❌ Antes: Imagen Cortada</h3>
+                <div class="card-container bg-white rounded-3xl shadow-xl overflow-hidden">
+                    <div class="relative h-full">
+                        <img 
+                            src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=95&w=1200&h=1600" 
+                            alt="Marcos - Antes" 
+                            class="w-full h-full pointer-events-none"
+                            style="object-fit: cover; object-position: center;"
+                        >
+                        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/70"></div>
+                        <div class="absolute bottom-0 left-0 right-0 p-6 text-white">
+                            <h2 class="text-2xl font-bold mb-2">Marcos, 27</h2>
+                            <p class="text-sm opacity-90">Posición: center (cortado)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Después: Mejor posicionamiento -->
+            <div class="bg-white rounded-lg p-6 shadow-lg">
+                <h3 class="text-lg font-semibold mb-4 text-green-600">✅ Después: Mejor Posicionamiento</h3>
+                <div class="card-container bg-white rounded-3xl shadow-xl overflow-hidden">
+                    <div class="relative h-full">
+                        <img 
+                            src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=95&w=1200&h=1600" 
+                            alt="Marcos - Después" 
+                            class="w-full h-full pointer-events-none"
+                            style="object-fit: cover; object-position: center 20%;"
+                        >
+                        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/70"></div>
+                        <div class="absolute bottom-0 left-0 right-0 p-6 text-white">
+                            <h2 class="text-2xl font-bold mb-2">Marcos, 27</h2>
+                            <p class="text-sm opacity-90">Posición: center 20% (mejorado)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+            <h3 class="font-semibold text-blue-800 mb-3">🎯 Cambio Aplicado</h3>
+            <div class="text-sm text-blue-700">
+                <p class="mb-2"><strong>Método:</strong> Estilos inline en el componente React</p>
+                <p class="mb-2"><strong>Ventaja:</strong> Se aplica inmediatamente sin depender de CSS externo</p>
+                <p><strong>Resultado:</strong> Mejor posicionamiento facial en las imágenes</p>
+            </div>
+        </div>
+
+        <div class="mt-6 text-center">
+            <a 
+                href="http://localhost:3000" 
+                target="_blank"
+                class="inline-block bg-gradient-to-r from-rose-500 to-pink-600 text-white px-6 py-3 rounded-full font-medium hover:shadow-lg transition-all"
+            >
+                🚀 Ver App Completa
+            </a>
+        </div>
+    </div>
+
+    <script>
+        console.log('🔧 Test de Estilos Inline - Ta\' Pa\' Ti');
+        console.log('✅ Cambio aplicado:');
+        console.log('   - objectFit: "cover" (mantiene tamaño)');
+        console.log('   - objectPosition: "center 20%" (mejor posicionamiento facial)');
+        console.log('🎯 Resultado: Las imágenes deberían verse mejor posicionadas');
+    </script>
+</body>
+</html>

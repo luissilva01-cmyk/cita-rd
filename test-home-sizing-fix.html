@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ta' Pa' Ti - Home Tab Sizing Fix Test</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ff8052",
+                        "background-light": "#f8f6f5",
+                        "background-dark": "#23140f",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"],
+                        "body": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem", 
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    
+    <style>
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            overflow-x: hidden;
+            min-height: max(884px, 100dvh);
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Ta' Pa' Ti Custom Styles */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+        }
+        
+        .coral-gold-gradient {
+            background: linear-gradient(135deg, #ff8052 0%, #ffc107 100%);
+        }
+        
+        .pink-red-gradient {
+            background: linear-gradient(135deg, #f43f5e 0%, #fb7185 100%);
+        }
+        
+        .blue-cyan-gradient {
+            background: linear-gradient(135deg, #0ea5e9 0%, #22d3ee 100%);
+        }
+        
+        .soft-shadow {
+            box-shadow: 0 10px 25px -5px rgba(255, 128, 82, 0.1), 0 8px 10px -6px rgba(255, 128, 82, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-background-light text-slate-900">
+    <!-- Layout Container -->
+    <div class="flex flex-col h-screen w-full max-w-md mx-auto bg-white shadow-2xl relative overflow-hidden">
+        <!-- Header -->
+        <header class="px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center bg-white/80 backdrop-blur-md z-10 sticky top-0 border-b border-slate-100 flex-shrink-0">
+            <div class="flex items-center gap-2">
+                <div class="bg-gradient-to-tr p-1.5 rounded-lg" style="background: linear-gradient(to top right, #FF6B6B, #FFD93D)">
+                    <svg class="text-white w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                </div>
+                <h1 class="text-xl sm:text-2xl font-bold bg-clip-text text-transparent" style="background: linear-gradient(to right, #FF6B6B, #FFD93D); -webkit-background-clip: text;">
+                    Ta' Pa' Ti
+                </h1>
+            </div>
+            <button class="p-2 rounded-full text-slate-400 hover:bg-slate-50">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+            </button>
+        </header>
+
+        <!-- Main Content - Home Tab -->
+        <main class="flex-1 overflow-y-auto no-scrollbar">
+            <div class="w-full min-h-full overflow-y-auto bg-gradient-to-br from-slate-50 to-white pb-4">
+                <!-- Header -->
+                <div class="flex items-center justify-between px-4 pt-3 pb-2">
+                    <div class="flex items-center gap-2">
+                        <div class="w-10 h-10 rounded-full border-2 p-0.5 shadow-sm" style="border-color: #ff8052">
+                            <div class="w-full h-full rounded-full bg-cover bg-center" style="background-image: url('https://picsum.photos/seed/carlos/200/200')"></div>
+                        </div>
+                        <div>
+                            <h2 class="text-base font-bold tracking-tight">¡Hola, Carlos! 👋</h2>
+                            <p class="text-xs font-medium opacity-70" style="color: #a15d45">
+                                Viernes, 9 de Enero • Santo Domingo
+                            </p>
+                        </div>
+                    </div>
+                    <button class="w-8 h-8 flex items-center justify-center rounded-full bg-white shadow-sm border border-black/5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5z" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Banner Motivacional -->
+                <div class="px-4 py-1">
+                    <div class="rounded-xl p-3 text-white relative overflow-hidden shadow-lg" style="background: linear-gradient(135deg, #ff8052 0%, #ffc107 100%)">
+                        <div class="relative z-10">
+                            <p class="text-base font-bold leading-tight mb-1">
+                                ¿Listo para encontrar quien ta' pa' ti?
+                            </p>
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="flex h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse"></span>
+                                <p class="text-xs font-medium opacity-90">
+                                    342 personas nuevas hoy
+                                </p>
+                            </div>
+                            <button class="bg-white text-orange-600 px-3 py-1.5 rounded-lg font-bold text-xs transition-transform active:scale-95 shadow-lg">
+                                Ver perfiles
+                            </button>
+                        </div>
+                        <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-white/20 rounded-full blur-3xl"></div>
+                    </div>
+                </div>
+
+                <!-- Acciones Rápidas -->
+                <div class="px-4 py-2">
+                    <div class="grid grid-cols-2 gap-2">
+                        <button class="p-3 rounded-xl text-white flex flex-col justify-between h-20 shadow-lg transition-transform active:scale-95" style="background: linear-gradient(135deg, #f43f5e 0%, #fb7185 100%)">
+                            <div class="w-6 h-6 bg-white/20 rounded-lg flex items-center justify-center">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-sm">Descubrir</h3>
+                                <p class="text-xs opacity-80">Encuentra tu match</p>
+                            </div>
+                        </button>
+
+                        <button class="p-3 rounded-xl text-white flex flex-col justify-between h-20 shadow-lg transition-transform active:scale-95" style="background: linear-gradient(135deg, #0ea5e9 0%, #22d3ee 100%)">
+                            <div class="w-6 h-6 bg-white/20 rounded-lg flex items-center justify-center relative">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4l4 4 4-4h4c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+                                </svg>
+                                <span class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-red-500 border border-white rounded-full"></span>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-sm">Mensajes</h3>
+                                <p class="text-xs opacity-80">3 nuevos hoy</p>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Actividad Reciente -->
+                <div class="px-4 py-2">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-sm font-bold tracking-tight">Actividad Reciente</h3>
+                        <button class="text-xs font-bold" style="color: #ff8052">
+                            Ver todo
+                        </button>
+                    </div>
+
+                    <div class="space-y-2">
+                        <!-- Match Item 1 -->
+                        <div class="flex items-center gap-2 bg-white p-2 rounded-xl border border-black/5 shadow-sm">
+                            <div class="w-10 h-10 rounded-full bg-cover bg-center shrink-0" style="background-image: url('https://picsum.photos/seed/maria/200/200')"></div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-1">
+                                    <span class="font-bold text-xs truncate">Maria, 24</span>
+                                    <svg class="w-3 h-3 text-blue-500 shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                </div>
+                                <div class="flex items-center text-xs text-gray-500 mt-0.5">
+                                    <svg class="w-2.5 h-2.5 mr-0.5 shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                                    </svg>
+                                    <span class="truncate text-xs">2.5 km de ti • Bella Vista</span>
+                                </div>
+                            </div>
+                            <button class="w-7 h-7 rounded-full flex items-center justify-center shrink-0" style="background-color: #ff805210; color: #ff8052">
+                                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <!-- Match Item 2 -->
+                        <div class="flex items-center gap-2 bg-white p-2 rounded-xl border border-black/5 shadow-sm">
+                            <div class="w-10 h-10 rounded-full bg-cover bg-center shrink-0" style="background-image: url('https://picsum.photos/seed/elena/200/200')"></div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-1">
+                                    <span class="font-bold text-xs truncate">Elena, 22</span>
+                                </div>
+                                <div class="flex items-center text-xs text-gray-500 mt-0.5">
+                                    <svg class="w-2.5 h-2.5 mr-0.5 shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                                    </svg>
+                                    <span class="truncate text-xs">5 km de ti • Gazcue</span>
+                                </div>
+                            </div>
+                            <button class="w-7 h-7 rounded-full flex items-center justify-center shrink-0" style="background-color: #ff805210; color: #ff8052">
+                                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progreso del Perfil -->
+                <div class="px-4 pb-2">
+                    <div class="border rounded-xl p-3" style="background-color: #ff805205; border-color: #ff805220">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="font-bold text-xs">Perfil Completado</h3>
+                            <span class="font-bold text-xs" style="color: #ff8052">85%</span>
+                        </div>
+                        <div class="w-full h-1.5 bg-gray-200 rounded-full mb-2 overflow-hidden">
+                            <div class="h-full rounded-full transition-all duration-300" style="background: linear-gradient(90deg, #ff8052, #ffc107); width: 85%;"></div>
+                        </div>
+                        <p class="text-xs text-gray-600 mb-2">
+                            Agrega 2 fotos más para destacar y recibir más matches este fin de semana.
+                        </p>
+                        <button class="w-full border-2 font-bold py-1.5 rounded-lg text-xs transition-colors hover:text-white hover:bg-orange-600" style="border-color: #ff8052; color: #ff8052">
+                            Editar Perfil
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Bottom Nav -->
+        <nav class="flex-shrink-0 bg-white border-t border-slate-100 px-2 sm:px-4 py-2 sm:py-3 flex justify-between items-center z-10">
+            <button class="relative flex flex-col items-center gap-1 transition-all min-w-0 flex-1 text-slate-600" style="color: #FF6B6B">
+                <div class="relative">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                    </svg>
+                </div>
+                <span class="text-[9px] sm:text-[10px] font-medium uppercase tracking-wider truncate w-full text-center">Inicio</span>
+            </button>
+            <button class="relative flex flex-col items-center gap-1 transition-all min-w-0 flex-1 text-slate-400 hover:text-slate-600">
+                <div class="relative">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                </div>
+                <span class="text-[9px] sm:text-[10px] font-medium uppercase tracking-wider truncate w-full text-center">Explorar</span>
+            </button>
+            <button class="relative flex flex-col items-center gap-1 transition-all min-w-0 flex-1 text-slate-400 hover:text-slate-600">
+                <div class="relative">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4l4 4 4-4h4c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+                    </svg>
+                    <div class="absolute -top-2 -right-2">
+                        <div class="bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">3</div>
+                    </div>
+                </div>
+                <span class="text-[9px] sm:text-[10px] font-medium uppercase tracking-wider truncate w-full text-center">Mensajes</span>
+            </button>
+            <button class="relative flex flex-col items-center gap-1 transition-all min-w-0 flex-1 text-slate-400 hover:text-slate-600">
+                <div class="relative">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                    </svg>
+                </div>
+                <span class="text-[9px] sm:text-[10px] font-medium uppercase tracking-wider truncate w-full text-center">Perfil</span>
+            </button>
+        </nav>
+    </div>
+
+    <script>
+        // Test scroll behavior
+        console.log('Home tab sizing test loaded');
+        
+        // Add click handlers for testing
+        document.querySelectorAll('button').forEach(button => {
+            button.addEventListener('click', (e) => {
+                console.log('Button clicked:', e.target.textContent || 'Button');
+            });
+        });
+        
+        // Check if all elements are visible
+        setTimeout(() => {
+            const elements = [
+                'Header profile section',
+                'Motivational banner',
+                'Quick action cards',
+                'Recent activity section',
+                'Profile progress section'
+            ];
+            
+            console.log('✅ All sections should now be visible and properly sized');
+            console.log('📱 Test on different screen sizes to verify responsiveness');
+        }, 1000);
+    </script>
+</body>
+</html>

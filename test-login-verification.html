@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔍 Verificación: Login Code</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .verification-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-frame {
+            width: 100%;
+            height: 600px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        .warning { background: #fff3cd; color: #856404; }
+        .code-block {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            margin: 10px 0;
+            border: 1px solid #dee2e6;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Verificación: ¿Está el botón en el código?</h1>
+    
+    <div class="verification-section">
+        <h2>✅ Confirmación del Código</h2>
+        <div class="success">
+            <strong>SÍ, el botón está implementado en Login.tsx:</strong>
+        </div>
+        
+        <div class="code-block">
+&lt;div className="flex justify-end mt-1"&gt;
+  &lt;button
+    onClick={() => navigate('/forgot-password')}
+    className="text-sm font-semibold transition-colors hover:opacity-80 bg-transparent border-none cursor-pointer p-0"
+    style={{ color: '#ec4913' }}
+    type="button"
+  &gt;
+    ¿Olvidaste tu contraseña?
+  &lt;/button&gt;
+&lt;/div&gt;
+        </div>
+    </div>
+
+    <div class="verification-section">
+        <h2>🧪 Test Visual del Login</h2>
+        <p>Cargando la página de login para verificar visualmente:</p>
+        <iframe src="http://localhost:3001/login" class="test-frame" id="login-frame"></iframe>
+        <div id="frame-status">Cargando...</div>
+    </div>
+
+    <div class="verification-section">
+        <h2>🔍 Posibles Problemas</h2>
+        
+        <div class="warning">
+            <strong>Si no ves el botón en el iframe arriba:</strong>
+            <ol>
+                <li><strong>Cache del navegador:</strong> Presiona Ctrl+F5 para limpiar cache</li>
+                <li><strong>Hot reload no funcionó:</strong> El servidor necesita reinicio</li>
+                <li><strong>Versión incorrecta:</strong> Estás viendo una versión cacheada</li>
+                <li><strong>Error de compilación:</strong> Hay un error que impide la actualización</li>
+            </ol>
+        </div>
+    </div>
+
+    <div class="verification-section">
+        <h2>🛠️ Soluciones Inmediatas</h2>
+        
+        <div class="info">
+            <strong>Pasos para forzar la actualización:</strong>
+            <ol>
+                <li><strong>Limpiar cache del navegador:</strong> Ctrl+F5 o Ctrl+Shift+R</li>
+                <li><strong>Abrir en incógnito:</strong> Para evitar cache completamente</li>
+                <li><strong>Reiniciar servidor:</strong> Parar y volver a ejecutar npm start</li>
+                <li><strong>Hard refresh:</strong> Cerrar y abrir el navegador</li>
+            </ol>
+        </div>
+    </div>
+
+    <div class="verification-section">
+        <h2>📋 Checklist de Verificación</h2>
+        <div id="checklist">
+            <div class="info">
+                <strong>Verifica estos puntos:</strong>
+                <ul>
+                    <li>✅ <strong>Código implementado:</strong> El botón está en Login.tsx</li>
+                    <li>❓ <strong>Servidor actualizado:</strong> ¿El servidor recargó los cambios?</li>
+                    <li>❓ <strong>Cache limpio:</strong> ¿El navegador tiene la versión más reciente?</li>
+                    <li>❓ <strong>Compilación exitosa:</strong> ¿No hay errores de TypeScript?</li>
+                    <li>❓ <strong>Botón visible:</strong> ¿Aparece en la página de login?</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="verification-section">
+        <h2>🚀 Test de Funcionalidad</h2>
+        <div class="warning">
+            <strong>Una vez que veas el botón:</strong>
+            <ol>
+                <li>Busca "¿Olvidaste tu contraseña?" debajo del campo de contraseña</li>
+                <li>Haz clic en el botón</li>
+                <li>Debería navegar a /forgot-password</li>
+                <li>Si no navega, revisa la consola (F12) para errores</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        console.log('🔍 Verificación de Login iniciada');
+        console.log('✅ Confirmado: El botón SÍ está en el código');
+        console.log('📋 Ubicación: Login.tsx línea ~285-295');
+        console.log('🔧 Implementación: button con onClick={() => navigate(\'/forgot-password\')}');
+        
+        // Monitorear iframe
+        const loginFrame = document.getElementById('login-frame');
+        const frameStatus = document.getElementById('frame-status');
+        
+        loginFrame.onload = function() {
+            frameStatus.innerHTML = '<div class="success">✅ Login page cargada - Busca el botón "¿Olvidaste tu contraseña?"</div>';
+            console.log('✅ Login iframe cargado correctamente');
+        };
+        
+        loginFrame.onerror = function() {
+            frameStatus.innerHTML = '<div class="error">❌ Error al cargar login page</div>';
+            console.error('❌ Error en login iframe');
+        };
+        
+        // Timeout para detectar problemas de carga
+        setTimeout(() => {
+            if (frameStatus.innerHTML === 'Cargando...') {
+                frameStatus.innerHTML = '<div class="warning">⚠️ Login page tardando en cargar - Posible problema de servidor</div>';
+            }
+        }, 10000);
+        
+        // Instrucciones adicionales
+        console.log('');
+        console.log('🧪 Si no ves el botón:');
+        console.log('   1. Presiona Ctrl+F5 para limpiar cache');
+        console.log('   2. Abre en modo incógnito');
+        console.log('   3. Reinicia el servidor (npm start)');
+        console.log('   4. Verifica errores en la consola');
+    </script>
+</body>
+</html>

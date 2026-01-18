@@ -4,15 +4,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CitaRD - Conecta con Alma</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Ta' Pa' Ti - Cuando alguien sí te elige</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ff8052",
+                        "background-light": "#f8f6f5",
+                        "background-dark": "#23140f",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"],
+                        "body": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem", 
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    
     <style>
-        body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        html, body { 
+            height: 100%;
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; 
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+        }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
-        /* Animaciones personalizadas para CitaRD */
+        /* Ta' Pa' Ti Custom Styles */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+        }
+        
+        .coral-gold-gradient {
+            background: linear-gradient(135deg, #ff8052 0%, #ffc107 100%);
+        }
+        
+        .pink-red-gradient {
+            background: linear-gradient(135deg, #f43f5e 0%, #fb7185 100%);
+        }
+        
+        .blue-cyan-gradient {
+            background: linear-gradient(135deg, #0ea5e9 0%, #22d3ee 100%);
+        }
+        
+        .soft-shadow {
+            box-shadow: 0 10px 25px -5px rgba(255, 128, 82, 0.1), 0 8px 10px -6px rgba(255, 128, 82, 0.1);
+        }
+        
+        /* Animaciones personalizadas para Ta' Pa' Ti */
         @keyframes pulse-ring {
             0% { transform: scale(.33); }
             80%, 100% { opacity: 0; }
@@ -22,8 +83,8 @@
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-900">
-    <div id="root"></div>
+<body class="min-h-screen bg-background-light text-slate-900">
+    <div id="root" class="min-h-screen"></div>
     <script type="module" src="./index.tsx"></script>
 </body>
 </html>

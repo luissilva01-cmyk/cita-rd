@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CitaRD - Login Sin Cache</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .iframe-container {
+            border: 3px solid #10b981;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(to right, #f97316, #e11d48);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            margin: 10px;
+            transition: transform 0.2s;
+        }
+        .button:hover {
+            transform: scale(1.05);
+        }
+        .alert {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            color: #92400e;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 style="text-align: center; color: #1f2937;">🔍 Verificación Login - Sin Cache</h1>
+        
+        <div class="alert">
+            <strong>⚠️ Instrucciones para ver los cambios:</strong>
+            <ol>
+                <li>Presiona <strong>Ctrl+F5</strong> (Windows) o <strong>Cmd+Shift+R</strong> (Mac) para recargar sin cache</li>
+                <li>O abre el navegador en modo incógnito</li>
+                <li>El fondo de Login debe ser gris claro (bg-slate-50), igual que Register</li>
+            </ol>
+        </div>
+        
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="http://localhost:3000/login" target="_blank" class="button">
+                🔐 Abrir Login (Nueva Pestaña)
+            </a>
+            <a href="http://localhost:3000/register" target="_blank" class="button">
+                📝 Abrir Register (Nueva Pestaña)
+            </a>
+        </div>
+        
+        <h2>📱 Vista Previa de Login (Actualizada)</h2>
+        <div class="iframe-container">
+            <iframe 
+                src="http://localhost:3000/login?v=2024&nocache=true" 
+                width="100%" 
+                height="600"
+                frameborder="0">
+            </iframe>
+        </div>
+        
+        <div style="background: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h3>✅ Lo que deberías ver ahora:</h3>
+            <ul>
+                <li><strong>Fondo:</strong> Gris claro (bg-slate-50) - igual que Register</li>
+                <li><strong>Header:</strong> Logo CitaRD con ícono de corazón ❤️</li>
+                <li><strong>Contenedor:</strong> Blanco con bordes redondeados</li>
+                <li><strong>Footer:</strong> "100% Gratis", "Verificado", "Seguro"</li>
+            </ul>
+        </div>
+        
+        <div style="text-align: center; margin: 30px 0;">
+            <p><strong>Timestamp:</strong> <span id="timestamp"></span></p>
+            <button onclick="location.reload(true)" style="padding: 10px 20px; background: #3b82f6; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                🔄 Recargar Página
+            </button>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('timestamp').textContent = new Date().toLocaleString();
+        
+        // Forzar recarga sin cache cada 30 segundos
+        setTimeout(() => {
+            location.reload(true);
+        }, 30000);
+    </script>
+</body>
+</html>

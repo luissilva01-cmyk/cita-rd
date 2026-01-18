@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CitaRD - Test Stories Message Fix</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .console-log {
+            background: #1f2937;
+            color: #10b981;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        
+        .error-log {
+            background: #7f1d1d;
+            color: #fca5a5;
+        }
+        
+        .success-log {
+            background: #064e3b;
+            color: #6ee7b7;
+        }
+        
+        .test-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin: 0.5rem;
+        }
+        
+        .test-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        
+        .test-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-4">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold text-center mb-6 text-gray-800">
+            🔧 CitaRD - Stories Message Fix Test
+        </h1>
+        
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700">🎯 Objetivo</h2>
+            <p class="text-gray-600 mb-4">
+                Diagnosticar y solucionar el error que aparece al intentar enviar mensajes desde las Stories.
+                El error indica problemas con <code>storiesService.getStoryGroups()</code> o <code>privacyService.canViewStories()</code>.
+            </p>
+            
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+                <h3 class="font-semibold text-red-800 mb-2">❌ Error Reportado:</h3>
+                <ul class="text-red-700 text-sm space-y-1">
+                    <li>• Error en storiesService.getStoryGroups()</li>
+                    <li>• Error en privacyService.canViewStories()</li>
+                    <li>• Problema con IDs de usuario</li>
+                    <li>• Error de red o Firebase</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Test Controls -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700">🧪 Tests de Diagnóstico</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <button onclick="testPrivacyService()" class="test-button">
+                    🔒 Test Privacy Service
+                </button>
+                <button onclick="testStoriesService()" class="test-button">
+                    📱 Test Stories Service
+                </button>
+                <button onclick="testUserIDs()" class="test-button">
+                    👤 Test User IDs
+                </button>
+                <button onclick="testStoryMessage()" class="test-button">
+                    💬 Test Story Message
+                </button>
+                <button onclick="testFullFlow()" class="test-button">
+                    🔄 Test Full Flow
+                </button>
+                <button onclick="clearLogs()" class="test-button" style="background: #dc2626;">
+                    🗑️ Clear Logs
+                </button>
+            </div>
+        </div>
+
+        <!-- Console Output -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700">📋 Console Output</h2>
+            <div id="console-output" class="console-log">
+                🚀 Test environment ready. Click buttons above to run tests.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mock implementations para testing
+        
+        // Mock Privacy Service
+        class MockPrivacyService {
+            constructor() {
+                this.privacySettings = new Map();
+                this.userMatches = [];
+                this.initializeDemoData();
+            }
+            
+            initializeDemoData() {
+                const demoSettings = [
+                    {
+                        userId: 'KU5ZalR92QcPV7RGbLFTjEjTXZm2',
+                        storiesVisibility: 'everyone',
+                        allowStoryReplies: true,
+                        showOnlineStatus: true,
+                        allowProfileViews: 'everyone'
+                    },
+                    {
+                        userId: '1',
+                        storiesVisibility: 'everyone',
+                        allowStoryReplies: true,
+                        showOnlineStatus: true,
+                        allowProfileViews: 'everyone'
+                    },
+                    {
+                        userId: '2',
+                        storiesVisibility: 'everyone',
+                        allowStoryReplies: true,
+                        showOnlineStatus: true,
+                        allowProfileViews: 'everyone'
+                    },
+                    {
+                        userId: '3',
+                        storiesVisibility: 'everyone',
+                        allowStoryReplies: true,
+                        showOnlineStatus: true,
+                        allowProfileViews: 'everyone'
+                    }
+                ];
+                
+                demoSettings.forEach(setting => {
+                    this.privacySettings.set(setting.userId, setting);
+                });
+                
+                this.userMatches = [
+                    {
+                        userId1: 'KU5ZalR92QcPV7RGbLFTjEjTXZm2',
+                        userId2: '1',
+                        matchedAt: new Date(),
+                        isActive: true
+                    },
+                    {
+                        userId1: 'KU5ZalR92QcPV7RGbLFTjEjTXZm2',
+                        userId2: '2',
+                        matchedAt: new Date(),
+                        isActive: true
+                    },
+                    {
+                        userId1: 'KU5ZalR92QcPV7RGbLFTjEjTXZm2',
+                        userId2: '3',
+                        matchedAt: new Date(),
+                        isActive: true
+                    }
+                ];
+            }
+            
+            async getPrivacySettings(userId) {
+                log(`🔒 Getting privacy settings for: ${userId}`);
+                
+                let settings = this.privacySettings.get(userId);
+                
+                if (!settings) {
+                    settings = {
+                        userId,
+                        storiesVisibility: 'everyone',
+                        allowStoryReplies: true,
+                        showOnlineStatus: true,
+                        allowProfileViews: 'everyone'
+                    };
+                    this.privacySettings.set(userId, settings);
+                }
+                
+                log(`✅ Privacy settings: ${JSON.stringify(settings, null, 2)}`);
+                return settings;
+            }
+            
+            async areUsersMatched(userId1, userId2) {
+                const isMatched = this.userMatches.some(match => 
+                    match.isActive && (
+                        (match.userId1 === userId1 && match.userId2 === userId2) ||
+                        (match.userId1 === userId2 && match.userId2 === userId1)
+                    )
+                );
+                
+                log(`🔍 Checking match between ${userId1} and ${userId2}: ${isMatched}`);
+                return isMatched;
+            }
+            
+            async canViewStories(viewerId, storyOwnerId) {
+                log(`👁️ Checking if ${viewerId} can view stories of ${storyOwnerId}`);
+                
+                if (viewerId === storyOwnerId) {
+                    log('✅ User viewing own stories');
+                    return true;
+                }
+                
+                const ownerSettings = await this.getPrivacySettings(storyOwnerId);
+                
+                switch (ownerSettings.storiesVisibility) {
+                    case 'everyone':
+                        log('✅ Stories are public - everyone can view');
+                        return true;
+                        
+                    case 'matches_only':
+                        const areMatched = await this.areUsersMatched(viewerId, storyOwnerId);
+                        log(`🔒 Stories for matches only: ${areMatched}`);
+                        return areMatched;
+                        
+                    case 'close_friends':
+                        const areCloseFriends = await this.areUsersMatched(viewerId, storyOwnerId);
+                        log(`👥 Stories for close friends: ${areCloseFriends}`);
+                        return areCloseFriends;
+                        
+                    default:
+                        log('❌ Unknown privacy setting');
+                        return false;
+                }
+            }
+            
+            async canReplyToStories(viewerId, storyOwnerId) {
+                log(`💬 Checking if ${viewerId} can reply to stories of ${storyOwnerId}`);
+                
+                const canView = await this.canViewStories(viewerId, storyOwnerId);
+                if (!canView) {
+                    log('❌ Cannot view stories, therefore cannot reply');
+                    return false;
+                }
+                
+                const ownerSettings = await this.getPrivacySettings(storyOwnerId);
+                log(`💬 Story replies allowed: ${ownerSettings.allowStoryReplies}`);
+                
+                return ownerSettings.allowStoryReplies;
+            }
+        }
+        
+        // Mock Stories Service
+        class MockStoriesService {
+            constructor() {
+                this.stories = [];
+                this.storyGroups = [];
+                this.initializeDemoData();
+            }
+            
+            initializeDemoData() {
+                const demoStories = [
+                    {
+                        id: 'story1',
+                        userId: '1',
+                        type: 'image',
+                        content: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=400&h=600&fit=crop',
+                        createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
+                        expiresAt: new Date(Date.now() + 22 * 60 * 60 * 1000),
+                        viewedBy: []
+                    },
+                    {
+                        id: 'story2',
+                        userId: '2',
+                        type: 'text',
+                        content: '¡Hermoso día en Santo Domingo! ☀️',
+                        backgroundColor: '#FF6B6B',
+                        textColor: '#FFFFFF',
+                        createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000),
+                        expiresAt: new Date(Date.now() + 23 * 60 * 60 * 1000),
+                        viewedBy: []
+                    },
+                    {
+                        id: 'story3',
+                        userId: '3',
+                        type: 'image',
+                        content: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=600&fit=crop',
+                        createdAt: new Date(Date.now() - 30 * 60 * 1000),
+                        expiresAt: new Date(Date.now() + 23.5 * 60 * 60 * 1000),
+                        viewedBy: []
+                    }
+                ];
+                
+                this.stories = demoStories;
+                
+                this.storyGroups = [
+                    {
+                        id: 'group1',
+                        userId: '1',
+                        user: {
+                            name: 'Carolina',
+                            avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=64&h=64&fit=crop&crop=face'
+                        },
+                        stories: demoStories.filter(s => s.userId === '1'),
+                        hasUnviewed: true,
+                        lastUpdated: new Date(Date.now() - 1 * 60 * 60 * 1000)
+                    },
+                    {
+                        id: 'group2',
+                        userId: '2',
+                        user: {
+                            name: 'Marcos',
+                            avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=64&h=64&fit=crop&crop=face'
+                        },
+                        stories: demoStories.filter(s => s.userId === '2'),
+                        hasUnviewed: false,
+                        lastUpdated: new Date(Date.now() - 3 * 60 * 60 * 1000)
+                    },
+                    {
+                        id: 'group3',
+                        userId: '3',
+                        user: {
+                            name: 'Isabella',
+                            avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=64&h=64&fit=crop&crop=face'
+                        },
+                        stories: demoStories.filter(s => s.userId === '3'),
+                        hasUnviewed: true,
+                        lastUpdated: new Date(Date.now() - 30 * 60 * 1000)
+                    }
+                ];
+            }
+            
+            async getStoryGroups(currentUserId) {
+                log(`📱 Getting story groups for user: ${currentUserId}`);
+                
+                try {
+                    const now = new Date();
+                    const activeStories = this.stories.filter(story => story.expiresAt > now);
+                    log(`📱 Active stories: ${activeStories.length} of ${this.stories.length}`);
+                    
+                    const filteredGroups = [];
+                    
+                    for (const group of this.storyGroups) {
+                        log(`🔍 Checking group: ${group.user.name} (ID: ${group.userId})`);
+                        
+                        try {
+                            const canView = await mockPrivacyService.canViewStories(currentUserId, group.userId);
+                            log(`👁️ Can view stories of ${group.user.name}: ${canView}`);
+                            
+                            if (canView) {
+                                const groupActiveStories = activeStories.filter(story => story.userId === group.userId);
+                                log(`📖 Active stories for ${group.user.name}: ${groupActiveStories.length}`);
+                                
+                                if (groupActiveStories.length > 0) {
+                                    const hasUnviewed = groupActiveStories.some(story => !story.viewedBy.includes(currentUserId));
+                                    
+                                    filteredGroups.push({
+                                        ...group,
+                                        stories: groupActiveStories,
+                                        hasUnviewed
+                                    });
+                                    
+                                    log(`✅ Group added: ${group.user.name} - Unviewed: ${hasUnviewed}`);
+                                }
+                            }
+                        } catch (groupError) {
+                            logError(`❌ Error checking group ${group.user.name}: ${groupError.message}`);
+                        }
+                    }
+                    
+                    log(`✅ Filtered story groups: ${filteredGroups.length} of ${this.storyGroups.length}`);
+                    return filteredGroups;
+                    
+                } catch (error) {
+                    logError(`🚨 ERROR in getStoryGroups: ${error.message}`);
+                    return [];
+                }
+            }
+        }
+        
+        // Initialize mock services
+        const mockPrivacyService = new MockPrivacyService();
+        const mockStoriesService = new MockStoriesService();
+        
+        // Logging functions
+        function log(message) {
+            const output = document.getElementById('console-output');
+            const timestamp = new Date().toLocaleTimeString();
+            output.textContent += `[${timestamp}] ${message}\n`;
+            output.scrollTop = output.scrollHeight;
+        }
+        
+        function logError(message) {
+            const output = document.getElementById('console-output');
+            const timestamp = new Date().toLocaleTimeString();
+            output.innerHTML += `<span style="color: #ef4444;">[${timestamp}] ${message}</span>\n`;
+            output.scrollTop = output.scrollHeight;
+        }
+        
+        function logSuccess(message) {
+            const output = document.getElementById('console-output');
+            const timestamp = new Date().toLocaleTimeString();
+            output.innerHTML += `<span style="color: #10b981;">[${timestamp}] ${message}</span>\n`;
+            output.scrollTop = output.scrollHeight;
+        }
+        
+        function clearLogs() {
+            document.getElementById('console-output').textContent = '🧹 Logs cleared.\n';
+        }
+        
+        // Test functions
+        async function testPrivacyService() {
+            log('🔒 === TESTING PRIVACY SERVICE ===');
+            
+            try {
+                const currentUserId = 'KU5ZalR92QcPV7RGbLFTjEjTXZm2';
+                const targetUserId = '1';
+                
+                // Test 1: Get privacy settings
+                log('Test 1: Getting privacy settings...');
+                const settings = await mockPrivacyService.getPrivacySettings(targetUserId);
+                logSuccess(`✅ Privacy settings retrieved: ${JSON.stringify(settings, null, 2)}`);
+                
+                // Test 2: Check if users are matched
+                log('Test 2: Checking user match...');
+                const areMatched = await mockPrivacyService.areUsersMatched(currentUserId, targetUserId);
+                logSuccess(`✅ Users matched: ${areMatched}`);
+                
+                // Test 3: Check if can view stories
+                log('Test 3: Checking story view permissions...');
+                const canView = await mockPrivacyService.canViewStories(currentUserId, targetUserId);
+                logSuccess(`✅ Can view stories: ${canView}`);
+                
+                // Test 4: Check if can reply to stories
+                log('Test 4: Checking story reply permissions...');
+                const canReply = await mockPrivacyService.canReplyToStories(currentUserId, targetUserId);
+                logSuccess(`✅ Can reply to stories: ${canReply}`);
+                
+                logSuccess('🎉 Privacy Service tests completed successfully!');
+                
+            } catch (error) {
+                logError(`❌ Privacy Service test failed: ${error.message}`);
+                logError(`Stack: ${error.stack}`);
+            }
+        }
+        
+        async function testStoriesService() {
+            log('📱 === TESTING STORIES SERVICE ===');
+            
+            try {
+                const currentUserId = 'KU5ZalR92QcPV7RGbLFTjEjTXZm2';
+                
+                // Test 1: Get story groups
+                log('Test 1: Getting story groups...');
+                const storyGroups = await mockStoriesService.getStoryGroups(currentUserId);
+                logSuccess(`✅ Story groups retrieved: ${storyGroups.length} groups`);
+                
+                storyGroups.forEach((group, index) => {
+                    log(`  Group ${index + 1}: ${group.user.name} (${group.stories.length} stories, unviewed: ${group.hasUnviewed})`);
+                });
+                
+                logSuccess('🎉 Stories Service tests completed successfully!');
+                
+            } catch (error) {
+                logError(`❌ Stories Service test failed: ${error.message}`);
+                logError(`Stack: ${error.stack}`);
+            }
+        }
+        
+        async function testUserIDs() {
+            log('👤 === TESTING USER IDS ===');
+            
+            try {
+                const testUserIds = [
+                    'KU5ZalR92QcPV7RGbLFTjEjTXZm2',
+                    '1',
+                    '2',
+                    '3',
+                    'invalid-user-id',
+                    null,
+                    undefined,
+                    ''
+                ];
+                
+                for (const userId of testUserIds) {
+                    log(`Testing user ID: ${userId}`);
+                    
+                    if (!userId) {
+                        logError(`❌ Invalid user ID: ${userId}`);
+                        continue;
+                    }
+                    
+                    try {
+                        const settings = await mockPrivacyService.getPrivacySettings(userId);
+                        logSuccess(`✅ Valid user ID: ${userId}`);
+                    } catch (error) {
+                        logError(`❌ Error with user ID ${userId}: ${error.message}`);
+                    }
+                }
+                
+                logSuccess('🎉 User ID tests completed!');
+                
+            } catch (error) {
+                logError(`❌ User ID test failed: ${error.message}`);
+            }
+        }
+        
+        async function testStoryMessage() {
+            log('💬 === TESTING STORY MESSAGE FLOW ===');
+            
+            try {
+                const currentUserId = 'KU5ZalR92QcPV7RGbLFTjEjTXZm2';
+                const targetUserId = '1';
+                const message = '❤️';
+                const messageType = 'story_reaction';
+                
+                log(`Simulating story message from ${currentUserId} to ${targetUserId}`);
+                log(`Message: "${message}" (type: ${messageType})`);
+                
+                // Step 1: Check if user can view stories
+                log('Step 1: Checking story view permissions...');
+                const canView = await mockPrivacyService.canViewStories(currentUserId, targetUserId);
+                
+                if (!canView) {
+                    logError('❌ User cannot view stories');
+                    return;
+                }
+                logSuccess('✅ User can view stories');
+                
+                // Step 2: Check if user can reply to stories
+                log('Step 2: Checking story reply permissions...');
+                const canReply = await mockPrivacyService.canReplyToStories(currentUserId, targetUserId);
+                
+                if (!canReply) {
+                    logError('❌ User cannot reply to stories');
+                    return;
+                }
+                logSuccess('✅ User can reply to stories');
+                
+                // Step 3: Simulate message sending
+                log('Step 3: Simulating message send...');
+                
+                // Mock the handleSendStoryMessage function
+                const mockHandleSendStoryMessage = async (userId, message, type) => {
+                    log(`📤 Sending message to user ${userId}`);
+                    log(`📤 Message: "${message}"`);
+                    log(`📤 Type: ${type}`);
+                    
+                    // Simulate finding/creating chat
+                    const chatId = `chat_${currentUserId}_${userId}`;
+                    log(`✅ Chat found/created: ${chatId}`);
+                    
+                    // Simulate sending message
+                    log(`📨 Message sent successfully to chat ${chatId}`);
+                    
+                    return true;
+                };
+                
+                const result = await mockHandleSendStoryMessage(targetUserId, message, messageType);
+                
+                if (result) {
+                    logSuccess('🎉 Story message sent successfully!');
+                } else {
+                    logError('❌ Failed to send story message');
+                }
+                
+            } catch (error) {
+                logError(`❌ Story message test failed: ${error.message}`);
+                logError(`Stack: ${error.stack}`);
+            }
+        }
+        
+        async function testFullFlow() {
+            log('🔄 === TESTING FULL FLOW ===');
+            
+            try {
+                log('Running complete story message flow test...');
+                
+                await testPrivacyService();
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                await testStoriesService();
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                await testUserIDs();
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                await testStoryMessage();
+                
+                logSuccess('🎉 ALL TESTS COMPLETED SUCCESSFULLY!');
+                logSuccess('✅ No errors found in the story message flow');
+                logSuccess('💡 The issue might be in the actual implementation or Firebase connection');
+                
+            } catch (error) {
+                logError(`❌ Full flow test failed: ${error.message}`);
+            }
+        }
+        
+        // Auto-run basic test on load
+        window.addEventListener('load', () => {
+            log('🚀 Test environment initialized');
+            log('📋 Available tests:');
+            log('  • Privacy Service Test');
+            log('  • Stories Service Test');
+            log('  • User IDs Test');
+            log('  • Story Message Test');
+            log('  • Full Flow Test');
+            log('');
+            log('💡 Click any button above to run tests');
+        });
+    </script>
+</body>
+</html>

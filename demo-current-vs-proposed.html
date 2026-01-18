@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ta' Pa' Ti - Actual vs Propuesto</title>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        .demo-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: #f3f4f6;
+        }
+        
+        .demo-header {
+            background: linear-gradient(135deg, #FF6B6B 0%, #FFD93D 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .demo-content {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+        
+        .demo-section {
+            flex: 1;
+            position: relative;
+            border-right: 3px solid #e5e7eb;
+        }
+        
+        .demo-section:last-child {
+            border-right: none;
+        }
+        
+        .section-label {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: bold;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Layout Actual (sin límites) */
+        .current-layout {
+            height: 100%;
+            display: flex;
+            background: linear-gradient(135deg, #FF6B6B 0%, #FFD93D 100%);
+        }
+        
+        .current-sidebar {
+            width: 320px;
+            background: white;
+            height: 100%;
+            flex-shrink: 0;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .current-main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 32px;
+        }
+        
+        .current-content {
+            width: 100%;
+            height: 80%;
+            background: white;
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        /* Layout Propuesto (con límites) */
+        .proposed-layout {
+            height: 100%;
+            display: flex;
+            background: linear-gradient(135deg, #FF6B6B 0%, #FFD93D 100%);
+        }
+        
+        .proposed-sidebar {
+            width: 320px;
+            background: white;
+            height: 100%;
+            flex-shrink: 0;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .proposed-main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 32px;
+        }
+        
+        .proposed-content {
+            width: 100%;
+            max-width: 672px; /* max-w-2xl */
+            height: 80%;
+            background: white;
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        /* Sidebar común */
+        .sidebar-header {
+            padding: 24px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .sidebar-nav {
+            flex: 1;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .nav-item {
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .nav-item.active {
+            background: #fff7ed;
+            color: #ea580c;
+            font-weight: 600;
+        }
+        
+        .nav-item:not(.active) {
+            color: #6b7280;
+        }
+        
+        /* Profile Card Simulada */
+        .profile-card-demo {
+            width: 100%;
+            max-width: 400px;
+            aspect-ratio: 4/5;
+            background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+            border-radius: 20px;
+            border: 3px dashed #94a3b8;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .profile-image-demo {
+            width: 100%;
+            height: 60%;
+            background: linear-gradient(135deg, #fecaca, #fed7d7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+        
+        .profile-info-demo {
+            padding: 0 20px;
+            text-align: center;
+        }
+        
+        .action-buttons-demo {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .action-btn {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            transition: transform 0.2s;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .pass-btn { background: #fee2e2; color: #dc2626; }
+        .like-btn { background: linear-gradient(135deg, #f97316, #eab308); color: white; }
+        .super-btn { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; }
+        
+        /* Indicadores de medidas */
+        .measurement {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-family: monospace;
+            z-index: 50;
+        }
+        
+        .width-indicator {
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .sidebar-indicator {
+            top: 50%;
+            left: 160px;
+            transform: translate(-50%, -50%);
+        }
+        
+        /* Análisis UX */
+        .ux-analysis {
+            position: absolute;
+            top: 80px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 12px;
+            max-width: 250px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-left: 4px solid #f97316;
+        }
+        
+        .ux-good { color: #059669; }
+        .ux-bad { color: #dc2626; }
+        .ux-neutral { color: #6b7280; }
+        
+        /* Responsive info */
+        .screen-info {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #1f2937;
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div class="screen-info">
+        <div>Pantalla: <span id="screenWidth"></span>px</div>
+        <div>Contenido actual: <span id="currentContentWidth"></span>px</div>
+        <div>Contenido propuesto: <span id="proposedContentWidth"></span>px</div>
+    </div>
+    
+    <div class="demo-container">
+        <div class="demo-header">
+            <h1 style="margin: 0; font-size: 28px; font-weight: bold;">Ta' Pa' Ti - Comparación de Layouts Desktop</h1>
+            <p style="margin: 8px 0 0 0; opacity: 0.9; font-size: 16px;">Análisis UX: Layout Actual vs Layout Propuesto</p>
+        </div>
+        
+        <div class="demo-content">
+            <!-- Layout Actual -->
+            <div class="demo-section">
+                <div class="section-label">📐 ACTUAL: Sin Límites (w-full h-full)</div>
+                
+                <div class="current-layout">
+                    <div class="current-sidebar">
+                        <div class="sidebar-header">
+                            <h2 style="margin: 0; color: #f97316; font-size: 22px; font-weight: bold;">Ta' Pa' Ti</h2>
+                            <p style="margin: 4px 0 0 0; font-size: 12px; color: #6b7280;">cuando alguien sí te elige</p>
+                        </div>
+                        <div class="sidebar-nav">
+                            <div class="nav-item active">🔍 Explorar</div>
+                            <div class="nav-item">👥 Matches</div>
+                            <div class="nav-item">💬 Mensajes</div>
+                            <div class="nav-item">👤 Mi Perfil</div>
+                        </div>
+                        <div class="measurement sidebar-indicator">320px</div>
+                    </div>
+                    
+                    <div class="current-main">
+                        <div class="current-content">
+                            <div class="profile-card-demo">
+                                <div class="profile-image-demo">👤</div>
+                                <div class="profile-info-demo">
+                                    <h3 style="margin: 0; font-size: 18px; font-weight: bold;">Carolina, 24</h3>
+                                    <p style="margin: 4px 0; font-size: 14px; color: #6b7280;">📍 Santo Domingo • 👩‍💼 Arquitecta</p>
+                                </div>
+                            </div>
+                            
+                            <div class="action-buttons-demo">
+                                <button class="action-btn pass-btn">❌</button>
+                                <button class="action-btn like-btn">❤️</button>
+                                <button class="action-btn super-btn">⭐</button>
+                            </div>
+                            
+                            <div class="measurement width-indicator" id="currentWidth">
+                                Ancho: Calculando...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="ux-analysis">
+                    <h4 style="margin: 0 0 12px 0; color: #f97316; font-weight: bold;">Análisis UX Actual:</h4>
+                    <div class="ux-bad">❌ Muy ancho en pantallas grandes</div>
+                    <div class="ux-bad">❌ Contenido "perdido" visualmente</div>
+                    <div class="ux-bad">❌ Difícil seguimiento visual</div>
+                    <div class="ux-good">✅ Usa todo el espacio disponible</div>
+                    <div class="ux-neutral">⚪ Sensación moderna</div>
+                </div>
+            </div>
+            
+            <!-- Layout Propuesto -->
+            <div class="demo-section">
+                <div class="section-label">✅ PROPUESTO: Con Límites (max-w-2xl)</div>
+                
+                <div class="proposed-layout">
+                    <div class="proposed-sidebar">
+                        <div class="sidebar-header">
+                            <h2 style="margin: 0; color: #f97316; font-size: 22px; font-weight: bold;">Ta' Pa' Ti</h2>
+                            <p style="margin: 4px 0 0 0; font-size: 12px; color: #6b7280;">cuando alguien sí te elige</p>
+                        </div>
+                        <div class="sidebar-nav">
+                            <div class="nav-item active">🔍 Explorar</div>
+                            <div class="nav-item">👥 Matches</div>
+                            <div class="nav-item">💬 Mensajes</div>
+                            <div class="nav-item">👤 Mi Perfil</div>
+                        </div>
+                        <div class="measurement sidebar-indicator">320px</div>
+                    </div>
+                    
+                    <div class="proposed-main">
+                        <div class="proposed-content">
+                            <div class="profile-card-demo">
+                                <div class="profile-image-demo">👤</div>
+                                <div class="profile-info-demo">
+                                    <h3 style="margin: 0; font-size: 18px; font-weight: bold;">Carolina, 24</h3>
+                                    <p style="margin: 4px 0; font-size: 14px; color: #6b7280;">📍 Santo Domingo • 👩‍💼 Arquitecta</p>
+                                </div>
+                            </div>
+                            
+                            <div class="action-buttons-demo">
+                                <button class="action-btn pass-btn">❌</button>
+                                <button class="action-btn like-btn">❤️</button>
+                                <button class="action-btn super-btn">⭐</button>
+                            </div>
+                            
+                            <div class="measurement width-indicator">
+                                Ancho: 672px máximo
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="ux-analysis">
+                    <h4 style="margin: 0 0 12px 0; color: #059669; font-weight: bold;">Análisis UX Propuesto:</h4>
+                    <div class="ux-good">✅ Contenido bien proporcionado</div>
+                    <div class="ux-good">✅ Fácil seguimiento visual</div>
+                    <div class="ux-good">✅ Funciona en cualquier pantalla</div>
+                    <div class="ux-good">✅ Foco claro en el contenido</div>
+                    <div class="ux-neutral">⚪ Espacios laterales en pantallas grandes</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function updateMeasurements() {
+            const screenWidth = window.innerWidth;
+            const currentContentWidth = Math.max(0, (screenWidth / 2) - 320 - 64); // Mitad de pantalla - sidebar - padding
+            const proposedContentWidth = Math.min(672, currentContentWidth); // max-w-2xl = 672px
+            
+            document.getElementById('screenWidth').textContent = screenWidth;
+            document.getElementById('currentContentWidth').textContent = Math.round(currentContentWidth);
+            document.getElementById('proposedContentWidth').textContent = Math.round(proposedContentWidth);
+            
+            // Actualizar indicador del layout actual
+            document.getElementById('currentWidth').textContent = `Ancho: ${Math.round(currentContentWidth)}px`;
+            
+            // Cambiar colores según el ancho
+            const currentWidthEl = document.getElementById('currentWidth');
+            if (currentContentWidth > 800) {
+                currentWidthEl.style.background = 'rgba(220, 38, 38, 0.9)'; // Rojo - muy ancho
+                currentWidthEl.textContent += ' ⚠️ MUY ANCHO';
+            } else if (currentContentWidth > 600) {
+                currentWidthEl.style.background = 'rgba(217, 119, 6, 0.9)'; // Naranja - algo ancho
+                currentWidthEl.textContent += ' ⚠️ ANCHO';
+            } else {
+                currentWidthEl.style.background = 'rgba(0, 0, 0, 0.8)'; // Negro - normal
+            }
+        }
+        
+        updateMeasurements();
+        window.addEventListener('resize', updateMeasurements);
+        
+        // Animaciones de botones
+        document.querySelectorAll('.action-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.style.transform = 'scale(0.9)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 150);
+            });
+        });
+        
+        console.log('🎯 Comparación Ta\' Pa\' Ti:');
+        console.log('- Izquierda: Layout actual (sin límites)');
+        console.log('- Derecha: Layout propuesto (max-w-2xl = 672px)');
+        console.log('- Redimensiona para ver diferencias en UX');
+    </script>
+</body>
+</html>

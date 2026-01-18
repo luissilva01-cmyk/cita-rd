@@ -21,8 +21,6 @@ export class VoiceRecorder {
   // Iniciar grabación
   async startRecording(): Promise<void> {
     try {
-      console.log('🎤 Iniciando grabación de voz...');
-      
       // Solicitar permisos de micrófono
       this.stream = await navigator.mediaDevices.getUserMedia({ 
         audio: {
@@ -48,44 +46,29 @@ export class VoiceRecorder {
       };
 
       this.mediaRecorder.onstop = () => {
-        console.log('🎤 📋 MediaRecorder.onstop evento disparado');
         const duration = Math.floor((Date.now() - this.startTime) / 1000);
         const audioBlob = new Blob(this.audioChunks, { type: 'audio/webm' });
         
-        console.log('🎤 ✅ Grabación completada:');
-        console.log('🎤   - Duración:', duration, 'segundos');
-        console.log('🎤   - Chunks:', this.audioChunks.length);
-        console.log('🎤   - Blob size:', audioBlob.size, 'bytes');
-        console.log('🎤   - Blob type:', audioBlob.type);
-        
         // Ejecutar callback
-        console.log('🎤 📞 Ejecutando callback onDataAvailable...');
         this.onDataAvailable?.(duration, audioBlob);
-        console.log('🎤 ✅ Callback ejecutado');
         
         // Limpiar stream
         if (this.stream) {
-          console.log('🎤 🧹 Limpiando stream...');
           this.stream.getTracks().forEach(track => {
             track.stop();
-            console.log('🎤   - Track detenido:', track.kind);
           });
           this.stream = null;
-          console.log('🎤 ✅ Stream limpiado');
         }
       };
 
       this.mediaRecorder.onerror = (event) => {
-        console.error('❌ Error en grabación:', event);
         this.onError?.(new Error('Error durante la grabación'));
       };
 
       // Iniciar grabación
       this.mediaRecorder.start();
-      console.log('🎤 Grabación iniciada');
 
     } catch (error) {
-      console.error('❌ Error iniciando grabación:', error);
       this.onError?.(error as Error);
       throw error;
     }
@@ -94,21 +77,13 @@ export class VoiceRecorder {
   // Detener grabación
   stopRecording(): void {
     if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
-      console.log('🎤 🛑 VoiceRecorder.stopRecording() - MediaRecorder encontrado');
-      console.log('🎤 Estado actual:', this.mediaRecorder.state);
       this.mediaRecorder.stop();
-      console.log('🎤 ✅ MediaRecorder.stop() llamado');
-    } else {
-      console.error('❌ MediaRecorder no disponible o no está grabando');
-      console.log('🎤 MediaRecorder:', this.mediaRecorder);
-      console.log('🎤 Estado:', this.mediaRecorder?.state);
     }
   }
 
   // Cancelar grabación
   cancelRecording(): void {
     if (this.mediaRecorder) {
-      console.log('🎤 Cancelando grabación...');
       this.mediaRecorder.stop();
       this.audioChunks = [];
     }
@@ -140,20 +115,13 @@ export const uploadVoiceMessage = async (
   senderId: string
 ): Promise<string> => {
   try {
-    console.log('☁️ Subiendo mensaje de voz...');
-    console.log('☁️ Blob size:', audioBlob.size, 'bytes');
-    console.log('☁️ Chat ID:', chatId);
-    console.log('☁️ Sender ID:', senderId);
-    
     // TEMPORAL: Crear URL local para desarrollo
     // En producción, usar Firebase Storage real
     const localUrl = URL.createObjectURL(audioBlob);
-    console.log('☁️ ✅ URL local creada:', localUrl);
     
     // Simular delay de subida
     await new Promise(resolve => setTimeout(resolve, 500));
     
-    console.log('☁️ ✅ Mensaje de voz "subido" (modo desarrollo)');
     return localUrl;
     
     /* CÓDIGO ORIGINAL PARA PRODUCCIÓN:
@@ -166,12 +134,11 @@ export const uploadVoiceMessage = async (
     // Obtener URL de descarga
     const downloadURL = await getDownloadURL(snapshot.ref);
     
-    console.log('✅ Mensaje de voz subido:', downloadURL);
     return downloadURL;
     */
     
   } catch (error) {
-    console.error('❌ Error subiendo mensaje de voz:', error);
+    console.error('Error subiendo mensaje de voz:', error);
     throw error;
   }
 };
@@ -207,17 +174,14 @@ export class VoicePlayer {
       
       // Eventos del audio
       this.audio.onplay = () => {
-        console.log('🔊 Reproduciendo mensaje de voz');
         this.onPlay?.();
       };
 
       this.audio.onpause = () => {
-        console.log('⏸️ Mensaje de voz pausado');
         this.onPause?.();
       };
 
       this.audio.onended = () => {
-        console.log('✅ Mensaje de voz terminado');
         this.onEnded?.();
       };
 
@@ -230,7 +194,7 @@ export class VoicePlayer {
       await this.audio.play();
       
     } catch (error) {
-      console.error('❌ Error reproduciendo mensaje de voz:', error);
+      console.error('Error reproduciendo mensaje de voz:', error);
       throw error;
     }
   }

@@ -242,11 +242,8 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
           <div className="flex items-center justify-center gap-2 mb-6">
             <Shield className="text-blue-500" size={20} />
             <span className="font-semibold text-blue-600">
-              {userVerification.verificationLevel === 'premium' ? 'Verificación Premium' : t('verified')}
+              {t('verified')}
             </span>
-            {userVerification.verificationLevel === 'premium' && (
-              <Star className="text-yellow-500" size={16} />
-            )}
           </div>
           
           <button
@@ -261,57 +258,57 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
   }
 
   return (
-    <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl w-full max-w-md max-h-[90vh] overflow-hidden">
+    <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-2 sm:p-4">
+      <div className="bg-white rounded-2xl w-full max-w-md max-h-[95vh] sm:max-h-[90vh] overflow-hidden">
         
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <div className="flex items-center gap-3">
-            <Shield className="text-blue-500" size={24} />
-            <h2 className="text-xl font-bold text-gray-900">{t('identityVerification')}</h2>
+        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Shield className="text-blue-500" size={20} />
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900">{t('identityVerification')}</h2>
           </div>
           <button
             onClick={handleClose}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
           >
-            <X size={20} />
+            <X size={18} />
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           
           {/* Intro Step */}
           {currentStep === 'intro' && (
             <div className="text-center">
-              <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Shield className="text-blue-500" size={40} />
+              <div className="w-16 sm:w-20 h-16 sm:h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
+                <Shield className="text-blue-500" size={32} />
               </div>
               
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">
+              <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">
                 {t('verifyIdentity')}
               </h3>
               
-              <p className="text-gray-600 mb-6">
+              <p className="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base">
                 {t('takeASelfie')}
               </p>
               
-              <div className="space-y-4 mb-6">
-                <div className="flex items-center gap-3 text-left">
-                  <CheckCircle className="text-green-500" size={20} />
-                  <span className="text-sm text-gray-700">{t('increasesVisibility')}</span>
+              <div className="space-y-3 sm:space-y-4 mb-4 sm:mb-6">
+                <div className="flex items-center gap-2 sm:gap-3 text-left">
+                  <CheckCircle className="text-green-500" size={18} />
+                  <span className="text-xs sm:text-sm text-gray-700">{t('increasesVisibility')}</span>
                 </div>
-                <div className="flex items-center gap-3 text-left">
-                  <CheckCircle className="text-green-500" size={20} />
-                  <span className="text-sm text-gray-700">{t('verificationBadge')}</span>
+                <div className="flex items-center gap-2 sm:gap-3 text-left">
+                  <CheckCircle className="text-green-500" size={18} />
+                  <span className="text-xs sm:text-sm text-gray-700">{t('verificationBadge')}</span>
                 </div>
-                <div className="flex items-center gap-3 text-left">
-                  <CheckCircle className="text-green-500" size={20} />
-                  <span className="text-sm text-gray-700">{t('greaterTrust')}</span>
+                <div className="flex items-center gap-2 sm:gap-3 text-left">
+                  <CheckCircle className="text-green-500" size={18} />
+                  <span className="text-xs sm:text-sm text-gray-700">{t('greaterTrust')}</span>
                 </div>
-                <div className="flex items-center gap-3 text-left">
-                  <CheckCircle className="text-green-500" size={20} />
-                  <span className="text-sm text-gray-700">{t('quickAndSecure')}</span>
+                <div className="flex items-center gap-2 sm:gap-3 text-left">
+                  <CheckCircle className="text-green-500" size={18} />
+                  <span className="text-xs sm:text-sm text-gray-700">{t('quickAndSecure')}</span>
                 </div>
               </div>
               
@@ -357,13 +354,13 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
                 </ul>
               </div>
               
-              {/* BOTÓN HORIZONTAL MEJORADO - SIN COMPONENTE OCULTO */}
+              {/* BOTÓN HORIZONTAL MEJORADO - RESPONSIVE */}
               <div className="w-full">
                 <button
                   onClick={startCamera}
-                  className="w-full py-4 px-6 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-2xl font-bold text-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center gap-3"
+                  className="w-full py-3 sm:py-4 px-4 sm:px-6 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center gap-2 sm:gap-3 min-h-[48px] sm:min-h-[56px]"
                 >
-                  <Camera size={24} />
+                  <Camera size={20} />
                   <span>{t('activateCamera')}</span>
                   <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
                 </button>
@@ -414,7 +411,7 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
                 </div>
               )}
               
-              <div className="relative mb-6">
+              <div className="relative mb-4 sm:mb-6">
                 {/* Componente de cámara confiable - SE INICIA AUTOMÁTICAMENTE */}
                 <ReliableCamera
                   ref={cameraRef}
@@ -430,7 +427,7 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
                     setCameraError(error);
                     console.error('🎯 Error desde ReliableCamera:', error);
                   }}
-                  className="w-full h-64 object-cover rounded-xl bg-gray-900"
+                  className="w-full h-48 sm:h-64 object-cover rounded-xl bg-gray-900"
                   autoStart={true}
                 />
                 
@@ -438,9 +435,9 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
                 {!isVideoReady && !cameraError && (
                   <div className="absolute inset-0 bg-gray-900 bg-opacity-90 rounded-xl flex items-center justify-center">
                     <div className="text-center text-white">
-                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-3"></div>
-                      <p className="text-lg font-semibold">Iniciando cámara...</p>
-                      <p className="text-sm mt-2 opacity-75">Configurando video...</p>
+                      <div className="animate-spin rounded-full h-8 sm:h-12 w-8 sm:w-12 border-b-2 border-white mx-auto mb-2 sm:mb-3"></div>
+                      <p className="text-base sm:text-lg font-semibold">Iniciando cámara...</p>
+                      <p className="text-xs sm:text-sm mt-1 sm:mt-2 opacity-75">Configurando video...</p>
                     </div>
                   </div>
                 )}
@@ -448,18 +445,18 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
                 {/* Guía visual simple */}
                 {isVideoReady && !cameraError && (
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div className="w-40 h-52 border-4 border-white rounded-full opacity-60 shadow-2xl"></div>
+                    <div className="w-32 sm:w-40 h-40 sm:h-52 border-4 border-white rounded-full opacity-60 shadow-2xl"></div>
                   </div>
                 )}
                 
                 {/* Indicador de estado mejorado */}
-                <div className="absolute top-3 left-3">
-                  <div className={`flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold shadow-lg ${
+                <div className="absolute top-2 sm:top-3 left-2 sm:left-3">
+                  <div className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 sm:py-2 rounded-full text-xs sm:text-sm font-bold shadow-lg ${
                     isVideoReady ? 'bg-green-500 text-white' : 
                     cameraError ? 'bg-red-500 text-white' : 
                     'bg-yellow-500 text-black'
                   }`}>
-                    <div className={`w-3 h-3 rounded-full ${
+                    <div className={`w-2 sm:w-3 h-2 sm:h-3 rounded-full ${
                       isVideoReady ? 'bg-white animate-pulse' : 
                       cameraError ? 'bg-white' : 
                       'bg-white animate-bounce'
@@ -472,7 +469,7 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
                 
                 {/* Información técnica para debug */}
                 {cameraStream && (
-                  <div className="absolute bottom-3 right-3 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
+                  <div className="absolute bottom-2 sm:bottom-3 right-2 sm:right-3 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
                     Stream: {cameraStream.active ? 'Activo' : 'Inactivo'}
                   </div>
                 )}
@@ -487,7 +484,7 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
                 }
               </p>
               
-              <div className="flex gap-3">
+              <div className="flex gap-2 sm:gap-3">
                 <button
                   onClick={() => {
                     console.log('❌ Cancelando captura, deteniendo cámara...');
@@ -507,14 +504,14 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
                     setCameraError(null);
                     setCurrentStep('camera');
                   }}
-                  className="flex-1 py-3 px-4 border border-gray-300 rounded-xl text-gray-700 font-semibold hover:bg-gray-50 transition-colors"
+                  className="flex-1 py-2.5 sm:py-3 px-3 sm:px-4 border border-gray-300 rounded-xl text-gray-700 font-semibold hover:bg-gray-50 transition-colors min-h-[44px] text-sm sm:text-base"
                 >
                   {t('cancel')}
                 </button>
                 <button
                   onClick={capturePhoto}
                   disabled={!isVideoReady || !!cameraError}
-                  className="flex-1 py-3 px-4 bg-blue-500 text-white rounded-xl font-semibold hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="flex-1 py-2.5 sm:py-3 px-3 sm:px-4 bg-blue-500 text-white rounded-xl font-semibold hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors min-h-[44px] text-sm sm:text-base"
                 >
                   {isVideoReady ? t('capture') : t('loading')}
                 </button>

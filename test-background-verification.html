@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CitaRD - Verificación de Fondo: Login vs Register</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+        }
+        
+        .bg-slate-50-demo {
+            background-color: #f8fafc;
+        }
+        
+        .iframe-container {
+            border: 3px solid #10b981;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(to right, #ea580c, #e11d48);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold gradient-text mb-4">
+                🔍 Verificación de Fondo - Login vs Register
+            </h1>
+            <p class="text-xl text-gray-700">
+                Ambas páginas deben tener exactamente el mismo fondo <code class="bg-gray-200 px-2 py-1 rounded">bg-slate-50</code>
+            </p>
+        </div>
+        
+        <!-- Muestra del color de fondo esperado -->
+        <div class="max-w-4xl mx-auto mb-8">
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-center mb-4">Color de Fondo Esperado</h2>
+                <div class="bg-slate-50-demo h-32 rounded-lg border-2 border-gray-300 flex items-center justify-center">
+                    <div class="text-center">
+                        <div class="text-lg font-semibold text-gray-700">bg-slate-50</div>
+                        <div class="text-sm text-gray-500">#f8fafc</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Comparación lado a lado -->
+        <div class="grid md:grid-cols-2 gap-8 max-w-7xl mx-auto">
+            <!-- Login -->
+            <div class="bg-white rounded-xl shadow-xl p-6">
+                <h2 class="text-2xl font-bold text-center mb-4 text-blue-600">
+                    🔐 Página de Login
+                </h2>
+                <div class="iframe-container">
+                    <iframe 
+                        src="http://localhost:3000/login" 
+                        width="100%" 
+                        height="600"
+                        frameborder="0"
+                        title="Login Page">
+                    </iframe>
+                </div>
+                <div class="mt-4 text-center">
+                    <a href="http://localhost:3000/login" target="_blank" 
+                       class="inline-flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                        Abrir en nueva pestaña
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-1M14 6h6m0 0v6m0-6L10 16"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Register -->
+            <div class="bg-white rounded-xl shadow-xl p-6">
+                <h2 class="text-2xl font-bold text-center mb-4 text-green-600">
+                    📝 Página de Register
+                </h2>
+                <div class="iframe-container">
+                    <iframe 
+                        src="http://localhost:3000/register" 
+                        width="100%" 
+                        height="600"
+                        frameborder="0"
+                        title="Register Page">
+                    </iframe>
+                </div>
+                <div class="mt-4 text-center">
+                    <a href="http://localhost:3000/register" target="_blank" 
+                       class="inline-flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
+                        Abrir en nueva pestaña
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-1M14 6h6m0 0v6m0-6L10 16"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Checklist de verificación -->
+        <div class="max-w-4xl mx-auto mt-12 bg-white rounded-xl shadow-xl p-8">
+            <h2 class="text-3xl font-bold text-center mb-8 gradient-text">
+                ✅ Lista de Verificación
+            </h2>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <div>
+                    <h3 class="text-xl font-semibold mb-4 text-gray-800">🎨 Elementos Visuales</h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-center gap-3">
+                            <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                                <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <span>Fondo <code>bg-slate-50</code> idéntico</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                                <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <span>Header con logo CitaRD + Heart ❤️</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                                <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <span>Contenedor blanco redondeado</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                                <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <span>Footer con características idénticas</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-xl font-semibold mb-4 text-gray-800">🔧 Detalles Técnicos</h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-center gap-3">
+                            <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                                <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <span>Inputs con <code>bg-slate-50</code></span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                                <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <span>Focus naranja en inputs</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                                <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <span>Gradiente naranja-rosa en botones</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                                <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <span>Animaciones Framer Motion</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Instrucciones -->
+        <div class="max-w-4xl mx-auto mt-8 bg-blue-50 border border-blue-200 rounded-xl p-6">
+            <h3 class="text-xl font-semibold text-blue-800 mb-4">📋 Instrucciones de Verificación</h3>
+            <ol class="list-decimal list-inside space-y-2 text-blue-700">
+                <li>Observa ambas páginas en los iframes de arriba</li>
+                <li>Verifica que ambas tengan el mismo fondo gris claro (slate-50)</li>
+                <li>Compara que los headers sean idénticos (logo + ícono corazón)</li>
+                <li>Confirma que los footers tengan el mismo texto</li>
+                <li>Abre ambas páginas en pestañas separadas para comparar directamente</li>
+            </ol>
+        </div>
+        
+        <!-- Resultado -->
+        <div class="max-w-4xl mx-auto mt-8 bg-green-50 border border-green-200 rounded-xl p-8 text-center">
+            <div class="text-6xl mb-4">✅</div>
+            <h2 class="text-3xl font-bold text-green-800 mb-4">¡Verificación Completada!</h2>
+            <p class="text-xl text-green-700">
+                Si ambas páginas se ven idénticas, el problema del fondo ha sido resuelto.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

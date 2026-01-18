@@ -23,7 +23,7 @@ export interface UserVerification {
   userId: string;
   isVerified: boolean;
   verifiedAt?: Date;
-  verificationLevel: 'none' | 'basic' | 'premium';
+  verificationLevel: 'none' | 'basic';
   attempts: number;
   lastAttemptAt?: Date;
   badge: {
@@ -84,12 +84,12 @@ class VerificationService {
         userId: 'user3',
         isVerified: true,
         verifiedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
-        verificationLevel: 'premium',
+        verificationLevel: 'basic',
         attempts: 1,
         lastAttemptAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
         badge: {
-          type: 'premium_verified',
-          color: '#F59E0B',
+          type: 'verified',
+          color: '#3B82F6',
           icon: 'shield_check'
         }
       }
@@ -227,19 +227,13 @@ class VerificationService {
     verification.isVerified = true;
     verification.verifiedAt = new Date();
     verification.verificationLevel = 'basic';
-    
-    // Usuarios premium obtienen badge especial
-    if (Math.random() > 0.7) { // 30% obtienen verificación premium
-      verification.verificationLevel = 'premium';
-      verification.badge = {
-        type: 'premium_verified',
-        color: '#F59E0B',
-        icon: 'shield_check'
-      };
-    }
+    verification.badge = {
+      type: 'verified',
+      color: '#3B82F6',
+      icon: 'shield_check'
+    };
     
     this.verifications.set(userId, verification);
-    console.log('✅ Usuario verificado:', userId);
   }
 
   // Obtener intento de verificación

@@ -400,42 +400,42 @@ const ChatView: React.FC<ChatViewProps> = ({
 
   return (
     <div className="flex flex-col h-full bg-white animate-in slide-in-from-right duration-300">
-      {/* Header */}
-      <div className="bg-white/90 backdrop-blur-md border-b border-slate-100 px-4 py-3 flex items-center justify-between sticky top-0 z-20">
-        <div className="flex items-center gap-3">
+      {/* Header - Responsive */}
+      <div className="bg-white/90 backdrop-blur-md border-b border-slate-100 px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between sticky top-0 z-20 safe-area-top">
+        <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
           <button 
             onClick={onBack} 
-            className="p-2 -ml-2 hover:bg-slate-100 rounded-full text-slate-600 transition-colors"
+            className="p-2 -ml-1 sm:-ml-2 hover:bg-slate-100 rounded-full text-slate-600 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
           >
-            <ChevronLeft size={24} />
+            <ChevronLeft size={20} className="sm:w-6 sm:h-6" />
           </button>
           <img 
             src={match.user.images[0]} 
             alt={match.user.name}
-            className="w-10 h-10 rounded-full object-cover shadow-sm" 
+            className="w-8 h-8 sm:w-10 sm:h-10 rounded-full profile-image-smart shadow-sm flex-shrink-0" 
           />
-          <div>
-            <h3 className="font-bold text-sm">{match.user.name}</h3>
-            <p className="text-[10px] text-emerald-500 font-bold uppercase">Online</p>
+          <div className="min-w-0 flex-1">
+            <h3 className="font-bold text-sm sm:text-base truncate">{match.user.name}</h3>
+            <p className="text-[9px] sm:text-[10px] text-emerald-500 font-bold uppercase">Online</p>
           </div>
         </div>
-        <div className="flex gap-2 text-slate-400">
+        <div className="flex gap-1 sm:gap-2 text-slate-400 flex-shrink-0">
           {/* Botón de IA Emocional */}
           <button 
             onClick={() => setShowEmotionalInsights(true)}
-            className={`p-2 hover:bg-slate-100 rounded-full transition-colors relative ${
+            className={`p-2 hover:bg-slate-100 rounded-full transition-colors relative min-w-[44px] min-h-[44px] flex items-center justify-center ${
               currentEmotion || conversationInsights ? 'text-purple-500' : ''
             }`}
             title="Análisis Emocional IA"
           >
-            <Brain size={20} />
+            <Brain size={18} className="sm:w-5 sm:h-5" />
             {/* Indicador de actividad */}
             {isAnalyzing && (
-              <div className="absolute -top-1 -right-1 w-3 h-3 bg-purple-500 rounded-full animate-pulse"></div>
+              <div className="absolute -top-1 -right-1 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-purple-500 rounded-full animate-pulse"></div>
             )}
             {/* Indicador de insights disponibles */}
             {(currentEmotion || conversationInsights) && !isAnalyzing && (
-              <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full"></div>
+              <div className="absolute -top-1 -right-1 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-green-500 rounded-full"></div>
             )}
           </button>
           
@@ -444,33 +444,33 @@ const ChatView: React.FC<ChatViewProps> = ({
               console.log('📞 Botón de llamada de voz presionado');
               handleStartCall('voice');
             }}
-            className="p-2 hover:bg-slate-100 rounded-full transition-colors"
+            className="p-2 hover:bg-slate-100 rounded-full transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
           >
-            <Phone size={20} className="cursor-pointer hover:text-slate-600 transition-colors" />
+            <Phone size={18} className="sm:w-5 sm:h-5 cursor-pointer hover:text-slate-600 transition-colors" />
           </button>
           <button 
             onClick={() => {
               console.log('📹 Botón de videollamada presionado');
               handleStartCall('video');
             }}
-            className="p-2 hover:bg-slate-100 rounded-full transition-colors"
+            className="p-2 hover:bg-slate-100 rounded-full transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
           >
-            <Video size={20} className="cursor-pointer hover:text-slate-600 transition-colors" />
+            <Video size={18} className="sm:w-5 sm:h-5 cursor-pointer hover:text-slate-600 transition-colors" />
           </button>
         </div>
       </div>
 
-      {/* Messages */}
+      {/* Messages - Responsive */}
       <div 
         ref={scrollRef} 
-        className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50 no-scrollbar"
+        className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4 bg-slate-50/50 no-scrollbar"
       >
         {messages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-center py-8">
-            <div className="w-16 h-16 bg-gradient-to-br from-rose-400 to-pink-500 rounded-full flex items-center justify-center mb-4">
-              <Send className="text-white" size={24} />
+          <div className="flex flex-col items-center justify-center h-full text-center py-6 sm:py-8 px-4">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-rose-400 to-pink-500 rounded-full flex items-center justify-center mb-3 sm:mb-4">
+              <Send className="text-white" size={20} />
             </div>
-            <h3 className="text-lg font-bold text-slate-800 mb-2">{t('newMatchExclamation')}</h3>
+            <h3 className="text-base sm:text-lg font-bold text-slate-800 mb-2">{t('newMatchExclamation')}</h3>
             <p className="text-slate-600 text-sm mb-4">{t('sendFirstMessage', { name: match.user.name })}</p>
           </div>
         ) : (
@@ -482,7 +482,7 @@ const ChatView: React.FC<ChatViewProps> = ({
               {/* Mensaje de texto */}
               {msg.type === 'text' && (
                 <div 
-                  className={`max-w-[75%] px-4 py-2.5 rounded-2xl text-sm ${
+                  className={`max-w-[85%] sm:max-w-[75%] px-3 sm:px-4 py-2 sm:py-2.5 rounded-2xl text-sm ${
                     msg.senderId === currentUserId 
                       ? 'bg-rose-500 text-white rounded-tr-none shadow-md shadow-rose-100' 
                       : 'bg-white text-slate-800 rounded-tl-none border border-slate-100 shadow-sm'
@@ -495,7 +495,7 @@ const ChatView: React.FC<ChatViewProps> = ({
               {/* Mensaje de emoji */}
               {msg.type === 'emoji' && (
                 <div 
-                  className={`max-w-[75%] px-4 py-2.5 rounded-2xl text-3xl ${
+                  className={`max-w-[85%] sm:max-w-[75%] px-3 sm:px-4 py-2 sm:py-2.5 rounded-2xl text-2xl sm:text-3xl ${
                     msg.senderId === currentUserId 
                       ? 'bg-rose-500 rounded-tr-none shadow-md shadow-rose-100' 
                       : 'bg-white rounded-tl-none border border-slate-100 shadow-sm'
@@ -520,13 +520,13 @@ const ChatView: React.FC<ChatViewProps> = ({
                 console.log('🔍 Mensaje story_reaction:', msg.text, 'Longitud:', msg.text?.length);
                 return (
                   <div 
-                    className={`max-w-[75%] px-4 py-3 rounded-2xl text-sm flex flex-col items-center gap-2 ${
+                    className={`max-w-[85%] sm:max-w-[75%] px-3 sm:px-4 py-2.5 sm:py-3 rounded-2xl text-sm flex flex-col items-center gap-2 ${
                       msg.senderId === currentUserId 
                         ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-tr-none shadow-md shadow-purple-100' 
                         : 'bg-gradient-to-r from-purple-50 to-pink-50 text-purple-800 rounded-tl-none border border-purple-200 shadow-sm'
                     }`}
                   >
-                    <span className="text-3xl">{msg.text}</span>
+                    <span className="text-2xl sm:text-3xl">{msg.text}</span>
                     <span className="text-xs opacity-70">Reaccionó a tu historia</span>
                   </div>
                 );
@@ -535,27 +535,27 @@ const ChatView: React.FC<ChatViewProps> = ({
           ))
         )}
 
-        {/* AI Icebreakers Section */}
-        <div className="pt-4 flex flex-col items-center">
+        {/* AI Icebreakers Section - Responsive */}
+        <div className="pt-3 sm:pt-4 flex flex-col items-center px-2 sm:px-0">
           {!icebreakers.length && !loadingIce && (
             <button 
               onClick={loadIcebreakers}
-              className="flex items-center gap-2 bg-indigo-50 text-indigo-600 px-4 py-2 rounded-full text-xs font-black shadow-sm border border-indigo-100 hover:bg-indigo-100 transition-colors"
+              className="flex items-center gap-2 bg-indigo-50 text-indigo-600 px-3 sm:px-4 py-2 rounded-full text-xs font-black shadow-sm border border-indigo-100 hover:bg-indigo-100 transition-colors min-h-[44px]"
             >
-              <Sparkles size={14} /> Romper el hielo con IA
+              <Sparkles size={12} className="sm:w-3.5 sm:h-3.5" /> Romper el hielo con IA
             </button>
           )}
 
           {loadingIce && (
             <div className="flex items-center gap-2 text-indigo-400">
-              <Loader2 className="animate-spin" size={16} />
+              <Loader2 className="animate-spin" size={14} />
               <span className="text-xs">Generando sugerencias...</span>
             </div>
           )}
 
           {icebreakers.length > 0 && (
             <div className="w-full space-y-2">
-              <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest ml-2">
+              <p className="text-[9px] sm:text-[10px] font-black text-indigo-400 uppercase tracking-widest ml-2">
                 Sugerencias bacanas
               </p>
               <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2">
@@ -563,7 +563,7 @@ const ChatView: React.FC<ChatViewProps> = ({
                   <button 
                     key={i}
                     onClick={() => setInputValue(ice)}
-                    className="shrink-0 bg-white border border-indigo-100 text-[11px] px-4 py-3 rounded-2xl text-slate-700 shadow-sm hover:bg-indigo-50 transition-colors"
+                    className="shrink-0 bg-white border border-indigo-100 text-[10px] sm:text-[11px] px-3 sm:px-4 py-2.5 sm:py-3 rounded-2xl text-slate-700 shadow-sm hover:bg-indigo-50 transition-colors min-h-[44px] flex items-center"
                   >
                     {ice}
                   </button>
@@ -572,11 +572,11 @@ const ChatView: React.FC<ChatViewProps> = ({
             </div>
           )}
 
-          {/* Sugerencias de IA Emocional */}
+          {/* Sugerencias de IA Emocional - Responsive */}
           {smartSuggestions.length > 0 && (
-            <div className="w-full space-y-2 mt-4">
-              <p className="text-[10px] font-black text-purple-400 uppercase tracking-widest ml-2 flex items-center gap-1">
-                <Brain size={10} />
+            <div className="w-full space-y-2 mt-3 sm:mt-4">
+              <p className="text-[9px] sm:text-[10px] font-black text-purple-400 uppercase tracking-widest ml-2 flex items-center gap-1">
+                <Brain size={8} className="sm:w-2.5 sm:h-2.5" />
                 IA Emocional sugiere
               </p>
               <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2">
@@ -584,13 +584,13 @@ const ChatView: React.FC<ChatViewProps> = ({
                   <button 
                     key={suggestion.id}
                     onClick={() => handleSuggestionSelect(suggestion)}
-                    className="shrink-0 bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 text-[11px] px-4 py-3 rounded-2xl text-purple-700 shadow-sm hover:from-purple-100 hover:to-pink-100 transition-all"
+                    className="shrink-0 bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 text-[10px] sm:text-[11px] px-3 sm:px-4 py-2.5 sm:py-3 rounded-2xl text-purple-700 shadow-sm hover:from-purple-100 hover:to-pink-100 transition-all min-h-[44px] flex flex-col items-center justify-center"
                   >
                     <div className="flex items-center gap-1 mb-1">
-                      <span className="text-xs opacity-70">{Math.round(suggestion.confidence * 100)}%</span>
+                      <span className="text-[9px] sm:text-xs opacity-70">{Math.round(suggestion.confidence * 100)}%</span>
                       <div className="flex">
                         {suggestion.emotionalContext.slice(0, 2).map((emotion, i) => (
-                          <span key={i} className="text-xs">
+                          <span key={i} className="text-[10px] sm:text-xs">
                             {emotion === 'joy' ? '😊' : 
                              emotion === 'flirtation' ? '😏' :
                              emotion === 'interest' ? '🤔' :
@@ -609,27 +609,27 @@ const ChatView: React.FC<ChatViewProps> = ({
         </div>
       </div>
 
-      {/* Input */}
-      <div className="p-4 bg-white border-t border-slate-100">
+      {/* Input - Responsive */}
+      <div className="p-3 sm:p-4 bg-white border-t border-slate-100 safe-area-bottom">
         
-        {/* Grabación de voz activa */}
+        {/* Grabación de voz activa - Responsive */}
         {isRecording && (
-          <div className="mb-4 bg-red-50 border border-red-200 rounded-2xl p-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-              <span className="text-red-700 font-medium">Grabando...</span>
+          <div className="mb-3 sm:mb-4 bg-red-50 border border-red-200 rounded-2xl p-3 sm:p-4 flex items-center justify-between">
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+              <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-red-500 rounded-full animate-pulse flex-shrink-0"></div>
+              <span className="text-red-700 font-medium text-sm">Grabando...</span>
               <span className="text-red-600 text-sm">{formatRecordingDuration(recordingDuration)}</span>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-shrink-0">
               <button
                 onClick={handleCancelVoiceRecording}
-                className="px-3 py-1 text-red-600 text-sm hover:bg-red-100 rounded-lg transition-colors"
+                className="px-3 py-1.5 text-red-600 text-sm hover:bg-red-100 rounded-lg transition-colors min-h-[44px] flex items-center"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleStopVoiceRecording}
-                className="px-3 py-1 bg-red-500 text-white text-sm rounded-lg hover:bg-red-600 transition-colors flex items-center gap-1"
+                className="px-3 py-1.5 bg-red-500 text-white text-sm rounded-lg hover:bg-red-600 transition-colors flex items-center gap-1 min-h-[44px]"
               >
                 <StopCircle size={14} />
                 Enviar
@@ -638,27 +638,27 @@ const ChatView: React.FC<ChatViewProps> = ({
           </div>
         )}
 
-        <div className="flex items-center gap-2 bg-slate-100 rounded-full px-4 py-1 focus-within:bg-white focus-within:ring-2 focus-within:ring-rose-500 focus-within:border-rose-500 transition-all">
+        <div className="flex items-center gap-2 bg-slate-100 rounded-full px-3 sm:px-4 py-1 focus-within:bg-white focus-within:ring-2 focus-within:ring-rose-500 focus-within:border-rose-500 transition-all">
           
-          {/* Botón de emoji */}
+          {/* Botón de emoji - Touch optimized */}
           <button
             onClick={() => setShowEmojiPicker(true)}
-            className="text-slate-400 hover:text-slate-600 transition-colors"
+            className="text-slate-400 hover:text-slate-600 transition-colors p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
           >
-            <Smile size={20} />
+            <Smile size={18} className="sm:w-5 sm:h-5" />
           </button>
 
-          {/* Botón de micrófono */}
+          {/* Botón de micrófono - Touch optimized */}
           <button
             onClick={isRecording ? handleStopVoiceRecording : handleStartVoiceRecording}
-            className={`transition-colors ${
+            className={`transition-colors p-2 min-w-[44px] min-h-[44px] flex items-center justify-center ${
               isRecording 
                 ? 'text-red-500 hover:text-red-600' 
                 : 'text-slate-400 hover:text-slate-600'
             }`}
             title={isRecording ? 'Detener grabación' : 'Iniciar grabación de voz'}
           >
-            {isRecording ? <MicOff size={20} /> : <Mic size={20} />}
+            {isRecording ? <MicOff size={18} className="sm:w-5 sm:h-5" /> : <Mic size={18} className="sm:w-5 sm:h-5" />}
           </button>
 
           <input 
@@ -666,20 +666,20 @@ const ChatView: React.FC<ChatViewProps> = ({
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={t('typeSomethingCool')}
-            className="flex-1 bg-transparent border-none focus:ring-0 py-3 text-sm outline-none placeholder-slate-400"
+            className="flex-1 bg-transparent border-none focus:ring-0 py-3 text-sm outline-none placeholder-slate-400 min-h-[44px]"
             disabled={isRecording}
           />
           
           <button 
             onClick={handleSendMessage}
             disabled={!inputValue.trim() || isRecording}
-            className={`p-1 rounded-full transition-all ${
+            className={`p-2 rounded-full transition-all min-w-[44px] min-h-[44px] flex items-center justify-center ${
               inputValue.trim() && !isRecording
                 ? 'text-white bg-rose-500 hover:bg-rose-600 shadow-md' 
                 : 'text-slate-300'
             }`}
           >
-            <Send size={18} />
+            <Send size={16} className="sm:w-4.5 sm:h-4.5" />
           </button>
         </div>
       </div>

@@ -11,6 +11,11 @@ export interface UserProfile {
   distance?: string;
   isVerified?: boolean;
   
+  // Información adicional del perfil
+  education?: string;
+  height?: string;
+  relationshipGoal?: string;
+  
   // Propiedades de análisis de perfil
   visibilityBoost?: number;
   profileScore?: number;
@@ -55,4 +60,4 @@ export interface Call {
   duration?: number;
 }
 
-export type View = 'discovery' | 'messages' | 'ai-coach' | 'profile' | 'chat';
+export type View = 'home' | 'discovery' | 'messages' | 'matches' | 'ai-coach' | 'profile' | 'chat';

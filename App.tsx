@@ -1,129 +1,98 @@
 
 import React, { useState, useEffect } from 'react';
 import Layout from './components/components/Layout';
+import Home from './views/views/Home';
 import Discovery from './views/views/Discovery';
 import Messages from './views/views/Messages';
+import Matches from './views/views/Matches';
 import AICoach from './views/views/AICoach';
 import ProfileView from './views/views/Profile';
 import ChatView from './views/views/ChatView';
 import ErrorBoundary from './components/ErrorBoundary';
+import StoriesViewer from './components/StoriesViewer';
+import CreateStoryModal from './components/CreateStoryModal';
 import { View, UserProfile, Message } from './types';
 import { getUserChats, sendMessage, listenToMessages, findOrCreateChat, Chat } from './services/chatService';
-import { getDiscoveryProfiles, createOrUpdateProfile } from './services/profileService';
+import { getDiscoveryProfiles, createOrUpdateProfile, getUserProfile } from './services/profileService';
 import { privacyService } from './services/privacyService';
 import { LanguageProvider } from './contexts/LanguageContext';
+import { StoryGroup } from './services/storiesService';
+import { auth } from './src/utils/firebase';
 
-// Mock user ID - En producción esto vendría de la autenticación
-const CURRENT_USER_ID = 'KU5ZalR92QcPV7RGbLFTjEjTXZm2'; // Tu ID de usuario real
-
-const INITIAL_POTENTIAL_MATCHES: UserProfile[] = [
-  {
-    id: '1',
-    name: 'Carolina',
-    age: 24,
-    bio: 'Amo el mofongo y bailar bachata en la Zona Colonial. Busco a alguien para ir de aventura a Samaná.',
-    location: 'Santo Domingo',
-    distance: '3km',
-    images: ['https://randomuser.me/api/portraits/women/1.jpg'],
-    interests: ['Bachata', 'Playa', 'Gastronomía'],
-    job: 'Arquitecta',
-    isVerified: true
-  },
-  {
-    id: '2',
-    name: 'Marcos',
-    age: 27,
-    bio: 'Fanático de las Águilas Cibaeñas. Si no estamos viendo pelota, estamos en la playa.',
-    location: 'Santiago',
-    distance: '15km',
-    images: ['https://randomuser.me/api/portraits/men/2.jpg'],
-    interests: ['Béisbol', 'Tecnología', 'Café'],
-    job: 'Desarrollador',
-    isVerified: true
-  },
-  {
-    id: '3',
-    name: 'Isabella',
-    age: 26,
-    bio: 'Doctora apasionada por ayudar a otros. Me encanta la salsa y los atardeceres en el Malecón.',
-    location: 'Santo Domingo',
-    distance: '5km',
-    images: ['https://randomuser.me/api/portraits/women/3.jpg'],
-    interests: ['Medicina', 'Salsa', 'Fotografía'],
-    job: 'Doctora',
-    isVerified: true
-  },
-  {
-    id: '4',
-    name: 'Rafael',
-    age: 29,
-    bio: 'Chef profesional. Si quieres probar el mejor mangú de la ciudad, ya sabes a quién llamar.',
-    location: 'Santiago',
-    distance: '12km',
-    images: ['https://randomuser.me/api/portraits/men/4.jpg'],
-    interests: ['Cocina', 'Música', 'Viajes'],
-    job: 'Chef',
-    isVerified: false
-  },
-  {
-    id: '5',
-    name: 'Sofía',
-    age: 23,
-    bio: 'Estudiante de arte. Me encanta pintar y explorar galerías en la Zona Colonial.',
-    location: 'Santo Domingo',
-    distance: '2km',
-    images: ['https://randomuser.me/api/portraits/women/5.jpg'],
-    interests: ['Arte', 'Pintura', 'Cultura'],
-    job: 'Estudiante',
-    isVerified: false
-  },
-  {
-    id: '6',
-    name: 'Diego',
-    age: 30,
-    bio: 'Ingeniero y surfista. Los fines de semana me encuentras en las playas de Cabarete.',
-    location: 'Puerto Plata',
-    distance: '25km',
-    images: ['https://randomuser.me/api/portraits/men/6.jpg'],
-    interests: ['Surf', 'Ingeniería', 'Aventura'],
-    job: 'Ingeniero',
-    isVerified: true
-  }
-];
+const INITIAL_POTENTIAL_MATCHES: UserProfile[] = [];
 
 const App: React.FC = () => {
-  const [activeView, setActiveView] = useState<View>('discovery');
-  const [currentUser, setCurrentUser] = useState<UserProfile>({
-    id: CURRENT_USER_ID,
-    name: 'Juan Pérez',
-    age: 26,
-    bio: 'Me gusta el merengue y salir con amigos a comer.',
-    location: 'Santo Domingo, RD',
-    images: ['https://picsum.photos/seed/user/200/200'],
-    interests: ['Playa', 'Bailar', 'Cine'],
-    isVerified: false
-  });
+  const [activeView, setActiveView] = useState<View>('home');
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const [potentialMatches, setPotentialMatches] = useState<UserProfile[]>(INITIAL_POTENTIAL_MATCHES);
   const [chats, setChats] = useState<Chat[]>([]);
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
   const [chatMessages, setChatMessages] = useState<Record<string, Message[]>>({});
+  
+  // Estados para Stories
+  const [showStoriesViewer, setShowStoriesViewer] = useState(false);
+  const [selectedStoryGroup, setSelectedStoryGroup] = useState<StoryGroup | null>(null);
+  const [showCreateStoryModal, setShowCreateStoryModal] = useState(false);
+  const [storiesRefreshKey, setStoriesRefreshKey] = useState(0);
+
+  // Cargar perfil del usuario autenticado
+  useEffect(() => {
+    const loadUserProfile = async () => {
+      const user = auth.currentUser;
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const profile = await getUserProfile(user.uid);
+        
+        if (profile) {
+          setCurrentUser(profile);
+        } else {
+          // Crear perfil básico si no existe
+          const basicProfile: UserProfile = {
+            id: user.uid,
+            name: user.displayName || user.email?.split('@')[0] || 'Usuario',
+            age: 18,
+            bio: '',
+            location: '',
+            images: [],
+            interests: [],
+            isVerified: false
+          };
+          setCurrentUser(basicProfile);
+          // Guardar perfil básico en Firebase
+          await createOrUpdateProfile(user.uid, basicProfile);
+        }
+      } catch (error) {
+        console.error('Error cargando perfil:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadUserProfile();
+  }, []);
 
   // Cargar chats del usuario en tiempo real
   useEffect(() => {
-    console.log('🔍 Cargando chats para usuario:', CURRENT_USER_ID);
+    if (!currentUser) return;
     
-    const unsubscribe = getUserChats(CURRENT_USER_ID, (userChats) => {
-      console.log('📱 Chats recibidos:', userChats.length, userChats);
+    const unsubscribe = getUserChats(currentUser.id, (userChats) => {
       setChats(userChats);
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [currentUser]);
 
   // Cargar perfiles para Discovery
   useEffect(() => {
-    const unsubscribe = getDiscoveryProfiles(CURRENT_USER_ID, (profiles) => {
+    if (!currentUser) return;
+
+    const unsubscribe = getDiscoveryProfiles(currentUser.id, (profiles) => {
       if (profiles.length > 0) {
         setPotentialMatches(profiles);
       }
@@ -131,7 +100,7 @@ const App: React.FC = () => {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [currentUser]);
 
   // Escuchar mensajes del chat seleccionado
   useEffect(() => {
@@ -146,50 +115,46 @@ const App: React.FC = () => {
 
   // Crear perfil del usuario actual si no existe
   useEffect(() => {
-    createOrUpdateProfile(CURRENT_USER_ID, currentUser);
+    if (!currentUser) return;
+    
+    createOrUpdateProfile(currentUser.id, currentUser);
     
     // Crear algunos matches de demo para probar el sistema de privacidad
-    initializeDemoMatches();
+    // Comentado para no crear matches automáticamente
+    // initializeDemoMatches();
   }, [currentUser]);
 
   // Inicializar matches de demo
   const initializeDemoMatches = async () => {
+    if (!currentUser) return;
+    
     try {
-      console.log('💕 Inicializando matches de demo...');
-      
       // Crear matches con algunos usuarios
-      await privacyService.createMatch(CURRENT_USER_ID, '1'); // Match con Carolina
-      await privacyService.createMatch(CURRENT_USER_ID, '3'); // Match con Isabella
-      
-      console.log('✅ Matches de demo creados');
+      await privacyService.createMatch(currentUser.id, '1'); // Match con Carolina
+      await privacyService.createMatch(currentUser.id, '3'); // Match con Isabella
     } catch (error) {
       console.error('Error creando matches de demo:', error);
     }
   };
 
   const handleLike = async (user: UserProfile) => {
-    console.log('🔥 Haciendo like a:', user.name);
+    if (!currentUser) return false;
     
     // 100% chance of match for testing purposes
     if (Math.random() > 0.0) {
       try {
-        console.log('✅ ¡Es un match! Creando chat...');
-        
         // Crear o encontrar chat existente
-        const chatId = await findOrCreateChat(CURRENT_USER_ID, user.id);
-        console.log('📱 Chat creado con ID:', chatId);
+        const chatId = await findOrCreateChat(currentUser.id, user.id);
         
         // Enviar mensaje inicial
-        await sendMessage(chatId, CURRENT_USER_ID, '¡Hola! Me gustó tu perfil 😊');
-        console.log('💬 Mensaje inicial enviado');
+        await sendMessage(chatId, currentUser.id, '¡Hola! Me gustó tu perfil 😊');
         
         return true;
       } catch (error) {
-        console.error('❌ Error creating match:', error);
+        console.error('Error creating match:', error);
         return false;
       }
     } else {
-      console.log('💔 No hubo match esta vez');
       return false;
     }
   };
@@ -201,8 +166,10 @@ const App: React.FC = () => {
     content?: string, 
     duration?: number
   ) => {
+    if (!currentUser) return;
+    
     try {
-      await sendMessage(chatId, CURRENT_USER_ID, text, type, content, duration);
+      await sendMessage(chatId, currentUser.id, text, type, content, duration);
     } catch (error) {
       console.error('Error sending message:', error);
     }
@@ -213,81 +180,95 @@ const App: React.FC = () => {
     message: string, 
     type: 'text' | 'story_reaction' = 'text'
   ) => {
-    console.log('🚀 === INICIO handleSendStoryMessage ===');
-    console.log('📱 userId:', userId);
-    console.log('📱 message:', message);
-    console.log('� typee:', type);
-    console.log('📱 CURRENT_USER_ID:', CURRENT_USER_ID);
-    
     try {
-      console.log('� Vaalidando parámetros...');
-      
-      if (!userId) {
-        throw new Error('userId es requerido');
+      if (!userId || !message || !currentUser!.id) {
+        throw new Error('Parámetros inválidos');
       }
-      
-      if (!message) {
-        throw new Error('message es requerido');
-      }
-      
-      if (!CURRENT_USER_ID) {
-        throw new Error('CURRENT_USER_ID no está definido');
-      }
-      
-      console.log('✅ Parámetros válidos');
-      console.log('🔍 Buscando/creando chat...');
       
       // Buscar o crear chat con el usuario
-      const chatId = await findOrCreateChat(CURRENT_USER_ID, userId);
-      console.log('✅ Chat encontrado/creado:', chatId);
-      
-      console.log('📤 Enviando mensaje...');
+      const chatId = await findOrCreateChat(currentUser!.id, userId);
       
       // Enviar mensaje
-      await sendMessage(chatId, CURRENT_USER_ID, message, type);
-      console.log('✅ Mensaje enviado exitosamente');
-      console.log('🏁 === FIN handleSendStoryMessage ===');
+      await sendMessage(chatId, currentUser!.id, message, type);
       
     } catch (error) {
-      console.error('🚨 === ERROR en handleSendStoryMessage ===');
-      console.error('❌ Error:', error);
-      console.error('❌ Error message:', (error as Error).message);
-      console.error('❌ Error stack:', (error as Error).stack);
-      console.error('❌ Parámetros que causaron el error:', { userId, message, type, CURRENT_USER_ID });
-      console.error('🚨 === FIN ERROR ===');
-      
-      // No hacer throw del error para evitar que rompa la aplicación
-      // En su lugar, mostrar un mensaje de error amigable
-      console.log('⚠️ Mensaje no enviado debido a un error. La aplicación continúa funcionando.');
+      console.error('Error enviando mensaje:', error);
     }
   };
 
+  // Funciones para Stories
+  const handleStoryClick = (storyGroup: StoryGroup) => {
+    setSelectedStoryGroup(storyGroup);
+    setShowStoriesViewer(true);
+  };
+
+  const handleCreateStory = () => {
+    setShowCreateStoryModal(true);
+  };
+
+  const handleCloseStoriesViewer = () => {
+    setShowStoriesViewer(false);
+    setSelectedStoryGroup(null);
+  };
+
   const renderView = () => {
+    // En este punto, currentUser ya fue verificado como no-null
+    const user = currentUser!;
+    
     switch (activeView) {
+      case 'home':
+        // Convertir chats reales a UserProfile[] para recentMatches
+        const recentMatchesFromChats = chats.slice(0, 3).map(chat => {
+          const otherUserId = chat.participants.find(p => p !== user.id) || '';
+          // Buscar en potentialMatches o crear perfil básico
+          let matchUser = potentialMatches.find(u => u.id === otherUserId);
+          
+          if (!matchUser) {
+            matchUser = {
+              id: otherUserId,
+              name: 'Usuario',
+              age: 25,
+              bio: '',
+              location: '',
+              images: [],
+              interests: []
+            };
+          }
+          
+          return matchUser;
+        });
+        
+        return (
+          <Home 
+            currentUser={user}
+            recentMatches={recentMatchesFromChats}
+            onNavigateToDiscovery={() => setActiveView('discovery')}
+            onNavigateToMessages={() => setActiveView('messages')}
+            onNavigateToProfile={() => setActiveView('profile')}
+            availableProfilesCount={potentialMatches.length}
+          />
+        );
       case 'discovery':
         return (
           <Discovery 
             users={potentialMatches} 
-            currentUserId={CURRENT_USER_ID}
+            currentUserId={currentUser!.id}
             onLike={handleLike} 
             onSendMessage={handleSendStoryMessage}
             onAction={(id) => {
               // No remover usuarios, solo hacer log
-              console.log('👤 Usuario procesado:', id);
               // setPotentialMatches(p => p.filter(u => u.id !== id)) // REMOVIDO
             }}
             onOpenChat={(userId) => {
               // Buscar el chat existente para este usuario
               const existingChat = chats.find(chat => 
-                chat.participants.includes(userId) && chat.participants.includes(CURRENT_USER_ID)
+                chat.participants.includes(userId) && chat.participants.includes(currentUser!.id)
               );
               
               if (existingChat) {
-                console.log('📱 Abriendo chat existente:', existingChat.id);
                 setSelectedChatId(existingChat.id);
                 setActiveView('chat');
               } else {
-                console.log('❌ No se encontró chat para el usuario:', userId);
                 // Ir a la vista de mensajes como fallback
                 setActiveView('messages');
               }
@@ -299,7 +280,7 @@ const App: React.FC = () => {
           <Messages 
             matches={chats.map(chat => {
               // Encontrar el ID del otro usuario
-              const otherUserId = chat.participants.find(p => p !== CURRENT_USER_ID) || '';
+              const otherUserId = chat.participants.find(p => p !== currentUser!.id) || '';
               
               // Crear un usuario basado en los perfiles mock o usar datos por defecto
               let otherUser = potentialMatches.find(u => u.id === otherUserId);
@@ -335,16 +316,58 @@ const App: React.FC = () => {
             }} 
           />
         );
+      case 'matches':
+        return (
+          <Matches 
+            matches={chats.map(chat => {
+              // Encontrar el ID del otro usuario
+              const otherUserId = chat.participants.find(p => p !== currentUser!.id) || '';
+              
+              // Crear un usuario basado en los perfiles mock o usar datos por defecto
+              let otherUser = potentialMatches.find(u => u.id === otherUserId);
+              
+              if (!otherUser) {
+                // Si no está en los matches, crear un usuario por defecto
+                otherUser = {
+                  id: otherUserId,
+                  name: otherUserId === '1' ? 'Carolina' : otherUserId === '2' ? 'Marcos' : 'Usuario',
+                  age: 25,
+                  bio: '',
+                  location: 'Santo Domingo',
+                  images: [otherUserId === '1' 
+                    ? 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&q=80&w=600'
+                    : otherUserId === '2' 
+                    ? 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=600'
+                    : 'https://picsum.photos/200'
+                  ],
+                  interests: []
+                };
+              }
+              
+              return {
+                id: chat.id,
+                user: otherUser,
+                lastMessage: chat.lastMessage || 'Nuevo match',
+                timestamp: chat.timestamp || Date.now()
+              };
+            })} 
+            onSelectMatch={(match) => { 
+              setSelectedChatId(match.id); 
+              setActiveView('chat'); 
+            }}
+            currentUserId={currentUser!.id}
+          />
+        );
       case 'ai-coach':
-        return <AICoach profile={currentUser} />;
+        return <AICoach profile={user} />;
       case 'profile':
-        return <ProfileView user={currentUser} onUpdate={setCurrentUser} />;
+        return <ProfileView user={user} onUpdate={setCurrentUser} />;
       case 'chat':
         const currentChat = chats.find(c => c.id === selectedChatId);
         if (!currentChat) return null;
         
         // Encontrar el ID del otro usuario
-        const otherUserId = currentChat.participants.find(p => p !== CURRENT_USER_ID) || '';
+        const otherUserId = currentChat.participants.find(p => p !== currentUser!.id) || '';
         
         // Crear un usuario basado en los perfiles mock o usar datos por defecto
         let otherUser = potentialMatches.find(u => u.id === otherUserId);
@@ -379,13 +402,25 @@ const App: React.FC = () => {
               handleSendMessage(currentChat.id, text, type, content, duration)
             } 
             onBack={() => setActiveView('messages')} 
-            currentUserId={CURRENT_USER_ID}
+            currentUserId={currentUser!.id}
           />
         );
       default:
         return null;
     }
   };
+
+  // Mostrar loading mientras se carga el perfil
+  if (loading || !currentUser) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-white text-lg">Cargando tu perfil...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <ErrorBoundary>
@@ -394,13 +429,42 @@ const App: React.FC = () => {
           activeView={activeView === 'chat' ? 'messages' : activeView} 
           onViewChange={setActiveView}
           chats={chats}
-          currentUserId={CURRENT_USER_ID}
+          currentUserId={currentUser!.id}
+          onStoryClick={handleStoryClick}
+          onCreateStory={handleCreateStory}
+          storiesRefreshKey={storiesRefreshKey}
         >
           {renderView()}
         </Layout>
+        
+        {/* Stories Viewer */}
+        <StoriesViewer
+          isOpen={showStoriesViewer}
+          storyGroup={selectedStoryGroup}
+          currentUserId={currentUser!.id}
+          onClose={handleCloseStoriesViewer}
+          onSendMessage={handleSendStoryMessage}
+        />
+        
+        {/* Create Story Modal */}
+        <CreateStoryModal
+          isOpen={showCreateStoryModal}
+          currentUserId={currentUser!.id}
+          onClose={() => setShowCreateStoryModal(false)}
+          onStoryCreated={() => {
+            setShowCreateStoryModal(false);
+            // Forzar recarga de stories incrementando la key
+            setStoriesRefreshKey(prev => prev + 1);
+          }}
+          userProfile={{
+            name: currentUser!.name,
+            avatar: currentUser!.images?.[0] || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=face'
+          }}
+        />
       </LanguageProvider>
     </ErrorBoundary>
   );
 };
 
 export default App;
+

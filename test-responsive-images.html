@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - Responsive Images Fix</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Responsive image handling for profile pictures */
+        .profile-image {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        .profile-image-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 50%;
+            aspect-ratio: 1;
+        }
+
+        /* Smart image cropping for different orientations */
+        .profile-image-smart {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            object-position: center top; /* Focus on face area */
+        }
+
+        /* Background image fallback with better positioning */
+        .bg-image-smart {
+            background-size: cover;
+            background-position: center 25%; /* Better face positioning */
+            background-repeat: no-repeat;
+        }
+
+        /* Desktop specific image improvements */
+        @media (min-width: 1024px) {
+            .profile-image-desktop {
+                object-fit: cover;
+                object-position: center 25%; /* Better face positioning for desktop */
+            }
+            
+            .profile-container-desktop {
+                width: 56px;
+                height: 56px; /* Larger for desktop */
+            }
+            
+            .bg-image-desktop {
+                background-position: center 20%; /* Even better positioning for larger screens */
+            }
+        }
+
+        /* Tablet specific adjustments */
+        @media (min-width: 641px) and (max-width: 1023px) {
+            .profile-container-tablet {
+                width: 48px;
+                height: 48px;
+            }
+            
+            .bg-image-tablet {
+                background-position: center 22%;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 p-4">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-2xl font-bold text-center mb-8 text-gray-800">
+            🖼️ Test de Imágenes Responsivas - Ta' Pa' Ti
+        </h1>
+        
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-lg font-semibold mb-4">Antes vs Después - Imágenes Horizontales</h2>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Antes: bg-cover bg-center (problema) -->
+                <div class="space-y-4">
+                    <h3 class="font-medium text-red-600">❌ Antes (bg-cover bg-center)</h3>
+                    <div class="flex items-center gap-3 bg-gray-50 p-3 rounded-lg">
+                        <div 
+                            class="w-12 h-12 rounded-full bg-cover bg-center shrink-0 border-2 border-gray-300"
+                            style="background-image: url('https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=600&h=400')"
+                        ></div>
+                        <div>
+                            <p class="font-semibold">Imagen Horizontal</p>
+                            <p class="text-sm text-gray-600">Se corta mal en móvil/desktop</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Después: bg-image-smart (solución) -->
+                <div class="space-y-4">
+                    <h3 class="font-medium text-green-600">✅ Después (bg-image-smart)</h3>
+                    <div class="flex items-center gap-3 bg-gray-50 p-3 rounded-lg">
+                        <div class="w-12 h-12 rounded-full shrink-0 border-2 border-green-300 profile-image-container">
+                            <div 
+                                class="w-full h-full rounded-full bg-image-smart md:bg-image-tablet lg:bg-image-desktop"
+                                style="background-image: url('https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=600&h=400')"
+                            ></div>
+                        </div>
+                        <div>
+                            <p class="font-semibold">Imagen Horizontal</p>
+                            <p class="text-sm text-gray-600">Mejor posicionamiento facial</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-lg font-semibold mb-4">Comparación con Diferentes Orientaciones</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Imagen Cuadrada -->
+                <div class="text-center">
+                    <h3 class="font-medium mb-3">Imagen Cuadrada</h3>
+                    <div class="flex justify-center mb-2">
+                        <div class="w-16 h-16 rounded-full profile-image-container border-2 border-blue-300">
+                            <div 
+                                class="w-full h-full rounded-full bg-image-smart md:bg-image-tablet lg:bg-image-desktop"
+                                style="background-image: url('https://images.unsplash.com/photo-1494790108755-2616b612b786?auto=format&fit=crop&q=80&w=400&h=400')"
+                            ></div>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-600">Funciona perfectamente</p>
+                </div>
+                
+                <!-- Imagen Horizontal -->
+                <div class="text-center">
+                    <h3 class="font-medium mb-3">Imagen Horizontal</h3>
+                    <div class="flex justify-center mb-2">
+                        <div class="w-16 h-16 rounded-full profile-image-container border-2 border-orange-300">
+                            <div 
+                                class="w-full h-full rounded-full bg-image-smart md:bg-image-tablet lg:bg-image-desktop"
+                                style="background-image: url('https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=600&h=400')"
+                            ></div>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-600">Mejor enfoque facial</p>
+                </div>
+                
+                <!-- Imagen Vertical -->
+                <div class="text-center">
+                    <h3 class="font-medium mb-3">Imagen Vertical</h3>
+                    <div class="flex justify-center mb-2">
+                        <div class="w-16 h-16 rounded-full profile-image-container border-2 border-purple-300">
+                            <div 
+                                class="w-full h-full rounded-full bg-image-smart md:bg-image-tablet lg:bg-image-desktop"
+                                style="background-image: url('https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400&h=600')"
+                            ></div>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-600">Mantiene proporción</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-lg font-semibold mb-4">Tamaños Responsivos</h2>
+            
+            <div class="space-y-4">
+                <!-- Móvil -->
+                <div class="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
+                    <div class="w-11 h-11 rounded-full profile-image-container border-2 border-blue-400">
+                        <div 
+                            class="w-full h-full rounded-full bg-image-smart"
+                            style="background-image: url('https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&q=80&w=600')"
+                        ></div>
+                    </div>
+                    <div>
+                        <p class="font-semibold">Móvil (44px)</p>
+                        <p class="text-sm text-gray-600">Tamaño base para touch targets</p>
+                    </div>
+                </div>
+                
+                <!-- Tablet -->
+                <div class="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
+                    <div class="w-14 h-14 rounded-full profile-image-container border-2 border-green-400">
+                        <div 
+                            class="w-full h-full rounded-full bg-image-tablet"
+                            style="background-image: url('https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&q=80&w=600')"
+                        ></div>
+                    </div>
+                    <div>
+                        <p class="font-semibold">Tablet (56px)</p>
+                        <p class="text-sm text-gray-600">Tamaño intermedio con mejor posicionamiento</p>
+                    </div>
+                </div>
+                
+                <!-- Desktop -->
+                <div class="flex items-center gap-3 p-3 bg-purple-50 rounded-lg">
+                    <div class="w-16 h-16 rounded-full profile-image-container border-2 border-purple-400">
+                        <div 
+                            class="w-full h-full rounded-full bg-image-desktop"
+                            style="background-image: url('https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&q=80&w=600')"
+                        ></div>
+                    </div>
+                    <div>
+                        <p class="font-semibold">Desktop (64px)</p>
+                        <p class="text-sm text-gray-600">Tamaño grande con posicionamiento optimizado</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-8 text-center">
+            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg">
+                <p class="font-semibold">✅ Problema Resuelto</p>
+                <p class="text-sm mt-1">
+                    Las imágenes horizontales ahora se muestran correctamente en desktop con mejor enfoque facial.
+                    Los tamaños son responsivos y siguen las mejores prácticas de UX.
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

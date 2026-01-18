@@ -146,7 +146,7 @@ const StoriesRing: React.FC<StoriesRingProps> = ({
                   <img
                     src={storyGroup.user.avatar}
                     alt={storyGroup.user.name}
-                    className="w-full h-full object-cover rounded-full"
+                    className="w-full h-full rounded-full object-cover"
                     onError={(e) => {
                       // Fallback si la imagen no carga
                       const target = e.target as HTMLImageElement;

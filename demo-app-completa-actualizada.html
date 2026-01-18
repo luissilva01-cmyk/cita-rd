@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ta' Pa' Ti - App Completa</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Animaciones personalizadas */
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes super-like-flash {
+            0%, 100% { opacity: 0; }
+            10%, 90% { opacity: 1; }
+        }
+
+        @keyframes super-like-bounce {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.3) rotate(-15deg); }
+            50% { transform: scale(1.1) rotate(15deg); }
+            75% { transform: scale(1.2) rotate(-10deg); }
+        }
+
+        @keyframes star-burst {
+            0% { transform: scale(0.5) rotate(0deg); opacity: 1; }
+            100% { transform: scale(2.5) rotate(180deg); opacity: 0; }
+        }
+
+        @keyframes particle-1 {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(-60px, -80px) scale(0); opacity: 0; }
+        }
+
+        @keyframes particle-2 {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(70px, -60px) scale(0); opacity: 0; }
+        }
+
+        @keyframes particle-3 {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(-50px, 70px) scale(0); opacity: 0; }
+        }
+
+        @keyframes particle-4 {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(60px, 80px) scale(0); opacity: 0; }
+        }
+
+        @keyframes super-like-card-pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+            50% { box-shadow: 0 0 40px 10px rgba(59, 130, 246, 0.6); }
+        }
+
+        .animate-slideUp { animation: slideUp 0.3s ease-out; }
+        .animate-super-like-flash { animation: super-like-flash 2s ease-in-out; }
+        .animate-super-like-bounce { animation: super-like-bounce 1s ease-in-out; }
+        .animate-star-burst { animation: star-burst 1.5s ease-out; }
+        .animate-particle-1 { animation: particle-1 1.5s ease-out; }
+        .animate-particle-2 { animation: particle-2 1.5s ease-out 0.1s; }
+        .animate-particle-3 { animation: particle-3 1.5s ease-out 0.2s; }
+        .animate-particle-4 { animation: particle-4 1.5s ease-out 0.3s; }
+        .super-like-pulse { animation: super-like-card-pulse 0.5s ease-in-out; }
+
+        .toast-enter {
+            animation: slideInRight 0.3s ease-out;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
+    
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200 px-4 py-3">
+        <div class="flex items-center justify-between max-w-md mx-auto">
+            <h1 class="text-2xl font-bold bg-gradient-to-r from-orange-500 to-yellow-500 bg-clip-text text-transparent">
+                Ta' Pa' Ti
+            </h1>
+            <div class="text-xs text-gray-500">cuando alguien sí te elige</div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-md mx-auto bg-white min-h-screen">
+        
+        <!-- Stories Section -->
+        <div class="p-4 border-b border-gray-100">
+            <div class="flex gap-4 overflow-x-auto pb-2">
+                <!-- Add Story -->
+                <div class="flex-shrink-0 text-center">
+                    <div class="w-16 h-16 rounded-full bg-gradient-to-br from-orange-400 to-yellow-500 flex items-center justify-center mb-2 cursor-pointer hover:scale-105 transition-transform">
+                        <svg class="text-white" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                    </div>
+                    <span class="text-xs text-gray-600">Tu historia</span>
+                </div>
+                
+                <!-- Stories -->
+                <div class="flex-shrink-0 text-center">
+                    <div class="w-16 h-16 rounded-full bg-gradient-to-br from-pink-400 to-red-500 p-0.5 cursor-pointer hover:scale-105 transition-transform">
+                        <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&q=95&w=200" 
+                             alt="Carolina" class="w-full h-full rounded-full object-cover">
+                    </div>
+                    <span class="text-xs text-gray-600">Carolina</span>
+                </div>
+                
+                <div class="flex-shrink-0 text-center">
+                    <div class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 p-0.5 cursor-pointer hover:scale-105 transition-transform">
+                        <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=95&w=200" 
+                             alt="Marcos" class="w-full h-full rounded-full object-cover">
+                    </div>
+                    <span class="text-xs text-gray-600">Marcos</span>
+                </div>
+                
+                <div class="flex-shrink-0 text-center">
+                    <div class="w-16 h-16 rounded-full bg-gradient-to-br from-green-400 to-teal-500 p-0.5 cursor-pointer hover:scale-105 transition-transform">
+                        <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?auto=format&fit=crop&q=95&w=200" 
+                             alt="Isabella" class="w-full h-full rounded-full object-cover">
+                    </div>
+                    <span class="text-xs text-gray-600">Isabella</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Discovery Cards -->
+        <div class="p-4">
+            <div class="relative">
+                <!-- Card Container -->
+                <div id="cardContainer" class="relative w-full aspect-[4/5] rounded-2xl overflow-hidden shadow-2xl bg-white">
+                    <!-- Profile Image -->
+                    <img 
+                        id="profileImage"
+                        src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&q=95&w=1200&h=1600" 
+                        alt="Profile"
+                        class="w-full h-full object-cover"
+                        style="object-position: center 20%;"
+                    />
+                    
+                    <!-- Gradient Overlay -->
+                    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/70"></div>
+                    
+                    <!-- Profile Info -->
+                    <div class="absolute bottom-0 left-0 right-0 p-6 text-white">
+                        <div class="flex items-center gap-2 mb-2">
+                            <h2 id="profileName" class="text-3xl font-bold">Carolina, 24</h2>
+                            <span class="bg-blue-500 text-white px-2 py-1 rounded-full text-xs">✓</span>
+                            <span class="bg-green-500 text-white px-2 py-1 rounded-full text-xs flex items-center gap-1">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                                </svg>
+                                87%
+                            </span>
+                        </div>
+                        
+                        <div class="flex items-center gap-1 mb-3 text-white/90">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                <circle cx="12" cy="10" r="3"></circle>
+                            </svg>
+                            <span id="profileLocation" class="text-sm">Santo Domingo • 3km</span>
+                        </div>
+                        
+                        <!-- Interests -->
+                        <div class="flex flex-wrap gap-2 mb-3">
+                            <span class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-xs font-medium">Bachata</span>
+                            <span class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-xs font-medium">Playa</span>
+                            <span class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-xs font-medium">Gastronomía</span>
+                        </div>
+                        
+                        <!-- About Me Button -->
+                        <button
+                            id="aboutMeBtn"
+                            class="flex items-center gap-2 text-white/90 hover:text-white transition-colors text-sm font-medium"
+                        >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="16" x2="12" y2="12"></line>
+                                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                            </svg>
+                            <span id="aboutMeText">Sobre mí</span>
+                        </button>
+                    </div>
+
+                    <!-- Super Like Animation Overlay -->
+                    <div id="superLikeOverlay" class="hidden absolute inset-0 z-40 flex items-center justify-center bg-blue-500/20 backdrop-blur-sm animate-super-like-flash pointer-events-none">
+                        <div class="relative">
+                            <!-- Star burst effect -->
+                            <div class="absolute inset-0 animate-star-burst">
+                                <svg class="text-yellow-300 fill-yellow-300 w-32 h-32 drop-shadow-2xl" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                </svg>
+                            </div>
+                            <!-- Main star -->
+                            <svg class="text-blue-400 fill-blue-400 w-32 h-32 drop-shadow-2xl animate-super-like-bounce" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                            </svg>
+                            <!-- Particles -->
+                            <div class="absolute top-0 left-0 w-full h-full">
+                                <div class="absolute top-1/4 left-1/4 w-3 h-3 bg-yellow-300 rounded-full animate-particle-1"></div>
+                                <div class="absolute top-1/3 right-1/4 w-2 h-2 bg-blue-300 rounded-full animate-particle-2"></div>
+                                <div class="absolute bottom-1/4 left-1/3 w-2.5 h-2.5 bg-yellow-400 rounded-full animate-particle-3"></div>
+                                <div class="absolute bottom-1/3 right-1/3 w-2 h-2 bg-blue-400 rounded-full animate-particle-4"></div>
+                            </div>
+                        </div>
+                        <div class="absolute bottom-20 text-center">
+                            <div class="text-white text-3xl font-bold drop-shadow-lg">
+                                ⭐ SUPER LIKE ⭐
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- About Me Expandable Section -->
+                    <div 
+                        id="aboutMeSection"
+                        class="hidden absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/95 via-black/90 to-transparent p-6 pt-32 overflow-y-auto max-h-[70%]"
+                    >
+                        <div class="space-y-4 text-white">
+                            <!-- Header -->
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-xl font-bold">Sobre Carolina</h3>
+                                <button
+                                    id="closeAboutMe"
+                                    class="text-white/70 hover:text-white transition-colors"
+                                >
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                    </svg>
+                                </button>
+                            </div>
+                            
+                            <!-- Bio -->
+                            <div>
+                                <h4 class="text-sm font-semibold text-white/70 mb-2">Biografía</h4>
+                                <p class="text-sm text-white/90">Amo el mofongo y bailar bachata en la Zona Colonial. Busco a alguien para ir de aventura a Samaná. Me encanta explorar nuevos lugares y conocer gente interesante.</p>
+                            </div>
+                            
+                            <!-- Job -->
+                            <div class="flex items-start gap-3">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-white/70 mt-0.5 flex-shrink-0">
+                                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                                </svg>
+                                <div>
+                                    <h4 class="text-sm font-semibold text-white/70">Trabajo</h4>
+                                    <p class="text-sm text-white/90">Arquitecta</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Education -->
+                            <div class="flex items-start gap-3">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-white/70 mt-0.5 flex-shrink-0">
+                                    <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                                    <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+                                </svg>
+                                <div>
+                                    <h4 class="text-sm font-semibold text-white/70">Educación</h4>
+                                    <p class="text-sm text-white/90">Universidad Autónoma de Santo Domingo</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Interests -->
+                            <div>
+                                <h4 class="text-sm font-semibold text-white/70 mb-2 flex items-center gap-2">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M9 18V5l12-2v13"></path>
+                                        <circle cx="6" cy="18" r="3"></circle>
+                                        <circle cx="18" cy="16" r="3"></circle>
+                                    </svg>
+                                    Intereses
+                                </h4>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-full text-xs font-medium">Bachata</span>
+                                    <span class="px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-full text-xs font-medium">Playa</span>
+                                    <span class="px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-full text-xs font-medium">Gastronomía</span>
+                                    <span class="px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-full text-xs font-medium">Viajes</span>
+                                    <span class="px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-full text-xs font-medium">Fotografía</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Additional Info -->
+                            <div class="flex items-center gap-2 text-sm">
+                                <span class="text-white/70">Altura:</span>
+                                <span class="text-white/90">1.65m</span>
+                            </div>
+                            
+                            <div class="flex items-center gap-2 text-sm">
+                                <span class="text-white/70">Buscando:</span>
+                                <span class="text-white/90">Relación seria</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="absolute -bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-6 z-30">
+                    <button
+                        id="passBtn"
+                        class="w-14 h-14 rounded-full bg-white/70 backdrop-blur-md shadow-xl flex items-center justify-center hover:scale-110 transition-transform border border-white/30"
+                    >
+                        <svg class="text-red-500" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                    
+                    <button
+                        id="likeBtn"
+                        class="w-18 h-18 bg-gradient-to-r from-rose-500 to-pink-600 rounded-full shadow-lg shadow-rose-500/40 flex items-center justify-center hover:scale-110 transition-transform p-4"
+                    >
+                        <svg class="text-white fill-current" width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                        </svg>
+                    </button>
+                    
+                    <button
+                        id="superLikeBtn"
+                        class="w-14 h-14 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 backdrop-blur-md shadow-xl shadow-blue-500/50 flex items-center justify-center hover:scale-110 transition-transform border border-blue-300"
+                    >
+                        <svg class="text-white fill-current" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2">
+            <div class="flex justify-around max-w-md mx-auto">
+                <button id="homeTab" class="flex flex-col items-center py-2 px-3 text-gray-400 hover:text-orange-500 transition-colors">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9,22 9,12 15,12 15,22"></polyline>
+                    </svg>
+                    <span class="text-xs mt-1">Inicio</span>
+                </button>
+                
+                <button id="exploreTab" class="flex flex-col items-center py-2 px-3 text-orange-500">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="M21 21l-4.35-4.35"></path>
+                    </svg>
+                    <span class="text-xs mt-1">Explorar</span>
+                </button>
+                
+                <button id="messagesTab" class="flex flex-col items-center py-2 px-3 text-gray-400 hover:text-orange-500 transition-colors">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    <span class="text-xs mt-1">Mensajes</span>
+                </button>
+                
+                <button id="profileTab" class="flex flex-col items-center py-2 px-3 text-gray-400 hover:text-orange-500 transition-colors">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    <span class="text-xs mt-1">Perfil</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Toast Container -->
+        <div id="toastContainer" class="fixed top-4 right-4 z-50 max-w-sm w-full"></div>
+    </main>
+
+    <script>
+        // Usuarios mock
+        const users = [
+            {
+                name: 'Carolina, 24',
+                location: 'Santo Domingo • 3km',
+                image: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&q=95&w=1200&h=1600',
+                interests: ['Bachata', 'Playa', 'Gastronomía'],
+                bio: 'Amo el mofongo y bailar bachata en la Zona Colonial. Busco a alguien para ir de aventura a Samaná.',
+                job: 'Arquitecta',
+                education: 'Universidad Autónoma de Santo Domingo',
+                height: '1.65m',
+                relationshipGoal: 'Relación seria'
+            },
+            {
+                name: 'Marcos, 27',
+                location: 'Santiago • 15km',
+                image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=95&w=1200&h=1600',
+                interests: ['Béisbol', 'Tecnología', 'Café'],
+                bio: 'Emprendedor digital. Fanático de las Águilas Cibaeñas. Si no estamos viendo pelota, estamos en la playa.',
+                job: 'Desarrollador',
+                education: 'PUCMM',
+                height: '1.78m',
+                relationshipGoal: 'Conocer gente nueva'
+            },
+            {
+                name: 'Isabella, 26',
+                location: 'Santo Domingo • 5km',
+                image: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?auto=format&fit=crop&q=95&w=1200&h=1600',
+                interests: ['Medicina', 'Salsa', 'Fotografía'],
+                bio: 'Doctora apasionada por ayudar a otros. Me encanta la salsa y los atardeceres en el Malecón.',
+                job: 'Doctora',
+                education: 'UNPHU - Medicina',
+                height: '1.62m',
+                relationshipGoal: 'Relación seria'
+            }
+        ];
+
+        let currentUserIndex = 0;
+
+        // Elementos DOM
+        const cardContainer = document.getElementById('cardContainer');
+        const profileImage = document.getElementById('profileImage');
+        const profileName = document.getElementById('profileName');
+        const profileLocation = document.getElementById('profileLocation');
+        const aboutMeBtn = document.getElementById('aboutMeBtn');
+        const aboutMeText = document.getElementById('aboutMeText');
+        const aboutMeSection = document.getElementById('aboutMeSection');
+        const closeAboutMe = document.getElementById('closeAboutMe');
+        const superLikeBtn = document.getElementById('superLikeBtn');
+        const superLikeOverlay = document.getElementById('superLikeOverlay');
+        const toastContainer = document.getElementById('toastContainer');
+
+        // Función para mostrar toast
+        function showToast(title, message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = 'toast-enter rounded-lg border p-4 shadow-lg mb-2';
+            
+            const bgColor = type === 'info' ? 'bg-blue-50 border-blue-200' : 
+                           type === 'success' ? 'bg-green-50 border-green-200' : 
+                           'bg-gray-50 border-gray-200';
+            
+            const iconColor = type === 'info' ? 'text-blue-500' : 
+                             type === 'success' ? 'text-green-500' : 
+                             'text-gray-500';
+            
+            toast.className += ` ${bgColor}`;
+            
+            toast.innerHTML = `
+                <div class="flex items-start gap-3">
+                    <svg class="${iconColor} flex-shrink-0" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                    <div class="flex-1 min-w-0">
+                        <h4 class="text-sm font-medium text-gray-900">${title}</h4>
+                        <p class="text-sm text-gray-600 mt-1">${message}</p>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.remove()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+            `;
+            
+            toastContainer.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.transition = 'all 0.3s ease-out';
+                toast.style.transform = 'translateX(100%)';
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // Función para actualizar perfil
+        function updateProfile() {
+            const user = users[currentUserIndex];
+            profileName.textContent = user.name;
+            profileLocation.textContent = user.location;
+            profileImage.src = user.image;
+            
+            // Actualizar intereses
+            const interestsContainer = document.querySelector('.flex.flex-wrap.gap-2.mb-3');
+            interestsContainer.innerHTML = user.interests.slice(0, 3).map(interest => 
+                `<span class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-xs font-medium">${interest}</span>`
+            ).join('');
+        }
+
+        // Función para avanzar al siguiente perfil
+        function nextProfile() {
+            currentUserIndex = (currentUserIndex + 1) % users.length;
+            updateProfile();
+            
+            // Cerrar "Sobre mí" si está abierto
+            if (!aboutMeSection.classList.contains('hidden')) {
+                hideAboutMe();
+            }
+        }
+
+        // Funciones para "Sobre mí"
+        function showAboutMe() {
+            aboutMeSection.classList.remove('hidden');
+            aboutMeSection.classList.add('animate-slideUp');
+            aboutMeText.textContent = 'Ocultar información';
+        }
+
+        function hideAboutMe() {
+            aboutMeSection.classList.add('hidden');
+            aboutMeSection.classList.remove('animate-slideUp');
+            aboutMeText.textContent = 'Sobre mí';
+        }
+
+        // Event listeners
+        aboutMeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (aboutMeSection.classList.contains('hidden')) {
+                showAboutMe();
+            } else {
+                hideAboutMe();
+            }
+        });
+
+        closeAboutMe.addEventListener('click', (e) => {
+            e.stopPropagation();
+            hideAboutMe();
+        });
+
+        // Botones de acción
+        document.getElementById('passBtn').addEventListener('click', () => {
+            showToast('Perfil pasado', `Has pasado el perfil de ${users[currentUserIndex].name.split(',')[0]}`);
+            nextProfile();
+        });
+
+        document.getElementById('likeBtn').addEventListener('click', () => {
+            showToast('Like enviado', `Le has dado like a ${users[currentUserIndex].name.split(',')[0]}`, 'success');
+            nextProfile();
+        });
+
+        superLikeBtn.addEventListener('click', () => {
+            const userName = users[currentUserIndex].name.split(',')[0];
+            
+            // Mostrar animación
+            cardContainer.classList.add('super-like-pulse');
+            setTimeout(() => cardContainer.classList.remove('super-like-pulse'), 500);
+            
+            superLikeOverlay.classList.remove('hidden');
+            
+            // Mostrar toast
+            showToast(
+                '⭐ Super Like enviado!',
+                `Le has enviado un Super Like a ${userName}. Serás priorizado en su lista.`,
+                'info'
+            );
+            
+            // Ocultar overlay y avanzar perfil después de 2 segundos
+            setTimeout(() => {
+                superLikeOverlay.classList.add('hidden');
+                nextProfile();
+            }, 2000);
+        });
+
+        // Navegación de tabs
+        document.querySelectorAll('[id$="Tab"]').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remover clase activa de todos los tabs
+                document.querySelectorAll('[id$="Tab"]').forEach(t => {
+                    t.classList.remove('text-orange-500');
+                    t.classList.add('text-gray-400', 'hover:text-orange-500');
+                });
+                
+                // Activar tab clickeado
+                tab.classList.remove('text-gray-400', 'hover:text-orange-500');
+                tab.classList.add('text-orange-500');
+                
+                // Mostrar contenido correspondiente
+                const tabName = tab.id.replace('Tab', '');
+                console.log(`Navegando a: ${tabName}`);
+            });
+        });
+
+        // Inicializar
+        updateProfile();
+    </script>
+
+</body>
+</html>

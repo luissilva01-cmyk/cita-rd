@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Legal Routes - Ta' Pa' Ti</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f8f6f6;
+    }
+    .test-section {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #1b110d;
+      margin-bottom: 10px;
+    }
+    .info {
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 12px;
+      margin: 15px 0;
+      border-radius: 4px;
+    }
+    .test-link {
+      display: block;
+      padding: 12px 20px;
+      background: #ec4913;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      margin: 10px 0;
+      text-align: center;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+    .test-link:hover {
+      background: #d43d0f;
+    }
+    .direct-link {
+      background: #3b82f6;
+    }
+    .direct-link:hover {
+      background: #2563eb;
+    }
+    code {
+      background: #f1f1f1;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    .status {
+      margin-top: 20px;
+      padding: 15px;
+      background: #e3f2fd;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="test-section">
+    <h1>🧪 Test de Rutas Legales</h1>
+    <p>Esta página te ayudará a verificar si las rutas legales funcionan correctamente.</p>
+    
+    <div class="info">
+      <strong>⚠️ Problema reportado:</strong> Al hacer clic en "Términos" o "Privacidad", 
+      la app redirige al login en lugar de mostrar los documentos.
+    </div>
+  </div>
+
+  <div class="test-section">
+    <h2>📋 Prueba 1: Enlaces Directos</h2>
+    <p>Haz clic en estos enlaces para acceder directamente a las páginas:</p>
+    
+    <a href="http://localhost:3000/terms-of-service" class="test-link direct-link" target="_blank">
+      📄 Términos de Servicio (Nueva pestaña)
+    </a>
+    
+    <a href="http://localhost:3000/privacy-policy" class="test-link direct-link" target="_blank">
+      🔒 Política de Privacidad (Nueva pestaña)
+    </a>
+    
+    <p style="margin-top: 15px; font-size: 14px; color: #666;">
+      <strong>Resultado esperado:</strong> Deberías ver la página legal completa sin ser redirigido al login.
+    </p>
+  </div>
+
+  <div class="test-section">
+    <h2>🔗 Prueba 2: Navegación desde Login</h2>
+    <p>Primero ve al login, luego haz clic en los enlaces del footer:</p>
+    
+    <a href="http://localhost:3000/login" class="test-link" target="_blank">
+      🚪 Ir al Login
+    </a>
+    
+    <p style="margin-top: 15px; font-size: 14px; color: #666;">
+      <strong>Instrucciones:</strong> Una vez en el login, busca el footer y haz clic en "Términos" o "Privacidad".
+    </p>
+  </div>
+
+  <div class="test-section">
+    <h2>🔍 Información de Debug</h2>
+    <div class="status">
+      <p><strong>Servidor:</strong> <code>http://localhost:3000</code></p>
+      <p><strong>Rutas configuradas:</strong></p>
+      <ul>
+        <li><code>/terms-of-service</code> → TermsOfService.tsx</li>
+        <li><code>/privacy-policy</code> → PrivacyPolicy.tsx</li>
+      </ul>
+      <p><strong>Cambio implementado:</strong> Las rutas legales ahora son públicas y no pasan por el hook de autenticación.</p>
+    </div>
+  </div>
+
+  <div class="test-section">
+    <h2>🛠️ Pasos de Troubleshooting</h2>
+    <ol>
+      <li>Abre las herramientas de desarrollo (F12)</li>
+      <li>Ve a la pestaña "Console"</li>
+      <li>Haz clic en uno de los enlaces de arriba</li>
+      <li>Observa si hay errores en la consola</li>
+      <li>Ve a la pestaña "Network" y verifica las peticiones</li>
+    </ol>
+    
+    <div class="info" style="margin-top: 15px;">
+      <strong>💡 Tip:</strong> Si ves un error de "Cannot GET /terms-of-service", 
+      significa que el servidor no está manejando correctamente las rutas de React Router.
+    </div>
+  </div>
+
+  <div class="test-section">
+    <h2>📊 Reporta el Resultado</h2>
+    <p>Después de probar, reporta qué sucede:</p>
+    <ul>
+      <li>✅ ¿Se muestra la página legal?</li>
+      <li>❌ ¿Redirige al login?</li>
+      <li>⚠️ ¿Muestra una página en blanco?</li>
+      <li>🔴 ¿Muestra un error 404?</li>
+      <li>🔍 ¿Qué errores aparecen en la consola?</li>
+    </ul>
+  </div>
+
+  <script>
+    console.log('🧪 Test de Rutas Legales - Ta\' Pa\' Ti');
+    console.log('Servidor:', 'http://localhost:3000');
+    console.log('Rutas a probar:');
+    console.log('  - /terms-of-service');
+    console.log('  - /privacy-policy');
+  </script>
+</body>
+</html>

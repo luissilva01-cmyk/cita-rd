@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔗 Test - Integración Dashboard de Privacidad</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8fafc;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        .step {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .step h3 {
+            color: #1e293b;
+            margin: 0 0 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .step-content {
+            color: #64748b;
+            line-height: 1.6;
+        }
+        .code {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+        .success {
+            background: #dcfce7;
+            border-color: #16a34a;
+            color: #166534;
+        }
+        .warning {
+            background: #fef3c7;
+            border-color: #f59e0b;
+            color: #92400e;
+        }
+        .info {
+            background: #dbeafe;
+            border-color: #3b82f6;
+            color: #1e40af;
+        }
+        .button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-block;
+            margin: 10px 10px 10px 0;
+        }
+        .button:hover {
+            background: #2563eb;
+        }
+        .button.secondary {
+            background: #6b7280;
+        }
+        .button.secondary:hover {
+            background: #4b5563;
+        }
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+        .checklist li {
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .checklist li::before {
+            content: '✅';
+            font-size: 16px;
+        }
+        .url {
+            background: #f1f5f9;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: monospace;
+            border: 1px solid #cbd5e1;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔗 Integración Dashboard de Privacidad</h1>
+            <p>Guía paso a paso para probar la integración completa</p>
+        </div>
+
+        <!-- Paso 1: Verificar Servidor -->
+        <div class="step success">
+            <h3>🚀 Paso 1: Verificar Servidor</h3>
+            <div class="step-content">
+                <p>El servidor de desarrollo debe estar corriendo correctamente.</p>
+                <div class="url">http://localhost:3000</div>
+                <ul class="checklist">
+                    <li>Servidor iniciado con <code>npm run dev</code></li>
+                    <li>Puerto 3000 disponible</li>
+                    <li>Aplicación carga sin errores</li>
+                </ul>
+                <a href="http://localhost:3000" target="_blank" class="button">Abrir Aplicación</a>
+            </div>
+        </div>
+
+        <!-- Paso 2: Navegación -->
+        <div class="step info">
+            <h3>🧭 Paso 2: Navegación al Dashboard</h3>
+            <div class="step-content">
+                <p>Sigue estos pasos para acceder al Dashboard de Privacidad:</p>
+                <ol>
+                    <li>Abre la aplicación en <strong>http://localhost:3000</strong></li>
+                    <li>Busca el botón de <strong>configuración/perfil</strong> (generalmente en la esquina)</li>
+                    <li>Haz clic en <strong>"Configuración de Cuenta"</strong> o similar</li>
+                    <li>En la sección <strong>"Privacidad y Seguridad"</strong></li>
+                    <li>Haz clic en <strong>"Dashboard de Privacidad"</strong></li>
+                </ol>
+                
+                <div class="code">
+// Ruta de navegación esperada:
+App → Profile/Settings → Account Settings → Privacy Dashboard
+</div>
+            </div>
+        </div>
+
+        <!-- Paso 3: Pruebas del Dashboard -->
+        <div class="step">
+            <h3>🔒 Paso 3: Probar Dashboard de Privacidad</h3>
+            <div class="step-content">
+                <p>Una vez abierto el Dashboard, verifica estas funcionalidades:</p>
+                
+                <h4>📊 Tab "Resumen"</h4>
+                <ul class="checklist">
+                    <li>Puntuación de privacidad visible (0-100%)</li>
+                    <li>Estadísticas rápidas (configuraciones seguras, riesgos, datos compartidos)</li>
+                    <li>Recomendaciones personalizadas</li>
+                    <li>Lista de riesgos detectados</li>
+                </ul>
+
+                <h4>👁️ Tab "Visibilidad"</h4>
+                <ul class="checklist">
+                    <li>Toggle "Aparecer en búsquedas"</li>
+                    <li>Toggle "Mostrar edad"</li>
+                    <li>Toggle "Estado en línea"</li>
+                    <li>Sección "Modo Incógnito" (Premium)</li>
+                </ul>
+
+                <h4>📊 Tab "Datos"</h4>
+                <ul class="checklist">
+                    <li>Control "Análisis emocional"</li>
+                    <li>Control "IA de matching"</li>
+                    <li>Botón "Solicitar Exportación"</li>
+                </ul>
+
+                <h4>🔐 Tab "Seguridad"</h4>
+                <ul class="checklist">
+                    <li>Botón "Eliminar Cuenta" (con confirmación)</li>
+                </ul>
+
+                <h4>📋 Tab "Actividad"</h4>
+                <ul class="checklist">
+                    <li>Lista de acciones registradas</li>
+                    <li>Timestamps de cada acción</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Paso 4: Pruebas Interactivas -->
+        <div class="step warning">
+            <h3>🧪 Paso 4: Pruebas Interactivas</h3>
+            <div class="step-content">
+                <p>Realiza estas acciones para verificar que todo funciona:</p>
+                
+                <h4>🔄 Cambiar Configuraciones</h4>
+                <ol>
+                    <li>Cambia varios toggles en el tab "Visibilidad"</li>
+                    <li>Observa cómo cambia la puntuación en tiempo real</li>
+                    <li>Verifica que los cambios se guarden (recarga la página)</li>
+                </ol>
+
+                <h4>📤 Exportar Datos</h4>
+                <ol>
+                    <li>Ve al tab "Datos"</li>
+                    <li>Haz clic en "Solicitar Exportación"</li>
+                    <li>Verifica que aparezca confirmación</li>
+                </ol>
+
+                <h4>🗑️ Eliminar Cuenta (CUIDADO)</h4>
+                <ol>
+                    <li>Ve al tab "Seguridad"</li>
+                    <li>Haz clic en "Eliminar Cuenta"</li>
+                    <li>Verifica que aparezca modal de confirmación</li>
+                    <li><strong>NO confirmes la eliminación</strong></li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Paso 5: Verificar Consola -->
+        <div class="step">
+            <h3>🔍 Paso 5: Verificar Consola del Navegador</h3>
+            <div class="step-content">
+                <p>Abre las herramientas de desarrollador (F12) y verifica:</p>
+                
+                <div class="code">
+// Logs esperados en la consola:
+🔒 usePrivacyDashboard - Inicializando para usuario: [userId]
+✅ Configuración cargada: { userId, lastUpdated, version }
+🔄 usePrivacyDashboard - Actualizando: [category] [updates]
+💾 Guardando configuración de privacidad: [userId]
+📊 Puntuación de privacidad calculada: [score]%
+</div>
+
+                <ul class="checklist">
+                    <li>No hay errores en rojo</li>
+                    <li>Logs de carga de configuraciones</li>
+                    <li>Logs de cambios de configuración</li>
+                    <li>Logs de cálculo de puntuación</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Paso 6: Pruebas de Rendimiento -->
+        <div class="step">
+            <h3>⚡ Paso 6: Verificar Rendimiento</h3>
+            <div class="step-content">
+                <p>Verifica que la aplicación funcione de manera fluida:</p>
+                
+                <ul class="checklist">
+                    <li>Dashboard abre rápidamente (< 1 segundo)</li>
+                    <li>Cambio entre tabs es instantáneo</li>
+                    <li>Toggles responden inmediatamente</li>
+                    <li>Puntuación se actualiza en tiempo real</li>
+                    <li>No hay lag o congelamiento</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Paso 7: Pruebas de Responsividad -->
+        <div class="step">
+            <h3>📱 Paso 7: Probar Responsividad</h3>
+            <div class="step-content">
+                <p>Verifica que funcione en diferentes tamaños de pantalla:</p>
+                
+                <ol>
+                    <li>Abre las herramientas de desarrollador (F12)</li>
+                    <li>Activa el modo de dispositivo móvil</li>
+                    <li>Prueba diferentes tamaños: iPhone, iPad, Desktop</li>
+                    <li>Verifica que todos los elementos sean accesibles</li>
+                </ol>
+
+                <ul class="checklist">
+                    <li>Dashboard se adapta a pantalla móvil</li>
+                    <li>Tabs siguen siendo navegables</li>
+                    <li>Toggles son fáciles de usar en móvil</li>
+                    <li>Texto es legible en todas las resoluciones</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Resultados Esperados -->
+        <div class="step success">
+            <h3>✅ Resultados Esperados</h3>
+            <div class="step-content">
+                <p>Si todo funciona correctamente, deberías ver:</p>
+                
+                <ul class="checklist">
+                    <li>Dashboard abre sin errores</li>
+                    <li>5 tabs funcionan correctamente</li>
+                    <li>Puntuación de privacidad se calcula dinámicamente</li>
+                    <li>Configuraciones se guardan y persisten</li>
+                    <li>Exportación de datos funciona</li>
+                    <li>Modal de eliminación aparece</li>
+                    <li>Audit log registra acciones</li>
+                    <li>Interfaz es responsiva</li>
+                    <li>No hay errores en consola</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Troubleshooting -->
+        <div class="step warning">
+            <h3>🔧 Troubleshooting</h3>
+            <div class="step-content">
+                <p>Si encuentras problemas, verifica:</p>
+                
+                <h4>❌ Dashboard no abre</h4>
+                <ul>
+                    <li>Verifica que el servidor esté corriendo</li>
+                    <li>Revisa la consola por errores de importación</li>
+                    <li>Asegúrate de que todos los archivos estén en su lugar</li>
+                </ul>
+
+                <h4>❌ Configuraciones no se guardan</h4>
+                <ul>
+                    <li>Verifica que localStorage esté habilitado</li>
+                    <li>Revisa la consola por errores de guardado</li>
+                    <li>Prueba en modo incógnito</li>
+                </ul>
+
+                <h4>❌ Puntuación no se actualiza</h4>
+                <ul>
+                    <li>Verifica que el algoritmo de cálculo funcione</li>
+                    <li>Revisa los logs de cálculo en consola</li>
+                    <li>Asegúrate de que los estados se actualicen</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Enlaces Útiles -->
+        <div class="step info">
+            <h3>🔗 Enlaces Útiles</h3>
+            <div class="step-content">
+                <a href="http://localhost:3000" target="_blank" class="button">Aplicación Principal</a>
+                <a href="./test-privacy-dashboard-interactive.html" target="_blank" class="button secondary">Pruebas Interactivas</a>
+                <a href="./test-privacy-dashboard.html" target="_blank" class="button secondary">Documentación</a>
+                
+                <div class="code">
+// Archivos principales del Dashboard:
+- services/privacyDashboardService.ts
+- hooks/usePrivacyDashboard.ts  
+- components/PrivacyDashboard.tsx
+- components/AccountSettings.tsx (integración)
+</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Verificar si el servidor está corriendo
+        fetch('http://localhost:3000')
+            .then(response => {
+                if (response.ok) {
+                    console.log('✅ Servidor detectado en http://localhost:3000');
+                    document.querySelector('.step.success .step-content').innerHTML += 
+                        '<div style="margin-top: 10px; padding: 10px; background: #dcfce7; border-radius: 6px; color: #166534;">✅ Servidor detectado y funcionando correctamente</div>';
+                } else {
+                    throw new Error('Servidor no responde');
+                }
+            })
+            .catch(error => {
+                console.log('❌ Error conectando con servidor:', error);
+                document.querySelector('.step.success .step-content').innerHTML += 
+                    '<div style="margin-top: 10px; padding: 10px; background: #fecaca; border-radius: 6px; color: #991b1b;">❌ No se puede conectar con el servidor. Asegúrate de que esté corriendo en http://localhost:3000</div>';
+            });
+
+        // Agregar timestamp
+        document.addEventListener('DOMContentLoaded', function() {
+            const timestamp = new Date().toLocaleString();
+            document.querySelector('.header p').innerHTML += `<br><small>Generado el ${timestamp}</small>`;
+        });
+    </script>
+</body>
+</html>

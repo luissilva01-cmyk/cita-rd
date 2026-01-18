@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CitaRD - Comparación Final Sin Cache</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <style>
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .page-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .iframe-wrapper {
+            border: 3px solid #10b981;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #f8fafc;
+        }
+        .page-title {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .login-title {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+        }
+        .register-title {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+        .status-bar {
+            background: #f0fdf4;
+            border: 2px solid #10b981;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .timestamp {
+            font-size: 0.9rem;
+            color: #666;
+            text-align: center;
+            margin: 10px 0;
+        }
+        .refresh-btn {
+            background: linear-gradient(135deg, #f97316, #e11d48);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px;
+            transition: transform 0.2s;
+        }
+        .refresh-btn:hover {
+            transform: scale(1.05);
+        }
+        .external-links {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .external-link {
+            display: inline-block;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            margin: 5px;
+            border: 2px solid rgba(255,255,255,0.3);
+            transition: all 0.3s;
+        }
+        .external-link:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+        @media (max-width: 768px) {
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+            body {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 style="font-size: 2.5rem; margin-bottom: 10px;">🔍 Comparación Final - Login vs Register</h1>
+            <p style="font-size: 1.2rem; opacity: 0.9;">Verificación sin cache - Ambas páginas deben verse idénticas</p>
+        </div>
+        
+        <div class="status-bar">
+            <h2 style="margin: 0 0 10px 0; color: #065f46;">✅ Estado: Servidor Reiniciado</h2>
+            <p style="margin: 0; color: #047857;">
+                Ambas páginas ahora tienen <strong>bg-slate-50</strong> (#f8fafc) como fondo
+            </p>
+            <div class="timestamp">
+                Última actualización: <span id="timestamp"></span>
+            </div>
+        </div>
+        
+        <div class="comparison-grid">
+            <!-- Login -->
+            <div class="page-container">
+                <div class="page-title login-title">
+                    🔐 Login Page
+                </div>
+                <div class="iframe-wrapper">
+                    <iframe 
+                        src="http://localhost:3000/login?nocache=true&t=2024" 
+                        width="100%" 
+                        height="600"
+                        frameborder="0"
+                        title="Login Page">
+                    </iframe>
+                </div>
+                <div class="timestamp">
+                    Fondo esperado: <code style="background: #f8fafc; padding: 2px 6px; border-radius: 4px;">#f8fafc (bg-slate-50)</code>
+                </div>
+            </div>
+            
+            <!-- Register -->
+            <div class="page-container">
+                <div class="page-title register-title">
+                    📝 Register Page
+                </div>
+                <div class="iframe-wrapper">
+                    <iframe 
+                        src="http://localhost:3000/register?nocache=true&t=2024" 
+                        width="100%" 
+                        height="600"
+                        frameborder="0"
+                        title="Register Page">
+                    </iframe>
+                </div>
+                <div class="timestamp">
+                    Fondo esperado: <code style="background: #f8fafc; padding: 2px 6px; border-radius: 4px;">#f8fafc (bg-slate-50)</code>
+                </div>
+            </div>
+        </div>
+        
+        <div class="external-links">
+            <h3 style="color: white; text-align: center;">🔗 Enlaces Directos (Nueva Pestaña)</h3>
+            <a href="http://localhost:3000/login" target="_blank" class="external-link">
+                🔐 Login Directo
+            </a>
+            <a href="http://localhost:3000/register" target="_blank" class="external-link">
+                📝 Register Directo
+            </a>
+            <a href="http://localhost:3000/" target="_blank" class="external-link">
+                🏠 App Principal
+            </a>
+        </div>
+        
+        <div style="text-align: center; margin: 30px 0;">
+            <button onclick="forceReload()" class="refresh-btn">
+                🔄 Recargar Todo Sin Cache
+            </button>
+            <button onclick="location.reload(true)" class="refresh-btn">
+                ↻ Recargar Esta Página
+            </button>
+        </div>
+        
+        <div style="background: rgba(255,255,255,0.1); border-radius: 10px; padding: 20px; color: white; margin: 20px 0;">
+            <h3>📋 Instrucciones para verificar:</h3>
+            <ol>
+                <li><strong>Presiona Ctrl+F5</strong> (Windows) o <strong>Cmd+Shift+R</strong> (Mac) para recargar sin cache</li>
+                <li><strong>Compara ambos iframes</strong> - deben tener el mismo fondo gris claro</li>
+                <li><strong>Abre en pestañas separadas</strong> usando los enlaces directos</li>
+                <li><strong>Verifica en modo incógnito</strong> si aún hay diferencias</li>
+            </ol>
+        </div>
+        
+        <div style="background: rgba(16, 185, 129, 0.2); border: 2px solid #10b981; border-radius: 10px; padding: 20px; color: white; margin: 20px 0;">
+            <h3 style="margin-top: 0;">✅ Cambios Aplicados:</h3>
+            <ul>
+                <li>✅ Servidor reiniciado completamente</li>
+                <li>✅ Login.tsx reescrito con bg-slate-50</li>
+                <li>✅ Fondo forzado con style inline</li>
+                <li>✅ Mismo ícono Heart ❤️ en ambas páginas</li>
+                <li>✅ Footer idéntico en ambas páginas</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        function updateTimestamp() {
+            document.getElementById('timestamp').textContent = new Date().toLocaleString();
+        }
+        
+        function forceReload() {
+            // Recargar iframes sin cache
+            const iframes = document.querySelectorAll('iframe');
+            iframes.forEach(iframe => {
+                const src = iframe.src.split('?')[0];
+                iframe.src = src + '?nocache=true&t=' + Date.now();
+            });
+        }
+        
+        // Actualizar timestamp
+        updateTimestamp();
+        
+        // Auto-refresh cada 60 segundos
+        setInterval(() => {
+            forceReload();
+            updateTimestamp();
+        }, 60000);
+    </script>
+</body>
+</html>

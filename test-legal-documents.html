@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - Documentos Legales CitaRD</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f8f6f6;
+            color: #1b110d;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #ec4913;
+            margin-bottom: 10px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 2px solid #e7d5cf;
+            border-radius: 12px;
+        }
+        .test-section h3 {
+            color: #ec4913;
+            margin-top: 0;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #ec4913;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            margin: 5px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .button:hover {
+            background: #d63f0f;
+            transform: translateY(-1px);
+        }
+        .status {
+            padding: 10px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔥 CitaRD - Test Documentos Legales</h1>
+            <p>Verificación de implementación de Términos de Servicio y Política de Privacidad</p>
+        </div>
+
+        <div class="test-section">
+            <h3>📋 Términos de Servicio</h3>
+            <div class="status success">
+                ✅ Componente creado: <code>src/pages/Legal/TermsOfService.tsx</code>
+            </div>
+            <div class="status info">
+                📍 Ruta configurada: <code>/terms-of-service</code>
+            </div>
+            <p><strong>Contenido incluido:</strong></p>
+            <ul>
+                <li>Elegibilidad (18+ años)</li>
+                <li>Reglas de comportamiento</li>
+                <li>Sistema de matching con IA</li>
+                <li>Seguridad personal</li>
+                <li>Limitación de responsabilidad</li>
+                <li>Ley aplicable (República Dominicana)</li>
+            </ul>
+            <a href="http://localhost:3000/terms-of-service" class="button" target="_blank">
+                Ver Términos de Servicio
+            </a>
+        </div>
+
+        <div class="test-section">
+            <h3>🔒 Política de Privacidad</h3>
+            <div class="status success">
+                ✅ Componente creado: <code>src/pages/Legal/PrivacyPolicy.tsx</code>
+            </div>
+            <div class="status info">
+                📍 Ruta configurada: <code>/privacy-policy</code>
+            </div>
+            <p><strong>Contenido incluido:</strong></p>
+            <ul>
+                <li>Información que recopilamos</li>
+                <li>Cómo usamos los datos</li>
+                <li>Nunca vendemos datos personales</li>
+                <li>Seguridad y encriptación</li>
+                <li>Derechos del usuario (GDPR)</li>
+                <li>Retención de datos</li>
+            </ul>
+            <a href="http://localhost:3000/privacy-policy" class="button" target="_blank">
+                Ver Política de Privacidad
+            </a>
+        </div>
+
+        <div class="test-section">
+            <h3>✅ Modal de Consentimientos</h3>
+            <div class="status success">
+                ✅ Componente creado: <code>src/components/Legal/ConsentModal.tsx</code>
+            </div>
+            <div class="status info">
+                🔗 Integrado en: <code>src/pages/Auth/Register.tsx</code>
+            </div>
+            <p><strong>Funcionalidades:</strong></p>
+            <ul>
+                <li>Confirmación de edad (18+)</li>
+                <li>Aceptación de términos (obligatorio)</li>
+                <li>Aceptación de privacidad (obligatorio)</li>
+                <li>Opt-in marketing (opcional)</li>
+                <li>Enlaces directos a documentos</li>
+            </ul>
+            <a href="http://localhost:3000/register" class="button" target="_blank">
+                Probar Registro con Consentimientos
+            </a>
+        </div>
+
+        <div class="test-section">
+            <h3>💾 Servicio de Consentimientos</h3>
+            <div class="status success">
+                ✅ Servicio creado: <code>src/services/consentService.ts</code>
+            </div>
+            <div class="status info">
+                🔥 Integrado con Firebase Firestore
+            </div>
+            <p><strong>Funcionalidades:</strong></p>
+            <ul>
+                <li>Guardar consentimientos con timestamp</li>
+                <li>Verificar consentimientos válidos</li>
+                <li>Historial de consentimientos</li>
+                <li>Actualizar preferencias de marketing</li>
+                <li>Eliminar datos (GDPR compliance)</li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h3>🚀 Cómo Probar</h3>
+            <div class="status warning">
+                ⚠️ Asegúrate de que tu servidor local esté corriendo en <code>localhost:3000</code>
+            </div>
+            <ol>
+                <li><strong>Términos:</strong> Visita <code>localhost:3000/terms-of-service</code></li>
+                <li><strong>Privacidad:</strong> Visita <code>localhost:3000/privacy-policy</code></li>
+                <li><strong>Registro:</strong> Visita <code>localhost:3000/register</code> y completa el formulario</li>
+                <li><strong>Modal:</strong> Al hacer clic en "Crear Cuenta" verás el modal de consentimientos</li>
+                <li><strong>Navegación:</strong> Los documentos tienen navegación con botón de regreso</li>
+            </ol>
+        </div>
+
+        <div class="test-section">
+            <h3>📱 Características del Diseño</h3>
+            <ul>
+                <li>✅ Diseño móvil responsivo</li>
+                <li>✅ Colores de marca CitaRD (#ec4913)</li>
+                <li>✅ Tipografía system fonts (sin Google Fonts)</li>
+                <li>✅ Iconos Lucide React</li>
+                <li>✅ Animaciones Framer Motion</li>
+                <li>✅ Navegación intuitiva</li>
+            </ul>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 2px solid #e7d5cf;">
+            <p style="color: #9a5f4c; font-size: 14px;">
+                💡 <strong>Tip:</strong> Abre las herramientas de desarrollador para ver los logs de Firebase cuando pruebes el registro
+            </p>
+        </div>
+    </div>
+
+    <script>
+        console.log('🔥 CitaRD - Test de Documentos Legales');
+        console.log('📋 Términos de Servicio: /terms-of-service');
+        console.log('🔒 Política de Privacidad: /privacy-policy');
+        console.log('✅ Modal de Consentimientos: /register');
+        console.log('💾 Servicio de Consentimientos: Firebase integrado');
+    </script>
+</body>
+</html>

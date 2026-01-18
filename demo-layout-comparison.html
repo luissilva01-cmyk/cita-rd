@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparación Layout Desktop - Ta' Pa' Ti</title>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        .comparison-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            background: #1f2937;
+            color: white;
+            padding: 16px;
+            text-align: center;
+        }
+        
+        .layouts-container {
+            flex: 1;
+            display: flex;
+        }
+        
+        .layout-demo {
+            flex: 1;
+            position: relative;
+            border-right: 2px solid #e5e7eb;
+        }
+        
+        .layout-demo:last-child {
+            border-right: none;
+        }
+        
+        .layout-title {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            z-index: 100;
+        }
+        
+        /* Layout Sin Límites */
+        .unlimited-layout {
+            height: 100%;
+            display: flex;
+            background: linear-gradient(135deg, #FF6B6B 0%, #FFD93D 100%);
+        }
+        
+        .unlimited-sidebar {
+            width: 320px;
+            background: white;
+            height: 100%;
+            flex-shrink: 0;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        
+        .unlimited-main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 32px;
+        }
+        
+        .unlimited-content {
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Layout Con Límites (max-w-2xl) */
+        .limited-layout {
+            height: 100%;
+            display: flex;
+            background: linear-gradient(135deg, #FF6B6B 0%, #FFD93D 100%);
+        }
+        
+        .limited-sidebar {
+            width: 320px;
+            background: white;
+            height: 100%;
+            flex-shrink: 0;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        
+        .limited-main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 32px;
+        }
+        
+        .limited-content {
+            width: 100%;
+            max-width: 672px; /* max-w-2xl = 42rem = 672px */
+            background: white;
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Sidebar común */
+        .sidebar-header {
+            padding: 24px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .sidebar-content {
+            padding: 16px;
+            height: calc(100% - 100px);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        /* Profile Card Demo */
+        .profile-card {
+            width: 100%;
+            max-width: 400px;
+            aspect-ratio: 4/5;
+            background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+            border-radius: 16px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #6b7280;
+            border: 2px dashed #9ca3af;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 16px;
+            margin-top: 16px;
+        }
+        
+        .action-button {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        
+        .pass-btn { background: #fee2e2; color: #dc2626; }
+        .like-btn { background: #fef3c7; color: #d97706; }
+        .super-btn { background: #dbeafe; color: #2563eb; }
+        
+        /* Métricas */
+        .metrics {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-family: monospace;
+        }
+        
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+        
+        .pros-cons {
+            position: absolute;
+            top: 50px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            max-width: 200px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .pros { color: #059669; }
+        .cons { color: #dc2626; }
+        
+        /* Responsive indicator */
+        .screen-size {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: #1f2937;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div class="screen-size" id="screenSize">
+        Pantalla: <span id="screenWidth"></span>px
+    </div>
+    
+    <div class="comparison-container">
+        <div class="header">
+            <h1 style="margin: 0; font-size: 24px;">Comparación Layout Desktop - Ta' Pa' Ti</h1>
+            <p style="margin: 8px 0 0 0; opacity: 0.8;">Redimensiona la ventana para ver cómo se comporta cada diseño</p>
+        </div>
+        
+        <div class="layouts-container">
+            <!-- Layout Sin Límites -->
+            <div class="layout-demo">
+                <div class="layout-title">❌ SIN LÍMITES (Actual)</div>
+                
+                <div class="unlimited-layout">
+                    <div class="unlimited-sidebar">
+                        <div class="sidebar-header">
+                            <h2 style="margin: 0; color: #f97316; font-size: 20px;">Ta' Pa' Ti</h2>
+                            <p style="margin: 4px 0 0 0; font-size: 12px; color: #6b7280;">cuando alguien sí te elige</p>
+                        </div>
+                        <div class="sidebar-content">
+                            <div>
+                                <div style="padding: 8px; background: #fff7ed; color: #ea580c; border-radius: 8px; margin-bottom: 8px; font-size: 14px;">🔍 Explorar</div>
+                                <div style="padding: 8px; color: #6b7280; font-size: 14px;">💬 Mensajes</div>
+                                <div style="padding: 8px; color: #6b7280; font-size: 14px;">👤 Perfil</div>
+                            </div>
+                            <div style="border-top: 1px solid #e5e7eb; padding-top: 16px; font-size: 12px; color: #6b7280;">
+                                Sidebar: 320px fijo
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="unlimited-main">
+                        <div class="unlimited-content">
+                            <div class="profile-card">
+                                📱 Tarjeta de Perfil<br>
+                                <small style="font-size: 14px;">Se extiende mucho en pantallas grandes</small>
+                            </div>
+                            
+                            <div class="action-buttons">
+                                <button class="action-button pass-btn">❌</button>
+                                <button class="action-button like-btn">❤️</button>
+                                <button class="action-button super-btn">⭐</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="pros-cons">
+                    <div class="pros">✅ PROS:</div>
+                    <div style="font-size: 10px; margin-bottom: 8px;">
+                        • Usa todo el espacio<br>
+                        • Sensación moderna<br>
+                        • Flexible
+                    </div>
+                    <div class="cons">❌ CONTRAS:</div>
+                    <div style="font-size: 10px;">
+                        • Muy ancho en pantallas grandes<br>
+                        • Contenido "perdido"<br>
+                        • Fatiga visual<br>
+                        • Líneas de texto largas
+                    </div>
+                </div>
+                
+                <div class="metrics">
+                    <div class="metric-row">
+                        <span>Sidebar:</span>
+                        <span>320px</span>
+                    </div>
+                    <div class="metric-row">
+                        <span>Contenido:</span>
+                        <span id="unlimitedWidth">100%</span>
+                    </div>
+                    <div class="metric-row">
+                        <span>Total:</span>
+                        <span id="unlimitedTotal">100%</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Layout Con Límites -->
+            <div class="layout-demo">
+                <div class="layout-title">✅ CON LÍMITES (max-w-2xl)</div>
+                
+                <div class="limited-layout">
+                    <div class="limited-sidebar">
+                        <div class="sidebar-header">
+                            <h2 style="margin: 0; color: #f97316; font-size: 20px;">Ta' Pa' Ti</h2>
+                            <p style="margin: 4px 0 0 0; font-size: 12px; color: #6b7280;">cuando alguien sí te elige</p>
+                        </div>
+                        <div class="sidebar-content">
+                            <div>
+                                <div style="padding: 8px; background: #fff7ed; color: #ea580c; border-radius: 8px; margin-bottom: 8px; font-size: 14px;">🔍 Explorar</div>
+                                <div style="padding: 8px; color: #6b7280; font-size: 14px;">💬 Mensajes</div>
+                                <div style="padding: 8px; color: #6b7280; font-size: 14px;">👤 Perfil</div>
+                            </div>
+                            <div style="border-top: 1px solid #e5e7eb; padding-top: 16px; font-size: 12px; color: #6b7280;">
+                                Sidebar: 320px fijo
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="limited-main">
+                        <div class="limited-content">
+                            <div class="profile-card">
+                                📱 Tarjeta de Perfil<br>
+                                <small style="font-size: 14px;">Tamaño óptimo y centrado</small>
+                            </div>
+                            
+                            <div class="action-buttons">
+                                <button class="action-button pass-btn">❌</button>
+                                <button class="action-button like-btn">❤️</button>
+                                <button class="action-button super-btn">⭐</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="pros-cons">
+                    <div class="pros">✅ PROS:</div>
+                    <div style="font-size: 10px; margin-bottom: 8px;">
+                        • Contenido bien proporcionado<br>
+                        • Fácil de leer<br>
+                        • Foco visual claro<br>
+                        • Funciona en cualquier pantalla
+                    </div>
+                    <div class="cons">❌ CONTRAS:</div>
+                    <div style="font-size: 10px;">
+                        • Espacio "desperdiciado"<br>
+                        • Menos inmersivo
+                    </div>
+                </div>
+                
+                <div class="metrics">
+                    <div class="metric-row">
+                        <span>Sidebar:</span>
+                        <span>320px</span>
+                    </div>
+                    <div class="metric-row">
+                        <span>Contenido:</span>
+                        <span>672px max</span>
+                    </div>
+                    <div class="metric-row">
+                        <span>Total:</span>
+                        <span id="limitedTotal">100%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function updateMetrics() {
+            const screenWidth = window.innerWidth;
+            document.getElementById('screenWidth').textContent = screenWidth;
+            
+            // Calcular anchos para layout sin límites
+            const unlimitedContentWidth = screenWidth - 320 - 64; // sidebar + padding
+            document.getElementById('unlimitedWidth').textContent = unlimitedContentWidth + 'px';
+            document.getElementById('unlimitedTotal').textContent = screenWidth + 'px';
+            
+            // Layout con límites siempre es 672px max
+            document.getElementById('limitedTotal').textContent = screenWidth + 'px';
+            
+            // Mostrar advertencias según el tamaño
+            const unlimitedCard = document.querySelector('.unlimited-layout .profile-card small');
+            const limitedCard = document.querySelector('.limited-layout .profile-card small');
+            
+            if (screenWidth > 1600) {
+                unlimitedCard.textContent = '⚠️ MUY ANCHO - Difícil de usar';
+                unlimitedCard.style.color = '#dc2626';
+                limitedCard.textContent = '✅ Tamaño perfecto';
+                limitedCard.style.color = '#059669';
+            } else if (screenWidth > 1200) {
+                unlimitedCard.textContent = '⚠️ Algo ancho para tarjetas';
+                unlimitedCard.style.color = '#d97706';
+                limitedCard.textContent = '✅ Tamaño óptimo';
+                limitedCard.style.color = '#059669';
+            } else {
+                unlimitedCard.textContent = 'Tamaño aceptable';
+                unlimitedCard.style.color = '#6b7280';
+                limitedCard.textContent = '✅ Tamaño óptimo y centrado';
+                limitedCard.style.color = '#059669';
+            }
+        }
+        
+        updateMetrics();
+        window.addEventListener('resize', updateMetrics);
+        
+        // Simular interacciones
+        document.querySelectorAll('.action-button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.style.transform = 'scale(0.9)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 150);
+            });
+        });
+        
+        console.log('🎯 Comparación de Layouts:');
+        console.log('- Sin límites: Contenido se extiende según pantalla');
+        console.log('- Con límites: Contenido máximo 672px (max-w-2xl)');
+        console.log('- Redimensiona la ventana para ver las diferencias');
+    </script>
+</body>
+</html>

@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CitaRD - Test Stories Navigation Fix</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .console-log {
+            background: #1f2937;
+            color: #10b981;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        
+        .story-viewer {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 1rem;
+            padding: 2rem;
+            color: white;
+            text-align: center;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .progress-bar {
+            height: 4px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: white;
+            transition: width 0.1s linear;
+        }
+        
+        .nav-button {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin: 0.25rem;
+        }
+        
+        .nav-button:hover {
+            background: rgba(255,255,255,0.3);
+            border-color: rgba(255,255,255,0.5);
+        }
+        
+        .nav-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .test-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin: 0.5rem;
+        }
+        
+        .test-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        
+        .error-highlight {
+            background: #7f1d1d;
+            color: #fca5a5;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            margin: 0.25rem 0;
+        }
+        
+        .success-highlight {
+            background: #064e3b;
+            color: #6ee7b7;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            margin: 0.25rem 0;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-4">
+    <div class="max-w-6xl mx-auto">
+        <h1 class="text-3xl font-bold text-center mb-6 text-gray-800">
+            🎬 CitaRD - Stories Navigation Fix Test
+        </h1>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Story Viewer Simulator -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">📱 Story Viewer Simulator</h2>
+                
+                <div class="story-viewer mb-4">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h3 class="text-2xl font-bold mb-2" id="story-title">Story 1 de 3</h3>
+                        <p class="text-lg" id="story-content">Contenido de la historia...</p>
+                        <p class="text-sm opacity-75 mt-2" id="story-user">Usuario: Carolina</p>
+                    </div>
+                    
+                    <div class="flex justify-center gap-4 mt-4">
+                        <button class="nav-button" onclick="previousStory()" id="prev-btn">
+                            ⬅️ Anterior
+                        </button>
+                        <button class="nav-button" onclick="togglePause()" id="pause-btn">
+                            ⏸️ Pausar
+                        </button>
+                        <button class="nav-button" onclick="nextStory()" id="next-btn">
+                            ➡️ Siguiente
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="testNavigation()" class="test-button">
+                        🧪 Test Navigation
+                    </button>
+                    <button onclick="testErrorScenarios()" class="test-button">
+                        ❌ Test Errors
+                    </button>
+                    <button onclick="resetSimulator()" class="test-button">
+                        🔄 Reset
+                    </button>
+                    <button onclick="clearLogs()" class="test-button" style="background: #dc2626;">
+                        🗑️ Clear Logs
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Console Output -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">📋 Console Output</h2>
+                <div id="console-output" class="console-log">
+                    🚀 Stories Navigation Test ready.
+                    Click buttons to simulate navigation and test error scenarios.
+                </div>
+            </div>
+        </div>
+        
+        <!-- Test Results -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mt-6">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700">📊 Test Results</h2>
+            <div id="test-results" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="text-center p-4 bg-gray-50 rounded-lg">
+                    <div class="text-2xl font-bold text-blue-600" id="navigation-tests">0</div>
+                    <div class="text-sm text-gray-600">Navigation Tests</div>
+                </div>
+                <div class="text-center p-4 bg-gray-50 rounded-lg">
+                    <div class="text-2xl font-bold text-green-600" id="successful-tests">0</div>
+                    <div class="text-sm text-gray-600">Successful</div>
+                </div>
+                <div class="text-center p-4 bg-gray-50 rounded-lg">
+                    <div class="text-2xl font-bold text-red-600" id="failed-tests">0</div>
+                    <div class="text-sm text-gray-600">Failed</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mock story data
+        const mockStoryGroups = [
+            {
+                id: 'group1',
+                userId: '1',
+                user: { name: 'Carolina', avatar: 'avatar1.jpg' },
+                stories: [
+                    { id: 'story1', content: '¡Hermoso día en Santo Domingo! ☀️', type: 'text' },
+                    { id: 'story2', content: 'Explorando la Zona Colonial 🏛️', type: 'text' },
+                    { id: 'story3', content: 'Atardecer en el Malecón 🌅', type: 'text' }
+                ]
+            },
+            {
+                id: 'group2',
+                userId: '2',
+                user: { name: 'Marcos', avatar: 'avatar2.jpg' },
+                stories: [
+                    { id: 'story4', content: 'Partido de béisbol ⚾', type: 'text' },
+                    { id: 'story5', content: 'Café dominicano ☕', type: 'text' }
+                ]
+            }
+        ];
+        
+        // Simulator state
+        let currentGroupIndex = 0;
+        let currentStoryIndex = 0;
+        let progress = 0;
+        let isPaused = false;
+        let progressInterval = null;
+        
+        // Test counters
+        let navigationTests = 0;
+        let successfulTests = 0;
+        let failedTests = 0;
+        
+        // Logging functions
+        function log(message) {
+            const output = document.getElementById('console-output');
+            const timestamp = new Date().toLocaleTimeString();
+            output.textContent += `[${timestamp}] ${message}\n`;
+            output.scrollTop = output.scrollHeight;
+        }
+        
+        function logError(message) {
+            const output = document.getElementById('console-output');
+            const timestamp = new Date().toLocaleTimeString();
+            output.innerHTML += `<div class="error-highlight">[${timestamp}] ${message}</div>`;
+            output.scrollTop = output.scrollHeight;
+        }
+        
+        function logSuccess(message) {
+            const output = document.getElementById('console-output');
+            const timestamp = new Date().toLocaleTimeString();
+            output.innerHTML += `<div class="success-highlight">[${timestamp}] ${message}</div>`;
+            output.scrollTop = output.scrollHeight;
+        }
+        
+        function clearLogs() {
+            document.getElementById('console-output').innerHTML = '🧹 Logs cleared.\n';
+        }
+        
+        // Update UI
+        function updateUI() {
+            try {
+                const currentGroup = mockStoryGroups[currentGroupIndex];
+                const currentStory = currentGroup.stories[currentStoryIndex];
+                
+                document.getElementById('story-title').textContent = 
+                    `Story ${currentStoryIndex + 1} de ${currentGroup.stories.length}`;
+                document.getElementById('story-content').textContent = currentStory.content;
+                document.getElementById('story-user').textContent = `Usuario: ${currentGroup.user.name}`;
+                
+                // Update progress bar
+                document.getElementById('progress-fill').style.width = progress + '%';
+                
+                // Update buttons
+                document.getElementById('prev-btn').disabled = 
+                    currentGroupIndex === 0 && currentStoryIndex === 0;
+                document.getElementById('next-btn').disabled = 
+                    currentGroupIndex === mockStoryGroups.length - 1 && 
+                    currentStoryIndex === currentGroup.stories.length - 1;
+                
+                document.getElementById('pause-btn').textContent = isPaused ? '▶️ Reanudar' : '⏸️ Pausar';
+                
+                log(`✅ UI actualizada - Grupo: ${currentGroupIndex}, Story: ${currentStoryIndex}, Progreso: ${progress}%`);
+                
+            } catch (error) {
+                logError(`❌ Error actualizando UI: ${error.message}`);
+                throw error;
+            }
+        }
+        
+        // Navigation functions
+        function previousStory() {
+            log('⬅️ === NAVEGACIÓN ANTERIOR ===');
+            navigationTests++;
+            
+            try {
+                if (currentStoryIndex > 0) {
+                    log(`⬅️ Retrocediendo en el grupo actual: ${currentStoryIndex} -> ${currentStoryIndex - 1}`);
+                    currentStoryIndex--;
+                    progress = 0;
+                    successfulTests++;
+                    logSuccess('✅ Navegación anterior exitosa');
+                } else if (currentGroupIndex > 0) {
+                    log(`⬅️ Cambiando al grupo anterior: ${currentGroupIndex} -> ${currentGroupIndex - 1}`);
+                    currentGroupIndex--;
+                    currentStoryIndex = mockStoryGroups[currentGroupIndex].stories.length - 1;
+                    progress = 0;
+                    successfulTests++;
+                    logSuccess('✅ Cambio de grupo anterior exitoso');
+                } else {
+                    log('⬅️ Ya estamos en la primera story del primer grupo');
+                    successfulTests++;
+                }
+                
+                updateUI();
+                updateTestCounters();
+                
+            } catch (error) {
+                logError(`❌ Error en navegación anterior: ${error.message}`);
+                failedTests++;
+                updateTestCounters();
+            }
+        }
+        
+        function nextStory() {
+            log('➡️ === NAVEGACIÓN SIGUIENTE ===');
+            navigationTests++;
+            
+            try {
+                const currentGroup = mockStoryGroups[currentGroupIndex];
+                
+                if (currentStoryIndex < currentGroup.stories.length - 1) {
+                    log(`➡️ Avanzando en el grupo actual: ${currentStoryIndex} -> ${currentStoryIndex + 1}`);
+                    currentStoryIndex++;
+                    progress = 0;
+                    successfulTests++;
+                    logSuccess('✅ Navegación siguiente exitosa');
+                } else if (currentGroupIndex < mockStoryGroups.length - 1) {
+                    log(`➡️ Cambiando al siguiente grupo: ${currentGroupIndex} -> ${currentGroupIndex + 1}`);
+                    currentGroupIndex++;
+                    currentStoryIndex = 0;
+                    progress = 0;
+                    successfulTests++;
+                    logSuccess('✅ Cambio de grupo siguiente exitoso');
+                } else {
+                    log('➡️ Ya estamos en la última story del último grupo');
+                    logSuccess('✅ Fin de stories alcanzado correctamente');
+                    successfulTests++;
+                }
+                
+                updateUI();
+                updateTestCounters();
+                
+            } catch (error) {
+                logError(`❌ Error en navegación siguiente: ${error.message}`);
+                failedTests++;
+                updateTestCounters();
+            }
+        }
+        
+        function togglePause() {
+            isPaused = !isPaused;
+            log(`⏯️ Stories ${isPaused ? 'pausadas' : 'reanudadas'}`);
+            
+            if (isPaused) {
+                if (progressInterval) {
+                    clearInterval(progressInterval);
+                    progressInterval = null;
+                }
+            } else {
+                startProgress();
+            }
+            
+            updateUI();
+        }
+        
+        function startProgress() {
+            if (progressInterval) {
+                clearInterval(progressInterval);
+            }
+            
+            progressInterval = setInterval(() => {
+                if (!isPaused) {
+                    progress += 2; // 2% cada 100ms = 5 segundos total
+                    
+                    if (progress >= 100) {
+                        progress = 0;
+                        nextStory();
+                    } else {
+                        document.getElementById('progress-fill').style.width = progress + '%';
+                    }
+                }
+            }, 100);
+        }
+        
+        function resetSimulator() {
+            log('🔄 === RESETEANDO SIMULADOR ===');
+            
+            try {
+                currentGroupIndex = 0;
+                currentStoryIndex = 0;
+                progress = 0;
+                isPaused = false;
+                
+                if (progressInterval) {
+                    clearInterval(progressInterval);
+                    progressInterval = null;
+                }
+                
+                updateUI();
+                logSuccess('✅ Simulador reseteado correctamente');
+                
+            } catch (error) {
+                logError(`❌ Error reseteando simulador: ${error.message}`);
+            }
+        }
+        
+        function updateTestCounters() {
+            document.getElementById('navigation-tests').textContent = navigationTests;
+            document.getElementById('successful-tests').textContent = successfulTests;
+            document.getElementById('failed-tests').textContent = failedTests;
+        }
+        
+        // Test functions
+        function testNavigation() {
+            log('🧪 === INICIANDO TEST DE NAVEGACIÓN ===');
+            
+            try {
+                // Reset first
+                resetSimulator();
+                
+                // Test forward navigation
+                log('📍 Test 1: Navegación hacia adelante');
+                for (let i = 0; i < 3; i++) {
+                    nextStory();
+                }
+                
+                // Test backward navigation
+                log('📍 Test 2: Navegación hacia atrás');
+                for (let i = 0; i < 2; i++) {
+                    previousStory();
+                }
+                
+                // Test boundary conditions
+                log('📍 Test 3: Condiciones límite');
+                resetSimulator();
+                previousStory(); // Should handle gracefully
+                
+                // Go to last story
+                currentGroupIndex = mockStoryGroups.length - 1;
+                currentStoryIndex = mockStoryGroups[currentGroupIndex].stories.length - 1;
+                updateUI();
+                nextStory(); // Should handle gracefully
+                
+                logSuccess('🎉 Test de navegación completado');
+                
+            } catch (error) {
+                logError(`❌ Error en test de navegación: ${error.message}`);
+                failedTests++;
+                updateTestCounters();
+            }
+        }
+        
+        function testErrorScenarios() {
+            log('❌ === INICIANDO TEST DE ESCENARIOS DE ERROR ===');
+            
+            try {
+                // Test invalid indices
+                log('📍 Test 1: Índices inválidos');
+                
+                const originalGroupIndex = currentGroupIndex;
+                const originalStoryIndex = currentStoryIndex;
+                
+                // Test negative indices
+                currentGroupIndex = -1;
+                currentStoryIndex = -1;
+                
+                try {
+                    updateUI();
+                    logError('❌ UI debería haber fallado con índices negativos');
+                    failedTests++;
+                } catch (error) {
+                    logSuccess('✅ Error manejado correctamente para índices negativos');
+                    successfulTests++;
+                }
+                
+                // Test out of bounds indices
+                currentGroupIndex = 999;
+                currentStoryIndex = 999;
+                
+                try {
+                    updateUI();
+                    logError('❌ UI debería haber fallado con índices fuera de rango');
+                    failedTests++;
+                } catch (error) {
+                    logSuccess('✅ Error manejado correctamente para índices fuera de rango');
+                    successfulTests++;
+                }
+                
+                // Restore valid indices
+                currentGroupIndex = originalGroupIndex;
+                currentStoryIndex = originalStoryIndex;
+                updateUI();
+                
+                // Test null/undefined data
+                log('📍 Test 2: Datos null/undefined');
+                
+                const originalGroups = mockStoryGroups.slice();
+                
+                // Test with null story
+                mockStoryGroups[0].stories[0] = null;
+                
+                try {
+                    updateUI();
+                    logError('❌ UI debería haber fallado con story null');
+                    failedTests++;
+                } catch (error) {
+                    logSuccess('✅ Error manejado correctamente para story null');
+                    successfulTests++;
+                }
+                
+                // Restore original data
+                mockStoryGroups.splice(0, mockStoryGroups.length, ...originalGroups);
+                updateUI();
+                
+                logSuccess('🎉 Test de escenarios de error completado');
+                updateTestCounters();
+                
+            } catch (error) {
+                logError(`❌ Error en test de escenarios de error: ${error.message}`);
+                failedTests++;
+                updateTestCounters();
+            }
+        }
+        
+        // Initialize
+        window.addEventListener('load', () => {
+            log('🚀 Stories Navigation Test initialized');
+            updateUI();
+            updateTestCounters();
+            
+            log('📋 Available tests:');
+            log('  • Navigation Test - Tests forward/backward navigation');
+            log('  • Error Scenarios - Tests error handling');
+            log('  • Manual Navigation - Use arrow buttons');
+            log('');
+            log('💡 Click buttons to test navigation behavior');
+            
+            // Start auto-progress
+            startProgress();
+        });
+        
+        // Cleanup on unload
+        window.addEventListener('beforeunload', () => {
+            if (progressInterval) {
+                clearInterval(progressInterval);
+            }
+        });
+    </script>
+</body>
+</html>

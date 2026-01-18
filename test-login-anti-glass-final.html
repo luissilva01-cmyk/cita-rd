@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CitaRD - Login Anti-Glass Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        /* Simulando los estilos problemáticos que podrían estar interfiriendo */
+        .card-glass {
+            background: rgba(255, 255, 255, 0.1) !important;
+            backdrop-filter: blur(16px) !important;
+            border-radius: 24px !important;
+            padding: 2rem !important;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        }
+
+        .input-glass {
+            background: rgba(255, 255, 255, 0.1) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            border-radius: 12px !important;
+            padding: 12px 16px !important;
+            color: white !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .input-glass::placeholder {
+            color: rgba(255, 255, 255, 0.6) !important;
+        }
+
+        .input-glass:focus {
+            outline: none !important;
+            border-color: rgba(147, 51, 234, 0.5) !important;
+            box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.1) !important;
+            background: rgba(255, 255, 255, 0.15) !important;
+        }
+
+        /* Anti-glass styles for login page */
+        .login-page-unique * {
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+        }
+        
+        .login-page-unique .card-glass,
+        .login-page-unique .input-glass,
+        .login-page-unique .glass,
+        .login-page-unique .glass-dark {
+            background: transparent !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+        
+        .login-page-unique input {
+            background-color: #f8fafc !important;
+            border-color: #e2e8f0 !important;
+            color: #1e293b !important;
+        }
+        
+        .login-page-unique input:focus {
+            outline: none !important;
+            border-color: #f97316 !important;
+            box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.2) !important;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+                'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+                sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen p-8">
+        <div class="max-w-6xl mx-auto">
+            <h1 class="text-3xl font-bold text-center mb-8 text-gray-800">
+                CitaRD - Login Anti-Glass Test
+            </h1>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- LOGIN CON PROBLEMAS (simulado) -->
+                <div class="space-y-4">
+                    <h2 class="text-xl font-semibold text-center text-red-600">ANTES - Con Glass Effects (Problemático)</h2>
+                    <div class="min-h-screen flex items-center justify-center p-4" style="background-color: #f8fafc; min-height: 600px;">
+                        <div class="card-glass w-full max-w-md mx-auto shadow-2xl rounded-3xl overflow-hidden">
+                            
+                            <!-- Header -->
+                            <div class="px-6 py-4 bg-white/80 backdrop-blur-md border-b border-slate-100">
+                                <div class="flex items-center justify-center gap-2">
+                                    <div class="bg-gradient-to-tr from-orange-500 to-rose-600 p-2 rounded-lg">
+                                        <i data-lucide="heart" class="text-white" style="width: 20px; height: 20px;"></i>
+                                    </div>
+                                    <h1 class="text-2xl font-bold bg-gradient-to-r from-orange-600 to-rose-600 bg-clip-text text-transparent">
+                                        CitaRD
+                                    </h1>
+                                </div>
+                            </div>
+
+                            <!-- Content -->
+                            <div class="p-6">
+                                <div class="text-center mb-8">
+                                    <h2 class="text-2xl font-bold text-slate-800 mb-2">
+                                        ¡Bienvenido de vuelta!
+                                    </h2>
+                                    <p class="text-slate-600">
+                                        Inicia sesión para continuar tu búsqueda del amor
+                                    </p>
+                                </div>
+
+                                <form class="space-y-6">
+                                    <!-- Email -->
+                                    <div>
+                                        <label class="block text-sm font-medium text-slate-700 mb-2">
+                                            Correo electrónico *
+                                        </label>
+                                        <div class="relative">
+                                            <i data-lucide="mail" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400" style="width: 20px; height: 20px;"></i>
+                                            <input
+                                                type="email"
+                                                placeholder="tu@email.com"
+                                                class="input-glass w-full pl-12 pr-4 py-3 rounded-xl transition-all"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <!-- Password -->
+                                    <div>
+                                        <label class="block text-sm font-medium text-slate-700 mb-2">
+                                            Contraseña *
+                                        </label>
+                                        <div class="relative">
+                                            <i data-lucide="lock" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400" style="width: 20px; height: 20px;"></i>
+                                            <input
+                                                type="password"
+                                                placeholder="••••••••"
+                                                class="input-glass w-full pl-12 pr-12 py-3 rounded-xl transition-all"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <button class="w-full bg-gradient-to-r from-orange-500 to-rose-600 hover:from-orange-600 hover:to-rose-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center justify-center gap-2">
+                                        Iniciar Sesión
+                                        <i data-lucide="arrow-right" style="width: 20px; height: 20px;"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LOGIN CORREGIDO -->
+                <div class="space-y-4">
+                    <h2 class="text-xl font-semibold text-center text-green-600">DESPUÉS - Sin Glass Effects (Corregido)</h2>
+                    <div class="login-page-unique" style="min-height: 100vh; background-color: #f8fafc; display: flex; align-items: center; justify-content: center; padding: 1rem; background-image: none; backdrop-filter: none; -webkit-backdrop-filter: none; min-height: 600px;">
+                        
+                        <div style="width: 100%; max-width: 28rem; margin: 0 auto; background-color: #ffffff; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); border-radius: 1.5rem; overflow: hidden; backdrop-filter: none; -webkit-backdrop-filter: none;">
+                            
+                            <!-- Header -->
+                            <div style="padding: 1.5rem 1.5rem 1rem 1.5rem; background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid #f1f5f9;">
+                                <div class="flex items-center justify-center gap-2">
+                                    <div class="bg-gradient-to-tr from-orange-500 to-rose-600 p-2 rounded-lg">
+                                        <i data-lucide="heart" class="text-white" style="width: 20px; height: 20px;"></i>
+                                    </div>
+                                    <h1 class="text-2xl font-bold bg-gradient-to-r from-orange-600 to-rose-600 bg-clip-text text-transparent">
+                                        CitaRD
+                                    </h1>
+                                </div>
+                            </div>
+
+                            <!-- Content -->
+                            <div style="padding: 1.5rem; background-color: #ffffff;">
+                                <div class="text-center mb-8">
+                                    <h2 class="text-2xl font-bold text-slate-800 mb-2">
+                                        ¡Bienvenido de vuelta!
+                                    </h2>
+                                    <p class="text-slate-600">
+                                        Inicia sesión para continuar tu búsqueda del amor
+                                    </p>
+                                </div>
+
+                                <form class="space-y-6">
+                                    <!-- Email -->
+                                    <div>
+                                        <label class="block text-sm font-medium text-slate-700 mb-2">
+                                            Correo electrónico *
+                                        </label>
+                                        <div class="relative">
+                                            <i data-lucide="mail" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400" style="width: 20px; height: 20px;"></i>
+                                            <input
+                                                type="email"
+                                                placeholder="tu@email.com"
+                                                style="width: 100%; padding-left: 3rem; padding-right: 1rem; padding-top: 0.75rem; padding-bottom: 0.75rem; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.75rem; color: #1e293b; font-size: 1rem; transition: all 0.3s ease;"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <!-- Password -->
+                                    <div>
+                                        <label class="block text-sm font-medium text-slate-700 mb-2">
+                                            Contraseña *
+                                        </label>
+                                        <div class="relative">
+                                            <i data-lucide="lock" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400" style="width: 20px; height: 20px;"></i>
+                                            <input
+                                                type="password"
+                                                placeholder="••••••••"
+                                                style="width: 100%; padding-left: 3rem; padding-right: 3rem; padding-top: 0.75rem; padding-bottom: 0.75rem; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.75rem; color: #1e293b; font-size: 1rem; transition: all 0.3s ease;"
+                                            />
+                                            <button type="button" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors">
+                                                <i data-lucide="eye" style="width: 20px; height: 20px;"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <button class="w-full bg-gradient-to-r from-orange-500 to-rose-600 hover:from-orange-600 hover:to-rose-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center justify-center gap-2">
+                                        Iniciar Sesión
+                                        <i data-lucide="arrow-right" style="width: 20px; height: 20px;"></i>
+                                    </button>
+                                </form>
+
+                                <!-- Register link -->
+                                <div class="mt-8 text-center">
+                                    <p class="text-slate-600 mb-4">¿No tienes una cuenta?</p>
+                                    <button class="w-full border-2 border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 py-3 px-6 rounded-xl transition-all duration-300">
+                                        Crear cuenta nueva
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Footer -->
+                            <div style="padding: 1rem 1.5rem; background-color: #f8fafc; border-top: 1px solid #f1f5f9;">
+                                <div class="flex justify-center items-center gap-6 text-sm text-slate-500">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                                        <span>100% Gratis</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                        <span>Verificado</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-2 h-2 bg-orange-500 rounded-full"></div>
+                                        <span>Seguro</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 p-6 bg-white rounded-lg shadow-lg">
+                <h3 class="text-lg font-semibold mb-4">Solución Aplicada:</h3>
+                <div class="space-y-4 text-sm">
+                    <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+                        <h4 class="font-medium text-red-800 mb-2">Problema Identificado:</h4>
+                        <ul class="space-y-1 text-red-700">
+                            <li>• Efectos glass morphism (.card-glass, .input-glass) aplicándose al Login</li>
+                            <li>• Fondos semi-transparentes con backdrop-filter</li>
+                            <li>• Colores de texto blancos sobre fondos claros (invisibles)</li>
+                            <li>• Conflictos entre múltiples archivos CSS</li>
+                        </ul>
+                    </div>
+                    <div class="p-4 bg-green-50 border border-green-200 rounded-lg">
+                        <h4 class="font-medium text-green-800 mb-2">Solución Implementada:</h4>
+                        <ul class="space-y-1 text-green-700">
+                            <li>• Clase única .login-page-unique para aislar estilos</li>
+                            <li>• Estilos inline con !important para forzar valores correctos</li>
+                            <li>• Desactivación explícita de backdrop-filter</li>
+                            <li>• Colores forzados: fondo #f8fafc, texto #1e293b</li>
+                            <li>• Anulación de todas las clases glass</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+        
+        console.log('Login Anti-Glass Test loaded');
+        console.log('Left side shows problematic glass effects');
+        console.log('Right side shows corrected version with anti-glass protection');
+    </script>
+</body>
+</html>

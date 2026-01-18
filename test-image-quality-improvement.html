@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - Mejora de Calidad de Imágenes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* High quality image rendering */
+        .high-quality-image {
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+            image-rendering: optimize-quality;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+        }
+
+        .swipe-card-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+            image-rendering: optimize-quality;
+        }
+
+        .gradient-overlay {
+            background: linear-gradient(
+                to bottom,
+                rgba(0, 0, 0, 0) 0%,
+                rgba(0, 0, 0, 0.1) 50%,
+                rgba(0, 0, 0, 0.8) 100%
+            );
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-4">
+    <div class="max-w-6xl mx-auto">
+        <h1 class="text-3xl font-bold text-center mb-8 text-gray-800">
+            📸 Mejora de Calidad de Imágenes - Ta' Pa' Ti
+        </h1>
+        
+        <div class="mb-8 text-center">
+            <p class="text-lg text-gray-600 mb-4">
+                Comparación de calidad de imágenes en las tarjetas de swipe
+            </p>
+            <div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded-lg inline-block">
+                <p class="font-semibold">🎯 Objetivo: Imágenes de alta calidad para mejor experiencia</p>
+            </div>
+        </div>
+
+        <!-- Comparación Antes vs Después -->
+        <div class="grid md:grid-cols-2 gap-8 mb-8">
+            <!-- Antes: Baja Calidad -->
+            <div class="space-y-4">
+                <h2 class="text-xl font-bold text-red-600 text-center">❌ Antes (Baja Calidad)</h2>
+                
+                <div class="relative h-96 bg-white rounded-3xl shadow-xl overflow-hidden mx-auto max-w-sm">
+                    <div class="relative h-full">
+                        <img 
+                            src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&q=80&w=600"
+                            alt="Baja calidad"
+                            class="w-full h-full object-cover"
+                        />
+                        
+                        <div class="absolute inset-0 gradient-overlay"></div>
+                        
+                        <div class="absolute bottom-0 left-0 right-0 p-6 text-white">
+                            <div class="flex items-center gap-2 mb-2">
+                                <h3 class="text-2xl font-bold">Carolina, 24</h3>
+                                <div class="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
+                                    <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <p class="text-sm text-white/90 mb-3">Imagen pixelada y borrosa</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <h4 class="font-semibold text-red-700 mb-2">Problemas Identificados:</h4>
+                    <ul class="text-red-700 text-sm space-y-1">
+                        <li>• <strong>Resolución:</strong> Solo 600px de ancho</li>
+                        <li>• <strong>Calidad:</strong> 80% de compresión</li>
+                        <li>• <strong>Resultado:</strong> Imágenes pixeladas en pantallas grandes</li>
+                        <li>• <strong>Experiencia:</strong> Poco profesional</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Después: Alta Calidad -->
+            <div class="space-y-4">
+                <h2 class="text-xl font-bold text-green-600 text-center">✅ Después (Alta Calidad)</h2>
+                
+                <div class="relative h-96 bg-white rounded-3xl shadow-xl overflow-hidden mx-auto max-w-sm">
+                    <div class="relative h-full">
+                        <img 
+                            src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&q=95&w=1200&h=1600"
+                            alt="Alta calidad"
+                            class="swipe-card-image"
+                        />
+                        
+                        <div class="absolute inset-0 gradient-overlay"></div>
+                        
+                        <div class="absolute bottom-0 left-0 right-0 p-6 text-white">
+                            <div class="flex items-center gap-2 mb-2">
+                                <h3 class="text-2xl font-bold">Carolina, 24</h3>
+                                <div class="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
+                                    <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <p class="text-sm text-white/90 mb-3">Imagen nítida y de alta calidad</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <h4 class="font-semibold text-green-700 mb-2">Mejoras Implementadas:</h4>
+                    <ul class="text-green-700 text-sm space-y-1">
+                        <li>• <strong>Resolución:</strong> 1200x1600px (2x mejor)</li>
+                        <li>• <strong>Calidad:</strong> 95% de compresión</li>
+                        <li>• <strong>Resultado:</strong> Imágenes nítidas en todas las pantallas</li>
+                        <li>• <strong>Experiencia:</strong> Profesional y atractiva</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Especificaciones Técnicas -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h2 class="text-xl font-bold mb-6 text-center">Especificaciones Técnicas</h2>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                    <h3 class="font-semibold mb-3 text-red-600">❌ Configuración Anterior</h3>
+                    <div class="bg-red-50 rounded-lg p-4 font-mono text-sm">
+                        <p><span class="text-red-600">URL:</span></p>
+                        <p class="break-all text-xs">...?q=80&w=600</p>
+                        <br>
+                        <p><span class="text-red-600">Parámetros:</span></p>
+                        <p>• Ancho: 600px</p>
+                        <p>• Calidad: 80%</p>
+                        <p>• Avatar: 600px</p>
+                        <p>• Renderizado: Estándar</p>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="font-semibold mb-3 text-green-600">✅ Nueva Configuración</h3>
+                    <div class="bg-green-50 rounded-lg p-4 font-mono text-sm">
+                        <p><span class="text-green-600">URL:</span></p>
+                        <p class="break-all text-xs">...?q=95&w=1200&h=1600</p>
+                        <br>
+                        <p><span class="text-green-600">Parámetros:</span></p>
+                        <p>• Ancho: 1200px</p>
+                        <p>• Alto: 1600px</p>
+                        <p>• Calidad: 95%</p>
+                        <p>• Avatar: 1200px</p>
+                        <p>• Renderizado: Optimizado</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CSS Optimizations -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h2 class="text-xl font-bold mb-6 text-center">Optimizaciones CSS Aplicadas</h2>
+            
+            <div class="bg-gray-100 rounded-lg p-4 font-mono text-sm">
+                <p class="text-blue-600 font-semibold mb-2">/* High quality image rendering */</p>
+                <p>.swipe-card-image {</p>
+                <p class="ml-4">image-rendering: -webkit-optimize-contrast;</p>
+                <p class="ml-4">image-rendering: crisp-edges;</p>
+                <p class="ml-4">image-rendering: optimize-quality;</p>
+                <p class="ml-4">-webkit-backface-visibility: hidden;</p>
+                <p class="ml-4">backface-visibility: hidden;</p>
+                <p class="ml-4">-webkit-transform: translateZ(0);</p>
+                <p class="ml-4">transform: translateZ(0);</p>
+                <p>}</p>
+            </div>
+        </div>
+
+        <!-- Comparación de Diferentes Usuarios -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-xl font-bold mb-6 text-center">Galería de Alta Calidad</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Usuario 1 -->
+                <div class="relative h-64 bg-white rounded-2xl shadow-md overflow-hidden">
+                    <img 
+                        src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=95&w=1200&h=1600"
+                        alt="Marcos"
+                        class="swipe-card-image"
+                    />
+                    <div class="absolute inset-0 gradient-overlay"></div>
+                    <div class="absolute bottom-3 left-3 right-3 text-white">
+                        <h4 class="font-bold">Marcos, 27</h4>
+                        <p class="text-xs opacity-90">Santiago • 15km</p>
+                    </div>
+                </div>
+                
+                <!-- Usuario 2 -->
+                <div class="relative h-64 bg-white rounded-2xl shadow-md overflow-hidden">
+                    <img 
+                        src="https://images.unsplash.com/photo-1494790108755-2616b612b786?auto=format&fit=crop&q=95&w=1200&h=1600"
+                        alt="Isabella"
+                        class="swipe-card-image"
+                    />
+                    <div class="absolute inset-0 gradient-overlay"></div>
+                    <div class="absolute bottom-3 left-3 right-3 text-white">
+                        <h4 class="font-bold">Isabella, 26</h4>
+                        <p class="text-xs opacity-90">Santo Domingo • 5km</p>
+                    </div>
+                </div>
+                
+                <!-- Usuario 3 -->
+                <div class="relative h-64 bg-white rounded-2xl shadow-md overflow-hidden">
+                    <img 
+                        src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=95&w=1200&h=1600"
+                        alt="Sofía"
+                        class="swipe-card-image"
+                    />
+                    <div class="absolute inset-0 gradient-overlay"></div>
+                    <div class="absolute bottom-3 left-3 right-3 text-white">
+                        <h4 class="font-bold">Sofía, 23</h4>
+                        <p class="text-xs opacity-90">Santo Domingo • 2km</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-8 text-center">
+            <div class="bg-green-100 border border-green-400 text-green-700 px-6 py-4 rounded-lg inline-block">
+                <p class="font-semibold">✅ Calidad de Imágenes Mejorada</p>
+                <p class="text-sm mt-2">
+                    Las tarjetas de swipe ahora muestran imágenes de alta calidad<br>
+                    con renderizado optimizado para una experiencia premium.
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

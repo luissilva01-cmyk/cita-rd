@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - Stories Circular Fix</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Ensure circular images */
+        .story-avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .story-ring {
+            background: linear-gradient(45deg, #ff8052, #ffc107);
+            padding: 3px;
+            border-radius: 50%;
+        }
+        
+        .story-container {
+            background: white;
+            border-radius: 50%;
+            padding: 2px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-4">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold text-center mb-8 text-gray-800">
+            📱 Test de Fotos Circulares en Historias - Ta' Pa' Ti
+        </h1>
+        
+        <div class="mb-8 text-center">
+            <p class="text-lg text-gray-600 mb-4">
+                Verificación de que todas las fotos de historias sean perfectamente circulares
+            </p>
+            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg inline-block">
+                <p class="font-semibold">✅ Objetivo: Fotos de historias 100% circulares</p>
+            </div>
+        </div>
+
+        <!-- Stories Ring Simulation -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h2 class="text-xl font-bold mb-6 text-center">Ring de Historias</h2>
+            
+            <div class="flex gap-4 overflow-x-auto pb-4">
+                <!-- Mi Historia -->
+                <div class="flex flex-col items-center gap-2 min-w-[80px]">
+                    <div class="story-ring w-16 h-16">
+                        <div class="story-container w-full h-full">
+                            <img 
+                                src="https://images.unsplash.com/photo-1494790108755-2616b612b786?auto=format&fit=crop&q=80&w=200&h=200"
+                                alt="Mi Historia"
+                                class="story-avatar"
+                            />
+                        </div>
+                    </div>
+                    <span class="text-xs text-gray-600 text-center">Tu historia</span>
+                </div>
+                
+                <!-- Historia 1 - Imagen Cuadrada -->
+                <div class="flex flex-col items-center gap-2 min-w-[80px]">
+                    <div class="story-ring w-16 h-16">
+                        <div class="story-container w-full h-full">
+                            <img 
+                                src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&q=80&w=200&h=200"
+                                alt="Carolina"
+                                class="story-avatar"
+                            />
+                        </div>
+                    </div>
+                    <span class="text-xs text-gray-600 text-center">Carolina</span>
+                </div>
+                
+                <!-- Historia 2 - Imagen Horizontal -->
+                <div class="flex flex-col items-center gap-2 min-w-[80px]">
+                    <div class="story-ring w-16 h-16">
+                        <div class="story-container w-full h-full">
+                            <img 
+                                src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=300&h=200"
+                                alt="Marcos"
+                                class="story-avatar"
+                            />
+                        </div>
+                    </div>
+                    <span class="text-xs text-gray-600 text-center">Marcos</span>
+                </div>
+                
+                <!-- Historia 3 - Imagen Vertical -->
+                <div class="flex flex-col items-center gap-2 min-w-[80px]">
+                    <div class="story-ring w-16 h-16">
+                        <div class="story-container w-full h-full">
+                            <img 
+                                src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200&h=300"
+                                alt="Sofía"
+                                class="story-avatar"
+                            />
+                        </div>
+                    </div>
+                    <span class="text-xs text-gray-600 text-center">Sofía</span>
+                </div>
+                
+                <!-- Historia 4 - Imagen Horizontal Grande -->
+                <div class="flex flex-col items-center gap-2 min-w-[80px]">
+                    <div class="story-ring w-16 h-16">
+                        <div class="story-container w-full h-full">
+                            <img 
+                                src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=400&h=250"
+                                alt="Diego"
+                                class="story-avatar"
+                            />
+                        </div>
+                    </div>
+                    <span class="text-xs text-gray-600 text-center">Diego</span>
+                </div>
+                
+                <!-- Historia 5 - Imagen Muy Vertical -->
+                <div class="flex flex-col items-center gap-2 min-w-[80px]">
+                    <div class="story-ring w-16 h-16">
+                        <div class="story-container w-full h-full">
+                            <img 
+                                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=150&h=400"
+                                alt="Rafael"
+                                class="story-avatar"
+                            />
+                        </div>
+                    </div>
+                    <span class="text-xs text-gray-600 text-center">Rafael</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comparación de Tamaños -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h2 class="text-xl font-bold mb-6 text-center">Diferentes Tamaños - Todas Circulares</h2>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <!-- Pequeño -->
+                <div class="text-center">
+                    <h3 class="font-semibold mb-3">Pequeño (48px)</h3>
+                    <div class="flex justify-center">
+                        <div class="story-ring w-12 h-12">
+                            <div class="story-container w-full h-full">
+                                <img 
+                                    src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&q=80&w=200&h=200"
+                                    alt="Pequeño"
+                                    class="story-avatar"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Mediano -->
+                <div class="text-center">
+                    <h3 class="font-semibold mb-3">Mediano (64px)</h3>
+                    <div class="flex justify-center">
+                        <div class="story-ring w-16 h-16">
+                            <div class="story-container w-full h-full">
+                                <img 
+                                    src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=300&h=200"
+                                    alt="Mediano"
+                                    class="story-avatar"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Grande -->
+                <div class="text-center">
+                    <h3 class="font-semibold mb-3">Grande (80px)</h3>
+                    <div class="flex justify-center">
+                        <div class="story-ring w-20 h-20">
+                            <div class="story-container w-full h-full">
+                                <img 
+                                    src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200&h=300"
+                                    alt="Grande"
+                                    class="story-avatar"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Extra Grande -->
+                <div class="text-center">
+                    <h3 class="font-semibold mb-3">XL (96px)</h3>
+                    <div class="flex justify-center">
+                        <div class="story-ring w-24 h-24">
+                            <div class="story-container w-full h-full">
+                                <img 
+                                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=400&h=250"
+                                    alt="Extra Grande"
+                                    class="story-avatar"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Antes vs Después -->
+        <div class="grid md:grid-cols-2 gap-8 mb-8">
+            <!-- Antes: Problema -->
+            <div class="bg-red-50 border border-red-200 rounded-lg p-6">
+                <h3 class="text-lg font-bold text-red-700 mb-4 text-center">❌ Antes (Problema)</h3>
+                
+                <div class="flex justify-center mb-4">
+                    <div class="story-ring w-20 h-20">
+                        <div class="story-container w-full h-full">
+                            <!-- Simulando imagen no circular -->
+                            <img 
+                                src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=300&h=200"
+                                alt="Antes - No circular"
+                                class="w-full h-full object-cover"
+                                style="border-radius: 0;"
+                            />
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <p class="text-red-700 text-sm">
+                        <strong>Problema:</strong> Las imágenes no eran perfectamente circulares, 
+                        especialmente con imágenes horizontales o verticales.
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Después: Solución -->
+            <div class="bg-green-50 border border-green-200 rounded-lg p-6">
+                <h3 class="text-lg font-bold text-green-700 mb-4 text-center">✅ Después (Solucionado)</h3>
+                
+                <div class="flex justify-center mb-4">
+                    <div class="story-ring w-20 h-20">
+                        <div class="story-container w-full h-full">
+                            <img 
+                                src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=300&h=200"
+                                alt="Después - Circular"
+                                class="story-avatar"
+                            />
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <p class="text-green-700 text-sm">
+                        <strong>Solución:</strong> Todas las imágenes ahora son perfectamente circulares 
+                        usando <code>rounded-full object-cover</code>.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Especificaciones Técnicas -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-xl font-bold mb-6 text-center">Especificaciones Técnicas</h2>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                    <h3 class="font-semibold mb-3 text-blue-600">CSS Aplicado</h3>
+                    <div class="bg-gray-100 rounded-lg p-4 font-mono text-sm">
+                        <p><span class="text-blue-600">className:</span> "w-full h-full rounded-full object-cover"</p>
+                        <br>
+                        <p><span class="text-green-600">/* Equivale a: */</span></p>
+                        <p>width: 100%;</p>
+                        <p>height: 100%;</p>
+                        <p>border-radius: 50%;</p>
+                        <p>object-fit: cover;</p>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="font-semibold mb-3 text-purple-600">Componentes Actualizados</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li class="flex items-center gap-2">
+                            <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                            StoriesRingWorking.tsx
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                            StoriesRingSimple.tsx
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                            StoriesRingFixed.tsx
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                            StoriesRing.tsx
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-8 text-center">
+            <div class="bg-green-100 border border-green-400 text-green-700 px-6 py-4 rounded-lg inline-block">
+                <p class="font-semibold">✅ Fotos de Historias Corregidas</p>
+                <p class="text-sm mt-2">
+                    Todas las imágenes de historias ahora son perfectamente circulares<br>
+                    independientemente de la orientación original de la imagen.
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

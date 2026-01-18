@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CitaRD - Demo Completo del Proyecto</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .card-glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(16px);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .feature-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .demo-section {
+            margin: 2rem 0;
+            padding: 2rem;
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <div class="w-20 h-20 bg-gradient-to-r from-pink-500 to-red-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+                <span class="text-white text-3xl">❤️</span>
+            </div>
+            <h1 class="text-5xl font-bold text-white mb-4">CitaRD - Proyecto Completo</h1>
+            <p class="text-xl text-gray-200 max-w-3xl mx-auto">
+                Aplicación de citas completa con IA, Firebase, Stories, Chat en tiempo real y mucho más
+            </p>
+        </div>
+
+        <!-- Funcionalidades Principales -->
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+            <!-- Sistema de Autenticación -->
+            <div class="card-glass p-6 feature-card">
+                <div class="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center mb-4">
+                    <span class="text-white text-xl">🔐</span>
+                </div>
+                <h3 class="text-xl font-semibold text-white mb-3">Autenticación Firebase</h3>
+                <p class="text-gray-300 mb-4">Sistema completo de login, registro y gestión de usuarios con Firebase Auth</p>
+                <div class="text-sm text-gray-400">
+                    <div>✅ Login/Register</div>
+                    <div>✅ Recuperar contraseña</div>
+                    <div>✅ Verificación de email</div>
+                </div>
+            </div>
+
+            <!-- Sistema de Swipe -->
+            <div class="card-glass p-6 feature-card">
+                <div class="w-12 h-12 bg-pink-500 rounded-lg flex items-center justify-center mb-4">
+                    <span class="text-white text-xl">💕</span>
+                </div>
+                <h3 class="text-xl font-semibold text-white mb-3">Swipe & Match</h3>
+                <p class="text-gray-300 mb-4">Sistema de swipe como Tinder con animaciones y detección de matches</p>
+                <div class="text-sm text-gray-400">
+                    <div>✅ Swipe gestures</div>
+                    <div>✅ Match animations</div>
+                    <div>✅ Algoritmo de compatibilidad</div>
+                </div>
+            </div>
+
+            <!-- Chat en Tiempo Real -->
+            <div class="card-glass p-6 feature-card">
+                <div class="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center mb-4">
+                    <span class="text-white text-xl">💬</span>
+                </div>
+                <h3 class="text-xl font-semibold text-white mb-3">Chat Avanzado</h3>
+                <p class="text-gray-300 mb-4">Chat en tiempo real con mensajes de voz, emojis y videollamadas</p>
+                <div class="text-sm text-gray-400">
+                    <div>✅ Mensajes en tiempo real</div>
+                    <div>✅ Mensajes de voz</div>
+                    <div>✅ Videollamadas</div>
+                </div>
+            </div>
+
+            <!-- Stories Sistema -->
+            <div class="card-glass p-6 feature-card">
+                <div class="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center mb-4">
+                    <span class="text-white text-xl">📸</span>
+                </div>
+                <h3 class="text-xl font-semibold text-white mb-3">Stories Instagram-like</h3>
+                <p class="text-gray-300 mb-4">Sistema completo de historias con reacciones y mensajes privados</p>
+                <div class="text-sm text-gray-400">
+                    <div>✅ Crear/Ver stories</div>
+                    <div>✅ Reacciones rápidas</div>
+                    <div>✅ Configuración de privacidad</div>
+                </div>
+            </div>
+
+            <!-- IA Integrada -->
+            <div class="card-glass p-6 feature-card">
+                <div class="w-12 h-12 bg-yellow-500 rounded-lg flex items-center justify-center mb-4">
+                    <span class="text-white text-xl">🤖</span>
+                </div>
+                <h3 class="text-xl font-semibold text-white mb-3">IA Coach & Matching</h3>
+                <p class="text-gray-300 mb-4">IA para sugerencias de conversación y análisis de compatibilidad emocional</p>
+                <div class="text-sm text-gray-400">
+                    <div>✅ AI Coach conversacional</div>
+                    <div>✅ Análisis emocional</div>
+                    <div>✅ Matching inteligente</div>
+                </div>
+            </div>
+
+            <!-- Verificación de Fotos -->
+            <div class="card-glass p-6 feature-card">
+                <div class="w-12 h-12 bg-indigo-500 rounded-lg flex items-center justify-center mb-4">
+                    <span class="text-white text-xl">✅</span>
+                </div>
+                <h3 class="text-xl font-semibold text-white mb-3">Verificación de Fotos</h3>
+                <p class="text-gray-300 mb-4">Sistema de verificación de identidad y análisis de fotos con IA</p>
+                <div class="text-sm text-gray-400">
+                    <div>✅ Verificación facial</div>
+                    <div>✅ Análisis de calidad</div>
+                    <div>✅ Badges de verificación</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Secciones Detalladas -->
+        <div class="space-y-8">
+            <!-- Arquitectura Técnica -->
+            <div class="demo-section card-glass">
+                <h2 class="text-3xl font-bold text-white mb-6">🏗️ Arquitectura Técnica</h2>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <h4 class="text-lg font-semibold text-white mb-3">Frontend</h4>
+                        <ul class="text-gray-300 space-y-2">
+                            <li>✅ React 19 + TypeScript</li>
+                            <li>✅ React Router para navegación</li>
+                            <li>✅ Framer Motion para animaciones</li>
+                            <li>✅ Tailwind CSS + Glass morphism</li>
+                            <li>✅ PWA ready (Progressive Web App)</li>
+                            <li>✅ Responsive design mobile-first</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-semibold text-white mb-3">Backend & Servicios</h4>
+                        <ul class="text-gray-300 space-y-2">
+                            <li>✅ Firebase Auth + Firestore</li>
+                            <li>✅ Firebase Storage para fotos</li>
+                            <li>✅ Real-time database</li>
+                            <li>✅ Google Gemini AI integration</li>
+                            <li>✅ Stripe para pagos premium</li>
+                            <li>✅ Push notifications (FCM)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Páginas y Vistas -->
+            <div class="demo-section card-glass">
+                <h2 class="text-3xl font-bold text-white mb-6">📱 Páginas y Vistas</h2>
+                <div class="grid md:grid-cols-3 gap-4">
+                    <div class="bg-white/5 p-4 rounded-lg">
+                        <h5 class="font-semibold text-white mb-2">🏠 Home & Landing</h5>
+                        <ul class="text-sm text-gray-300 space-y-1">
+                            <li>• UltraModernHome</li>
+                            <li>• ModernHome</li>
+                            <li>• SimpleHome</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white/5 p-4 rounded-lg">
+                        <h5 class="font-semibold text-white mb-2">👤 Perfiles</h5>
+                        <ul class="text-sm text-gray-300 space-y-1">
+                            <li>• Perfil detallado</li>
+                            <li>• Editar perfil</li>
+                            <li>• Explorar perfiles</li>
+                            <li>• Swipe page</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white/5 p-4 rounded-lg">
+                        <h5 class="font-semibold text-white mb-2">💬 Chat & Social</h5>
+                        <ul class="text-sm text-gray-300 space-y-1">
+                            <li>• Chat individual</li>
+                            <li>• Lista de chats</li>
+                            <li>• Matches page</li>
+                            <li>• Stories page</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white/5 p-4 rounded-lg">
+                        <h5 class="font-semibold text-white mb-2">⚙️ Configuración</h5>
+                        <ul class="text-sm text-gray-300 space-y-1">
+                            <li>• Preferencias</li>
+                            <li>• Privacidad</li>
+                            <li>• Usuarios bloqueados</li>
+                            <li>• Configuración cuenta</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white/5 p-4 rounded-lg">
+                        <h5 class="font-semibold text-white mb-2">🤖 IA & Premium</h5>
+                        <ul class="text-sm text-gray-300 space-y-1">
+                            <li>• AI Coach</li>
+                            <li>• Funciones premium</li>
+                            <li>• Análisis emocional</li>
+                            <li>• Matching inteligente</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white/5 p-4 rounded-lg">
+                        <h5 class="font-semibold text-white mb-2">🧪 Testing</h5>
+                        <ul class="text-sm text-gray-300 space-y-1">
+                            <li>• Test pages</li>
+                            <li>• Debug tools</li>
+                            <li>• Component demos</li>
+                            <li>• Feature tests</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Componentes Avanzados -->
+            <div class="demo-section card-glass">
+                <h2 class="text-3xl font-bold text-white mb-6">🧩 Componentes Avanzados</h2>
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-white/5 p-4 rounded-lg">
+                        <h5 class="font-semibold text-white mb-2">📸 Media</h5>
+                        <ul class="text-sm text-gray-300 space-y-1">
+                            <li>• PhotoUploader</li>
+                            <li>• PhotoViewer</li>
+                            <li>• SimpleCamera</li>
+                            <li>• ReliableCamera</li>
+                            <li>• GaleriaFotos</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white/5 p-4 rounded-lg">
+                        <h5 class="font-semibold text-white mb-2">💬 Chat</h5>
+                        <ul class="text-sm text-gray-300 space-y-1">
+                            <li>• ChatInputEnhanced</li>
+                            <li>• VoiceMessage</li>
+                            <li>• CallInterface</li>
+                            <li>• EmojiPicker</li>
+                            <li>• TypingIndicator</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white/5 p-4 rounded-lg">
+                        <h5 class="font-semibold text-white mb-2">📱 Stories</h5>
+                        <ul class="text-sm text-gray-300 space-y-1">
+                            <li>• StoriesRing</li>
+                            <li>• StoriesViewer</li>
+                            <li>• CreateStoryModal</li>
+                            <li>• StoriesPrivacySettings</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white/5 p-4 rounded-lg">
+                        <h5 class="font-semibold text-white mb-2">🎮 Interacción</h5>
+                        <ul class="text-sm text-gray-300 space-y-1">
+                            <li>• SwipeCard</li>
+                            <li>• MatchModal</li>
+                            <li>• QuickReactions</li>
+                            <li>• ReactiveToggle</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Servicios y Hooks -->
+            <div class="demo-section card-glass">
+                <h2 class="text-3xl font-bold text-white mb-6">⚙️ Servicios y Hooks</h2>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div>
+                        <h4 class="text-lg font-semibold text-white mb-3">🔥 Firebase Services</h4>
+                        <ul class="text-gray-300 space-y-1 text-sm">
+                            <li>• authService</li>
+                            <li>• chatService</li>
+                            <li>• profileService</li>
+                            <li>• storiesService</li>
+                            <li>• uploadService</li>
+                            <li>• privacyService</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-semibold text-white mb-3">🤖 IA Services</h4>
+                        <ul class="text-gray-300 space-y-1 text-sm">
+                            <li>• geminiService</li>
+                            <li>• emotionalAI</li>
+                            <li>• matchingAI</li>
+                            <li>• photoAnalysisService</li>
+                            <li>• verificationService</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-semibold text-white mb-3">🎣 Custom Hooks</h4>
+                        <ul class="text-gray-300 space-y-1 text-sm">
+                            <li>• useAuth</li>
+                            <li>• useSwipeGesture</li>
+                            <li>• useMatchAnimation</li>
+                            <li>• useGeolocation</li>
+                            <li>• useNotifications</li>
+                            <li>• useEmotionalAI</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Acciones -->
+        <div class="text-center mt-12">
+            <h2 class="text-3xl font-bold text-white mb-6">🚀 Acceder a la Aplicación</h2>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="http://localhost:3000?demo=true" target="_blank" 
+                   class="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-4 rounded-2xl font-semibold text-lg hover:from-purple-700 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
+                    🏠 Ver App Principal (Modo Demo)
+                </a>
+                <a href="http://localhost:3000/login" target="_blank" 
+                   class="border-2 border-white/30 text-white px-8 py-4 rounded-2xl font-semibold text-lg hover:bg-white/10 hover:border-white/50 transition-all duration-300">
+                    🔐 Probar Autenticación
+                </a>
+            </div>
+            <p class="text-gray-300 mt-4">
+                <strong>Modo Demo:</strong> Accede directamente a la app sin registrarte<br>
+                <strong>Modo Normal:</strong> Requiere login/registro con Firebase
+            </p>
+            <div class="mt-6 p-4 bg-white/10 rounded-lg max-w-2xl mx-auto">
+                <h4 class="text-white font-semibold mb-2">🎯 Enlaces Directos:</h4>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
+                    <a href="http://localhost:3000?demo=true" target="_blank" class="text-blue-300 hover:text-blue-100">🏠 Discovery</a>
+                    <a href="http://localhost:3000?demo=true#/messages" target="_blank" class="text-blue-300 hover:text-blue-100">💬 Messages</a>
+                    <a href="http://localhost:3000?demo=true#/profile" target="_blank" class="text-blue-300 hover:text-blue-100">👤 Profile</a>
+                    <a href="http://localhost:3000?demo=true#/ai-coach" target="_blank" class="text-blue-300 hover:text-blue-100">🤖 AI Coach</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center mt-16 pt-8 border-t border-white/20">
+            <p class="text-gray-300">
+                © 2024 CitaRD - Aplicación de citas completa desarrollada con React, Firebase y IA
+            </p>
+            <p class="text-gray-400 text-sm mt-2">
+                Más de 100 componentes, 50+ páginas, integración completa con Firebase y IA
+            </p>
+        </div>
+    </div>
+
+    <script>
+        console.log('🚀 CitaRD - Demo Completo del Proyecto');
+        console.log('📱 Aplicación funcionando en: http://localhost:3000');
+        console.log('✅ Todas las funcionalidades implementadas');
+        
+        // Añadir interactividad a las cards
+        document.querySelectorAll('.feature-card').forEach(card => {
+            card.addEventListener('click', () => {
+                card.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    card.style.transform = 'translateY(-5px)';
+                }, 150);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔍 Debug: React Router Navigation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .debug-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-frame {
+            width: 100%;
+            height: 500px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        .warning { background: #fff3cd; color: #856404; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Debug: React Router Navigation</h1>
+    
+    <div class="debug-section">
+        <h2>Diagnóstico Confirmado</h2>
+        <div class="info">
+            <strong>✅ Confirmado:</strong> La aplicación SÍ carga (mensaje "Auth state changed: null" visible)
+            <br><strong>❌ Problema:</strong> El enlace "¿Olvidaste tu contraseña?" no navega
+            <br><strong>🎯 Causa:</strong> Problema específico de React Router Link
+        </div>
+    </div>
+
+    <div class="debug-section">
+        <h2>Test de Login Page con Inspector</h2>
+        <p>Carga la página de login y usa las herramientas de desarrollador:</p>
+        <iframe src="http://localhost:3001/login" class="test-frame" id="login-frame"></iframe>
+        
+        <div class="warning">
+            <strong>Instrucciones de Debug:</strong>
+            <ol>
+                <li>Haz clic derecho en el iframe arriba → "Inspeccionar elemento"</li>
+                <li>Busca el enlace "¿Olvidaste tu contraseña?" en el HTML</li>
+                <li>Verifica que tenga: <code>&lt;a href="/forgot-password"&gt;</code></li>
+                <li>Haz clic en el enlace y observa la consola</li>
+                <li>Verifica si hay errores de JavaScript</li>
+            </ol>
+        </div>
+    </div>
+
+    <div class="debug-section">
+        <h2>Posibles Causas del Problema</h2>
+        
+        <div class="error">
+            <strong>1. Event Handler Bloqueado:</strong>
+            <ul>
+                <li>El onClick del Link está siendo interceptado</li>
+                <li>Algún preventDefault() está bloqueando la navegación</li>
+                <li>Error en el event handler de React Router</li>
+            </ul>
+        </div>
+
+        <div class="error">
+            <strong>2. Router Context Problema:</strong>
+            <ul>
+                <li>El componente no está dentro del Router context</li>
+                <li>Múltiples routers conflictivos</li>
+                <li>BrowserRouter no configurado correctamente</li>
+            </ul>
+        </div>
+
+        <div class="error">
+            <strong>3. CSS/JavaScript Interferencia:</strong>
+            <ul>
+                <li>CSS pointer-events: none</li>
+                <li>JavaScript event listener conflictivo</li>
+                <li>Z-index o overlay bloqueando el click</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="debug-section">
+        <h2>Test Manual en Consola</h2>
+        <div class="info">
+            <strong>Ejecuta estos comandos en la consola del navegador (F12):</strong>
+            <pre style="background: #f8f9fa; padding: 10px; border-radius: 5px;">
+// 1. Verificar si React Router está disponible
+console.log('React Router:', window.ReactRouterDOM);
+
+// 2. Buscar el enlace en el DOM
+const forgotLink = document.querySelector('a[href="/forgot-password"]');
+console.log('Enlace encontrado:', forgotLink);
+
+// 3. Verificar event listeners
+if (forgotLink) {
+    console.log('Event listeners:', getEventListeners(forgotLink));
+}
+
+// 4. Simular click programático
+if (forgotLink) {
+    forgotLink.click();
+    console.log('Click simulado ejecutado');
+}
+
+// 5. Verificar la URL actual
+console.log('URL actual:', window.location.href);
+            </pre>
+        </div>
+    </div>
+
+    <div class="debug-section">
+        <h2>Solución Temporal: Navegación Programática</h2>
+        <div class="warning">
+            <p>Si el Link no funciona, podemos usar navegación programática:</p>
+            <pre style="background: #f8f9fa; padding: 10px; border-radius: 5px;">
+// En lugar de Link, usar:
+const navigate = useNavigate();
+
+&lt;button onClick={() => navigate('/forgot-password')}&gt;
+    ¿Olvidaste tu contraseña?
+&lt;/button&gt;
+            </pre>
+        </div>
+    </div>
+
+    <div class="debug-section">
+        <h2>Próximos Pasos</h2>
+        <div class="info">
+            <strong>Basado en lo que encontremos:</strong>
+            <ol>
+                <li><strong>Si el enlace existe en el DOM:</strong> Problema de event handling</li>
+                <li><strong>Si no hay event listeners:</strong> React Router no está conectado</li>
+                <li><strong>Si hay errores en consola:</strong> Problema de JavaScript</li>
+                <li><strong>Si nada funciona:</strong> Cambiar a navegación programática</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        console.log('🔍 Debug de React Router iniciado');
+        console.log('📋 El problema está identificado:');
+        console.log('   ✅ La app carga (Firebase Auth funciona)');
+        console.log('   ❌ El enlace no navega (React Router issue)');
+        console.log('');
+        console.log('🛠️ Ejecuta los comandos de debug en la consola');
+        console.log('🔧 Inspecciona el iframe para ver el HTML del enlace');
+        
+        // Monitorear el iframe
+        document.getElementById('login-frame').onload = function() {
+            console.log('✅ Login iframe cargado - Listo para debug');
+        };
+    </script>
+</body>
+</html>

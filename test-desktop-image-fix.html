@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test: Arreglo de Imágenes Desktop - Ta' Pa' Ti</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Swipe card image improvements */
+        .swipe-card-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        /* Desktop specific image improvements */
+        @media (min-width: 1024px) {
+            .swipe-card-image {
+                object-fit: contain; /* Show full image on desktop */
+                background-color: #f3f4f6; /* Light gray background */
+            }
+        }
+
+        /* Tablet specific adjustments */
+        @media (min-width: 641px) and (max-width: 1023px) {
+            .swipe-card-image {
+                object-fit: cover; /* Keep cropping on tablet */
+                object-position: center 30%; /* Better face positioning */
+            }
+        }
+
+        .card-container {
+            width: 100%;
+            max-width: 400px;
+            height: 600px;
+            margin: 0 auto;
+        }
+
+        @media (min-width: 1024px) {
+            .card-container {
+                max-width: 500px;
+                height: 700px;
+            }
+        }
+
+        .device-indicator {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            padding: 8px 12px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            border-radius: 6px;
+            font-size: 12px;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-4">
+    <div class="device-indicator">
+        <span id="deviceType">Móvil</span> | <span id="screenSize"></span>
+    </div>
+
+    <div class="max-w-6xl mx-auto">
+        <h1 class="text-3xl font-bold text-center mb-8 text-gray-800">
+            🖼️ Test: Arreglo de Imágenes en Desktop
+        </h1>
+        
+        <div class="bg-white rounded-lg p-6 mb-6 shadow-lg">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700">Problema Identificado</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div class="bg-red-50 p-4 rounded-lg border border-red-200">
+                    <h3 class="font-semibold text-red-800 mb-2">❌ Antes (Problema)</h3>
+                    <ul class="text-red-700 space-y-1">
+                        <li>• object-fit: cover en todas las pantallas</li>
+                        <li>• Imágenes se cortaban en desktop</li>
+                        <li>• Perdida de contenido visual importante</li>
+                        <li>• Experiencia inconsistente entre dispositivos</li>
+                    </ul>
+                </div>
+                <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                    <h3 class="font-semibold text-green-800 mb-2">✅ Después (Solución)</h3>
+                    <ul class="text-green-700 space-y-1">
+                        <li>• object-fit: contain en desktop (1024px+)</li>
+                        <li>• object-fit: cover en móvil y tablet</li>
+                        <li>• Fondo gris para espacios vacíos</li>
+                        <li>• Mejor posicionamiento de rostros</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Imagen Antes (Problema) -->
+            <div class="bg-white rounded-lg p-6 shadow-lg">
+                <h3 class="text-lg font-semibold mb-4 text-red-600">❌ Antes: Imagen Cortada</h3>
+                <div class="card-container bg-white rounded-3xl shadow-xl overflow-hidden">
+                    <div class="relative h-full">
+                        <img 
+                            src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=95&w=1200&h=1600" 
+                            alt="Marcos - Antes" 
+                            class="w-full h-full object-cover pointer-events-none"
+                            style="object-position: center;"
+                        >
+                        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/70"></div>
+                        <div class="absolute bottom-0 left-0 right-0 p-6 text-white">
+                            <h2 class="text-2xl font-bold mb-2">Marcos, 27</h2>
+                            <p class="text-sm opacity-90">Imagen cortada en desktop</p>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-sm text-red-600 mt-3 text-center">
+                    <strong>Problema:</strong> Se corta parte de la imagen en pantallas grandes
+                </p>
+            </div>
+
+            <!-- Imagen Después (Solución) -->
+            <div class="bg-white rounded-lg p-6 shadow-lg">
+                <h3 class="text-lg font-semibold mb-4 text-green-600">✅ Después: Imagen Completa</h3>
+                <div class="card-container bg-white rounded-3xl shadow-xl overflow-hidden">
+                    <div class="relative h-full bg-gray-100">
+                        <img 
+                            src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=95&w=1200&h=1600" 
+                            alt="Marcos - Después" 
+                            class="swipe-card-image pointer-events-none"
+                        >
+                        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/70"></div>
+                        <div class="absolute bottom-0 left-0 right-0 p-6 text-white">
+                            <h2 class="text-2xl font-bold mb-2">Marcos, 27</h2>
+                            <p class="text-sm opacity-90">Imagen completa en desktop</p>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-sm text-green-600 mt-3 text-center">
+                    <strong>Solución:</strong> Se muestra la imagen completa sin cortes
+                </p>
+            </div>
+        </div>
+
+        <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+            <h3 class="font-semibold text-blue-800 mb-3">📱 Comportamiento Responsivo</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                <div class="text-center">
+                    <div class="text-2xl mb-2">📱</div>
+                    <h4 class="font-semibold text-blue-700">Móvil</h4>
+                    <p class="text-blue-600">object-fit: cover<br>Imagen recortada para llenar</p>
+                </div>
+                <div class="text-center">
+                    <div class="text-2xl mb-2">📟</div>
+                    <h4 class="font-semibold text-blue-700">Tablet</h4>
+                    <p class="text-blue-600">object-fit: cover<br>Mejor posicionamiento facial</p>
+                </div>
+                <div class="text-center">
+                    <div class="text-2xl mb-2">🖥️</div>
+                    <h4 class="font-semibold text-blue-700">Desktop</h4>
+                    <p class="text-blue-600">object-fit: contain<br>Imagen completa visible</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-6 text-center">
+            <a 
+                href="http://localhost:3000" 
+                target="_blank"
+                class="inline-block bg-gradient-to-r from-rose-500 to-pink-600 text-white px-6 py-3 rounded-full font-medium hover:shadow-lg transition-all"
+            >
+                🚀 Ver App Completa
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Detectar tipo de dispositivo
+        function updateDeviceInfo() {
+            const width = window.innerWidth;
+            const deviceType = document.getElementById('deviceType');
+            const screenSize = document.getElementById('screenSize');
+            
+            screenSize.textContent = `${width}px`;
+            
+            if (width >= 1024) {
+                deviceType.textContent = 'Desktop';
+                deviceType.style.color = '#10b981'; // Verde
+            } else if (width >= 641) {
+                deviceType.textContent = 'Tablet';
+                deviceType.style.color = '#f59e0b'; // Amarillo
+            } else {
+                deviceType.textContent = 'Móvil';
+                deviceType.style.color = '#ef4444'; // Rojo
+            }
+        }
+
+        // Actualizar al cargar y al redimensionar
+        updateDeviceInfo();
+        window.addEventListener('resize', updateDeviceInfo);
+
+        console.log('🖼️ Test de Arreglo de Imágenes Desktop - Ta\' Pa\' Ti');
+        console.log('✅ Implementación:');
+        console.log('   - Desktop (1024px+): object-fit: contain + fondo gris');
+        console.log('   - Tablet (641-1023px): object-fit: cover + mejor posicionamiento');
+        console.log('   - Móvil (<641px): object-fit: cover + posicionamiento estándar');
+        console.log('📱 Redimensiona la ventana para ver los cambios responsivos');
+    </script>
+</body>
+</html>

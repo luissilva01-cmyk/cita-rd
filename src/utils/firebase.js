@@ -3,26 +3,15 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
-// Configuración de Firebase desde variables de entorno
+// Configuración completa para el proyecto Firebase: Citard (citard-fbc26)
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  apiKey: "AIzaSyDy2tLpXr3v6llyXGfQVhVlnmZtMgCDRhg",
+  authDomain: "citard-fbc26.firebaseapp.com",
+  projectId: "citard-fbc26",
+  storageBucket: "citard-fbc26.firebasestorage.app",
+  messagingSenderId: "564769541768",
+  appId: "1:564769541768:web:07013924da206d8b37593d"
 };
-
-// Validación de configuración
-const missingKeys = Object.entries(firebaseConfig)
-  .filter(([, value]) => !value)
-  .map(([key]) => key);
-
-if (missingKeys.length > 0) {
-  console.error(
-    `⚠️ Faltan variables de entorno para Firebase: ${missingKeys.join(", ")}`
-  );
-}
 
 // Inicializar Firebase
 const app = initializeApp(firebaseConfig);
@@ -30,6 +19,9 @@ const app = initializeApp(firebaseConfig);
 // Exportar Auth y Firestore
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+
+// Configurar idioma español para Firebase Auth
+auth.languageCode = 'es';
 
 // Función auxiliar para mensajes de error más amigables
 export function parseFirebaseError(error) {

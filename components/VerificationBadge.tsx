@@ -1,10 +1,9 @@
 // cita-rd/components/VerificationBadge.tsx
 import React from 'react';
-import { Shield, Star, CheckCircle } from 'lucide-react';
+import { CheckCircle } from 'lucide-react';
 
 interface VerificationBadgeProps {
   isVerified: boolean;
-  verificationLevel?: 'basic' | 'premium';
   size?: 'sm' | 'md' | 'lg';
   showText?: boolean;
   className?: string;
@@ -12,7 +11,6 @@ interface VerificationBadgeProps {
 
 const VerificationBadge: React.FC<VerificationBadgeProps> = ({
   isVerified,
-  verificationLevel = 'basic',
   size = 'md',
   showText = false,
   className = ''
@@ -31,24 +29,7 @@ const VerificationBadge: React.FC<VerificationBadgeProps> = ({
     lg: 'text-base'
   };
 
-  const isPremium = verificationLevel === 'premium';
-
   const BadgeIcon = () => {
-    if (isPremium) {
-      return (
-        <div className="relative">
-          <Shield 
-            className={`${sizeClasses[size]} text-yellow-500`}
-            fill="currentColor"
-          />
-          <Star 
-            className="absolute -top-0.5 -right-0.5 w-2 h-2 text-yellow-400"
-            fill="currentColor"
-          />
-        </div>
-      );
-    }
-    
     return (
       <CheckCircle 
         className={`${sizeClasses[size]} text-blue-500`}
@@ -61,17 +42,15 @@ const VerificationBadge: React.FC<VerificationBadgeProps> = ({
     return (
       <div className={`flex items-center gap-1.5 ${className}`}>
         <BadgeIcon />
-        <span className={`font-semibold ${
-          isPremium ? 'text-yellow-600' : 'text-blue-600'
-        } ${textSizeClasses[size]}`}>
-          {isPremium ? 'Premium Verificado' : 'Verificado'}
+        <span className={`font-semibold text-blue-600 ${textSizeClasses[size]}`}>
+          Verificado
         </span>
       </div>
     );
   }
 
   return (
-    <div className={`${className}`} title={isPremium ? 'Premium Verificado' : 'Verificado'}>
+    <div className={`${className}`} title="Verificado">
       <BadgeIcon />
     </div>
   );

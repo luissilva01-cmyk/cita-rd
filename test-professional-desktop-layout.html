@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test: Layout Profesional Desktop - Ta' Pa' Ti</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .device-indicator {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            padding: 8px 12px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            border-radius: 6px;
+            font-size: 12px;
+            z-index: 1000;
+        }
+
+        /* Layout anterior (con espacios) */
+        .layout-old {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background: #f8f6f5;
+        }
+
+        .layout-old .card-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Layout nuevo (profesional) */
+        .layout-new {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background: #f8f6f5;
+            position: relative;
+        }
+
+        .layout-new .card-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            padding: 32px;
+        }
+
+        .layout-new .card-wrapper {
+            width: 100%;
+            max-width: 900px;
+            height: 85vh;
+            max-height: 750px;
+        }
+
+        .swipe-card {
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .action-buttons {
+            position: absolute;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 24px;
+            z-index: 20;
+        }
+
+        .action-btn {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .btn-pass {
+            background: white;
+            border: 2px solid #e5e7eb;
+        }
+
+        .btn-star {
+            background: white;
+            border: 2px solid #e5e7eb;
+        }
+
+        .btn-like {
+            background: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
+        }
+    </style>
+</head>
+<body>
+    <div class="device-indicator">
+        <span id="deviceType">Desktop</span> | <span id="screenSize"></span>
+    </div>
+
+    <!-- Layout Nuevo (Profesional) -->
+    <div class="layout-new">
+        <!-- Header -->
+        <div class="bg-white border-b border-gray-200 px-6 py-4">
+            <div class="flex items-center justify-between max-w-7xl mx-auto">
+                <h1 class="text-2xl font-bold bg-gradient-to-r from-rose-500 to-pink-600 bg-clip-text text-transparent">
+                    Ta' Pa' Ti
+                </h1>
+                <div class="flex items-center gap-4">
+                    <button class="px-4 py-2 bg-purple-100 text-purple-700 rounded-full text-sm font-medium">
+                        🧠 IA Insights
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card Container -->
+        <div class="card-container">
+            <div class="card-wrapper">
+                <div class="swipe-card">
+                    <img 
+                        src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=95&w=1200&h=1600" 
+                        alt="Profile" 
+                        style="width: 100%; height: 100%; object-fit: cover; object-position: center 20%;"
+                    >
+                    <div style="position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 0%, transparent 50%, rgba(0,0,0,0.8) 100%);"></div>
+                    
+                    <!-- Profile Info -->
+                    <div style="position: absolute; bottom: 100px; left: 0; right: 0; padding: 32px; color: white;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                            <h2 style="font-size: 36px; font-weight: bold; margin: 0;">Marcos, 27</h2>
+                            <span style="background: #3b82f6; padding: 4px 8px; border-radius: 9999px; font-size: 14px;">✓</span>
+                            <span style="background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%); padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: bold;">🔥 HOT</span>
+                        </div>
+                        <p style="font-size: 16px; opacity: 0.9; margin-bottom: 8px;">📍 Santiago • 15km</p>
+                        <p style="font-size: 16px; opacity: 0.9; margin-bottom: 16px;">Emprendedor digital. Fanático de las Águilas Cibaeñas. Si no estamos viendo pelota, estamos en la playa.</p>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <span style="padding: 8px 16px; background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); border-radius: 9999px; font-size: 14px;">⚾ Béisbol</span>
+                            <span style="padding: 8px 16px; background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); border-radius: 9999px; font-size: 14px;">💻 Tecnología</span>
+                            <span style="padding: 8px 16px; background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); border-radius: 9999px; font-size: 14px;">☕ Café</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <div class="action-btn btn-pass">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </div>
+            <div class="action-btn btn-star">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                </svg>
+            </div>
+            <div class="action-btn btn-like">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="white">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Bottom Nav -->
+        <div class="bg-white border-t border-gray-200 px-6 py-4">
+            <div class="flex items-center justify-center gap-12 max-w-md mx-auto">
+                <button class="flex flex-col items-center gap-1 text-gray-400">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+                    </svg>
+                    <span class="text-xs">Inicio</span>
+                </button>
+                <button class="flex flex-col items-center gap-1 text-rose-500">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                    <span class="text-xs font-semibold">Explorar</span>
+                </button>
+                <button class="flex flex-col items-center gap-1 text-gray-400">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+                    </svg>
+                    <span class="text-xs">Mensajes</span>
+                </button>
+                <button class="flex flex-col items-center gap-1 text-gray-400">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                    </svg>
+                    <span class="text-xs">Perfil</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div style="position: fixed; bottom: 20px; left: 20px; background: white; padding: 16px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 300px;">
+        <h3 style="font-weight: bold; color: #10b981; margin-bottom: 8px;">✅ Layout Profesional</h3>
+        <ul style="font-size: 13px; color: #6b7280; line-height: 1.6; margin: 0; padding-left: 20px;">
+            <li>Tarjeta más grande (900px ancho)</li>
+            <li>Ocupa 85% del viewport</li>
+            <li>Sin espacios en blanco</li>
+            <li>Botones flotantes sobre la tarjeta</li>
+            <li>Look más moderno y profesional</li>
+        </ul>
+    </div>
+
+    <script>
+        // Detectar tipo de dispositivo
+        function updateDeviceInfo() {
+            const width = window.innerWidth;
+            const screenSize = document.getElementById('screenSize');
+            screenSize.textContent = `${width}px`;
+        }
+
+        updateDeviceInfo();
+        window.addEventListener('resize', updateDeviceInfo);
+
+        console.log('💼 Test de Layout Profesional Desktop - Ta\' Pa\' Ti');
+        console.log('✅ Mejoras implementadas:');
+        console.log('   - Tarjeta: 900px ancho × 85vh alto');
+        console.log('   - Sin espacios en blanco laterales');
+        console.log('   - Botones flotantes sobre la tarjeta');
+        console.log('   - Layout centrado y profesional');
+    </script>
+</body>
+</html>

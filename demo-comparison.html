@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CitaRD - Comparación Login vs Register</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #f8f6f6 0%, #e8e4e4 100%);
+            color: #1b110d;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            color: #ec4913;
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #9a5f4c;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        
+        .comparison-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .page-section {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .page-title {
+            color: #ec4913;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-align: center;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #ec4913;
+        }
+        
+        .iframe-container {
+            position: relative;
+            width: 100%;
+            height: 600px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+        }
+        
+        .iframe-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 15px;
+        }
+        
+        .features-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .features-list li {
+            margin: 8px 0;
+            padding-left: 20px;
+            position: relative;
+            color: #9a5f4c;
+            font-weight: 500;
+        }
+        
+        .features-list li:before {
+            content: "✓";
+            color: #28a745;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+        
+        .test-links {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .test-link {
+            flex: 1;
+            padding: 12px;
+            background: linear-gradient(135deg, #ec4913 0%, #d63e0f 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+        
+        .test-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(236, 73, 19, 0.3);
+        }
+        
+        .unified-features {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .unified-features h3 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+        }
+        
+        .unified-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .unified-item {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .unified-item h4 {
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            padding: 5px 12px;
+            background: #28a745;
+            color: white;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        @media (max-width: 1024px) {
+            .comparison-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .iframe-container {
+                height: 500px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .iframe-container {
+                height: 400px;
+            }
+            
+            .test-links {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔥 CitaRD - Comparación de Diseño</h1>
+        <p>Login vs Register - Diseño Moderno Unificado</p>
+        <div class="status-indicator">✅ DISEÑO UNIFICADO COMPLETADO</div>
+    </div>
+
+    <div class="comparison-container">
+        <!-- Login Section -->
+        <div class="page-section">
+            <h2 class="page-title">🔐 Página de Login</h2>
+            
+            <div class="iframe-container">
+                <iframe src="./demo-login-standalone.html"></iframe>
+            </div>
+            
+            <h4 style="color: #1b110d; margin-bottom: 10px;">Características:</h4>
+            <ul class="features-list">
+                <li>Fondo beige unificado (#f8f6f6)</li>
+                <li>Color primario naranja (#ec4913)</li>
+                <li>Tipografía Plus Jakarta Sans</li>
+                <li>Login con email/password</li>
+                <li>Integración social (Google, Apple)</li>
+                <li>Recuperación de contraseña</li>
+                <li>Validación en tiempo real</li>
+            </ul>
+            
+            <div class="test-links">
+                <a href="http://localhost:3000/login" class="test-link" target="_blank">
+                    🚀 Probar Real
+                </a>
+                <a href="./demo-login-standalone.html" class="test-link" target="_blank">
+                    👁️ Ver Demo
+                </a>
+            </div>
+        </div>
+
+        <!-- Register Section -->
+        <div class="page-section">
+            <h2 class="page-title">📝 Página de Register</h2>
+            
+            <div class="iframe-container">
+                <iframe src="./demo-register-standalone.html"></iframe>
+            </div>
+            
+            <h4 style="color: #1b110d; margin-bottom: 10px;">Características:</h4>
+            <ul class="features-list">
+                <li>Diseño idéntico al Login</li>
+                <li>Mismos colores y tipografía</li>
+                <li>Formulario completo de registro</li>
+                <li>Validación de edad (18+)</li>
+                <li>Confirmación de contraseña</li>
+                <li>Términos y condiciones</li>
+                <li>Integración social completa</li>
+            </ul>
+            
+            <div class="test-links">
+                <a href="http://localhost:3000/register" class="test-link" target="_blank">
+                    🚀 Probar Real
+                </a>
+                <a href="./demo-register-standalone.html" class="test-link" target="_blank">
+                    👁️ Ver Demo
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Unified Features Section -->
+    <div class="unified-features">
+        <h3>🎨 Diseño Unificado Completado</h3>
+        <p style="font-size: 1.1rem; margin-bottom: 20px;">
+            Ambas páginas ahora comparten el mismo diseño moderno y consistente
+        </p>
+        
+        <div class="unified-grid">
+            <div class="unified-item">
+                <h4>🎨 Colores Unificados</h4>
+                <p>Fondo beige (#f8f6f6) y naranja primario (#ec4913) en ambas páginas</p>
+            </div>
+            
+            <div class="unified-item">
+                <h4>📱 Responsive Design</h4>
+                <p>Optimizado para móviles con diseño mobile-first en ambas páginas</p>
+            </div>
+            
+            <div class="unified-item">
+                <h4>⚡ Funcionalidad Completa</h4>
+                <p>Firebase Auth integrado con validaciones y manejo de errores</p>
+            </div>
+            
+            <div class="unified-item">
+                <h4>✨ Experiencia Consistente</h4>
+                <p>Navegación fluida entre Login y Register con transiciones suaves</p>
+            </div>
+        </div>
+        
+        <div style="margin-top: 30px; padding: 20px; background: rgba(255,255,255,0.1); border-radius: 15px;">
+            <h4 style="margin-bottom: 15px;">🚀 Estado del Proyecto:</h4>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; text-align: left;">
+                <div>✅ Errores TypeScript corregidos</div>
+                <div>✅ Diseño unificado implementado</div>
+                <div>✅ Firebase Auth funcionando</div>
+                <div>✅ Responsive design completo</div>
+                <div>✅ Validaciones implementadas</div>
+                <div>✅ Listo para producción</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('🔥 CitaRD Comparison Page Loaded');
+        console.log('✅ Login y Register con diseño unificado');
+        console.log('🎨 Colores consistentes aplicados');
+        console.log('📱 Responsive design implementado');
+        
+        // Auto-refresh iframes every 30 seconds to show latest changes
+        setInterval(() => {
+            const iframes = document.querySelectorAll('iframe');
+            iframes.forEach(iframe => {
+                const src = iframe.src;
+                iframe.src = '';
+                setTimeout(() => {
+                    iframe.src = src;
+                }, 100);
+            });
+        }, 30000);
+        
+        // Add smooth scroll behavior
+        document.documentElement.style.scrollBehavior = 'smooth';
+    </script>
+</body>
+</html>

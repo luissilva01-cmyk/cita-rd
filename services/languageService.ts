@@ -126,6 +126,7 @@ export interface Translations {
   cameraProblems: string;
   
   // Navigation & Main Views
+  home: string;
   discover: string;
   matches: string;
   messages: string;
@@ -136,6 +137,9 @@ export interface Translations {
   // Profile & Account
   editProfile: string;
   myProfile: string;
+  logout: string;
+  confirmLogout: string;
+  logoutError: string;
   accountSettings: string;
   privacyAndSecurity: string;
   configurePrivacy: string;
@@ -371,6 +375,7 @@ const translations: Record<Language, Translations> = {
     cameraProblems: 'Hay un problema con la cámara. Revisa los permisos e intenta de nuevo.',
     
     // Navigation & Main Views
+    home: 'Inicio',
     discover: 'Descubrir',
     matches: 'Matches',
     messages: 'Mensajes',
@@ -381,6 +386,9 @@ const translations: Record<Language, Translations> = {
     // Profile & Account
     editProfile: 'Editar Perfil',
     myProfile: 'Mi Perfil',
+    logout: 'Cerrar Sesión',
+    confirmLogout: '¿Estás seguro de que quieres cerrar sesión?',
+    logoutError: 'Error al cerrar sesión. Inténtalo de nuevo.',
     accountSettings: 'Configuración de Cuenta',
     privacyAndSecurity: 'Privacidad y Seguridad',
     configurePrivacy: 'Configurar Privacidad',
@@ -615,6 +623,7 @@ const translations: Record<Language, Translations> = {
     cameraProblems: 'There\'s a camera problem. Check permissions and try again.',
     
     // Navigation & Main Views
+    home: 'Home',
     discover: 'Discover',
     matches: 'Matches',
     messages: 'Messages',
@@ -625,6 +634,9 @@ const translations: Record<Language, Translations> = {
     // Profile & Account
     editProfile: 'Edit Profile',
     myProfile: 'My Profile',
+    logout: 'Logout',
+    confirmLogout: 'Are you sure you want to logout?',
+    logoutError: 'Error logging out. Please try again.',
     accountSettings: 'Account Settings',
     privacyAndSecurity: 'Privacy and Security',
     configurePrivacy: 'Configure Privacy',
@@ -859,6 +871,7 @@ const translations: Record<Language, Translations> = {
     cameraProblems: 'Há um problema com a câmera. Verifique as permissões e tente novamente.',
     
     // Navigation & Main Views
+    home: 'Início',
     discover: 'Descobrir',
     matches: 'Matches',
     messages: 'Mensagens',
@@ -869,6 +882,9 @@ const translations: Record<Language, Translations> = {
     // Profile & Account
     editProfile: 'Editar Perfil',
     myProfile: 'Meu Perfil',
+    logout: 'Sair',
+    confirmLogout: 'Tem certeza de que deseja sair?',
+    logoutError: 'Erro ao sair. Tente novamente.',
     accountSettings: 'Configurações da Conta',
     privacyAndSecurity: 'Privacidade e Segurança',
     configurePrivacy: 'Configurar Privacidade',
@@ -1103,6 +1119,7 @@ const translations: Record<Language, Translations> = {
     cameraProblems: 'Il y a un problème avec la caméra. Vérifiez les permissions et réessayez.',
     
     // Navigation & Main Views
+    home: 'Accueil',
     discover: 'Découvrir',
     matches: 'Matches',
     messages: 'Messages',
@@ -1113,6 +1130,9 @@ const translations: Record<Language, Translations> = {
     // Profile & Account
     editProfile: 'Modifier le Profil',
     myProfile: 'Mon Profil',
+    logout: 'Se Déconnecter',
+    confirmLogout: 'Êtes-vous sûr de vouloir vous déconnecter?',
+    logoutError: 'Erreur lors de la déconnexion. Veuillez réessayer.',
     accountSettings: 'Paramètres du Compte',
     privacyAndSecurity: 'Confidentialité et Sécurité',
     configurePrivacy: 'Configurer la Confidentialité',

@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../../utils/firebase";
+import { auth } from "../../../services/firebase";
 import { checkStorageAvailability, showStorageWarning } from "../../utils/storageHelper";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, ArrowLeft, Heart, Mail, AlertTriangle, CheckCircle } from "lucide-react";

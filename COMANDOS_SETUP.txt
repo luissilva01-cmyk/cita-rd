@@ -1,0 +1,52 @@
+===========================================
+🚀 COMANDOS PARA CONFIGURAR CLOUD FUNCTIONS
+===========================================
+
+Copia y pega estos comandos en orden:
+
+---
+1. INSTALAR FIREBASE CLI
+---
+npm install -g firebase-tools
+
+---
+2. INICIAR SESIÓN
+---
+firebase login
+
+---
+3. INSTALAR DEPENDENCIAS
+---
+cd cita-rd/functions
+npm install
+cd ..
+
+---
+4. CONFIGURAR IMAGEKIT (3 comandos)
+---
+firebase functions:config:set imagekit.public_key="public_7UvlcweOdXIY9MmkbNWvPHW/aw0="
+
+firebase functions:config:set imagekit.private_key="private_QQPSCxQq54yEBrjQf8JLkQhLELc="
+
+firebase functions:config:set imagekit.url_endpoint="https://ik.imagekit.io/tapapati"
+
+---
+5. VERIFICAR CONFIGURACIÓN
+---
+firebase functions:config:get
+
+---
+6. DESPLEGAR FUNCTIONS
+---
+firebase deploy --only functions
+
+---
+7. REINICIAR SERVIDOR
+---
+npm run dev
+
+===========================================
+✅ ¡LISTO! Ahora las fotos se eliminan físicamente de ImageKit
+===========================================
+
+Ver documentación completa: CLOUD_FUNCTIONS_SETUP.md

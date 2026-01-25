@@ -17,7 +17,7 @@ import {
 import { Match, Message, Call } from '../../types';
 import { getIcebreakerSuggestions } from '../../services/geminiService';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { sendMessage } from '../../services/chatService';
+import { sendMessage, updateTypingStatus, listenToTypingStatus } from '../../services/chatService';
 import { callManager, listenToIncomingCalls } from '../../services/callService';
 import { VoiceRecorder, uploadVoiceMessage } from '../../services/voiceMessageService';
 import EmojiPicker from '../../components/EmojiPicker';
@@ -25,6 +25,7 @@ import CallInterface from '../../components/CallInterface';
 import VoiceMessage from '../../components/VoiceMessage';
 import EmotionalInsights from '../../components/EmotionalInsights';
 import { useEmotionalAI } from '../../hooks/useEmotionalAI';
+import TypingIndicator from '../../components/TypingIndicator';
 import { SmartSuggestion } from '../../services/emotionalAI';
 
 interface ChatViewProps {
@@ -33,6 +34,7 @@ interface ChatViewProps {
   onSendMessage: (text?: string, type?: Message['type'], content?: string, duration?: number) => void;
   onBack: () => void;
   currentUserId: string;
+  chatId: string; // Necesitamos el chatId para el typing status
 }
 
 const ChatView: React.FC<ChatViewProps> = ({ 
@@ -40,13 +42,24 @@ const ChatView: React.FC<ChatViewProps> = ({
   messages, 
   onSendMessage, 
   onBack, 
-  currentUserId 
+  currentUserId,
+  chatId
 }) => {
+  console.log('🚀 ChatView montado:', { 
+    chatId, 
+    currentUserId, 
+    matchUserId: match.user.id, 
+    matchUserName: match.user.name,
+    'Escuchando typing de': match.user.id
+  });
+  
   const { t } = useLanguage();
   const [inputValue, setInputValue] = useState('');
   const [icebreakers, setIcebreakers] = useState<string[]>([]);
   const [loadingIce, setLoadingIce] = useState(false);
+  const [otherUserTyping, setOtherUserTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   // Estados para nuevas funcionalidades
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -81,6 +94,16 @@ const ChatView: React.FC<ChatViewProps> = ({
         clearInterval(recordingIntervalRef.current);
       }
       
+      // Limpiar timeout de typing
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+      
+      // Limpiar typing status al salir
+      if (chatId && currentUserId) {
+        updateTypingStatus(chatId, currentUserId, false);
+      }
+      
       // Cancelar grabación si está activa
       const recorder = (window as any).currentVoiceRecorder;
       if (recorder) {
@@ -88,7 +111,36 @@ const ChatView: React.FC<ChatViewProps> = ({
         (window as any).currentVoiceRecorder = null;
       }
     };
-  }, []);
+  }, [chatId, currentUserId]);
+
+  // Escuchar typing status del otro usuario
+  useEffect(() => {
+    console.log('='.repeat(50));
+    console.log('🎯 TYPING LISTENER USEEFFECT EJECUTÁNDOSE');
+    console.log('chatId:', chatId);
+    console.log('match.user.id:', match.user.id);
+    console.log('match.user.name:', match.user.name);
+    console.log('='.repeat(50));
+    
+    if (!chatId || !match.user.id) {
+      console.log('❌ Falta chatId o match.user.id, saliendo');
+      return;
+    }
+    
+    console.log('✅ Configurando listener de typing...');
+    
+    const unsubscribe = listenToTypingStatus(chatId, match.user.id, (isTyping) => {
+      console.log('🔔 Typing status changed:', { userName: match.user.name, isTyping });
+      setOtherUserTyping(isTyping);
+    });
+    
+    console.log('✅ Listener configurado exitosamente');
+    
+    return () => {
+      console.log('🧹 Limpiando listener de typing');
+      unsubscribe();
+    };
+  }, [chatId, match.user.id]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -99,8 +151,6 @@ const ChatView: React.FC<ChatViewProps> = ({
   // Analizar conversación cuando cambian los mensajes
   useEffect(() => {
     if (messages.length > 0) {
-      console.log('🧠 Analizando conversación con', messages.length, 'mensajes');
-      
       // Analizar el último mensaje si es nuevo
       const lastMessage = messages[messages.length - 1];
       if (lastMessage && lastMessage.text) {
@@ -121,26 +171,21 @@ const ChatView: React.FC<ChatViewProps> = ({
   // Escuchar llamadas entrantes
   useEffect(() => {
     if (!currentUserId) {
-      console.log('❌ currentUserId no está definido');
       return;
     }
     
-    console.log('📞 Configurando listener para llamadas entrantes:', currentUserId);
     const unsubscribe = listenToIncomingCalls(currentUserId, (calls) => {
-      console.log('📞 Llamadas entrantes recibidas:', calls);
       setIncomingCalls(calls);
       // Si hay una llamada entrante para este chat, mostrarla
       const incomingCall = calls.find(call => 
         call.chatId === match.id && call.status === 'ringing'
       );
       if (incomingCall) {
-        console.log('📞 Llamada entrante para este chat:', incomingCall);
         setCurrentCall(incomingCall);
       }
     });
 
     return () => {
-      console.log('📞 Limpiando listener de llamadas');
       unsubscribe();
     };
   }, [currentUserId, match.id]);
@@ -179,6 +224,39 @@ const ChatView: React.FC<ChatViewProps> = ({
     if (inputValue.trim()) {
       onSendMessage(inputValue, 'text');
       setInputValue('');
+      
+      // Limpiar typing status
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+        typingTimeoutRef.current = null;
+      }
+      updateTypingStatus(chatId, currentUserId, false);
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setInputValue(value);
+    
+    console.log('⌨️ Input changed, updating typing status:', { value: value.trim() ? 'typing' : 'not typing', chatId, currentUserId });
+    
+    // Limpiar timeout anterior
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+    
+    if (value.trim()) {
+      // Usuario está escribiendo
+      updateTypingStatus(chatId, currentUserId, true);
+      
+      // Establecer timeout para limpiar después de 3 segundos de inactividad
+      typingTimeoutRef.current = setTimeout(() => {
+        console.log('⏱️ Timeout: Limpiando typing status después de 3 segundos');
+        updateTypingStatus(chatId, currentUserId, false);
+      }, 3000);
+    } else {
+      // Campo vacío, limpiar inmediatamente
+      updateTypingStatus(chatId, currentUserId, false);
     }
   };
 
@@ -188,86 +266,55 @@ const ChatView: React.FC<ChatViewProps> = ({
 
   // Manejar selección de sugerencia de IA
   const handleSuggestionSelect = (suggestion: SmartSuggestion) => {
-    console.log('💡 Sugerencia seleccionada:', suggestion.text);
     setInputValue(suggestion.text);
     setShowEmotionalInsights(false);
   };
 
   const handleStartVoiceRecording = async () => {
     try {
-      console.log('🎤 Iniciando grabación de voz...');
-      
-      // Crear nuevo recorder con logs detallados
+      // Crear nuevo recorder
       const recorder = new VoiceRecorder(
         // onDataAvailable - cuando termina la grabación
         async (duration: number, audioBlob: Blob) => {
           try {
-            console.log('🎤 ✅ Callback onDataAvailable ejecutado!');
-            console.log('🎤 Duración:', duration, 'segundos');
-            console.log('🎤 Blob size:', audioBlob.size, 'bytes');
-            console.log('🎤 Blob type:', audioBlob.type);
-            
-            // Mostrar estado antes de subir
-            console.log('☁️ Iniciando subida a Firebase...');
-            console.log('☁️ Chat ID:', match.id);
-            console.log('☁️ Sender ID:', currentUserId);
-            
             // Subir a Firebase Storage
             const audioUrl = await uploadVoiceMessage(audioBlob, match.id, currentUserId);
-            console.log('☁️ ✅ Audio subido exitosamente:', audioUrl);
             
             // Enviar mensaje de voz
-            console.log('📤 Enviando mensaje de voz...');
             onSendMessage(undefined, 'voice', audioUrl, duration);
-            console.log('📤 ✅ Mensaje de voz enviado');
             
             setIsRecording(false);
             setRecordingDuration(0);
             
           } catch (error) {
-            console.error('❌ Error procesando mensaje de voz:', error);
-            console.error('❌ Error stack:', (error as Error).stack);
-            // TODO: Mostrar notificación de error más elegante
-            console.error('Error enviando mensaje de voz:', (error as Error).message);
+            console.error('Error procesando mensaje de voz:', error);
             setIsRecording(false);
             setRecordingDuration(0);
           }
         },
         // onError
         (error: Error) => {
-          console.error('❌ Error en grabación:', error);
-          console.error('❌ Error stack:', error.stack);
-          // TODO: Mostrar notificación de error más elegante
-          console.error('Error grabando:', error.message);
+          console.error('Error en grabación:', error);
           setIsRecording(false);
           setRecordingDuration(0);
         }
       );
       
-      console.log('🎤 VoiceRecorder creado, iniciando grabación...');
-      
       // Iniciar grabación
       await recorder.startRecording();
-      console.log('🎤 ✅ Grabación iniciada exitosamente');
       
       setIsRecording(true);
       
       // Contador de duración
       recordingIntervalRef.current = setInterval(() => {
-        setRecordingDuration(prev => {
-          const newDuration = prev + 1;
-          console.log('🎤 Duración actual:', newDuration, 'segundos');
-          return newDuration;
-        });
+        setRecordingDuration(prev => prev + 1);
       }, 1000);
       
       // Guardar referencia del recorder para poder detenerlo
       (window as any).currentVoiceRecorder = recorder;
-      console.log('🎤 Recorder guardado en window.currentVoiceRecorder');
       
     } catch (error) {
-      console.error('❌ Error iniciando grabación:', error);
-      console.error('❌ Error stack:', (error as Error).stack);
+      console.error('Error iniciando grabación:', error);
       
       let errorMessage = 'Error desconocido';
       if (error instanceof Error) {
@@ -285,32 +332,24 @@ const ChatView: React.FC<ChatViewProps> = ({
   };
 
   const handleStopVoiceRecording = () => {
-    console.log('🎤 🛑 Deteniendo grabación...');
-    
     // Detener contador
     if (recordingIntervalRef.current) {
       clearInterval(recordingIntervalRef.current);
       recordingIntervalRef.current = null;
-      console.log('🎤 ✅ Contador detenido');
     }
     
     // Detener grabación
     const recorder = (window as any).currentVoiceRecorder;
     if (recorder) {
-      console.log('🎤 Recorder encontrado, llamando stopRecording...');
       recorder.stopRecording();
       (window as any).currentVoiceRecorder = null;
-      console.log('🎤 ✅ stopRecording() llamado, esperando callback...');
     } else {
-      console.error('❌ No se encontró recorder en window.currentVoiceRecorder');
       setIsRecording(false);
       setRecordingDuration(0);
     }
   };
 
   const handleCancelVoiceRecording = () => {
-    console.log('🎤 Cancelando grabación...');
-    
     // Detener contador
     if (recordingIntervalRef.current) {
       clearInterval(recordingIntervalRef.current);
@@ -330,24 +369,14 @@ const ChatView: React.FC<ChatViewProps> = ({
 
   const handleStartCall = async (type: 'voice' | 'video') => {
     try {
-      console.log('📞 Iniciando llamada:', type);
-      console.log('📞 Match ID:', match.id);
-      console.log('📞 Current User ID:', currentUserId);
-      console.log('📞 Other User ID:', match.user.id);
-      
       // Verificar permisos primero
       const constraints = {
         audio: true,
         video: type === 'video'
       };
       
-      console.log('📞 Solicitando permisos:', constraints);
-      
       // Solicitar permisos antes de crear la llamada
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
-      console.log('📞 Permisos obtenidos:', stream);
-      console.log('📞 Video tracks:', stream.getVideoTracks());
-      console.log('📞 Audio tracks:', stream.getAudioTracks());
       
       // Crear llamada simulada (en producción usar callManager.startCall)
       const mockCall: Call = {
@@ -360,14 +389,12 @@ const ChatView: React.FC<ChatViewProps> = ({
         startTime: Date.now()
       };
       
-      console.log('📞 Creando llamada:', mockCall);
       setCurrentCall(mockCall);
       
       // No limpiar el stream inmediatamente, dejarlo para CallInterface
-      console.log('📞 Llamada iniciada correctamente');
       
     } catch (error) {
-      console.error('❌ Error iniciando llamada:', error);
+      console.error('Error iniciando llamada:', error);
       
       let errorMessage = 'Error desconocido';
       if (error instanceof Error) {
@@ -416,7 +443,7 @@ const ChatView: React.FC<ChatViewProps> = ({
           />
           <div className="min-w-0 flex-1">
             <h3 className="font-bold text-sm sm:text-base truncate">{match.user.name}</h3>
-            <p className="text-[9px] sm:text-[10px] text-emerald-500 font-bold uppercase">Online</p>
+            <p className="text-[9px] sm:text-[10px] text-emerald-500 font-bold uppercase">{t('online')}</p>
           </div>
         </div>
         <div className="flex gap-1 sm:gap-2 text-slate-400 flex-shrink-0">
@@ -440,19 +467,13 @@ const ChatView: React.FC<ChatViewProps> = ({
           </button>
           
           <button 
-            onClick={() => {
-              console.log('📞 Botón de llamada de voz presionado');
-              handleStartCall('voice');
-            }}
+            onClick={() => handleStartCall('voice')}
             className="p-2 hover:bg-slate-100 rounded-full transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
           >
             <Phone size={18} className="sm:w-5 sm:h-5 cursor-pointer hover:text-slate-600 transition-colors" />
           </button>
           <button 
-            onClick={() => {
-              console.log('📹 Botón de videollamada presionado');
-              handleStartCall('video');
-            }}
+            onClick={() => handleStartCall('video')}
             className="p-2 hover:bg-slate-100 rounded-full transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
           >
             <Video size={18} className="sm:w-5 sm:h-5 cursor-pointer hover:text-slate-600 transition-colors" />
@@ -516,24 +537,27 @@ const ChatView: React.FC<ChatViewProps> = ({
               )}
 
               {/* Reacción a historia */}
-              {msg.type === 'story_reaction' && (() => {
-                console.log('🔍 Mensaje story_reaction:', msg.text, 'Longitud:', msg.text?.length);
-                return (
-                  <div 
-                    className={`max-w-[85%] sm:max-w-[75%] px-3 sm:px-4 py-2.5 sm:py-3 rounded-2xl text-sm flex flex-col items-center gap-2 ${
-                      msg.senderId === currentUserId 
-                        ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-tr-none shadow-md shadow-purple-100' 
-                        : 'bg-gradient-to-r from-purple-50 to-pink-50 text-purple-800 rounded-tl-none border border-purple-200 shadow-sm'
-                    }`}
-                  >
-                    <span className="text-2xl sm:text-3xl">{msg.text}</span>
-                    <span className="text-xs opacity-70">Reaccionó a tu historia</span>
-                  </div>
-                );
-              })()}
+              {msg.type === 'story_reaction' && (
+                <div 
+                  className={`max-w-[85%] sm:max-w-[75%] px-3 sm:px-4 py-2.5 sm:py-3 rounded-2xl text-sm flex flex-col items-center gap-2 ${
+                    msg.senderId === currentUserId 
+                      ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-tr-none shadow-md shadow-purple-100' 
+                      : 'bg-gradient-to-r from-purple-50 to-pink-50 text-purple-800 rounded-tl-none border border-purple-200 shadow-sm'
+                  }`}
+                >
+                  <span className="text-2xl sm:text-3xl">{msg.text}</span>
+                  <span className="text-xs opacity-70">Reaccionó a tu historia</span>
+                </div>
+              )}
             </div>
           ))
         )}
+
+        {/* Typing Indicator - Real-time with Firebase */}
+        <TypingIndicator 
+          userName={match.user.name}
+          isVisible={otherUserTyping}
+        />
 
         {/* AI Icebreakers Section - Responsive */}
         <div className="pt-3 sm:pt-4 flex flex-col items-center px-2 sm:px-0">
@@ -663,7 +687,7 @@ const ChatView: React.FC<ChatViewProps> = ({
 
           <input 
             value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
+            onChange={handleInputChange}
             onKeyDown={handleKeyDown}
             placeholder={t('typeSomethingCool')}
             className="flex-1 bg-transparent border-none focus:ring-0 py-3 text-sm outline-none placeholder-slate-400 min-h-[44px]"
@@ -703,28 +727,23 @@ const ChatView: React.FC<ChatViewProps> = ({
       />
 
       {/* Call Interface */}
-      {(() => {
-        console.log('🎬 Renderizando CallInterface:', { currentCall, isIncoming: currentCall?.receiverId === currentUserId });
-        return (
-          <CallInterface
-            call={currentCall}
-            isIncoming={currentCall?.receiverId === currentUserId}
-            onAnswer={() => {
-              console.log('📞 Llamada respondida');
-            }}
-            onDecline={() => {
-              console.log('📞 Llamada rechazada');
-              setCurrentCall(null);
-            }}
-            onEnd={() => {
-              console.log('📞 Llamada terminada');
-              setCurrentCall(null);
-            }}
-            otherUserName={match.user.name}
-            otherUserImage={match.user.images[0]}
-          />
-        );
-      })()}
+      {currentCall && (
+        <CallInterface
+          call={currentCall}
+          isIncoming={currentCall?.receiverId === currentUserId}
+          onAnswer={() => {
+            // Llamada respondida
+          }}
+          onDecline={() => {
+            setCurrentCall(null);
+          }}
+          onEnd={() => {
+            setCurrentCall(null);
+          }}
+          otherUserName={match.user.name}
+          otherUserImage={match.user.images[0]}
+        />
+      )}
     </div>
   );
 };

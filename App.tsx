@@ -17,7 +17,7 @@ import { getDiscoveryProfiles, createOrUpdateProfile, getUserProfile } from './s
 import { privacyService } from './services/privacyService';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { StoryGroup } from './services/storiesService';
-import { auth } from './src/utils/firebase';
+import { auth } from './services/firebase';
 
 const INITIAL_POTENTIAL_MATCHES: UserProfile[] = [];
 
@@ -403,6 +403,7 @@ const App: React.FC = () => {
             } 
             onBack={() => setActiveView('messages')} 
             currentUserId={currentUser!.id}
+            chatId={currentChat.id}
           />
         );
       default:

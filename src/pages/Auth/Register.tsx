@@ -2,13 +2,13 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../../utils/firebase";
+import { auth } from "../../../services/firebase";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, ArrowLeft } from "lucide-react";
 import ConsentModal from "../../components/Legal/ConsentModal";
 import { consentService, ConsentData } from "../../services/consentService";
-import { createOrUpdateProfile } from "../../../../services/profileService";
-import { UserProfile } from "../../../../types";
+import { createOrUpdateProfile } from "../../../services/profileService";
+import { UserProfile } from "../../../types";
 
 export default function Register() {
   const [formData, setFormData] = useState({

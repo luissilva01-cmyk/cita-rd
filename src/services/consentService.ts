@@ -1,5 +1,5 @@
 // cita-rd/src/services/consentService.ts
-import { db } from '../utils/firebase';
+import { db } from '../../services/firebase';
 import { collection, doc, setDoc, getDoc, query, where, getDocs, addDoc, Timestamp } from 'firebase/firestore';
 
 export interface ConsentRecord {

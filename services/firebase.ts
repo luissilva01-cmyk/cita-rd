@@ -8,14 +8,29 @@ const firebaseConfig = {
   apiKey: "AIzaSyDy2tLpXr3v6llyXGfQVhVlnmZtMgCDRhg",
   authDomain: "citard-fbc26.firebaseapp.com",
   projectId: "citard-fbc26",
-  storageBucket: "citard-fbc26.firebasestorage.app",
+  storageBucket: "citard-fbc26.appspot.com", // Formato antiguo
   messagingSenderId: "564769541768",
   appId: "1:564769541768:web:07013924da206d8b37593d"
 };
 
+console.log('🔧 Inicializando Firebase...');
+
 // Initialize Firebase using the modular SDK (v9+).
 const app = initializeApp(firebaseConfig);
+console.log('✅ Firebase App inicializada');
 
 export const auth = getAuth(app);
 export const db = getFirestore(app);
-export const storage = getStorage(app);
+
+// Intentar inicializar Storage - puede fallar si no está habilitado
+let storageInstance = null;
+try {
+  storageInstance = getStorage(app);
+  console.log('✅ Firebase Storage inicializado');
+} catch (error) {
+  console.warn('⚠️ Firebase Storage NO está habilitado en este proyecto');
+  console.warn('⚠️ Para habilitar: https://console.firebase.google.com/project/citard-fbc26/storage');
+  storageInstance = null;
+}
+
+export const storage = storageInstance;

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Edit3, MapPin, Briefcase, Heart, Settings, Camera, BarChart3, LogOut, X, Plus } from 'lucide-react';
 import { signOut } from 'firebase/auth';
-import { auth } from '../../src/utils/firebase';
+import { auth } from '../../services/firebase';
 import { UserProfile } from '../../types';
 import PhotoUploader from '../../components/PhotoUploader';
 import ProfileScore from '../../components/ProfileScore';

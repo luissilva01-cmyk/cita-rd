@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test ImageKit Upload - Ta' Pa' Ti</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 600px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    h1 {
+      color: #667eea;
+      margin-bottom: 10px;
+      font-size: 28px;
+    }
+
+    .subtitle {
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+
+    .upload-area {
+      border: 3px dashed #667eea;
+      border-radius: 15px;
+      padding: 40px;
+      text-align: center;
+      margin-bottom: 20px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .upload-area:hover {
+      background: #f8f9ff;
+      border-color: #764ba2;
+    }
+
+    .upload-area.dragover {
+      background: #f0f4ff;
+      border-color: #764ba2;
+      transform: scale(1.02);
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    .upload-icon {
+      font-size: 48px;
+      margin-bottom: 15px;
+    }
+
+    .upload-text {
+      color: #667eea;
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .upload-hint {
+      color: #999;
+      font-size: 14px;
+    }
+
+    .preview-area {
+      margin-top: 20px;
+      display: none;
+    }
+
+    .preview-image {
+      width: 100%;
+      max-height: 400px;
+      object-fit: contain;
+      border-radius: 10px;
+      margin-bottom: 15px;
+    }
+
+    .file-info {
+      background: #f8f9ff;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+    }
+
+    .file-info p {
+      margin: 5px 0;
+      color: #666;
+      font-size: 14px;
+    }
+
+    .file-info strong {
+      color: #333;
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    button:hover:not(:disabled) {
+      transform: translateY(-2px);
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .result {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 10px;
+      display: none;
+    }
+
+    .result.success {
+      background: #d4edda;
+      border: 1px solid #c3e6cb;
+      color: #155724;
+    }
+
+    .result.error {
+      background: #f8d7da;
+      border: 1px solid #f5c6cb;
+      color: #721c24;
+    }
+
+    .result-url {
+      margin-top: 10px;
+      padding: 10px;
+      background: white;
+      border-radius: 5px;
+      word-break: break-all;
+      font-size: 12px;
+      font-family: monospace;
+    }
+
+    .log {
+      margin-top: 20px;
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 15px;
+      border-radius: 10px;
+      max-height: 300px;
+      overflow-y: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .log-entry {
+      margin: 3px 0;
+    }
+
+    .log-entry.info { color: #4fc3f7; }
+    .log-entry.success { color: #81c784; }
+    .log-entry.error { color: #e57373; }
+    .log-entry.warning { color: #ffb74d; }
+
+    .config-info {
+      background: #f8f9ff;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      font-size: 13px;
+    }
+
+    .config-info p {
+      margin: 5px 0;
+      color: #666;
+    }
+
+    .config-info code {
+      background: #e8eaf6;
+      padding: 2px 6px;
+      border-radius: 3px;
+      color: #667eea;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🖼️ Test ImageKit Upload</h1>
+    <p class="subtitle">Prueba de subida de fotos con ImageKit para Ta' Pa' Ti</p>
+
+    <div class="config-info">
+      <p><strong>📋 Configuración ImageKit:</strong></p>
+      <p>ImageKit ID: <code>tapapati</code></p>
+      <p>URL Endpoint: <code>https://ik.imagekit.io/tapapati</code></p>
+      <p>Public Key: <code>public_7Uv...aw0=</code></p>
+      <p>Región: <code>North Virginia (US)</code></p>
+    </div>
+
+    <div class="upload-area" id="uploadArea">
+      <div class="upload-icon">📸</div>
+      <div class="upload-text">Haz clic o arrastra una imagen aquí</div>
+      <div class="upload-hint">JPG, PNG o WEBP (máx. 5MB)</div>
+      <input type="file" id="fileInput" accept="image/*">
+    </div>
+
+    <div class="preview-area" id="previewArea">
+      <img id="previewImage" class="preview-image" alt="Preview">
+      <div class="file-info" id="fileInfo"></div>
+      <button id="uploadButton">📤 Subir a ImageKit</button>
+    </div>
+
+    <div class="result" id="result"></div>
+
+    <div class="log" id="log">
+      <div class="log-entry info">📋 Esperando selección de archivo...</div>
+    </div>
+  </div>
+
+  <script>
+    const IMAGEKIT_PUBLIC_KEY = 'public_7UvlcweOdXIY9MmkbNWvPHW/aw0=';
+    const IMAGEKIT_PRIVATE_KEY = 'private_QQPSCxQq54yEBrjQf8JLkQhLELc=';
+    const IMAGEKIT_URL_ENDPOINT = 'https://ik.imagekit.io/tapapati';
+
+    let selectedFile = null;
+
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('fileInput');
+    const previewArea = document.getElementById('previewArea');
+    const previewImage = document.getElementById('previewImage');
+    const fileInfo = document.getElementById('fileInfo');
+    const uploadButton = document.getElementById('uploadButton');
+    const result = document.getElementById('result');
+    const logDiv = document.getElementById('log');
+
+    function addLog(message, type = 'info') {
+      const entry = document.createElement('div');
+      entry.className = `log-entry ${type}`;
+      const timestamp = new Date().toLocaleTimeString();
+      entry.textContent = `[${timestamp}] ${message}`;
+      logDiv.appendChild(entry);
+      logDiv.scrollTop = logDiv.scrollHeight;
+    }
+
+    // Click en área de subida
+    uploadArea.addEventListener('click', () => fileInput.click());
+
+    // Drag & Drop
+    uploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadArea.classList.add('dragover');
+    });
+
+    uploadArea.addEventListener('dragleave', () => {
+      uploadArea.classList.remove('dragover');
+    });
+
+    uploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadArea.classList.remove('dragover');
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        handleFileSelect(files[0]);
+      }
+    });
+
+    // Selección de archivo
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        handleFileSelect(e.target.files[0]);
+      }
+    });
+
+    function handleFileSelect(file) {
+      addLog(`📁 Archivo seleccionado: ${file.name}`, 'info');
+      addLog(`📊 Tamaño: ${(file.size / 1024).toFixed(2)} KB`, 'info');
+      addLog(`📋 Tipo: ${file.type}`, 'info');
+
+      // Validar tipo
+      if (!file.type.startsWith('image/')) {
+        addLog('❌ El archivo debe ser una imagen', 'error');
+        return;
+      }
+
+      // Validar tamaño (5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        addLog('❌ La imagen debe ser menor a 5MB', 'error');
+        return;
+      }
+
+      selectedFile = file;
+
+      // Mostrar preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        previewImage.src = e.target.result;
+        previewArea.style.display = 'block';
+        
+        fileInfo.innerHTML = `
+          <p><strong>Nombre:</strong> ${file.name}</p>
+          <p><strong>Tamaño:</strong> ${(file.size / 1024).toFixed(2)} KB</p>
+          <p><strong>Tipo:</strong> ${file.type}</p>
+        `;
+
+        addLog('✅ Preview generado correctamente', 'success');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Generar parámetros de autenticación
+    async function getAuthenticationParameters() {
+      const expire = Math.floor(Date.now() / 1000) + 2400; // 40 minutos
+      const token = Math.random().toString(36).substring(2);
+      
+      addLog('🔐 Generando parámetros de autenticación...', 'info');
+      addLog(`⏰ Expire: ${expire}`, 'info');
+      addLog(`🎫 Token: ${token}`, 'info');
+      
+      // Crear signature usando HMAC-SHA1
+      const stringToSign = token + expire;
+      const encoder = new TextEncoder();
+      const data = encoder.encode(stringToSign);
+      const keyData = encoder.encode(IMAGEKIT_PRIVATE_KEY);
+      
+      const key = await crypto.subtle.importKey(
+        'raw',
+        keyData,
+        { name: 'HMAC', hash: 'SHA-1' },
+        false,
+        ['sign']
+      );
+      
+      const signatureBuffer = await crypto.subtle.sign('HMAC', key, data);
+      const signatureArray = Array.from(new Uint8Array(signatureBuffer));
+      const signature = signatureArray.map(b => b.toString(16).padStart(2, '0')).join('');
+      
+      addLog(`🔏 Signature generada: ${signature.substring(0, 20)}...`, 'success');
+      
+      return { signature, expire, token };
+    }
+
+    // Subir a ImageKit
+    uploadButton.addEventListener('click', async () => {
+      if (!selectedFile) {
+        addLog('⚠️ No hay archivo seleccionado', 'warning');
+        return;
+      }
+
+      uploadButton.disabled = true;
+      uploadButton.textContent = '⏳ Subiendo...';
+      result.style.display = 'none';
+
+      try {
+        addLog('📤 Iniciando subida a ImageKit...', 'info');
+        
+        // Obtener parámetros de autenticación
+        const authParams = await getAuthenticationParameters();
+        
+        // Preparar FormData
+        const formData = new FormData();
+        const timestamp = Date.now();
+        const fileName = `test_${timestamp}.jpg`;
+        
+        formData.append('file', selectedFile);
+        formData.append('fileName', fileName);
+        formData.append('publicKey', IMAGEKIT_PUBLIC_KEY);
+        formData.append('signature', authParams.signature);
+        formData.append('expire', authParams.expire.toString());
+        formData.append('token', authParams.token);
+        formData.append('folder', '/profile-photos');
+        formData.append('useUniqueFileName', 'true');
+        
+        addLog('📦 FormData preparado', 'info');
+        addLog('🔄 Enviando petición a ImageKit...', 'info');
+        
+        // Hacer la petición
+        const response = await fetch('https://upload.imagekit.io/api/v1/files/upload', {
+          method: 'POST',
+          body: formData
+        });
+        
+        addLog(`📡 Respuesta recibida: HTTP ${response.status}`, 'info');
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || `HTTP ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        addLog('✅ ¡Subida exitosa!', 'success');
+        addLog(`🔗 URL: ${data.url}`, 'success');
+        addLog(`📝 File ID: ${data.fileId}`, 'info');
+        addLog(`📏 Dimensiones: ${data.width}x${data.height}`, 'info');
+        
+        // Mostrar resultado
+        result.className = 'result success';
+        result.innerHTML = `
+          <strong>✅ ¡Foto subida exitosamente a ImageKit!</strong>
+          <div class="result-url">
+            <strong>URL:</strong><br>
+            <a href="${data.url}" target="_blank">${data.url}</a>
+          </div>
+          <p style="margin-top: 10px; font-size: 13px;">
+            <strong>File ID:</strong> ${data.fileId}<br>
+            <strong>Tamaño:</strong> ${(data.size / 1024).toFixed(2)} KB<br>
+            <strong>Dimensiones:</strong> ${data.width}x${data.height}px
+          </p>
+        `;
+        result.style.display = 'block';
+        
+      } catch (error) {
+        addLog(`❌ Error: ${error.message}`, 'error');
+        
+        result.className = 'result error';
+        result.innerHTML = `
+          <strong>❌ Error al subir la foto</strong>
+          <p style="margin-top: 10px;">${error.message}</p>
+        `;
+        result.style.display = 'block';
+      } finally {
+        uploadButton.disabled = false;
+        uploadButton.textContent = '📤 Subir a ImageKit';
+      }
+    });
+
+    addLog('✅ Sistema listo para subir archivos', 'success');
+  </script>
+</body>
+</html>

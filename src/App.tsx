@@ -2,7 +2,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from './utils/firebase';
+import { auth } from '../services/firebase';
 import MainApp from '../App';
 import Register from './pages/Auth/Register';
 import Login from './pages/Auth/Login';

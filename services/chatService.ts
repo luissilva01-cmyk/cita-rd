@@ -9,7 +9,8 @@ import {
   orderBy, 
   serverTimestamp,
   where,
-  getDocs
+  getDocs,
+  setDoc
 } from "firebase/firestore";
 import { UserProfile, Message } from '../types';
 
@@ -38,27 +39,20 @@ export const createChat = async (currentUserId: string, otherUserId: string): Pr
 
 // Obtener chats del usuario actual
 export const getUserChats = (userId: string, callback: (chats: Chat[]) => void) => {
-  console.log('🔍 Buscando chats para userId:', userId);
-  
   const q = query(
     collection(db, "chats"), 
     where("participants", "array-contains", userId)
-    // Removemos orderBy temporalmente para evitar problemas de índices
   );
   
   return onSnapshot(q, (querySnapshot) => {
-    console.log('📊 Documentos encontrados:', querySnapshot.size);
-    
     const chats: Chat[] = [];
     querySnapshot.forEach((doc) => {
-      console.log('📄 Chat encontrado:', doc.id, doc.data());
       chats.push({ id: doc.id, ...doc.data() } as Chat);
     });
     
     // Ordenar manualmente por timestamp
     chats.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
     
-    console.log('✅ Chats procesados:', chats.length);
     callback(chats);
   });
 };
@@ -72,8 +66,6 @@ export const sendMessage = async (
   content?: string,
   duration?: number
 ) => {
-  console.log('💾 sendMessage llamado con:', { chatId, senderId, text, type, content, duration });
-  
   const messageData: any = {
     senderId,
     type,
@@ -95,13 +87,9 @@ export const sendMessage = async (
   } else if (type === 'story_reaction' && text) {
     // Para reacciones a historias, el emoji viene en el parámetro text
     messageData.text = text;
-    console.log('📱 Guardando reacción a historia:', text, 'Longitud:', text.length);
   }
 
-  console.log('💾 Datos del mensaje a guardar:', messageData);
-
   await addDoc(collection(db, "chats", chatId, "messages"), messageData);
-  console.log('✅ Mensaje guardado en Firebase:', messageData);
   
   // Actualizar último mensaje del chat
   const lastMessageText = type === 'text' ? text : 
@@ -112,15 +100,11 @@ export const sendMessage = async (
                          type === 'story_reaction' ? `${text} Reaccionó a tu historia` :
                          'Mensaje';
   
-  console.log('💾 Actualizando último mensaje del chat:', lastMessageText);
-  
   await updateDoc(doc(db, "chats", chatId), {
     lastMessage: lastMessageText,
     timestamp: Date.now(),
     serverTimestamp: serverTimestamp()
   });
-  
-  console.log('✅ Chat actualizado exitosamente');
 };
 
 // Escuchar mensajes de un chat en tiempo real
@@ -158,8 +142,6 @@ export const getUserProfile = async (userId: string): Promise<UserProfile | null
 
 // Buscar o crear chat entre dos usuarios
 export const findOrCreateChat = async (currentUserId: string, otherUserId: string): Promise<string> => {
-  console.log('🔍 Buscando chat existente entre:', currentUserId, 'y', otherUserId);
-  
   // Buscar chat existente
   const q = query(
     collection(db, "chats"),
@@ -167,21 +149,100 @@ export const findOrCreateChat = async (currentUserId: string, otherUserId: strin
   );
   
   const querySnapshot = await getDocs(q);
-  console.log('📊 Chats encontrados para buscar:', querySnapshot.size);
   
   for (const doc of querySnapshot.docs) {
     const chatData = doc.data();
-    console.log('🔍 Revisando chat:', doc.id, 'participants:', chatData.participants);
     
     if (chatData.participants.includes(otherUserId)) {
-      console.log('✅ Chat existente encontrado:', doc.id);
       return doc.id; // Chat ya existe
     }
   }
   
   // Si no existe, crear nuevo chat
-  console.log('➕ Creando nuevo chat...');
   const newChatId = await createChat(currentUserId, otherUserId);
-  console.log('✅ Nuevo chat creado:', newChatId);
   return newChatId;
+};
+
+// Actualizar estado de typing
+export const updateTypingStatus = async (
+  chatId: string, 
+  userId: string, 
+  isTyping: boolean
+): Promise<void> => {
+  try {
+    console.log('🔥 updateTypingStatus llamado:', { chatId, userId, isTyping });
+    const typingRef = doc(db, "chats", chatId, "typingStatus", userId);
+    await updateDoc(typingRef, {
+      isTyping,
+      timestamp: serverTimestamp()
+    }).catch(async (error) => {
+      // Si el documento no existe, crearlo
+      if (error.code === 'not-found') {
+        await setDoc(typingRef, {
+          isTyping,
+          timestamp: serverTimestamp()
+        });
+      } else {
+        throw error;
+      }
+    });
+    console.log('✅ Typing status actualizado en Firebase:', isTyping);
+  } catch (error) {
+    console.error('Error updating typing status:', error);
+  }
+};
+
+// Escuchar estado de typing del otro usuario
+export const listenToTypingStatus = (
+  chatId: string, 
+  userId: string, 
+  callback: (isTyping: boolean) => void
+) => {
+  console.log('👂 ========================================');
+  console.log('👂 CONFIGURANDO LISTENER PARA TYPING');
+  console.log('👂 chatId:', chatId);
+  console.log('👂 userId (escuchando a):', userId);
+  console.log('👂 Path:', `chats/${chatId}/typingStatus/${userId}`);
+  console.log('👂 ========================================');
+  
+  const typingRef = doc(db, "chats", chatId, "typingStatus", userId);
+  
+  // Configurar listener con includeMetadataChanges para capturar cambios locales y remotos
+  const unsubscribe = onSnapshot(
+    typingRef,
+    { includeMetadataChanges: true },
+    (docSnapshot) => {
+      console.log('👂 ========================================');
+      console.log('👂 SNAPSHOT RECIBIDO!');
+      console.log('👂 Timestamp:', new Date().toISOString());
+      console.log('👂 Exists:', docSnapshot.exists());
+      console.log('👂 Data:', docSnapshot.data());
+      console.log('👂 From cache:', docSnapshot.metadata.fromCache);
+      console.log('👂 Has pending writes:', docSnapshot.metadata.hasPendingWrites);
+      console.log('👂 userId:', userId);
+      console.log('👂 ========================================');
+      
+      // Solo procesar cambios que vienen del servidor (no del cache local)
+      if (!docSnapshot.metadata.hasPendingWrites) {
+        if (docSnapshot.exists()) {
+          const data = docSnapshot.data();
+          const isTyping = data.isTyping || false;
+          console.log('👂 ✅ Llamando callback con isTyping=', isTyping);
+          callback(isTyping);
+        } else {
+          console.log('👂 ⚠️ Documento no existe, callback con false');
+          callback(false);
+        }
+      } else {
+        console.log('👂 ⏭️ Ignorando cambio local (pending writes)');
+      }
+    },
+    (error) => {
+      console.error('👂 ❌ ERROR en listener:', error);
+      callback(false);
+    }
+  );
+  
+  console.log('👂 ✅ Listener configurado exitosamente');
+  return unsubscribe;
 };

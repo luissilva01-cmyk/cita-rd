@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Firebase Storage Básico</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #333;
+      margin-bottom: 20px;
+    }
+    .test-section {
+      margin: 20px 0;
+      padding: 20px;
+      background: #f9f9f9;
+      border-radius: 5px;
+      border-left: 4px solid #4CAF50;
+    }
+    button {
+      background: #4CAF50;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 10px 5px;
+    }
+    button:hover {
+      background: #45a049;
+    }
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    input[type="file"] {
+      margin: 10px 0;
+      padding: 10px;
+      border: 2px dashed #ccc;
+      border-radius: 5px;
+      width: 100%;
+    }
+    .log {
+      background: #1e1e1e;
+      color: #00ff00;
+      padding: 15px;
+      border-radius: 5px;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      max-height: 400px;
+      overflow-y: auto;
+      margin-top: 20px;
+    }
+    .log-entry {
+      margin: 5px 0;
+      padding: 5px;
+    }
+    .log-success {
+      color: #00ff00;
+    }
+    .log-error {
+      color: #ff4444;
+    }
+    .log-info {
+      color: #4CAF50;
+    }
+    .log-warn {
+      color: #ffaa00;
+    }
+    .config {
+      background: #e3f2fd;
+      padding: 15px;
+      border-radius: 5px;
+      margin: 20px 0;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔥 Test Firebase Storage Básico</h1>
+    
+    <div class="config">
+      <strong>Configuración Firebase:</strong><br>
+      Project ID: citard-fbc26<br>
+      Storage Bucket: citard-fbc26.appspot.com<br>
+      API Key: AIzaSyDy2tLpXr3v6llyXGfQVhVlnmZtMgCDRhg
+    </div>
+
+    <div class="test-section">
+      <h3>📤 Test de Subida Básica</h3>
+      <p>Selecciona una imagen para probar la subida a Firebase Storage:</p>
+      
+      <input type="file" id="fileInput" accept="image/*">
+      
+      <button id="uploadBtn" disabled>Subir Imagen</button>
+      <button id="clearBtn">Limpiar Log</button>
+    </div>
+
+    <div class="log" id="log">
+      <div class="log-entry log-info">📋 Esperando inicialización...</div>
+    </div>
+  </div>
+
+  <!-- Firebase SDK v9+ (modular) -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
+
+    // Configuración Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyDy2tLpXr3v6llyXGfQVhVlnmZtMgCDRhg",
+      authDomain: "citard-fbc26.firebaseapp.com",
+      projectId: "citard-fbc26",
+      storageBucket: "citard-fbc26.appspot.com", // ← FORMATO .appspot.com
+      messagingSenderId: "564769541768",
+      appId: "1:564769541768:web:07013924da206d8b37593d"
+    };
+
+    const logDiv = document.getElementById('log');
+    const fileInput = document.getElementById('fileInput');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const clearBtn = document.getElementById('clearBtn');
+
+    function addLog(message, type = 'info') {
+      const entry = document.createElement('div');
+      entry.className = `log-entry log-${type}`;
+      entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      logDiv.appendChild(entry);
+      logDiv.scrollTop = logDiv.scrollHeight;
+      console.log(message);
+    }
+
+    function clearLog() {
+      logDiv.innerHTML = '<div class="log-entry log-info">📋 Log limpiado</div>';
+    }
+
+    // Inicializar Firebase
+    let app, storage;
+    
+    try {
+      addLog('🔧 Inicializando Firebase App...', 'info');
+      app = initializeApp(firebaseConfig);
+      addLog('✅ Firebase App inicializada correctamente', 'success');
+      
+      addLog('🔧 Inicializando Firebase Storage...', 'info');
+      storage = getStorage(app);
+      addLog('✅ Firebase Storage inicializado correctamente', 'success');
+      addLog(`📦 Storage Bucket: ${storage.app.options.storageBucket}`, 'info');
+      
+      // Habilitar botón de subida
+      uploadBtn.disabled = false;
+      addLog('✅ Sistema listo para subir archivos', 'success');
+      
+    } catch (error) {
+      addLog(`❌ Error inicializando Firebase: ${error.message}`, 'error');
+      addLog(`❌ Error name: ${error.name}`, 'error');
+      addLog(`❌ Error stack: ${error.stack}`, 'error');
+    }
+
+    // Habilitar botón cuando se selecciona archivo
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        const file = e.target.files[0];
+        addLog(`📁 Archivo seleccionado: ${file.name}`, 'info');
+        addLog(`📊 Tamaño: ${(file.size / 1024).toFixed(2)} KB`, 'info');
+        addLog(`📋 Tipo: ${file.type}`, 'info');
+        uploadBtn.disabled = false;
+      }
+    });
+
+    // Función de subida
+    uploadBtn.addEventListener('click', async () => {
+      const file = fileInput.files[0];
+      if (!file) {
+        addLog('⚠️ No hay archivo seleccionado', 'warn');
+        return;
+      }
+
+      try {
+        uploadBtn.disabled = true;
+        addLog('📤 Iniciando subida...', 'info');
+        
+        // Crear referencia con timestamp
+        const timestamp = Date.now();
+        const fileName = `test_${timestamp}.jpg`;
+        const storageRef = ref(storage, `profile-photos/${fileName}`);
+        
+        addLog(`📁 Path: profile-photos/${fileName}`, 'info');
+        addLog('🔄 Subiendo bytes...', 'info');
+        
+        // Subir archivo
+        const snapshot = await uploadBytes(storageRef, file);
+        addLog('✅ Bytes subidos correctamente', 'success');
+        
+        // Obtener URL
+        addLog('🔗 Obteniendo URL de descarga...', 'info');
+        const downloadURL = await getDownloadURL(snapshot.ref);
+        addLog('✅ URL obtenida correctamente', 'success');
+        addLog(`🔗 URL: ${downloadURL}`, 'success');
+        
+        addLog('🎉 ¡SUBIDA EXITOSA!', 'success');
+        addLog('✅ Firebase Storage está funcionando correctamente', 'success');
+        
+      } catch (error) {
+        addLog(`❌ Error en la subida: ${error.message}`, 'error');
+        addLog(`❌ Error code: ${error.code}`, 'error');
+        addLog(`❌ Error name: ${error.name}`, 'error');
+        
+        // Mensajes específicos según el error
+        if (error.code === 'storage/unauthorized') {
+          addLog('⚠️ Error de permisos - Verifica las reglas de seguridad', 'warn');
+        } else if (error.code === 'storage/unknown') {
+          addLog('⚠️ Error desconocido - Storage podría no estar habilitado', 'warn');
+        } else if (error.message.includes('Service storage is not available')) {
+          addLog('⚠️ Storage no está disponible - Verifica la configuración', 'warn');
+        }
+        
+      } finally {
+        uploadBtn.disabled = false;
+      }
+    });
+
+    // Limpiar log
+    clearBtn.addEventListener('click', clearLog);
+
+  </script>
+</body>
+</html>

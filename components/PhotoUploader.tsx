@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Camera, Plus, X, Upload, AlertCircle, BarChart3 } from 'lucide-react';
 import { uploadPhoto, resizeImage, updateUserPhotos, deletePhoto } from '../services/photoUploadService';
+import { PhotoInfo, normalizePhotos, extractUrls } from '../types/PhotoInfo';
 import PhotoAnalysisCard from './PhotoAnalysisCard';
 
 interface PhotoUploaderProps {
@@ -38,17 +39,116 @@ const PhotoUploader: React.FC<PhotoUploaderProps> = ({
       console.log('📤 Subiendo foto...');
       const result = await uploadPhoto(resizedFile, userId, index);
       
-      if (result.success && result.url) {
-        // Actualizar array de fotos
-        const newPhotos = [...currentPhotos];
-        newPhotos[index] = result.url;
+      if (result.success && result.url && result.fileId) {
+        // Obtener photosInfo actual de Firestore
+        const { doc: docFunc, getDoc } = await import('firebase/firestore');
+        const { db } = await import('../services/firebase');
+        
+        const userRef = docFunc(db, 'perfiles', userId);
+        const userDoc = await getDoc(userRef);
+        
+        let photosInfo: PhotoInfo[] = [];
+        
+        if (userDoc.exists()) {
+          const data = userDoc.data();
+          
+          console.log('📊 Datos de Firestore:');
+          console.log('   - photosInfo:', data.photosInfo);
+          console.log('   - images:', data.images);
+          
+          const hasPhotosInfo = data.photosInfo && Array.isArray(data.photosInfo) && data.photosInfo.length > 0;
+          const hasImages = data.images && Array.isArray(data.images) && data.images.length > 0;
+          
+          // Filtrar elementos inválidos de photosInfo
+          if (hasPhotosInfo) {
+            data.photosInfo = data.photosInfo.filter((p: any) => p && p.url && typeof p.url === 'string');
+          }
+          
+          // Filtrar elementos inválidos de images
+          if (hasImages) {
+            data.images = data.images.filter((url: any) => url && typeof url === 'string');
+          }
+          
+          // Si ambos existen pero tienen diferente longitud, hay desincronización
+          if (hasPhotosInfo && hasImages && data.photosInfo.length !== data.images.length) {
+            console.warn('⚠️ DESINCRONIZACIÓN DETECTADA:');
+            console.warn('   - photosInfo tiene', data.photosInfo.length, 'elementos');
+            console.warn('   - images tiene', data.images.length, 'elementos');
+            console.warn('   - Sincronizando usando images como fuente de verdad...');
+            
+            // Usar images como fuente de verdad y sincronizar con photosInfo
+            const imagesArray = data.images;
+            const photosInfoMap = new Map(data.photosInfo.map((p: PhotoInfo) => [p.url, p]));
+            
+            photosInfo = imagesArray.map((url: string) => {
+              // Si existe en photosInfo, usar ese objeto
+              if (photosInfoMap.has(url)) {
+                return photosInfoMap.get(url)!;
+              }
+              // Si no existe, crear PhotoInfo nuevo (foto antigua sin fileId)
+              return {
+                url,
+                fileId: '',
+                isMain: false,
+                createdAt: Date.now(),
+                analyzed: false
+              };
+            });
+            
+            // Marcar la primera como main
+            if (photosInfo.length > 0) {
+              photosInfo[0].isMain = true;
+            }
+            
+            console.log('   ✅ Sincronizado:', photosInfo.length, 'fotos');
+          }
+          // Si solo existe photosInfo, usarlo
+          else if (hasPhotosInfo) {
+            photosInfo = data.photosInfo;
+            console.log('   ✅ Usando photosInfo de Firestore:', photosInfo.length, 'fotos');
+          } 
+          // Si solo existe images, normalizarlo
+          else if (hasImages) {
+            photosInfo = normalizePhotos(data.images);
+            console.log('   ⚠️ Usando images (normalizadas):', photosInfo.length, 'fotos');
+          }
+          
+          console.log('   - Total fotos cargadas:', photosInfo.length);
+        }
+        
+        // Crear nuevo PhotoInfo para la foto subida
+        const newPhotoInfo: PhotoInfo = {
+          url: result.url,
+          fileId: result.fileId,
+          isMain: photosInfo.length === 0, // Primera foto es main
+          createdAt: Date.now(),
+          analyzed: false
+        };
+        
+        console.log('📝 ANTES de agregar:');
+        console.log('   - Fotos existentes:', photosInfo.length);
+        console.log('   - URLs existentes:', photosInfo.map(p => p && p.url ? p.url.substring(0, 50) + '...' : 'URL inválida'));
+        
+        // Simplemente agregar al final del array
+        photosInfo.push(newPhotoInfo);
+        
+        console.log('📝 DESPUÉS de agregar:');
+        console.log('   - Total de fotos:', photosInfo.length);
+        console.log('   - Nueva foto URL:', result.url.substring(0, 50) + '...');
+        console.log('   - Array completo:', JSON.stringify(photosInfo.map(p => ({
+          url: p && p.url ? p.url.substring(0, 50) + '...' : 'URL inválida',
+          fileId: p ? p.fileId : 'N/A',
+          isMain: p ? p.isMain : false
+        })), null, 2));
         
         // Actualizar en Firestore
-        const updateSuccess = await updateUserPhotos(userId, newPhotos);
+        const updateSuccess = await updateUserPhotos(userId, photosInfo);
         
         if (updateSuccess) {
+          // Actualizar UI con URLs
+          const newPhotos = extractUrls(photosInfo);
           onPhotosUpdate(newPhotos);
-          console.log('✅ Foto subida y perfil actualizado');
+          console.log('✅ Foto subida y perfil actualizado con fileId');
         } else {
           setError('Error actualizando el perfil');
         }
@@ -69,23 +169,65 @@ const PhotoUploader: React.FC<PhotoUploaderProps> = ({
 
   const handleDeletePhoto = async (index: number) => {
     const photoUrl = currentPhotos[index];
-    if (!photoUrl) return;
+    if (!photoUrl) {
+      console.log('⚠️ No hay foto en el índice', index);
+      return;
+    }
+
+    // Confirmación antes de eliminar
+    if (!confirm('¿Estás seguro de que quieres eliminar esta foto?')) {
+      return;
+    }
 
     setError(null);
     
     try {
-      // Eliminar de Firebase Storage
-      await deletePhoto(photoUrl);
+      // Obtener photosInfo completo de Firestore
+      const { doc: docFunc, getDoc } = await import('firebase/firestore');
+      const { db } = await import('../services/firebase');
       
-      // Actualizar array de fotos
-      const newPhotos = [...currentPhotos];
-      newPhotos[index] = '';
+      const userRef = docFunc(db, 'perfiles', userId);
+      const userDoc = await getDoc(userRef);
+      
+      let fileId: string | undefined;
+      let photosInfo: PhotoInfo[] = [];
+      
+      if (userDoc.exists()) {
+        const data = userDoc.data();
+        console.log('📊 Datos de Firestore:', data);
+        
+        // Obtener y normalizar photosInfo
+        const rawPhotos = data.photosInfo || data.images || [];
+        photosInfo = normalizePhotos(rawPhotos);
+        
+        console.log('📋 photosInfo normalizado:', photosInfo);
+        
+        // Buscar la foto por URL
+        const photoInfo = photosInfo.find(p => p.url === photoUrl);
+        
+        if (photoInfo && photoInfo.fileId) {
+          fileId = photoInfo.fileId;
+          console.log('✅ fileId encontrado:', fileId);
+        } else {
+          console.log('⚠️ No se encontró fileId para esta URL');
+        }
+      }
+      
+      console.log('🗑️ Eliminando foto con fileId:', fileId || 'no disponible');
+      
+      // Eliminar de ImageKit (con fileId si está disponible)
+      await deletePhoto(photoUrl, fileId);
+      
+      // Actualizar photosInfo eliminando la foto
+      const updatedPhotosInfo = photosInfo.filter(p => p.url !== photoUrl);
       
       // Actualizar en Firestore
-      const updateSuccess = await updateUserPhotos(userId, newPhotos.filter(p => p));
+      const updateSuccess = await updateUserPhotos(userId, updatedPhotosInfo);
       
       if (updateSuccess) {
-        onPhotosUpdate(newPhotos.filter(p => p));
+        // Actualizar UI
+        const newPhotos = currentPhotos.filter(p => p !== photoUrl);
+        onPhotosUpdate(newPhotos);
         console.log('✅ Foto eliminada');
       } else {
         setError('Error actualizando el perfil');

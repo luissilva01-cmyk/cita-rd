@@ -249,11 +249,11 @@ const ChatView: React.FC<ChatViewProps> = ({
       // Usuario está escribiendo
       updateTypingStatus(chatId, currentUserId, true);
       
-      // Establecer timeout para limpiar después de 3 segundos de inactividad
+      // Establecer timeout para limpiar después de 15 segundos de inactividad
       typingTimeoutRef.current = setTimeout(() => {
-        console.log('⏱️ Timeout: Limpiando typing status después de 3 segundos');
+        console.log('⏱️ Timeout: Limpiando typing status después de 15 segundos');
         updateTypingStatus(chatId, currentUserId, false);
-      }, 3000);
+      }, 15000);
     } else {
       // Campo vacío, limpiar inmediatamente
       updateTypingStatus(chatId, currentUserId, false);

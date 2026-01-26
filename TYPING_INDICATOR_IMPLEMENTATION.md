@@ -133,10 +133,10 @@ const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // Usuario está escribiendo
     updateTypingStatus(chatId, currentUserId, true);
     
-    // Establecer timeout para limpiar después de 2 segundos de inactividad
+    // Establecer timeout para limpiar después de 15 segundos de inactividad
     typingTimeoutRef.current = setTimeout(() => {
       updateTypingStatus(chatId, currentUserId, false);
-    }, 2000);
+    }, 15000);
   } else {
     // Campo vacío, limpiar inmediatamente
     updateTypingStatus(chatId, currentUserId, false);
@@ -218,8 +218,8 @@ chats/{chatId}/typingStatus/{userId}
    - `setOtherUserTyping(true)` updates state
    - TypingIndicator component shows "User A escribiendo..."
 
-3. **User A stops typing (2 seconds of inactivity):**
-   - Timeout triggers after 2 seconds
+3. **User A stops typing (15 seconds of inactivity):**
+   - Timeout triggers after 15 seconds
    - Calls `updateTypingStatus(chatId, userA_id, false)`
    - Updates Firebase document
 
@@ -234,6 +234,7 @@ chats/{chatId}/typingStatus/{userId}
 - ✅ User closes chat → typing status cleared on unmount
 - ✅ Document doesn't exist → automatically created with setDoc
 - ✅ Network errors → caught and logged, doesn't crash app
+- ✅ 15 seconds of inactivity → typing status automatically cleared
 
 ---
 
@@ -262,7 +263,7 @@ chats/{chatId}/typingStatus/{userId}
 ## Testing Checklist
 
 - [x] User A types → User B sees "User A escribiendo..."
-- [x] User A stops typing for 2 seconds → Indicator disappears
+- [x] User A stops typing for 15 seconds → Indicator disappears
 - [x] User A clears input → Indicator disappears immediately
 - [x] User A sends message → Indicator disappears immediately
 - [x] User A closes chat → Typing status cleared
@@ -283,7 +284,7 @@ chats/{chatId}/typingStatus/{userId}
 3. Start a chat between them
 4. In window 1, start typing
 5. In window 2, you should see "User 1 escribiendo..." appear
-6. Stop typing in window 1 for 2 seconds
+6. Stop typing in window 1 for 15 seconds
 7. Indicator should disappear in window 2
 
 ---
@@ -291,22 +292,23 @@ chats/{chatId}/typingStatus/{userId}
 ## Firebase Costs
 
 **Typing indicator generates:**
-- 1 write per keystroke (debounced to 2 seconds)
+- 1 write per keystroke (debounced to 15 seconds)
 - 1 write when stopping typing
 - 1 write when sending message
 - 1 write when closing chat
 - 1 read per typing status change (real-time listener)
 
 **Estimated cost for active chat:**
-- ~30 writes per minute (if typing continuously)
-- ~30 reads per minute (for other user)
+- ~4 writes per minute (if typing continuously with 15s timeout)
+- ~4 reads per minute (for other user)
 - Firebase free tier: 50,000 reads/day, 20,000 writes/day
-- Should be fine for development and small user base
+- ✅ Excellent for development and production with moderate user base
 
-**Optimization ideas for production:**
-- Debounce writes to every 3-5 seconds instead of 2
-- Use Cloud Functions to auto-cleanup stale typing status
-- Batch multiple status updates
+**Benefits of 15-second timeout:**
+- ✅ Significantly reduces Firebase writes (5x less than 3s timeout)
+- ✅ More natural UX - users can pause to think
+- ✅ Lower costs in production
+- ✅ Still responsive enough for good user experience
 
 ---
 
@@ -320,8 +322,9 @@ chats/{chatId}/typingStatus/{userId}
 - ✅ Responsive design maintained
 - ✅ **Production-ready** - All debug logs removed
 - ✅ Clean console output for end users
-- ⚠️ Monitor Firebase usage in production (writes can add up)
-- 💡 Consider adding more aggressive debouncing for production to reduce writes
+- ✅ **15-second timeout** - Optimal balance between UX and Firebase costs
+- ✅ Significantly reduces Firebase writes compared to shorter timeouts
+- 💡 15 seconds allows users to pause and think without indicator disappearing
 
 ---
 

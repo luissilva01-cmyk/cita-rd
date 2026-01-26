@@ -1,15 +1,42 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { MessageCircle, Clock } from 'lucide-react';
 import { Match } from '../../types';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { listenToTypingStatus } from '../../services/chatService';
 
 interface MessagesProps {
   matches: Match[];
   onSelectMatch: (match: Match) => void;
+  currentUserId: string; // NEW: Needed to listen to typing status
 }
 
-const Messages: React.FC<MessagesProps> = ({ matches, onSelectMatch }) => {
+const Messages: React.FC<MessagesProps> = ({ matches, onSelectMatch, currentUserId }) => {
   const { t } = useLanguage();
+  
+  // Track typing status for each chat
+  const [typingStatus, setTypingStatus] = useState<Record<string, boolean>>({});
+  
+  // Listen to typing status for all chats
+  useEffect(() => {
+    const unsubscribers: (() => void)[] = [];
+    
+    matches.forEach((match) => {
+      // Listen to the other user's typing status
+      const unsubscribe = listenToTypingStatus(match.id, match.user.id, (isTyping) => {
+        setTypingStatus(prev => ({
+          ...prev,
+          [match.id]: isTyping
+        }));
+      });
+      
+      unsubscribers.push(unsubscribe);
+    });
+    
+    // Cleanup all listeners on unmount
+    return () => {
+      unsubscribers.forEach(unsub => unsub());
+    };
+  }, [matches]);
   
   const formatTime = (timestamp: number) => {
     const date = new Date(timestamp);
@@ -74,9 +101,22 @@ const Messages: React.FC<MessagesProps> = ({ matches, onSelectMatch }) => {
                   <span className="text-[10px] sm:text-xs">{formatTime(match.timestamp)}</span>
                 </div>
               </div>
-              <p className="text-xs sm:text-sm text-slate-600 truncate">
-                {match.lastMessage || t('newMatch')}
-              </p>
+              
+              {/* Show typing indicator or last message */}
+              {typingStatus[match.id] ? (
+                <div className="flex items-center gap-1 text-emerald-500">
+                  <span className="text-xs sm:text-sm font-medium">{t('typing')}</span>
+                  <div className="flex gap-0.5">
+                    <div className="w-1 h-1 bg-emerald-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                    <div className="w-1 h-1 bg-emerald-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                    <div className="w-1 h-1 bg-emerald-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-xs sm:text-sm text-slate-600 truncate">
+                  {match.lastMessage || t('newMatch')}
+                </p>
+              )}
             </div>
           </button>
         ))}

@@ -278,6 +278,7 @@ const App: React.FC = () => {
       case 'messages':
         return (
           <Messages 
+            currentUserId={currentUser!.id}
             matches={chats.map(chat => {
               // Encontrar el ID del otro usuario
               const otherUserId = chat.participants.find(p => p !== currentUser!.id) || '';

@@ -97,17 +97,20 @@ const StoriesViewer: React.FC<StoriesViewerProps> = ({
               return 0;
             } else {
               // Última story, cerrar o ir al siguiente grupo
-              if (onNext) {
-                try {
-                  onNext();
-                } catch (error) {
-                  console.error('StoriesViewer: Error en onNext:', error);
+              // Usar setTimeout para evitar setState durante render
+              setTimeout(() => {
+                if (onNext) {
+                  try {
+                    onNext();
+                  } catch (error) {
+                    console.error('StoriesViewer: Error en onNext:', error);
+                    onClose();
+                  }
+                } else {
                   onClose();
                 }
-              } else {
-                onClose();
-              }
-              return 0;
+              }, 0);
+              return 100; // Mantener en 100% mientras se cierra
             }
           }
           
@@ -313,16 +316,24 @@ const StoriesViewer: React.FC<StoriesViewerProps> = ({
     }
   };
 
+  // Validación crítica: verificar que currentStoryIndex esté en rango válido
+  useEffect(() => {
+    if (storyGroup && storyGroup.stories && storyGroup.stories.length > 0) {
+      if (currentStoryIndex < 0 || currentStoryIndex >= storyGroup.stories.length) {
+        console.error('StoriesViewer: currentStoryIndex fuera de rango, corrigiendo...');
+        const validIndex = Math.max(0, Math.min(currentStoryIndex, storyGroup.stories.length - 1));
+        setCurrentStoryIndex(validIndex);
+      }
+    }
+  }, [currentStoryIndex, storyGroup]);
+
   if (!isOpen || !storyGroup || storyGroup.stories.length === 0) {
     return null;
   }
 
-  // Validación crítica: verificar que currentStoryIndex esté en rango válido
+  // Verificación adicional antes de acceder al array
   if (currentStoryIndex < 0 || currentStoryIndex >= storyGroup.stories.length) {
-    console.error('StoriesViewer: currentStoryIndex fuera de rango');
-    const validIndex = Math.max(0, Math.min(currentStoryIndex, storyGroup.stories.length - 1));
-    setCurrentStoryIndex(validIndex);
-    return null;
+    return null; // Esperar a que useEffect corrija el índice
   }
 
   const currentStory = storyGroup.stories[currentStoryIndex];

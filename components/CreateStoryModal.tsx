@@ -119,10 +119,10 @@ const CreateStoryModal: React.FC<CreateStoryModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl w-full max-w-md max-h-[90vh] overflow-hidden">
+      <div className="bg-white rounded-2xl w-full max-w-md max-h-[90vh] flex flex-col overflow-hidden">
         
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200">
+        <div className="flex items-center justify-between p-4 border-b border-gray-200 flex-shrink-0">
           <h2 className="text-xl font-bold text-gray-900">{t('createStoryTitle')}</h2>
           <button
             onClick={handleClose}
@@ -133,7 +133,7 @@ const CreateStoryModal: React.FC<CreateStoryModalProps> = ({
         </div>
 
         {/* Content */}
-        <div className="p-4">
+        <div className="p-4 overflow-y-auto flex-1">
           
           {/* Mode Selection */}
           {mode === 'select' && (
@@ -176,17 +176,17 @@ const CreateStoryModal: React.FC<CreateStoryModalProps> = ({
 
           {/* Text Story Mode */}
           {mode === 'text' && (
-            <div className="space-y-4">
+            <div className="space-y-4 pb-4">
               {/* Preview */}
               <div 
-                className="w-full h-64 rounded-xl flex items-center justify-center p-4 relative overflow-hidden"
+                className="w-full h-48 sm:h-64 rounded-xl flex items-center justify-center p-4 relative overflow-hidden"
                 style={{ backgroundColor }}
               >
                 <textarea
                   value={textContent}
                   onChange={(e) => setTextContent(e.target.value)}
                   placeholder={t('writeYourMessage')}
-                  className="w-full h-full bg-transparent resize-none outline-none text-center text-xl font-bold placeholder-white/70"
+                  className="w-full h-full bg-transparent resize-none outline-none text-center text-lg sm:text-xl font-bold placeholder-white/70"
                   style={{ color: textColor }}
                   maxLength={200}
                 />
@@ -231,18 +231,18 @@ const CreateStoryModal: React.FC<CreateStoryModalProps> = ({
                 </div>
               </div>
               
-              {/* Actions */}
-              <div className="flex gap-3 pt-4">
+              {/* Actions - Fixed at bottom */}
+              <div className="flex gap-3 pt-2 sticky bottom-0 bg-white pb-safe">
                 <button
                   onClick={() => setMode('select')}
-                  className="flex-1 py-3 px-4 border border-gray-300 rounded-xl text-gray-700 font-semibold hover:bg-gray-50 transition-colors"
+                  className="flex-1 py-3 px-4 border border-gray-300 rounded-xl text-gray-700 font-semibold hover:bg-gray-50 transition-colors active:scale-95"
                 >
                   {t('back')}
                 </button>
                 <button
                   onClick={handleCreateStory}
                   disabled={!textContent.trim() || isCreating}
-                  className="flex-1 py-3 px-4 bg-rose-500 text-white rounded-xl font-semibold hover:bg-rose-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="flex-1 py-3 px-4 bg-rose-500 text-white rounded-xl font-semibold hover:bg-rose-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors active:scale-95"
                 >
                   {isCreating ? t('creating') : t('publish')}
                 </button>
@@ -252,9 +252,9 @@ const CreateStoryModal: React.FC<CreateStoryModalProps> = ({
 
           {/* Image Story Mode */}
           {mode === 'image' && selectedImage && (
-            <div className="space-y-4">
+            <div className="space-y-4 pb-4">
               {/* Preview */}
-              <div className="w-full h-64 rounded-xl overflow-hidden bg-gray-100">
+              <div className="w-full h-64 sm:h-80 rounded-xl overflow-hidden bg-gray-100">
                 <img
                   src={selectedImage}
                   alt="Story preview"
@@ -262,21 +262,21 @@ const CreateStoryModal: React.FC<CreateStoryModalProps> = ({
                 />
               </div>
               
-              {/* Actions */}
-              <div className="flex gap-3">
+              {/* Actions - Fixed at bottom */}
+              <div className="flex gap-3 sticky bottom-0 bg-white pb-safe">
                 <button
                   onClick={() => {
                     setSelectedImage(null);
                     setMode('select');
                   }}
-                  className="flex-1 py-3 px-4 border border-gray-300 rounded-xl text-gray-700 font-semibold hover:bg-gray-50 transition-colors"
+                  className="flex-1 py-3 px-4 border border-gray-300 rounded-xl text-gray-700 font-semibold hover:bg-gray-50 transition-colors active:scale-95"
                 >
                   {t('changePhoto')}
                 </button>
                 <button
                   onClick={handleCreateStory}
                   disabled={isCreating}
-                  className="flex-1 py-3 px-4 bg-rose-500 text-white rounded-xl font-semibold hover:bg-rose-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="flex-1 py-3 px-4 bg-rose-500 text-white rounded-xl font-semibold hover:bg-rose-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors active:scale-95"
                 >
                   {isCreating ? t('creating') : t('publish')}
                 </button>

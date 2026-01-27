@@ -27,6 +27,7 @@ import EmotionalInsights from '../../components/EmotionalInsights';
 import { useEmotionalAI } from '../../hooks/useEmotionalAI';
 import TypingIndicator from '../../components/TypingIndicator';
 import { SmartSuggestion } from '../../services/emotionalAI';
+import { listenToUserPresence, formatPresenceStatus, PresenceStatus } from '../../services/presenceService';
 
 interface ChatViewProps {
   match: Match;
@@ -58,6 +59,7 @@ const ChatView: React.FC<ChatViewProps> = ({
   const [icebreakers, setIcebreakers] = useState<string[]>([]);
   const [loadingIce, setLoadingIce] = useState(false);
   const [otherUserTyping, setOtherUserTyping] = useState(false);
+  const [otherUserPresence, setOtherUserPresence] = useState<PresenceStatus>({ online: false, lastSeen: Date.now() });
   const scrollRef = useRef<HTMLDivElement>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
@@ -141,6 +143,25 @@ const ChatView: React.FC<ChatViewProps> = ({
       unsubscribe();
     };
   }, [chatId, match.user.id]);
+
+  // Listen to other user's presence status
+  useEffect(() => {
+    console.log('👁️ Setting up presence listener for:', match.user.id);
+    
+    if (!match.user.id) {
+      return;
+    }
+    
+    const unsubscribe = listenToUserPresence(match.user.id, (status) => {
+      console.log('🟢 Presence status updated:', { userId: match.user.id, status });
+      setOtherUserPresence(status);
+    });
+    
+    return () => {
+      console.log('🧹 Cleaning up presence listener');
+      unsubscribe();
+    };
+  }, [match.user.id]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -443,7 +464,14 @@ const ChatView: React.FC<ChatViewProps> = ({
           />
           <div className="min-w-0 flex-1">
             <h3 className="font-bold text-sm sm:text-base truncate">{match.user.name}</h3>
-            <p className="text-[9px] sm:text-[10px] text-emerald-500 font-bold uppercase">{t('online')}</p>
+            <p className={`text-[9px] sm:text-[10px] font-bold uppercase flex items-center gap-1 ${
+              otherUserPresence.online ? 'text-emerald-500' : 'text-slate-400'
+            }`}>
+              <span className={`w-1.5 h-1.5 rounded-full ${
+                otherUserPresence.online ? 'bg-emerald-500' : 'bg-slate-400'
+              }`}></span>
+              {formatPresenceStatus(otherUserPresence, t)}
+            </p>
           </div>
         </div>
         <div className="flex gap-1 sm:gap-2 text-slate-400 flex-shrink-0">

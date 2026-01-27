@@ -18,6 +18,7 @@ import { privacyService } from './services/privacyService';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { StoryGroup } from './services/storiesService';
 import { auth } from './services/firebase';
+import { setupPresenceSystem } from './services/presenceService';
 
 const INITIAL_POTENTIAL_MATCHES: UserProfile[] = [];
 
@@ -76,6 +77,19 @@ const App: React.FC = () => {
 
     loadUserProfile();
   }, []);
+
+  // Setup presence system when user is loaded
+  useEffect(() => {
+    if (!currentUser) return;
+    
+    console.log('🟢 Setting up presence system for user:', currentUser.id);
+    const cleanup = setupPresenceSystem(currentUser.id);
+    
+    return () => {
+      console.log('🔴 Cleaning up presence system for user:', currentUser.id);
+      cleanup();
+    };
+  }, [currentUser]);
 
   // Cargar chats del usuario en tiempo real
   useEffect(() => {

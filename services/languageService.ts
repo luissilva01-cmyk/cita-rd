@@ -152,6 +152,10 @@ export interface Translations {
   offline: string;
   lastSeen: string;
   typing: string;
+  activeJustNow: string;
+  activeMinutesAgo: string;
+  activeHoursAgo: string;
+  activeDaysAgo: string;
   
   // Swipe Actions
   superLike: string;
@@ -401,6 +405,10 @@ const translations: Record<Language, Translations> = {
     offline: 'Desconectado',
     lastSeen: 'Visto por última vez',
     typing: 'escribiendo...',
+    activeJustNow: 'Activo justo ahora',
+    activeMinutesAgo: 'Activo hace {minutes} min',
+    activeHoursAgo: 'Activo hace {hours} h',
+    activeDaysAgo: 'Activo hace {days} d',
     
     // Swipe Actions
     superLike: 'Super Like',
@@ -649,6 +657,10 @@ const translations: Record<Language, Translations> = {
     offline: 'Offline',
     lastSeen: 'Last seen',
     typing: 'typing...',
+    activeJustNow: 'Active just now',
+    activeMinutesAgo: 'Active {minutes} min ago',
+    activeHoursAgo: 'Active {hours} h ago',
+    activeDaysAgo: 'Active {days} d ago',
     
     // Swipe Actions
     superLike: 'Super Like',
@@ -897,6 +909,10 @@ const translations: Record<Language, Translations> = {
     offline: 'Offline',
     lastSeen: 'Visto por último',
     typing: 'digitando...',
+    activeJustNow: 'Ativo agora mesmo',
+    activeMinutesAgo: 'Ativo há {minutes} min',
+    activeHoursAgo: 'Ativo há {hours} h',
+    activeDaysAgo: 'Ativo há {days} d',
     
     // Swipe Actions
     superLike: 'Super Like',
@@ -1145,6 +1161,10 @@ const translations: Record<Language, Translations> = {
     offline: 'Hors ligne',
     lastSeen: 'Vu pour la dernière fois',
     typing: 'en train d\'écrire...',
+    activeJustNow: 'Actif à l\'instant',
+    activeMinutesAgo: 'Actif il y a {minutes} min',
+    activeHoursAgo: 'Actif il y a {hours} h',
+    activeDaysAgo: 'Actif il y a {days} j',
     
     // Swipe Actions
     superLike: 'Super Like',

@@ -37,6 +37,17 @@ service cloud.firestore {
       allow write: if request.auth != null && request.auth.uid == userId;
     }
 
+    // Colección stories - historias de 24 horas
+    match /stories/{storyId} {
+      // Cualquiera puede leer stories (privacidad se maneja en el código)
+      allow read: if true;
+      // Cualquiera puede crear stories
+      allow create: if true;
+      // Solo el dueño puede actualizar o eliminar su story
+      allow update, delete: if request.auth != null && 
+                              request.auth.uid == resource.data.userId;
+    }
+
     // Permitir acceso a todas las colecciones para desarrollo
     match /{document=**} {
       allow read, write: if true;

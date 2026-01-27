@@ -1,5 +1,20 @@
 // cita-rd/services/storiesService.ts
 import { privacyService } from './privacyService';
+import { db } from './firebase';
+import { 
+  collection, 
+  doc, 
+  addDoc, 
+  updateDoc, 
+  deleteDoc, 
+  query, 
+  where, 
+  getDocs, 
+  getDoc,
+  orderBy,
+  Timestamp,
+  arrayUnion
+} from 'firebase/firestore';
 
 export interface Story {
   id: string;
@@ -26,25 +41,17 @@ export interface StoryGroup {
 }
 
 class StoriesService {
-  private stories: Story[] = [];
-  private storyGroups: StoryGroup[] = [];
+  private storiesCollection = collection(db, 'stories');
+  private perfilesCollection = collection(db, 'perfiles');
 
   constructor() {
-    this.initializeDemoData();
-  }
-
-  private initializeDemoData() {
-    // ✅ NO cargar datos mock - solo stories reales
-    this.stories = [];
-    this.storyGroups = [];
+    console.log('📱 StoriesService inicializado con persistencia en Firestore');
   }
 
   // Obtener todos los grupos de stories (con filtrado de privacidad)
   async getStoryGroups(currentUserId: string): Promise<StoryGroup[]> {
-    console.log('📊 === CARGANDO STORY GROUPS ===');
+    console.log('📊 === CARGANDO STORY GROUPS DESDE FIRESTORE ===');
     console.log('📊 Current User ID:', currentUserId);
-    console.log('📊 Total Stories en memoria:', this.stories.length);
-    console.log('📊 Total Story Groups en memoria:', this.storyGroups.length);
     
     try {
       // Validar parámetro de entrada
@@ -53,82 +60,105 @@ class StoriesService {
         return [];
       }
       
-      // Filtrar stories expiradas
+      // Obtener todas las stories activas desde Firestore
       const now = new Date();
-      const activeStories = this.stories.filter(story => {
-        try {
-          const isActive = story && story.expiresAt && story.expiresAt > now;
-          if (!isActive && story) {
-            console.log('⏰ Story expirada:', story.id, 'de usuario:', story.userId);
-          }
-          return isActive;
-        } catch (storyError) {
-          console.error('❌ Error filtrando story:', storyError);
-          return false;
-        }
+      const storiesQuery = query(
+        this.storiesCollection,
+        where('expiresAt', '>', Timestamp.fromDate(now)),
+        orderBy('expiresAt'),
+        orderBy('createdAt', 'desc')
+      );
+      
+      const storiesSnapshot = await getDocs(storiesQuery);
+      console.log('📊 Stories encontradas en Firestore:', storiesSnapshot.size);
+      
+      // Convertir documentos a objetos Story
+      const allStories: Story[] = storiesSnapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          userId: data.userId,
+          type: data.type,
+          content: data.content,
+          backgroundColor: data.backgroundColor,
+          textColor: data.textColor,
+          createdAt: data.createdAt.toDate(),
+          expiresAt: data.expiresAt.toDate(),
+          viewedBy: data.viewedBy || []
+        };
       });
       
-      console.log('✅ Stories activas (no expiradas):', activeStories.length);
+      console.log('✅ Stories activas cargadas:', allStories.length);
       
-      // Filtrar grupos según configuración de privacidad
+      // Agrupar stories por usuario
+      const storiesByUser = new Map<string, Story[]>();
+      for (const story of allStories) {
+        if (!storiesByUser.has(story.userId)) {
+          storiesByUser.set(story.userId, []);
+        }
+        storiesByUser.get(story.userId)!.push(story);
+      }
+      
+      console.log('📊 Usuarios con stories:', storiesByUser.size);
+      
+      // Crear grupos con información de perfil
       const filteredGroups: StoryGroup[] = [];
       
-      for (const group of this.storyGroups) {
+      for (const [userId, userStories] of storiesByUser.entries()) {
         try {
-          // Validar que el grupo tenga datos válidos
-          if (!group || !group.userId || !group.user) {
-            console.log('⚠️ Grupo inválido, saltando');
+          console.log('🔍 Procesando usuario:', userId, '- Stories:', userStories.length);
+          
+          // Verificar privacidad
+          const canView = await privacyService.canViewStories(currentUserId, userId);
+          console.log('👁️ ¿Puede ver?', canView);
+          
+          if (!canView) {
+            console.log('🔒 No puede ver este grupo (privacidad)');
             continue;
           }
           
-          console.log('🔍 Verificando grupo de:', group.user.name, '(userId:', group.userId, ')');
+          // Obtener información del perfil
+          const perfilDoc = await getDoc(doc(this.perfilesCollection, userId));
           
-          // Verificar si el usuario actual puede ver las stories de este grupo
-          const canView = await privacyService.canViewStories(currentUserId, group.userId);
-          
-          console.log('👁️ ¿Puede ver?', canView);
-          
-          if (canView) {
-            // Filtrar stories activas del grupo
-            const groupActiveStories = activeStories.filter(story => {
-              try {
-                return story && story.userId === group.userId;
-              } catch (filterError) {
-                console.error('❌ Error filtrando story del grupo:', filterError);
-                return false;
-              }
-            });
-            
-            console.log('📝 Stories activas en este grupo:', groupActiveStories.length);
-            
-            if (groupActiveStories.length > 0) {
-              const hasUnviewed = groupActiveStories.some(story => {
-                try {
-                  return story && story.viewedBy && !story.viewedBy.includes(currentUserId);
-                } catch (viewedError) {
-                  console.error('❌ Error verificando vistas:', viewedError);
-                  return false;
-                }
-              });
-              
-              console.log('✅ Agregando grupo:', group.user.name, '- No vistas:', hasUnviewed);
-              
-              filteredGroups.push({
-                ...group,
-                stories: groupActiveStories,
-                hasUnviewed
-              });
-            } else {
-              console.log('⚠️ Grupo sin stories activas, no se agrega');
-            }
-          } else {
-            console.log('🔒 No puede ver este grupo (privacidad)');
+          if (!perfilDoc.exists()) {
+            console.log('⚠️ Perfil no encontrado para userId:', userId);
+            continue;
           }
+          
+          const perfilData = perfilDoc.data();
+          
+          // Verificar si hay stories no vistas
+          const hasUnviewed = userStories.some(story => 
+            !story.viewedBy.includes(currentUserId)
+          );
+          
+          // Crear grupo
+          const group: StoryGroup = {
+            id: `group_${userId}`,
+            userId,
+            user: {
+              name: perfilData.nombre || 'Usuario',
+              avatar: perfilData.fotos?.[0] || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=face'
+            },
+            stories: userStories.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime()),
+            hasUnviewed,
+            lastUpdated: userStories[userStories.length - 1].createdAt
+          };
+          
+          console.log('✅ Agregando grupo:', group.user.name, '- No vistas:', hasUnviewed);
+          filteredGroups.push(group);
+          
         } catch (groupError) {
           console.error('❌ Error procesando grupo:', groupError);
-          // Continuar con el siguiente grupo en caso de error
         }
       }
+      
+      // Ordenar grupos: no vistas primero, luego por última actualización
+      filteredGroups.sort((a, b) => {
+        if (a.hasUnviewed && !b.hasUnviewed) return -1;
+        if (!a.hasUnviewed && b.hasUnviewed) return 1;
+        return b.lastUpdated.getTime() - a.lastUpdated.getTime();
+      });
       
       console.log('📊 === RESULTADO FINAL ===');
       console.log('📊 Grupos filtrados:', filteredGroups.length);
@@ -142,26 +172,70 @@ class StoriesService {
       console.error('❌ Error:', error);
       console.error('❌ Stack:', (error as Error).stack);
       console.error('🚨 === FIN ERROR ===');
-      // Retornar array vacío en caso de error para evitar crashes
       return [];
     }
   }
 
   // Obtener stories de un usuario específico
   async getUserStories(userId: string): Promise<Story[]> {
-    const now = new Date();
-    const userStories = this.stories
-      .filter(story => story.userId === userId && story.expiresAt > now)
-      .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
-
-    return userStories;
+    try {
+      const now = new Date();
+      const userStoriesQuery = query(
+        this.storiesCollection,
+        where('userId', '==', userId),
+        where('expiresAt', '>', Timestamp.fromDate(now)),
+        orderBy('expiresAt'),
+        orderBy('createdAt', 'asc')
+      );
+      
+      const snapshot = await getDocs(userStoriesQuery);
+      
+      const userStories: Story[] = snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          userId: data.userId,
+          type: data.type,
+          content: data.content,
+          backgroundColor: data.backgroundColor,
+          textColor: data.textColor,
+          createdAt: data.createdAt.toDate(),
+          expiresAt: data.expiresAt.toDate(),
+          viewedBy: data.viewedBy || []
+        };
+      });
+      
+      console.log('📱 Stories de usuario', userId, ':', userStories.length);
+      return userStories;
+      
+    } catch (error) {
+      console.error('❌ Error obteniendo stories de usuario:', error);
+      return [];
+    }
   }
 
   // Marcar story como vista
   async markStoryAsViewed(storyId: string, viewerId: string): Promise<void> {
-    const story = this.stories.find(s => s.id === storyId);
-    if (story && !story.viewedBy.includes(viewerId)) {
-      story.viewedBy.push(viewerId);
+    try {
+      const storyRef = doc(this.storiesCollection, storyId);
+      const storyDoc = await getDoc(storyRef);
+      
+      if (!storyDoc.exists()) {
+        console.log('⚠️ Story no encontrada:', storyId);
+        return;
+      }
+      
+      const viewedBy = storyDoc.data().viewedBy || [];
+      
+      if (!viewedBy.includes(viewerId)) {
+        await updateDoc(storyRef, {
+          viewedBy: arrayUnion(viewerId)
+        });
+        console.log('✅ Story marcada como vista:', storyId, 'por', viewerId);
+      }
+      
+    } catch (error) {
+      console.error('❌ Error marcando story como vista:', error);
     }
   }
 
@@ -176,80 +250,95 @@ class StoriesService {
     },
     userProfile?: { name: string; avatar: string }
   ): Promise<Story> {
-    const newStory: Story = {
-      id: `story_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      userId,
-      type,
-      content,
-      backgroundColor: options?.backgroundColor,
-      textColor: options?.textColor,
-      createdAt: new Date(),
-      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 horas
-      viewedBy: []
-    };
-
-    this.stories.push(newStory);
-    
-    // Actualizar o crear grupo de usuario
-    let userGroup = this.storyGroups.find(g => g.userId === userId);
-    if (userGroup) {
-      userGroup.stories.push(newStory);
-      userGroup.lastUpdated = new Date();
-      userGroup.hasUnviewed = true;
-    } else {
-      // Crear nuevo grupo para el usuario actual
-      userGroup = {
-        id: `group_${userId}`,
+    try {
+      const now = new Date();
+      const expiresAt = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 24 horas
+      
+      // Crear documento en Firestore
+      const storyData = {
         userId,
-        user: {
-          name: userProfile?.name || 'Mi Story',
-          avatar: userProfile?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=face'
-        },
-        stories: [newStory],
-        hasUnviewed: true,
-        lastUpdated: new Date()
+        type,
+        content,
+        backgroundColor: options?.backgroundColor || null,
+        textColor: options?.textColor || null,
+        createdAt: Timestamp.fromDate(now),
+        expiresAt: Timestamp.fromDate(expiresAt),
+        viewedBy: []
       };
-      this.storyGroups.unshift(userGroup); // Agregar al inicio
+      
+      const docRef = await addDoc(this.storiesCollection, storyData);
+      
+      console.log('✅ Story creada en Firestore:', docRef.id);
+      
+      // Retornar objeto Story
+      const newStory: Story = {
+        id: docRef.id,
+        userId,
+        type,
+        content,
+        backgroundColor: options?.backgroundColor,
+        textColor: options?.textColor,
+        createdAt: now,
+        expiresAt,
+        viewedBy: []
+      };
+      
+      return newStory;
+      
+    } catch (error) {
+      console.error('❌ Error creando story en Firestore:', error);
+      throw error;
     }
-    
-    return newStory;
   }
 
   // Eliminar story
   async deleteStory(storyId: string, userId: string): Promise<boolean> {
-    const storyIndex = this.stories.findIndex(s => s.id === storyId && s.userId === userId);
-    if (storyIndex === -1) {
+    try {
+      const storyRef = doc(this.storiesCollection, storyId);
+      const storyDoc = await getDoc(storyRef);
+      
+      if (!storyDoc.exists()) {
+        console.log('⚠️ Story no encontrada:', storyId);
+        return false;
+      }
+      
+      // Verificar que el usuario sea el dueño
+      if (storyDoc.data().userId !== userId) {
+        console.log('❌ Usuario no autorizado para eliminar story');
+        return false;
+      }
+      
+      await deleteDoc(storyRef);
+      console.log('✅ Story eliminada:', storyId);
+      return true;
+      
+    } catch (error) {
+      console.error('❌ Error eliminando story:', error);
       return false;
     }
-
-    this.stories.splice(storyIndex, 1);
-    
-    // Actualizar grupo
-    const userGroup = this.storyGroups.find(g => g.userId === userId);
-    if (userGroup) {
-      userGroup.stories = userGroup.stories.filter(s => s.id !== storyId);
-      if (userGroup.stories.length === 0) {
-        const groupIndex = this.storyGroups.findIndex(g => g.userId === userId);
-        if (groupIndex !== -1) {
-          this.storyGroups.splice(groupIndex, 1);
-        }
-      }
-    }
-
-    return true;
   }
 
   // Obtener estadísticas de una story
   async getStoryStats(storyId: string): Promise<{ views: number; viewers: string[] }> {
-    const story = this.stories.find(s => s.id === storyId);
-    if (!story) {
+    try {
+      const storyRef = doc(this.storiesCollection, storyId);
+      const storyDoc = await getDoc(storyRef);
+      
+      if (!storyDoc.exists()) {
+        return { views: 0, viewers: [] };
+      }
+      
+      const viewedBy = storyDoc.data().viewedBy || [];
+      
+      return {
+        views: viewedBy.length,
+        viewers: viewedBy
+      };
+      
+    } catch (error) {
+      console.error('❌ Error obteniendo estadísticas de story:', error);
       return { views: 0, viewers: [] };
     }
-
-    return {
-      views: story.viewedBy.length,
-      viewers: story.viewedBy
-    };
   }
 }
 

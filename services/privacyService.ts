@@ -153,10 +153,10 @@ class PrivacyService {
     let settings = this.privacySettings.get(userId);
     
     if (!settings) {
-      // Crear configuración por defecto
+      // Crear configuración por defecto - SIEMPRE PÚBLICO para nuevos usuarios
       settings = {
         userId,
-        storiesVisibility: 'everyone',
+        storiesVisibility: 'everyone', // ✅ Por defecto, todos pueden ver
         allowStoryReplies: true,
         showOnlineStatus: true,
         allowProfileViews: 'everyone',
@@ -164,6 +164,7 @@ class PrivacyService {
         updatedAt: new Date()
       };
       this.privacySettings.set(userId, settings);
+      console.log('✅ Configuración por defecto creada (público)');
     }
 
     console.log('✅ Configuración obtenida:', settings);

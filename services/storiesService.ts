@@ -41,9 +41,15 @@ class StoriesService {
 
   // Obtener todos los grupos de stories (con filtrado de privacidad)
   async getStoryGroups(currentUserId: string): Promise<StoryGroup[]> {
+    console.log('📊 === CARGANDO STORY GROUPS ===');
+    console.log('📊 Current User ID:', currentUserId);
+    console.log('📊 Total Stories en memoria:', this.stories.length);
+    console.log('📊 Total Story Groups en memoria:', this.storyGroups.length);
+    
     try {
       // Validar parámetro de entrada
       if (!currentUserId) {
+        console.log('❌ currentUserId vacío, retornando array vacío');
         return [];
       }
       
@@ -51,11 +57,18 @@ class StoriesService {
       const now = new Date();
       const activeStories = this.stories.filter(story => {
         try {
-          return story && story.expiresAt && story.expiresAt > now;
+          const isActive = story && story.expiresAt && story.expiresAt > now;
+          if (!isActive && story) {
+            console.log('⏰ Story expirada:', story.id, 'de usuario:', story.userId);
+          }
+          return isActive;
         } catch (storyError) {
+          console.error('❌ Error filtrando story:', storyError);
           return false;
         }
       });
+      
+      console.log('✅ Stories activas (no expiradas):', activeStories.length);
       
       // Filtrar grupos según configuración de privacidad
       const filteredGroups: StoryGroup[] = [];
@@ -64,11 +77,16 @@ class StoriesService {
         try {
           // Validar que el grupo tenga datos válidos
           if (!group || !group.userId || !group.user) {
+            console.log('⚠️ Grupo inválido, saltando');
             continue;
           }
           
+          console.log('🔍 Verificando grupo de:', group.user.name, '(userId:', group.userId, ')');
+          
           // Verificar si el usuario actual puede ver las stories de este grupo
           const canView = await privacyService.canViewStories(currentUserId, group.userId);
+          
+          console.log('👁️ ¿Puede ver?', canView);
           
           if (canView) {
             // Filtrar stories activas del grupo
@@ -76,34 +94,54 @@ class StoriesService {
               try {
                 return story && story.userId === group.userId;
               } catch (filterError) {
+                console.error('❌ Error filtrando story del grupo:', filterError);
                 return false;
               }
             });
+            
+            console.log('📝 Stories activas en este grupo:', groupActiveStories.length);
             
             if (groupActiveStories.length > 0) {
               const hasUnviewed = groupActiveStories.some(story => {
                 try {
                   return story && story.viewedBy && !story.viewedBy.includes(currentUserId);
                 } catch (viewedError) {
+                  console.error('❌ Error verificando vistas:', viewedError);
                   return false;
                 }
               });
+              
+              console.log('✅ Agregando grupo:', group.user.name, '- No vistas:', hasUnviewed);
               
               filteredGroups.push({
                 ...group,
                 stories: groupActiveStories,
                 hasUnviewed
               });
+            } else {
+              console.log('⚠️ Grupo sin stories activas, no se agrega');
             }
+          } else {
+            console.log('🔒 No puede ver este grupo (privacidad)');
           }
         } catch (groupError) {
+          console.error('❌ Error procesando grupo:', groupError);
           // Continuar con el siguiente grupo en caso de error
         }
       }
       
+      console.log('📊 === RESULTADO FINAL ===');
+      console.log('📊 Grupos filtrados:', filteredGroups.length);
+      console.log('📊 Grupos:', filteredGroups.map(g => g.user.name));
+      console.log('📊 === FIN CARGA ===');
+      
       return filteredGroups;
       
     } catch (error) {
+      console.error('🚨 === ERROR CRÍTICO en getStoryGroups ===');
+      console.error('❌ Error:', error);
+      console.error('❌ Stack:', (error as Error).stack);
+      console.error('🚨 === FIN ERROR ===');
       // Retornar array vacío en caso de error para evitar crashes
       return [];
     }

@@ -113,7 +113,11 @@ const App: React.FC = () => {
       setChats(userChats);
     });
 
-    return () => unsubscribe();
+    return () => {
+      if (unsubscribe && typeof unsubscribe === 'function') {
+        unsubscribe();
+      }
+    };
   }, [currentUser]);
 
   // Cargar perfiles para Discovery
@@ -127,7 +131,11 @@ const App: React.FC = () => {
       // Si no hay perfiles en Firebase, usar los mock
     });
 
-    return () => unsubscribe();
+    return () => {
+      if (unsubscribe && typeof unsubscribe === 'function') {
+        unsubscribe();
+      }
+    };
   }, [currentUser]);
 
   // Escuchar mensajes del chat seleccionado
@@ -138,7 +146,11 @@ const App: React.FC = () => {
       setChatMessages(prev => ({ ...prev, [selectedChatId]: messages }));
     });
 
-    return () => unsubscribe();
+    return () => {
+      if (unsubscribe && typeof unsubscribe === 'function') {
+        unsubscribe();
+      }
+    };
   }, [selectedChatId]);
 
   // Crear perfil del usuario actual si no existe

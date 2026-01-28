@@ -101,6 +101,10 @@ class StoriesService {
       
       console.log('📊 Usuarios con stories:', storiesByUser.size);
       
+      // Obtener matches del usuario actual para filtrar
+      const userMatches = await privacyService.getUserMatches(currentUserId);
+      console.log('🔗 Matches del usuario:', userMatches.length);
+      
       // Crear grupos con información de perfil
       const filteredGroups: StoryGroup[] = [];
       
@@ -108,7 +112,13 @@ class StoriesService {
         try {
           console.log('🔍 Procesando usuario:', userId, '- Stories:', userStories.length);
           
-          // Verificar privacidad
+          // Solo mostrar stories del usuario actual o de sus matches
+          if (userId !== currentUserId && !userMatches.includes(userId)) {
+            console.log('🔒 Usuario no es match, saltando');
+            continue;
+          }
+          
+          // Verificar privacidad adicional
           const canView = await privacyService.canViewStories(currentUserId, userId);
           console.log('👁️ ¿Puede ver?', canView);
           

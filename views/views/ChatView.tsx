@@ -140,7 +140,9 @@ const ChatView: React.FC<ChatViewProps> = ({
     
     return () => {
       console.log('🧹 Limpiando listener de typing');
-      unsubscribe();
+      if (unsubscribe && typeof unsubscribe === 'function') {
+        unsubscribe();
+      }
     };
   }, [chatId, match.user.id]);
 
@@ -159,7 +161,9 @@ const ChatView: React.FC<ChatViewProps> = ({
     
     return () => {
       console.log('🧹 Cleaning up presence listener');
-      unsubscribe();
+      if (unsubscribe && typeof unsubscribe === 'function') {
+        unsubscribe();
+      }
     };
   }, [match.user.id]);
 
@@ -207,7 +211,9 @@ const ChatView: React.FC<ChatViewProps> = ({
     });
 
     return () => {
-      unsubscribe();
+      if (unsubscribe && typeof unsubscribe === 'function') {
+        unsubscribe();
+      }
     };
   }, [currentUserId, match.id]);
 

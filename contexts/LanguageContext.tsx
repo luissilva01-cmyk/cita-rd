@@ -27,7 +27,11 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
       setTranslations(languageService.getTranslations());
     });
 
-    return unsubscribe;
+    return () => {
+      if (unsubscribe && typeof unsubscribe === 'function') {
+        unsubscribe();
+      }
+    };
   }, []);
 
   const handleSetLanguage = (language: Language) => {

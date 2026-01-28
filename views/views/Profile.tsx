@@ -78,6 +78,19 @@ const ProfileView: React.FC<ProfileViewProps> = ({ user, onUpdate }) => {
   const [newInterest, setNewInterest] = useState('');
   const [showInterestSuggestions, setShowInterestSuggestions] = useState(false);
 
+  // Detectar si el perfil está incompleto
+  const isProfileIncomplete = !user.images || user.images.length === 0 || 
+                               !user.bio || user.bio.trim() === '' ||
+                               !user.location || user.location.trim() === '';
+
+  // Auto-activar modo edición si el perfil está incompleto
+  React.useEffect(() => {
+    if (isProfileIncomplete && !isEditing) {
+      setIsEditing(true);
+      setShowPhotoUploader(true); // Mostrar uploader automáticamente
+    }
+  }, [isProfileIncomplete, isEditing]);
+
   const handleLogout = async () => {
     if (window.confirm(t('confirmLogout') || '¿Estás seguro de que quieres cerrar sesión?')) {
       setIsLoggingOut(true);
@@ -168,6 +181,43 @@ const ProfileView: React.FC<ProfileViewProps> = ({ user, onUpdate }) => {
       </div>
 
       <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 safe-area-bottom">
+        {/* Welcome Banner for New Users */}
+        {isProfileIncomplete && (
+          <div className="bg-gradient-to-r from-orange-500 to-rose-500 rounded-xl p-4 sm:p-6 text-white shadow-lg">
+            <div className="flex items-start gap-3">
+              <div className="text-3xl">👋</div>
+              <div className="flex-1">
+                <h3 className="text-lg sm:text-xl font-bold mb-2">
+                  ¡Bienvenido a Ta' Pa' Ti!
+                </h3>
+                <p className="text-sm sm:text-base mb-3 opacity-90">
+                  Para empezar a conocer personas increíbles, completa tu perfil:
+                </p>
+                <ul className="space-y-2 text-sm">
+                  {(!user.images || user.images.length === 0) && (
+                    <li className="flex items-center gap-2">
+                      <span className="text-xl">📸</span>
+                      <span>Sube al menos una foto</span>
+                    </li>
+                  )}
+                  {(!user.bio || user.bio.trim() === '') && (
+                    <li className="flex items-center gap-2">
+                      <span className="text-xl">✍️</span>
+                      <span>Escribe una bio que te describa</span>
+                    </li>
+                  )}
+                  {(!user.location || user.location.trim() === '') && (
+                    <li className="flex items-center gap-2">
+                      <span className="text-xl">📍</span>
+                      <span>Selecciona tu provincia</span>
+                    </li>
+                  )}
+                </ul>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Profile Score Section - Responsive */}
         <div className="space-y-3 sm:space-y-4">
           <div className="flex items-center justify-between">

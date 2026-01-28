@@ -52,6 +52,16 @@ const App: React.FC = () => {
         
         if (profile) {
           setCurrentUser(profile);
+          
+          // Verificar si el perfil está incompleto y redirigir a Profile
+          const isIncomplete = !profile.images || profile.images.length === 0 || 
+                               !profile.bio || profile.bio.trim() === '' ||
+                               !profile.location || profile.location.trim() === '';
+          
+          if (isIncomplete) {
+            console.log('📝 Perfil incompleto detectado, redirigiendo a Profile');
+            setActiveView('profile');
+          }
         } else {
           // Crear perfil básico si no existe
           const basicProfile: UserProfile = {
@@ -67,6 +77,8 @@ const App: React.FC = () => {
           setCurrentUser(basicProfile);
           // Guardar perfil básico en Firebase
           await createOrUpdateProfile(user.uid, basicProfile);
+          // Redirigir a Profile para completar
+          setActiveView('profile');
         }
       } catch (error) {
         console.error('Error cargando perfil:', error);
@@ -445,7 +457,20 @@ const App: React.FC = () => {
       <LanguageProvider>
         <Layout 
           activeView={activeView === 'chat' ? 'messages' : activeView} 
-          onViewChange={setActiveView}
+          onViewChange={(view) => {
+            // Verificar si el perfil está incompleto
+            const isIncomplete = !currentUser.images || currentUser.images.length === 0 || 
+                                 !currentUser.bio || currentUser.bio.trim() === '' ||
+                                 !currentUser.location || currentUser.location.trim() === '';
+            
+            // Si el perfil está incompleto y el usuario intenta navegar fuera de Profile, mostrar alerta
+            if (isIncomplete && view !== 'profile') {
+              alert('⚠️ Por favor completa tu perfil antes de explorar la app.\n\n📸 Sube al menos una foto\n✍️ Escribe una bio\n📍 Selecciona tu provincia');
+              return;
+            }
+            
+            setActiveView(view);
+          }}
           chats={chats}
           currentUserId={currentUser!.id}
           onStoryClick={handleStoryClick}

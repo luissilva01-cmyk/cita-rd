@@ -87,7 +87,9 @@ const App: React.FC = () => {
     
     return () => {
       console.log('🔴 Cleaning up presence system for user:', currentUser.id);
-      cleanup();
+      if (cleanup && typeof cleanup === 'function') {
+        cleanup();
+      }
     };
   }, [currentUser]);
 

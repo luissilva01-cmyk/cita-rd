@@ -45,8 +45,18 @@ export const getUserProfile = async (userId: string): Promise<UserProfile | null
   }
 };
 
-// Obtener perfiles para Discovery (excluir el usuario actual)
-export const getDiscoveryProfiles = (currentUserId: string, callback: (profiles: UserProfile[]) => void) => {
+// Obtener perfiles para Discovery (excluir el usuario actual y matches)
+export const getDiscoveryProfiles = async (
+  currentUserId: string, 
+  callback: (profiles: UserProfile[]) => void
+) => {
+  // Importar privacyService para obtener matches
+  const { privacyService } = await import('./privacyService');
+  
+  // Obtener matches del usuario actual
+  const matchedUserIds = await privacyService.getUserMatches(currentUserId);
+  console.log('🔍 Discovery - Excluyendo matches:', matchedUserIds);
+  
   const q = query(
     collection(db, "perfiles"),
     orderBy("timestamp", "desc")
@@ -56,11 +66,22 @@ export const getDiscoveryProfiles = (currentUserId: string, callback: (profiles:
     const profiles: UserProfile[] = [];
     querySnapshot.forEach((doc) => {
       const profile = { id: doc.id, ...doc.data() } as UserProfile;
+      
       // Excluir el perfil del usuario actual
-      if (profile.id !== currentUserId) {
-        profiles.push(profile);
+      if (profile.id === currentUserId) {
+        return;
       }
+      
+      // Excluir perfiles con los que ya hizo match
+      if (matchedUserIds.includes(profile.id)) {
+        console.log('🚫 Excluyendo match:', profile.name || profile.id);
+        return;
+      }
+      
+      profiles.push(profile);
     });
+    
+    console.log('✅ Perfiles para Discovery:', profiles.length);
     callback(profiles);
   });
 };

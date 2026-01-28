@@ -114,7 +114,7 @@ export default function ConsentModal({ isOpen, onClose, onAccept, userEmail }: C
                   className="text-xl font-bold mb-2"
                   style={{ color: '#1b110d' }}
                 >
-                  ¡Bienvenido a CitaRD! 🔥
+                  ¡Bienvenido a Ta' Pa' Ti! 🔥
                 </h3>
                 <p 
                   className="text-sm leading-relaxed"
@@ -160,7 +160,7 @@ export default function ConsentModal({ isOpen, onClose, onAccept, userEmail }: C
                       className="text-xs leading-relaxed"
                       style={{ color: '#9a5f4c' }}
                     >
-                      CitaRD es exclusivamente para adultos. Debes tener al menos 18 años para usar nuestra plataforma.
+                      Ta' Pa' Ti es exclusivamente para adultos. Debes tener al menos 18 años para usar nuestra plataforma.
                     </p>
                   </div>
                 </label>
@@ -205,7 +205,7 @@ export default function ConsentModal({ isOpen, onClose, onAccept, userEmail }: C
                       className="text-xs leading-relaxed mb-2"
                       style={{ color: '#9a5f4c' }}
                     >
-                      Reglas de uso, comportamiento y responsabilidades en CitaRD.
+                      Reglas de uso, comportamiento y responsabilidades en Ta' Pa' Ti.
                     </p>
                     <button
                       onClick={() => navigate('/terms-of-service')}

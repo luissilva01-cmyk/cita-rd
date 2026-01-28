@@ -30,7 +30,7 @@ export default function LoadingSpinner({ size = 'md', className = '' }: LoadingS
         transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
         className="text-white text-center"
       >
-        <p className="text-lg font-semibold">CitaRD</p>
+        <p className="text-lg font-semibold">Ta' Pa' Ti</p>
         <p className="text-sm text-gray-300">Cargando...</p>
       </motion.div>
     </div>

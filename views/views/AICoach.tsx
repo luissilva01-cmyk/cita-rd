@@ -138,7 +138,7 @@ const AICoach: React.FC<AICoachProps> = ({ profile }) => {
             <Sparkles className="text-slate-300" size={32} />
           </div>
           <p className="text-sm text-slate-400 font-medium leading-relaxed">
-            Pulsa el botón de arriba y deja que la IA transforme tu presencia en CitaRD.
+            Pulsa el botón de arriba y deja que la IA transforme tu presencia en Ta' Pa' Ti.
           </p>
         </div>
       )}

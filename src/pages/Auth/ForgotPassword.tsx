@@ -337,7 +337,7 @@ export default function ForgotPassword() {
                 className="text-xs mt-1 ml-1"
                 style={{ color: '#9a5f4c' }}
               >
-                Ingresa el correo asociado a tu cuenta de CitaRD
+                Ingresa el correo asociado a tu cuenta de Ta' Pa' Ti
               </p>
             </div>
 

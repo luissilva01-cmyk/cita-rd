@@ -323,23 +323,18 @@ const App: React.FC = () => {
               // Encontrar el ID del otro usuario
               const otherUserId = chat.participants.find(p => p !== currentUser!.id) || '';
               
-              // Crear un usuario basado en los perfiles mock o usar datos por defecto
+              // Buscar el usuario en potentialMatches
               let otherUser = potentialMatches.find(u => u.id === otherUserId);
               
+              // Si no se encuentra, crear un perfil básico (esto solo debería pasar si hay un chat pero el perfil no se cargó)
               if (!otherUser) {
-                // Si no está en los matches, crear un usuario por defecto
                 otherUser = {
                   id: otherUserId,
-                  name: otherUserId === '1' ? 'Carolina' : otherUserId === '2' ? 'Marcos' : 'Usuario',
+                  name: 'Usuario',
                   age: 25,
                   bio: '',
-                  location: 'Santo Domingo',
-                  images: [otherUserId === '1' 
-                    ? 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&q=80&w=600'
-                    : otherUserId === '2' 
-                    ? 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=600'
-                    : 'https://picsum.photos/200'
-                  ],
+                  location: '',
+                  images: ['https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=face'],
                   interests: []
                 };
               }
@@ -364,23 +359,18 @@ const App: React.FC = () => {
               // Encontrar el ID del otro usuario
               const otherUserId = chat.participants.find(p => p !== currentUser!.id) || '';
               
-              // Crear un usuario basado en los perfiles mock o usar datos por defecto
+              // Buscar el usuario en potentialMatches
               let otherUser = potentialMatches.find(u => u.id === otherUserId);
               
+              // Si no se encuentra, crear un perfil básico (esto solo debería pasar si hay un chat pero el perfil no se cargó)
               if (!otherUser) {
-                // Si no está en los matches, crear un usuario por defecto
                 otherUser = {
                   id: otherUserId,
-                  name: otherUserId === '1' ? 'Carolina' : otherUserId === '2' ? 'Marcos' : 'Usuario',
+                  name: 'Usuario',
                   age: 25,
                   bio: '',
-                  location: 'Santo Domingo',
-                  images: [otherUserId === '1' 
-                    ? 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&q=80&w=600'
-                    : otherUserId === '2' 
-                    ? 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=600'
-                    : 'https://picsum.photos/200'
-                  ],
+                  location: '',
+                  images: ['https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=face'],
                   interests: []
                 };
               }
@@ -410,22 +400,18 @@ const App: React.FC = () => {
         // Encontrar el ID del otro usuario
         const otherUserId = currentChat.participants.find(p => p !== currentUser!.id) || '';
         
-        // Crear un usuario basado en los perfiles mock o usar datos por defecto
+        // Buscar el usuario en potentialMatches
         let otherUser = potentialMatches.find(u => u.id === otherUserId);
         
+        // Si no se encuentra, crear un perfil básico (esto solo debería pasar si hay un chat pero el perfil no se cargó)
         if (!otherUser) {
           otherUser = {
             id: otherUserId,
-            name: otherUserId === '1' ? 'Carolina' : otherUserId === '2' ? 'Marcos' : 'Usuario',
+            name: 'Usuario',
             age: 25,
             bio: '',
-            location: 'Santo Domingo',
-            images: [otherUserId === '1' 
-              ? 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&q=80&w=600'
-              : otherUserId === '2' 
-              ? 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=600'
-              : 'https://picsum.photos/200'
-            ],
+            location: '',
+            images: ['https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=face'],
             interests: []
           };
         }

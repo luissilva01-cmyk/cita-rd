@@ -1,194 +1,127 @@
-# ✅ Limpieza de Datos Mock - COMPLETADO
+# Eliminación de Matches Mock - Completado ✅
 
-**Fecha:** Enero 16, 2026  
-**Estado:** ✅ CORREGIDO  
-**Última Actualización:** Import path fix aplicado - perfil ahora se guarda correctamente
-
----
-
-## 🔧 FIX CRÍTICO APLICADO
-
-**Problema reportado:** "En la cuenta recién creada todo se quedó igual. Solo se eliminó Juan Pérez de la actividad reciente"
-
-**Causa raíz encontrada:** El import path en `Register.tsx` estaba incorrecto (3 niveles en vez de 4), lo que impedía que `createOrUpdateProfile` se ejecutara. Por eso el perfil nunca se guardaba con el nombre y edad correctos.
-
-**Solución:** Corregido import path de `../../../services/` a `../../../../services/`
+**Fecha:** 28 de enero de 2026  
+**Problema:** Usuario nuevo veía matches sin haber usado la app
 
 ---
 
-## 🐛 Bugs Corregidos
+## 🔍 Problema Identificado
 
-### ✅ 1. "Juan Pérez" y Matches Falsos Eliminados
-**Problema:** Aparecían datos mock (Juan Pérez, Carolina, Isabella, Diego)  
-**Solución:** Limpiado `INITIAL_POTENTIAL_MATCHES` - ahora es array vacío  
-**Archivo:** `cita-rd/App.tsx`
+Un usuario nuevo que se registraba por primera vez veía matches en la pestaña de Matches sin haber hecho swipe ni interactuado con la app.
 
+### Causas Raíz
+
+1. **`Matches.tsx`** tenía un array `MOCK_MATCHES` con 3 usuarios hardcodeados (Carolina, Isabella, Diego)
+2. **`App.tsx`** tenía lógica de fallback que creaba usuarios con IDs hardcodeados ('1', '2') cuando no encontraba perfiles reales
+3. La lógica mostraba estos usuarios mock incluso cuando `chats` estaba vacío
+
+---
+
+## ✅ Solución Implementada
+
+### 1. Eliminación de Mock Data en `Matches.tsx`
+
+**Antes:**
 ```typescript
-// ANTES:
-const INITIAL_POTENTIAL_MATCHES: UserProfile[] = [
-  { id: '1', name: 'Carolina', ... },
-  { id: '2', name: 'Marcos', ... },
-  // ... más datos mock
+const MOCK_MATCHES: Match[] = [
+  { id: 'match-1', user: { id: '1', name: 'Carolina', ... } },
+  { id: 'match-2', user: { id: '3', name: 'Isabella', ... } },
+  { id: 'match-3', user: { id: '6', name: 'Diego', ... } }
 ];
 
-// DESPUÉS:
-const INITIAL_POTENTIAL_MATCHES: UserProfile[] = [];
+setDisplayMatches(matches && matches.length > 0 ? matches : MOCK_MATCHES);
 ```
 
-### ✅ 2. Matches Reales en Home
-**Problema:** Home mostraba matches falsos  
-**Solución:** Ahora convierte chats reales a UserProfile[]  
-**Archivo:** `cita-rd/App.tsx`
-
+**Después:**
 ```typescript
-// Convertir chats reales a UserProfile[] para recentMatches
-const recentMatchesFromChats = chats.slice(0, 3).map(chat => {
-  const otherUserId = chat.participants.find(p => p !== user.id) || '';
-  // Buscar en potentialMatches o crear perfil básico
-  let matchUser = potentialMatches.find(u => u.id === otherUserId);
-  
-  if (!matchUser) {
-    matchUser = {
-      id: otherUserId,
-      name: 'Usuario',
-      age: 25,
-      bio: '',
-      location: '',
-      images: [],
-      interests: []
-    };
-  }
-  
-  return matchUser;
-});
+// SOLO mostrar matches reales, NO usar mock data
+setDisplayMatches(matches || []);
 ```
 
-### ✅ 3. Contador de Mensajes Correcto
-**Problema:** Mostraba "3 mensajes" hardcodeado  
-**Solución:** Calcula desde matches reales  
-**Archivo:** `cita-rd/views/views/Home.tsx`
+### 2. Limpieza de Lógica de Fallback en `App.tsx`
 
+**Antes:**
 ```typescript
-// ANTES:
-const unreadMessages = 3; // Hardcodeado
-
-// DESPUÉS:
-const unreadMessages = recentMatches.length; // Desde matches reales
+if (!otherUser) {
+  otherUser = {
+    id: otherUserId,
+    name: otherUserId === '1' ? 'Carolina' : otherUserId === '2' ? 'Marcos' : 'Usuario',
+    location: 'Santo Domingo',
+    images: [otherUserId === '1' 
+      ? 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1...'
+      : otherUserId === '2' 
+      ? 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e...'
+      : 'https://picsum.photos/200'
+    ],
+    // ...
+  };
+}
 ```
 
-### ✅ 4. Nombre Se Guarda Correctamente
-**Problema:** Aparecía email "silva132011" en vez del nombre  
-**Causa Raíz:** Import path incorrecto impedía que se ejecutara `createOrUpdateProfile`  
-**Solución:** Corregido import path de 3 a 4 niveles  
-**Archivo:** `cita-rd/src/pages/Auth/Register.tsx`
-
+**Después:**
 ```typescript
-// ❌ ANTES (Import path incorrecto - 3 niveles)
-import { createOrUpdateProfile } from "../../../services/profileService";
-
-// ✅ DESPUÉS (Import path correcto - 4 niveles)
-import { createOrUpdateProfile } from "../../../../services/profileService";
-
-// Ahora sí se ejecuta correctamente:
-const userProfile: UserProfile = {
-  id: user.uid,
-  name: formData.name, // ✅ Nombre del formulario
-  age: calculateAge(formData.birthDate), // ✅ Edad calculada
-  bio: '',
-  location: '',
-  images: [],
-  interests: [],
-  isVerified: false
-};
-
-await createOrUpdateProfile(user.uid, userProfile);
+if (!otherUser) {
+  // Crear perfil básico genérico (solo si hay un chat pero el perfil no se cargó)
+  otherUser = {
+    id: otherUserId,
+    name: 'Usuario',
+    age: 25,
+    bio: '',
+    location: '',
+    images: ['https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=face'],
+    interests: []
+  };
+}
 ```
 
-### ✅ 5. Edad Calculada Correctamente
-**Problema:** Mostraba 18 años hardcodeado  
-**Solución:** Calcula edad real desde fecha de nacimiento  
-**Archivo:** `cita-rd/src/pages/Auth/Register.tsx`
+### 3. Archivos Modificados
 
-```typescript
-// Función para calcular edad desde fecha de nacimiento
-const calculateAge = (birthDate: string): number => {
-  const today = new Date();
-  const birth = new Date(birthDate);
-  let age = today.getFullYear() - birth.getFullYear();
-  const monthDiff = today.getMonth() - birth.getMonth();
-  
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-    age--;
-  }
-  
-  return age;
-};
-```
+- ✅ `cita-rd/views/views/Matches.tsx` - Eliminado MOCK_MATCHES
+- ✅ `cita-rd/App.tsx` - Limpiado fallback en 3 lugares:
+  - Vista `messages` (línea ~320)
+  - Vista `matches` (línea ~350)
+  - Vista `chat` (línea ~380)
 
 ---
 
-## 📝 Archivos Modificados
+## 🎯 Resultado
 
-1. ✅ `cita-rd/App.tsx` - Limpiado datos mock, matches reales
-2. ✅ `cita-rd/src/pages/Auth/Register.tsx` - Guarda nombre y edad real
-3. ✅ `cita-rd/views/views/Home.tsx` - Contador de mensajes real
+### Usuario Nuevo Ahora Ve:
 
----
+1. **Pestaña Matches:** Mensaje "¡Aún no tienes matches!" con botón para explorar perfiles
+2. **Pestaña Messages:** Mensaje "No tienes mensajes aún" 
+3. **Sin datos mock:** Solo se muestran matches reales de Firestore
 
-## 🧪 Testing Requerido
+### Flujo Correcto:
 
-**Por favor, prueba lo siguiente:**
-
-### Test 1: Crear Nueva Cuenta
-1. Cierra sesión
-2. Crea una nueva cuenta con:
-   - Nombre: "Tu Nombre Real"
-   - Email: nuevo email
-   - Fecha de nacimiento: Tu fecha real
-3. **Verificar:**
-   - ✅ Perfil muestra tu nombre (NO el email)
-   - ✅ Perfil muestra tu edad correcta (NO 18)
-
-### Test 2: Página de Inicio Limpia
-1. Ve a la página de inicio
-2. **Verificar:**
-   - ✅ NO aparece "Juan Pérez"
-   - ✅ NO aparecen Carolina, Isabella, Diego
-   - ✅ Sección "Actividad Reciente" está vacía o muestra matches reales
-   - ✅ Contador de mensajes es 0 (si no tienes matches)
-
-### Test 3: Mensajes
-1. Ve a la sección de Mensajes
-2. **Verificar:**
-   - ✅ Muestra "No tienes matches aún" si no hay matches
-   - ✅ NO muestra contador falso de 5 mensajes
+1. Usuario se registra → Redirigido a Profile (sistema de onboarding)
+2. Completa perfil (foto + bio + ubicación)
+3. Puede navegar a Discovery
+4. Hace swipe y crea matches reales
+5. Solo entonces aparecen en Matches y Messages
 
 ---
 
-## ✅ Resultado Esperado
+## 🔗 Relacionado
 
-Después de estos fixes:
-
-- ✅ **Home limpio:** Sin datos mock, solo datos reales del usuario
-- ✅ **Perfil correcto:** Nombre y edad reales guardados
-- ✅ **Matches reales:** Solo muestra matches verdaderos
-- ✅ **Contadores correctos:** Reflejan datos reales
+- `ONBOARDING_SYSTEM.md` - Sistema que redirige usuarios nuevos a completar perfil
+- `STORIES_FILTER_FIX.md` - Filtro de stories por matches
+- `SESION_28_ENE_2026_UNSUBSCRIBE_FIX.md` - Fix de errores de cleanup
 
 ---
 
-## 🎯 Próximos Pasos
+## ✅ Verificación
 
-Una vez verificado que todo funciona:
+Para verificar que funciona:
 
-1. **Onboarding:** Crear flujo para que usuarios completen su perfil
-2. **Discovery:** Implementar sistema de descubrimiento real
-3. **Matching:** Implementar lógica de matching real
+1. Crear un usuario nuevo
+2. Completar perfil
+3. Ir a pestaña Matches → Debe mostrar "¡Aún no tienes matches!"
+4. Ir a pestaña Messages → Debe mostrar "No tienes mensajes aún"
+5. Hacer un match real en Discovery
+6. Verificar que aparece en Matches y Messages
 
 ---
 
-**Fixes completados exitosamente** ✨
-
-**Por favor, prueba creando una nueva cuenta y verifica que:**
-1. Tu nombre aparece correctamente
-2. Tu edad es correcta
-3. No hay datos mock en ninguna parte
+**Estado:** ✅ Completado  
+**Commit:** Pendiente

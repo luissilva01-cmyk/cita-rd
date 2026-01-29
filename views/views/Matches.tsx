@@ -10,64 +10,6 @@ interface MatchesProps {
   currentUserId?: string;
 }
 
-// Mock matches data
-const MOCK_MATCHES: Match[] = [
-  {
-    id: 'match-1',
-    user: {
-      id: '1',
-      name: 'Carolina',
-      age: 24,
-      bio: 'Amo el mofongo y bailar bachata en la Zona Colonial. Busco a alguien para ir de aventura a Samaná.',
-      location: 'Santo Domingo',
-      distance: '3km',
-      images: ['https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&q=95&w=1200&h=1600'],
-      interests: ['Bachata', 'Playa', 'Gastronomía'],
-      job: 'Arquitecta',
-      isVerified: true
-    },
-    lastMessage: '¡Hola! Me gustó tu perfil 😊',
-    timestamp: Date.now() - 1000 * 60 * 30, // 30 minutos atrás
-    unreadCount: 2
-  },
-  {
-    id: 'match-2',
-    user: {
-      id: '3',
-      name: 'Isabella',
-      age: 26,
-      bio: 'Doctora apasionada por ayudar a otros. Me encanta la salsa y los atardeceres en el Malecón.',
-      location: 'Santo Domingo',
-      distance: '5km',
-      images: ['https://images.unsplash.com/photo-1494790108755-2616b612b786?auto=format&fit=crop&q=95&w=1200&h=1600'],
-      interests: ['Medicina', 'Salsa', 'Fotografía'],
-      job: 'Doctora',
-      isVerified: true
-    },
-    lastMessage: 'Gracias por el match! ¿Cómo estás?',
-    timestamp: Date.now() - 1000 * 60 * 60 * 2, // 2 horas atrás
-    unreadCount: 0
-  },
-  {
-    id: 'match-3',
-    user: {
-      id: '6',
-      name: 'Diego',
-      age: 30,
-      bio: 'Ingeniero y surfista. Los fines de semana me encuentras en las playas de Cabarete.',
-      location: 'Puerto Plata',
-      distance: '25km',
-      images: ['https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=95&w=1200&h=1600'],
-      interests: ['Surf', 'Ingeniería', 'Aventura'],
-      job: 'Ingeniero',
-      isVerified: true
-    },
-    lastMessage: 'Nuevo match',
-    timestamp: Date.now() - 1000 * 60 * 60 * 6, // 6 horas atrás
-    unreadCount: 0
-  }
-];
-
 const Matches: React.FC<MatchesProps> = ({
   matches,
   onSelectMatch,
@@ -81,7 +23,8 @@ const Matches: React.FC<MatchesProps> = ({
   useEffect(() => {
     // Simular carga de matches
     setTimeout(() => {
-      setDisplayMatches(matches && matches.length > 0 ? matches : MOCK_MATCHES);
+      // SOLO mostrar matches reales, NO usar mock data
+      setDisplayMatches(matches || []);
       setLoading(false);
     }, 500);
   }, [matches]);

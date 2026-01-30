@@ -112,13 +112,7 @@ class StoriesService {
         try {
           console.log('🔍 Procesando usuario:', userId, '- Stories:', userStories.length);
           
-          // Solo mostrar stories del usuario actual o de sus matches
-          if (userId !== currentUserId && !userMatches.includes(userId)) {
-            console.log('🔒 Usuario no es match, saltando');
-            continue;
-          }
-          
-          // Verificar privacidad adicional
+          // Verificar privacidad - esto ya maneja la lógica de matches vs everyone
           const canView = await privacyService.canViewStories(currentUserId, userId);
           console.log('👁️ ¿Puede ver?', canView);
           

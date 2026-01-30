@@ -9,7 +9,7 @@ import VerificationBadge from './VerificationBadge';
 import { verificationService } from '../services/verificationService';
 import { languageService } from '../services/languageService';
 import { useTranslation } from '../hooks/useTranslation';
-import { deleteUserAccount } from '../services/accountDeletionService';
+import { deleteUserAccount, reauthenticateUser } from '../services/accountDeletionService';
 
 interface AccountSettingsProps {
   isOpen: boolean;
@@ -35,7 +35,9 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({
   const [showPrivacyDashboard, setShowPrivacyDashboard] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [deletePassword, setDeletePassword] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteStep, setDeleteStep] = useState<'confirm' | 'password'>('confirm');
 
   useEffect(() => {
     if (isOpen) {
@@ -70,40 +72,76 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({
   };
 
   const handleDeleteAccount = async () => {
-    if (deleteConfirmText !== 'ELIMINAR') {
-      alert(t('deleteConfirmError') || 'Debes escribir ELIMINAR para confirmar');
-      return;
-    }
-
-    if (!confirm(t('deleteAccountFinalWarning') || '⚠️ ÚLTIMA ADVERTENCIA: Esta acción es IRREVERSIBLE. ¿Estás completamente seguro?')) {
-      return;
-    }
-
-    setIsDeleting(true);
-
-    try {
-      console.log('🗑️ Iniciando eliminación de cuenta:', currentUserId);
-      
-      await deleteUserAccount(currentUserId);
-      
-      console.log('✅ Cuenta eliminada exitosamente');
-      
-      // Cerrar modal
-      setShowDeleteModal(false);
-      setDeleteConfirmText('');
-      
-      // Notificar al componente padre
-      if (onAccountDeleted) {
-        onAccountDeleted();
+    // Paso 1: Confirmar escribiendo "ELIMINAR"
+    if (deleteStep === 'confirm') {
+      if (deleteConfirmText !== 'ELIMINAR') {
+        alert(t('deleteConfirmError') || 'Debes escribir ELIMINAR para confirmar');
+        return;
       }
-      
-      // Cerrar el modal de configuración
-      onClose();
-      
-    } catch (error) {
-      console.error('❌ Error eliminando cuenta:', error);
-      alert(t('deleteAccountError') || 'Error al eliminar la cuenta. Por favor, intenta de nuevo o contacta a soporte.');
-      setIsDeleting(false);
+
+      if (!confirm(t('deleteAccountFinalWarning') || '⚠️ ÚLTIMA ADVERTENCIA: Esta acción es IRREVERSIBLE. ¿Estás completamente seguro?')) {
+        return;
+      }
+
+      // Pasar al paso de contraseña
+      setDeleteStep('password');
+      return;
+    }
+
+    // Paso 2: Verificar contraseña y eliminar
+    if (deleteStep === 'password') {
+      if (!deletePassword) {
+        alert('Por favor, ingresa tu contraseña para confirmar');
+        return;
+      }
+
+      setIsDeleting(true);
+
+      try {
+        console.log('🔐 Reautenticando usuario...');
+        
+        // Reautenticar usuario
+        await reauthenticateUser(deletePassword);
+        
+        console.log('🗑️ Iniciando eliminación de cuenta:', currentUserId);
+        
+        // Eliminar cuenta
+        await deleteUserAccount(currentUserId);
+        
+        console.log('✅ Cuenta eliminada exitosamente');
+        
+        // Cerrar modal
+        setShowDeleteModal(false);
+        setDeleteConfirmText('');
+        setDeletePassword('');
+        setDeleteStep('confirm');
+        
+        // Notificar al componente padre
+        if (onAccountDeleted) {
+          onAccountDeleted();
+        }
+        
+        // Cerrar el modal de configuración
+        onClose();
+        
+      } catch (error: any) {
+        console.error('❌ Error eliminando cuenta:', error);
+        
+        // Mostrar mensaje de error específico
+        let errorMessage = t('deleteAccountError') || 'Error al eliminar la cuenta. Por favor, intenta de nuevo o contacta a soporte.';
+        
+        if (error.message) {
+          errorMessage = error.message;
+        } else if (error.code === 'permission-denied') {
+          errorMessage = 'No tienes permisos para eliminar esta cuenta. Por favor, contacta a soporte.';
+        } else if (error.code === 'auth/requires-recent-login') {
+          errorMessage = 'Por seguridad, debes iniciar sesión nuevamente antes de eliminar tu cuenta. Por favor, cierra sesión e inicia sesión de nuevo.';
+        }
+        
+        alert(errorMessage);
+        setIsDeleting(false);
+        setDeletePassword('');
+      }
     }
   };
 
@@ -321,50 +359,80 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({
                   {t('deleteAccountTitle') || 'Eliminar Cuenta'}
                 </h3>
                 <p className="text-sm text-red-600 font-medium">
-                  {t('irreversibleAction') || 'Esta acción es irreversible'}
+                  {deleteStep === 'confirm' 
+                    ? (t('irreversibleAction') || 'Esta acción es irreversible')
+                    : 'Paso 2: Verifica tu identidad'}
                 </p>
               </div>
             </div>
 
-            {/* Advertencias */}
-            <div className="bg-red-50 border border-red-200 rounded-xl p-4 space-y-2">
-              <p className="text-sm font-semibold text-red-900">
-                {t('deleteAccountWarning') || 'Al eliminar tu cuenta:'}
-              </p>
-              <ul className="space-y-1 text-sm text-red-800">
-                <li className="flex items-start gap-2">
-                  <span className="text-red-600 mt-0.5">•</span>
-                  <span>{t('deleteWarning1') || 'Se eliminarán todos tus datos personales'}</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-red-600 mt-0.5">•</span>
-                  <span>{t('deleteWarning2') || 'Perderás todos tus matches y conversaciones'}</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-red-600 mt-0.5">•</span>
-                  <span>{t('deleteWarning3') || 'Se eliminarán todas tus fotos y stories'}</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-red-600 mt-0.5">•</span>
-                  <span>{t('deleteWarning4') || 'No podrás recuperar tu cuenta'}</span>
-                </li>
-              </ul>
-            </div>
+            {deleteStep === 'confirm' ? (
+              <>
+                {/* Advertencias */}
+                <div className="bg-red-50 border border-red-200 rounded-xl p-4 space-y-2">
+                  <p className="text-sm font-semibold text-red-900">
+                    {t('deleteAccountWarning') || 'Al eliminar tu cuenta:'}
+                  </p>
+                  <ul className="space-y-1 text-sm text-red-800">
+                    <li className="flex items-start gap-2">
+                      <span className="text-red-600 mt-0.5">•</span>
+                      <span>{t('deleteWarning1') || 'Se eliminarán todos tus datos personales'}</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-red-600 mt-0.5">•</span>
+                      <span>{t('deleteWarning2') || 'Perderás todos tus matches y conversaciones'}</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-red-600 mt-0.5">•</span>
+                      <span>{t('deleteWarning3') || 'Se eliminarán todas tus fotos y stories'}</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-red-600 mt-0.5">•</span>
+                      <span>{t('deleteWarning4') || 'No podrás recuperar tu cuenta'}</span>
+                    </li>
+                  </ul>
+                </div>
 
-            {/* Campo de confirmación */}
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
-                {t('deleteConfirmLabel') || 'Para confirmar, escribe'} <span className="font-bold text-red-600">ELIMINAR</span>
-              </label>
-              <input
-                type="text"
-                value={deleteConfirmText}
-                onChange={(e) => setDeleteConfirmText(e.target.value)}
-                placeholder="ELIMINAR"
-                className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-red-500 focus:outline-none text-center font-semibold"
-                disabled={isDeleting}
-              />
-            </div>
+                {/* Campo de confirmación */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    {t('deleteConfirmLabel') || 'Para confirmar, escribe'} <span className="font-bold text-red-600">ELIMINAR</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={deleteConfirmText}
+                    onChange={(e) => setDeleteConfirmText(e.target.value)}
+                    placeholder="ELIMINAR"
+                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-red-500 focus:outline-none text-center font-semibold"
+                    disabled={isDeleting}
+                  />
+                </div>
+              </>
+            ) : (
+              <>
+                {/* Campo de contraseña */}
+                <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                  <p className="text-sm text-blue-900">
+                    🔐 Por seguridad, ingresa tu contraseña para confirmar que eres tú.
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Contraseña
+                  </label>
+                  <input
+                    type="password"
+                    value={deletePassword}
+                    onChange={(e) => setDeletePassword(e.target.value)}
+                    placeholder="Ingresa tu contraseña"
+                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-red-500 focus:outline-none"
+                    disabled={isDeleting}
+                    autoFocus
+                  />
+                </div>
+              </>
+            )}
 
             {/* Botones */}
             <div className="flex gap-3 pt-2">
@@ -372,6 +440,8 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({
                 onClick={() => {
                   setShowDeleteModal(false);
                   setDeleteConfirmText('');
+                  setDeletePassword('');
+                  setDeleteStep('confirm');
                 }}
                 className="flex-1 py-3 px-4 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-all"
                 disabled={isDeleting}
@@ -380,9 +450,14 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({
               </button>
               <button
                 onClick={handleDeleteAccount}
-                disabled={deleteConfirmText !== 'ELIMINAR' || isDeleting}
+                disabled={
+                  (deleteStep === 'confirm' && deleteConfirmText !== 'ELIMINAR') ||
+                  (deleteStep === 'password' && !deletePassword) ||
+                  isDeleting
+                }
                 className={`flex-1 py-3 px-4 rounded-xl font-medium transition-all ${
-                  deleteConfirmText === 'ELIMINAR' && !isDeleting
+                  ((deleteStep === 'confirm' && deleteConfirmText === 'ELIMINAR') ||
+                   (deleteStep === 'password' && deletePassword)) && !isDeleting
                     ? 'bg-red-600 text-white hover:bg-red-700 shadow-lg'
                     : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                 }`}
@@ -391,6 +466,10 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({
                   <div className="flex items-center justify-center gap-2">
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                     {t('deleting') || 'Eliminando...'}
+                  </div>
+                ) : deleteStep === 'confirm' ? (
+                  <div className="flex items-center justify-center gap-2">
+                    {t('continue') || 'Continuar'}
                   </div>
                 ) : (
                   <div className="flex items-center justify-center gap-2">

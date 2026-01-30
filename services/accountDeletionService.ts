@@ -9,12 +9,39 @@ import {
   doc,
   writeBatch
 } from 'firebase/firestore';
-import { deleteUser } from 'firebase/auth';
+import { deleteUser, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
 
 /**
  * Servicio para eliminar completamente una cuenta de usuario
  * Elimina todos los datos del usuario de Firestore y Firebase Auth
  */
+
+// Reautenticar usuario antes de eliminar cuenta (requerido por Firebase)
+export async function reauthenticateUser(password: string): Promise<boolean> {
+  try {
+    const user = auth.currentUser;
+    
+    if (!user || !user.email) {
+      throw new Error('No hay usuario autenticado');
+    }
+    
+    const credential = EmailAuthProvider.credential(user.email, password);
+    await reauthenticateWithCredential(user, credential);
+    
+    console.log('✅ Usuario reautenticado correctamente');
+    return true;
+  } catch (error: any) {
+    console.error('❌ Error reautenticando usuario:', error);
+    
+    if (error.code === 'auth/wrong-password') {
+      throw new Error('Contraseña incorrecta');
+    } else if (error.code === 'auth/too-many-requests') {
+      throw new Error('Demasiados intentos. Por favor, espera un momento e intenta de nuevo.');
+    }
+    
+    throw new Error('Error al verificar tu identidad. Por favor, intenta de nuevo.');
+  }
+}
 
 // Eliminar perfil del usuario
 async function deleteUserProfile(userId: string): Promise<void> {
@@ -242,8 +269,14 @@ async function deleteAuthAccount(): Promise<void> {
     
     await deleteUser(user);
     console.log('✅ Cuenta de Firebase Auth eliminada');
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Error eliminando cuenta de Auth:', error);
+    
+    // Si el error es por reautenticación requerida, informar al usuario
+    if (error.code === 'auth/requires-recent-login') {
+      throw new Error('Por seguridad, debes iniciar sesión nuevamente antes de eliminar tu cuenta. Por favor, cierra sesión e inicia sesión de nuevo.');
+    }
+    
     throw error;
   }
 }
@@ -264,13 +297,28 @@ export async function deleteUserAccount(userId: string): Promise<void> {
   
   try {
     // 1. Eliminar datos de Firestore (en orden de dependencias)
-    await deleteUserStories(userId);
-    await deleteUserChats(userId);
-    await deleteUserMatches(userId);
-    await deleteUserLikes(userId);
-    await deleteUserPrivacySettings(userId);
-    await deleteUserVerification(userId);
-    await deleteUserPresence(userId);
+    // Usar Promise.allSettled para continuar incluso si algunas colecciones fallan
+    const firestoreResults = await Promise.allSettled([
+      deleteUserStories(userId),
+      deleteUserChats(userId),
+      deleteUserMatches(userId),
+      deleteUserLikes(userId),
+      deleteUserPrivacySettings(userId),
+      deleteUserVerification(userId),
+      deleteUserPresence(userId)
+    ]);
+    
+    // Log de resultados
+    firestoreResults.forEach((result, index) => {
+      const operations = ['Stories', 'Chats', 'Matches', 'Likes', 'Privacy', 'Verification', 'Presence'];
+      if (result.status === 'rejected') {
+        console.warn(`⚠️ Error eliminando ${operations[index]}:`, result.reason);
+      } else {
+        console.log(`✅ ${operations[index]} eliminados correctamente`);
+      }
+    });
+    
+    // Eliminar perfil (crítico)
     await deleteUserProfile(userId);
     
     // 2. Eliminar cuenta de Firebase Auth (último paso)
@@ -282,13 +330,20 @@ export async function deleteUserAccount(userId: string): Promise<void> {
     console.log('🗑️ Timestamp:', new Date().toISOString());
     console.log('🗑️ ========================================');
     
-  } catch (error) {
+  } catch (error: any) {
     console.error('🗑️ ========================================');
     console.error('🗑️ ❌ ERROR CRÍTICO EN ELIMINACIÓN');
     console.error('🗑️ Usuario ID:', userId);
     console.error('🗑️ Error:', error);
-    console.error('🗑️ Stack:', (error as Error).stack);
+    console.error('🗑️ Error message:', error.message);
+    console.error('🗑️ Error code:', error.code);
+    console.error('🗑️ Stack:', error.stack);
     console.error('🗑️ ========================================');
+    
+    // Lanzar error con mensaje más descriptivo
+    if (error.message) {
+      throw new Error(error.message);
+    }
     throw error;
   }
 }

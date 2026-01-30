@@ -6,6 +6,8 @@ import AccountSettings from './AccountSettings';
 import VerificationBadge from './VerificationBadge';
 import { verificationService } from '../services/verificationService';
 import { useTranslation } from '../hooks/useTranslation';
+import { signOut } from 'firebase/auth';
+import { auth } from '../services/firebase';
 
 interface StoriesRingProps {
   currentUserId: string;
@@ -205,6 +207,15 @@ const StoriesRing: React.FC<StoriesRingProps> = ({
         currentUserId={currentUserId}
         onClose={() => setShowAccountSettings(false)}
         onSettingsUpdated={handlePrivacyUpdated}
+        onAccountDeleted={async () => {
+          console.log('🗑️ Cuenta eliminada, cerrando sesión...');
+          try {
+            await signOut(auth);
+            // El AuthProvider se encargará de limpiar el estado y redirigir
+          } catch (error) {
+            console.error('Error al cerrar sesión después de eliminar cuenta:', error);
+          }
+        }}
       />
     </div>
   );

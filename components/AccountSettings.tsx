@@ -1,6 +1,6 @@
 // cita-rd/components/AccountSettings.tsx
 import React, { useState, useEffect } from 'react';
-import { X, Shield, Globe, Lock, CheckCircle, AlertCircle, Settings } from 'lucide-react';
+import { X, Shield, Globe, Lock, CheckCircle, AlertCircle, Settings, Trash2, AlertTriangle } from 'lucide-react';
 import IdentityVerification from './IdentityVerification';
 import LanguageSettings from './LanguageSettings';
 import StoriesPrivacySettings from './StoriesPrivacySettings';
@@ -9,28 +9,33 @@ import VerificationBadge from './VerificationBadge';
 import { verificationService } from '../services/verificationService';
 import { languageService } from '../services/languageService';
 import { useTranslation } from '../hooks/useTranslation';
+import { deleteUserAccount } from '../services/accountDeletionService';
 
 interface AccountSettingsProps {
   isOpen: boolean;
   currentUserId: string;
   onClose: () => void;
   onSettingsUpdated?: () => void;
+  onAccountDeleted?: () => void;
 }
 
 const AccountSettings: React.FC<AccountSettingsProps> = ({
   isOpen,
   currentUserId,
   onClose,
-  onSettingsUpdated
+  onSettingsUpdated,
+  onAccountDeleted
 }) => {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState<'verification' | 'privacy' | 'language'>('verification');
   const [isVerified, setIsVerified] = useState(false);
   const [currentLanguage, setCurrentLanguage] = useState('es');
   const [showVerificationModal, setShowVerificationModal] = useState(false);
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   const [showPrivacyDashboard, setShowPrivacyDashboard] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -62,6 +67,44 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({
 
   const handlePrivacyUpdate = () => {
     if (onSettingsUpdated) onSettingsUpdated();
+  };
+
+  const handleDeleteAccount = async () => {
+    if (deleteConfirmText !== 'ELIMINAR') {
+      alert(t('deleteConfirmError') || 'Debes escribir ELIMINAR para confirmar');
+      return;
+    }
+
+    if (!confirm(t('deleteAccountFinalWarning') || '⚠️ ÚLTIMA ADVERTENCIA: Esta acción es IRREVERSIBLE. ¿Estás completamente seguro?')) {
+      return;
+    }
+
+    setIsDeleting(true);
+
+    try {
+      console.log('🗑️ Iniciando eliminación de cuenta:', currentUserId);
+      
+      await deleteUserAccount(currentUserId);
+      
+      console.log('✅ Cuenta eliminada exitosamente');
+      
+      // Cerrar modal
+      setShowDeleteModal(false);
+      setDeleteConfirmText('');
+      
+      // Notificar al componente padre
+      if (onAccountDeleted) {
+        onAccountDeleted();
+      }
+      
+      // Cerrar el modal de configuración
+      onClose();
+      
+    } catch (error) {
+      console.error('❌ Error eliminando cuenta:', error);
+      alert(t('deleteAccountError') || 'Error al eliminar la cuenta. Por favor, intenta de nuevo o contacta a soporte.');
+      setIsDeleting(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -173,6 +216,17 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({
                     {t('configurePrivacy')} (Stories)
                   </div>
                 </button>
+                
+                {/* Botón Eliminar Cuenta */}
+                <button
+                  onClick={() => setShowDeleteModal(true)}
+                  className="w-full py-2 px-4 bg-red-50 text-red-600 rounded-xl font-medium hover:bg-red-100 transition-all border border-red-200 mt-3"
+                >
+                  <div className="flex items-center justify-center gap-2">
+                    <Trash2 size={14} />
+                    {t('deleteAccount') || 'Eliminar Cuenta'}
+                  </div>
+                </button>
               </div>
             </div>
 
@@ -252,6 +306,108 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({
         userId={currentUserId}
         onClose={() => setShowPrivacyDashboard(false)}
       />
+
+      {/* Modal de Confirmación de Eliminación de Cuenta */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black/70 z-[60] flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 space-y-4">
+            {/* Header con advertencia */}
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-red-100 rounded-full">
+                <AlertTriangle size={24} className="text-red-600" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-gray-900">
+                  {t('deleteAccountTitle') || 'Eliminar Cuenta'}
+                </h3>
+                <p className="text-sm text-red-600 font-medium">
+                  {t('irreversibleAction') || 'Esta acción es irreversible'}
+                </p>
+              </div>
+            </div>
+
+            {/* Advertencias */}
+            <div className="bg-red-50 border border-red-200 rounded-xl p-4 space-y-2">
+              <p className="text-sm font-semibold text-red-900">
+                {t('deleteAccountWarning') || 'Al eliminar tu cuenta:'}
+              </p>
+              <ul className="space-y-1 text-sm text-red-800">
+                <li className="flex items-start gap-2">
+                  <span className="text-red-600 mt-0.5">•</span>
+                  <span>{t('deleteWarning1') || 'Se eliminarán todos tus datos personales'}</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-red-600 mt-0.5">•</span>
+                  <span>{t('deleteWarning2') || 'Perderás todos tus matches y conversaciones'}</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-red-600 mt-0.5">•</span>
+                  <span>{t('deleteWarning3') || 'Se eliminarán todas tus fotos y stories'}</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-red-600 mt-0.5">•</span>
+                  <span>{t('deleteWarning4') || 'No podrás recuperar tu cuenta'}</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Campo de confirmación */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                {t('deleteConfirmLabel') || 'Para confirmar, escribe'} <span className="font-bold text-red-600">ELIMINAR</span>
+              </label>
+              <input
+                type="text"
+                value={deleteConfirmText}
+                onChange={(e) => setDeleteConfirmText(e.target.value)}
+                placeholder="ELIMINAR"
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-red-500 focus:outline-none text-center font-semibold"
+                disabled={isDeleting}
+              />
+            </div>
+
+            {/* Botones */}
+            <div className="flex gap-3 pt-2">
+              <button
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setDeleteConfirmText('');
+                }}
+                className="flex-1 py-3 px-4 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-all"
+                disabled={isDeleting}
+              >
+                {t('cancel') || 'Cancelar'}
+              </button>
+              <button
+                onClick={handleDeleteAccount}
+                disabled={deleteConfirmText !== 'ELIMINAR' || isDeleting}
+                className={`flex-1 py-3 px-4 rounded-xl font-medium transition-all ${
+                  deleteConfirmText === 'ELIMINAR' && !isDeleting
+                    ? 'bg-red-600 text-white hover:bg-red-700 shadow-lg'
+                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                }`}
+              >
+                {isDeleting ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    {t('deleting') || 'Eliminando...'}
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center gap-2">
+                    <Trash2 size={16} />
+                    {t('deleteAccountPermanently') || 'Eliminar Permanentemente'}
+                  </div>
+                )}
+              </button>
+            </div>
+
+            {/* Nota de soporte */}
+            <p className="text-xs text-center text-gray-500">
+              {t('deleteAccountSupport') || '¿Necesitas ayuda? Contacta a'} <a href="mailto:tapapatisoporte@gmail.com" className="text-purple-600 hover:underline">tapapatisoporte@gmail.com</a>
+            </p>
+          </div>
+        </div>
+      )}
     </>
   );
 };

@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Videomensajes - Ta' Pa' Ti</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      max-width: 600px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    h1 {
+      color: #667eea;
+      margin-bottom: 10px;
+      font-size: 28px;
+    }
+
+    .subtitle {
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+
+    .section {
+      margin-bottom: 30px;
+      padding: 20px;
+      background: #f8f9fa;
+      border-radius: 12px;
+    }
+
+    .section-title {
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 15px;
+      font-size: 16px;
+    }
+
+    button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      margin-right: 10px;
+      margin-bottom: 10px;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    button.secondary {
+      background: #6c757d;
+    }
+
+    button.danger {
+      background: #dc3545;
+    }
+
+    .status {
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      font-size: 14px;
+    }
+
+    .status.info {
+      background: #d1ecf1;
+      color: #0c5460;
+      border: 1px solid #bee5eb;
+    }
+
+    .status.success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .status.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .status.recording {
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeaa7;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .recording-dot {
+      width: 12px;
+      height: 12px;
+      background: #dc3545;
+      border-radius: 50%;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    video {
+      width: 100%;
+      max-height: 400px;
+      background: #000;
+      border-radius: 12px;
+      margin-top: 15px;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .info-item {
+      background: white;
+      padding: 12px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .info-label {
+      font-size: 11px;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 5px;
+    }
+
+    .info-value {
+      font-size: 18px;
+      font-weight: bold;
+      color: #667eea;
+    }
+
+    .log {
+      background: #1e1e1e;
+      color: #00ff00;
+      padding: 15px;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      max-height: 200px;
+      overflow-y: auto;
+      margin-top: 15px;
+    }
+
+    .log-entry {
+      margin-bottom: 5px;
+    }
+
+    .log-time {
+      color: #888;
+    }
+
+    .emoji {
+      font-size: 24px;
+      margin-right: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📹 Test de Videomensajes</h1>
+    <p class="subtitle">Prueba la funcionalidad de grabación de videomensajes para Ta' Pa' Ti</p>
+
+    <!-- Estado -->
+    <div id="status"></div>
+
+    <!-- Sección 1: Grabación -->
+    <div class="section">
+      <div class="section-title">1️⃣ Grabar Videomensaje</div>
+      <button id="startBtn" onclick="startRecording()">
+        <span class="emoji">📹</span> Iniciar Grabación
+      </button>
+      <button id="stopBtn" onclick="stopRecording()" disabled>
+        <span class="emoji">⏹️</span> Detener y Guardar
+      </button>
+      <button id="cancelBtn" onclick="cancelRecording()" class="danger" disabled>
+        <span class="emoji">❌</span> Cancelar
+      </button>
+
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="info-label">Duración</div>
+          <div class="info-value" id="duration">0:00</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Límite</div>
+          <div class="info-value">0:30</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Tamaño</div>
+          <div class="info-value" id="size">0 KB</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sección 2: Reproducción -->
+    <div class="section">
+      <div class="section-title">2️⃣ Reproducir Videomensaje</div>
+      <div id="videoContainer"></div>
+      <button id="downloadBtn" onclick="downloadVideo()" class="secondary" disabled>
+        <span class="emoji">💾</span> Descargar Video
+      </button>
+    </div>
+
+    <!-- Sección 3: Logs -->
+    <div class="section">
+      <div class="section-title">3️⃣ Logs de Debugging</div>
+      <div class="log" id="log"></div>
+    </div>
+  </div>
+
+  <script>
+    let mediaRecorder = null;
+    let recordedChunks = [];
+    let stream = null;
+    let startTime = null;
+    let durationInterval = null;
+    let videoBlob = null;
+
+    function log(message, type = 'info') {
+      const logDiv = document.getElementById('log');
+      const time = new Date().toLocaleTimeString();
+      const entry = document.createElement('div');
+      entry.className = 'log-entry';
+      entry.innerHTML = `<span class="log-time">[${time}]</span> ${message}`;
+      logDiv.appendChild(entry);
+      logDiv.scrollTop = logDiv.scrollHeight;
+      console.log(message);
+    }
+
+    function updateStatus(message, type = 'info') {
+      const statusDiv = document.getElementById('status');
+      statusDiv.className = `status ${type}`;
+      statusDiv.innerHTML = message;
+    }
+
+    function formatDuration(seconds) {
+      const mins = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      return `${mins}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    function formatSize(bytes) {
+      if (bytes === 0) return '0 KB';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+    }
+
+    async function startRecording() {
+      try {
+        log('📹 Solicitando permisos de cámara y micrófono...');
+        updateStatus('Solicitando permisos...', 'info');
+
+        // Solicitar permisos
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+            facingMode: 'user'
+          },
+          audio: true
+        });
+
+        log('✅ Permisos concedidos');
+        log(`📹 Video tracks: ${stream.getVideoTracks().length}`);
+        log(`🎤 Audio tracks: ${stream.getAudioTracks().length}`);
+
+        // Crear MediaRecorder
+        const options = { mimeType: 'video/webm;codecs=vp8,opus' };
+        mediaRecorder = new MediaRecorder(stream, options);
+        recordedChunks = [];
+
+        log(`🎬 MediaRecorder creado con mimeType: ${options.mimeType}`);
+
+        mediaRecorder.ondataavailable = (event) => {
+          if (event.data.size > 0) {
+            recordedChunks.push(event.data);
+            const currentSize = recordedChunks.reduce((acc, chunk) => acc + chunk.size, 0);
+            document.getElementById('size').textContent = formatSize(currentSize);
+            log(`📦 Chunk recibido: ${formatSize(event.data.size)}`);
+          }
+        };
+
+        mediaRecorder.onstop = () => {
+          log('⏹️ Grabación detenida');
+          
+          // Detener stream
+          stream.getTracks().forEach(track => {
+            track.stop();
+            log(`🛑 Track detenido: ${track.kind}`);
+          });
+
+          // Crear blob
+          videoBlob = new Blob(recordedChunks, { type: 'video/webm' });
+          log(`✅ Video blob creado: ${formatSize(videoBlob.size)}`);
+
+          // Mostrar video
+          displayVideo(videoBlob);
+
+          // Actualizar UI
+          updateStatus('✅ Video grabado exitosamente', 'success');
+          document.getElementById('startBtn').disabled = false;
+          document.getElementById('stopBtn').disabled = true;
+          document.getElementById('cancelBtn').disabled = true;
+          document.getElementById('downloadBtn').disabled = false;
+
+          // Detener contador
+          if (durationInterval) {
+            clearInterval(durationInterval);
+            durationInterval = null;
+          }
+        };
+
+        mediaRecorder.onerror = (error) => {
+          log(`❌ Error en MediaRecorder: ${error}`, 'error');
+          updateStatus(`❌ Error: ${error}`, 'error');
+        };
+
+        // Iniciar grabación
+        mediaRecorder.start();
+        startTime = Date.now();
+        log('🎬 Grabación iniciada');
+
+        // Actualizar UI
+        updateStatus(
+          '<div class="recording-dot"></div> Grabando videomensaje... 0:00 / 0:30',
+          'recording'
+        );
+        document.getElementById('startBtn').disabled = true;
+        document.getElementById('stopBtn').disabled = false;
+        document.getElementById('cancelBtn').disabled = false;
+
+        // Contador de duración
+        let seconds = 0;
+        durationInterval = setInterval(() => {
+          seconds++;
+          document.getElementById('duration').textContent = formatDuration(seconds);
+          updateStatus(
+            `<div class="recording-dot"></div> Grabando videomensaje... ${formatDuration(seconds)} / 0:30`,
+            'recording'
+          );
+
+          // Auto-detener a los 30 segundos
+          if (seconds >= 30) {
+            log('⏱️ Límite de 30 segundos alcanzado, deteniendo...');
+            stopRecording();
+          }
+        }, 1000);
+
+      } catch (error) {
+        log(`❌ Error: ${error.name} - ${error.message}`, 'error');
+        
+        let errorMessage = 'Error desconocido';
+        if (error.name === 'NotAllowedError') {
+          errorMessage = 'Permisos denegados. Por favor, permite el acceso a la cámara y micrófono.';
+        } else if (error.name === 'NotFoundError') {
+          errorMessage = 'No se encontró cámara disponible.';
+        } else if (error.name === 'NotReadableError') {
+          errorMessage = 'La cámara está siendo usada por otra aplicación.';
+        } else {
+          errorMessage = error.message;
+        }
+
+        updateStatus(`❌ ${errorMessage}`, 'error');
+      }
+    }
+
+    function stopRecording() {
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        log('⏹️ Deteniendo grabación...');
+        mediaRecorder.stop();
+      }
+    }
+
+    function cancelRecording() {
+      log('❌ Cancelando grabación...');
+
+      // Detener contador
+      if (durationInterval) {
+        clearInterval(durationInterval);
+        durationInterval = null;
+      }
+
+      // Detener MediaRecorder
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+      }
+
+      // Detener stream
+      if (stream) {
+        stream.getTracks().forEach(track => {
+          track.stop();
+          log(`🛑 Track detenido: ${track.kind}`);
+        });
+      }
+
+      // Limpiar
+      recordedChunks = [];
+      videoBlob = null;
+
+      // Actualizar UI
+      updateStatus('❌ Grabación cancelada', 'info');
+      document.getElementById('startBtn').disabled = false;
+      document.getElementById('stopBtn').disabled = true;
+      document.getElementById('cancelBtn').disabled = true;
+      document.getElementById('duration').textContent = '0:00';
+      document.getElementById('size').textContent = '0 KB';
+
+      log('✅ Grabación cancelada y recursos liberados');
+    }
+
+    function displayVideo(blob) {
+      const videoContainer = document.getElementById('videoContainer');
+      videoContainer.innerHTML = '';
+
+      const video = document.createElement('video');
+      video.src = URL.createObjectURL(blob);
+      video.controls = true;
+      video.preload = 'metadata';
+
+      video.onloadedmetadata = () => {
+        log(`📹 Video cargado: ${video.videoWidth}x${video.videoHeight}, ${Math.round(video.duration)}s`);
+      };
+
+      videoContainer.appendChild(video);
+      log('✅ Video mostrado en reproductor');
+    }
+
+    function downloadVideo() {
+      if (!videoBlob) {
+        log('❌ No hay video para descargar', 'error');
+        return;
+      }
+
+      const url = URL.createObjectURL(videoBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `videomensaje_${Date.now()}.webm`;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      log(`💾 Video descargado: ${a.download}`);
+      updateStatus('💾 Video descargado', 'success');
+    }
+
+    // Log inicial
+    log('🚀 Test de videomensajes iniciado');
+    log('📱 Navegador: ' + navigator.userAgent);
+    log('🎥 MediaRecorder disponible: ' + ('MediaRecorder' in window ? 'Sí' : 'No'));
+    
+    if ('MediaRecorder' in window) {
+      const types = [
+        'video/webm;codecs=vp8,opus',
+        'video/webm;codecs=vp9,opus',
+        'video/webm',
+        'video/mp4'
+      ];
+      
+      log('📹 Formatos soportados:');
+      types.forEach(type => {
+        const supported = MediaRecorder.isTypeSupported(type);
+        log(`  ${supported ? '✅' : '❌'} ${type}`);
+      });
+    }
+
+    updateStatus('✅ Listo para grabar. Haz clic en "Iniciar Grabación"', 'success');
+  </script>
+</body>
+</html>

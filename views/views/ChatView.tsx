@@ -2,27 +2,26 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   ChevronLeft, 
   Send, 
-  Phone, 
-  Video, 
   Mic, 
   MicOff,
   Sparkles, 
   Loader2, 
   Smile,
-  Image,
-  Camera,
+  Image as ImageIcon,
   StopCircle,
-  Brain
+  Brain,
+  Video as VideoIcon
 } from 'lucide-react';
-import { Match, Message, Call } from '../../types';
+import { Match, Message } from '../../types';
 import { getIcebreakerSuggestions } from '../../services/geminiService';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { sendMessage, updateTypingStatus, listenToTypingStatus } from '../../services/chatService';
-import { callManager, listenToIncomingCalls } from '../../services/callService';
-import { VoiceRecorder, uploadVoiceMessage } from '../../services/voiceMessageService';
+import { updateTypingStatus, listenToTypingStatus } from '../../services/chatService';
+import { VoiceRecorder, uploadVoiceMessage, uploadPhotoMessage } from '../../services/voiceMessageService';
 import EmojiPicker from '../../components/EmojiPicker';
-import CallInterface from '../../components/CallInterface';
 import VoiceMessage from '../../components/VoiceMessage';
+import VideoMessage from '../../components/VideoMessage';
+import PhotoMessage from '../../components/PhotoMessage';
+import PhotoPreviewModal from '../../components/PhotoPreviewModal';
 import EmotionalInsights from '../../components/EmotionalInsights';
 import { useEmotionalAI } from '../../hooks/useEmotionalAI';
 import TypingIndicator from '../../components/TypingIndicator';
@@ -67,9 +66,16 @@ const ChatView: React.FC<ChatViewProps> = ({
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [recordingDuration, setRecordingDuration] = useState(0);
-  const [currentCall, setCurrentCall] = useState<Call | null>(null);
-  const [incomingCalls, setIncomingCalls] = useState<Call[]>([]);
+  const [isRecordingVideo, setIsRecordingVideo] = useState(false);
+  const [videoRecordingDuration, setVideoRecordingDuration] = useState(0);
   const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const videoRecordingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const videoPreviewRef = useRef<HTMLVideoElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Estados para preview de fotos
+  const [showPhotoPreview, setShowPhotoPreview] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
   // Estados para IA Emocional
   const [showEmotionalInsights, setShowEmotionalInsights] = useState(false);
@@ -91,9 +97,14 @@ const ChatView: React.FC<ChatViewProps> = ({
   // Cleanup al desmontar componente
   useEffect(() => {
     return () => {
-      // Limpiar interval de grabación
+      // Limpiar interval de grabación de audio
       if (recordingIntervalRef.current) {
         clearInterval(recordingIntervalRef.current);
+      }
+      
+      // Limpiar interval de grabación de video
+      if (videoRecordingIntervalRef.current) {
+        clearInterval(videoRecordingIntervalRef.current);
       }
       
       // Limpiar timeout de typing
@@ -106,11 +117,18 @@ const ChatView: React.FC<ChatViewProps> = ({
         updateTypingStatus(chatId, currentUserId, false);
       }
       
-      // Cancelar grabación si está activa
+      // Cancelar grabación de audio si está activa
       const recorder = (window as any).currentVoiceRecorder;
       if (recorder) {
         recorder.cancelRecording();
         (window as any).currentVoiceRecorder = null;
+      }
+      
+      // Cancelar grabación de video si está activa
+      const videoRecorder = (window as any).currentVideoRecorder;
+      if (videoRecorder) {
+        videoRecorder.stop();
+        (window as any).currentVideoRecorder = null;
       }
     };
   }, [chatId, currentUserId]);
@@ -192,43 +210,6 @@ const ChatView: React.FC<ChatViewProps> = ({
       calculateMetrics(messages);
     }
   }, [messages, match.id, analyzeMessage, analyzeConversation, generateSuggestions, calculateMetrics]);
-
-  // Escuchar llamadas entrantes
-  useEffect(() => {
-    if (!currentUserId) {
-      return;
-    }
-    
-    const unsubscribe = listenToIncomingCalls(currentUserId, (calls) => {
-      setIncomingCalls(calls);
-      // Si hay una llamada entrante para este chat, mostrarla
-      const incomingCall = calls.find(call => 
-        call.chatId === match.id && call.status === 'ringing'
-      );
-      if (incomingCall) {
-        setCurrentCall(incomingCall);
-      }
-    });
-
-    return () => {
-      if (unsubscribe && typeof unsubscribe === 'function') {
-        unsubscribe();
-      }
-    };
-  }, [currentUserId, match.id]);
-
-  // Configurar call manager
-  useEffect(() => {
-    const handleCallStateChange = (call: Call | null) => {
-      setCurrentCall(call);
-    };
-
-    callManager.onCallStateChange = handleCallStateChange;
-
-    return () => {
-      callManager.onCallStateChange = undefined;
-    };
-  }, []);
 
   const loadIcebreakers = async () => {
     setLoadingIce(true);
@@ -394,41 +375,184 @@ const ChatView: React.FC<ChatViewProps> = ({
     setRecordingDuration(0);
   };
 
-  const handleStartCall = async (type: 'voice' | 'video') => {
+  // Funciones para videomensajes
+  const handleStartVideoRecording = async () => {
     try {
-      // Verificar permisos primero
-      const constraints = {
-        audio: true,
-        video: type === 'video'
+      console.log('📹 Iniciando grabación de videomensaje...');
+      
+      // IMPORTANTE: Activar estado PRIMERO para que el elemento <video> se renderice
+      setIsRecordingVideo(true);
+      
+      // Pequeño delay para asegurar que el DOM se actualice
+      await new Promise(resolve => setTimeout(resolve, 50));
+      
+      // Solicitar permisos de cámara y micrófono
+      // Formato vertical (retrato) para videomensajes tipo Stories
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          width: { ideal: 720 },
+          height: { ideal: 1280 },
+          facingMode: 'user',
+          aspectRatio: { ideal: 9/16 } // Formato vertical 9:16
+        },
+        audio: true
+      });
+      
+      console.log('📹 Stream obtenido:', stream);
+      console.log('📹 Video tracks:', stream.getVideoTracks());
+      console.log('📹 Audio tracks:', stream.getAudioTracks());
+      
+      // Asignar stream al elemento video
+      if (videoPreviewRef.current) {
+        console.log('📹 Asignando stream a video preview...');
+        videoPreviewRef.current.srcObject = stream;
+        
+        // Forzar reproducción
+        try {
+          await videoPreviewRef.current.play();
+          console.log('✅ Vista previa iniciada correctamente');
+        } catch (playError) {
+          console.warn('⚠️ Error iniciando preview (puede ser normal):', playError);
+          // Intentar de nuevo después de un delay
+          setTimeout(async () => {
+            if (videoPreviewRef.current) {
+              try {
+                await videoPreviewRef.current.play();
+                console.log('✅ Vista previa iniciada en segundo intento');
+              } catch (e) {
+                console.error('❌ No se pudo iniciar vista previa:', e);
+              }
+            }
+          }, 100);
+        }
+      } else {
+        console.error('❌ videoPreviewRef.current es null!');
+        // Si el ref es null, limpiar y salir
+        stream.getTracks().forEach(track => track.stop());
+        setIsRecordingVideo(false);
+        return;
+      }
+      
+      // Crear MediaRecorder
+      const options = { mimeType: 'video/webm;codecs=vp8,opus' };
+      const mediaRecorder = new MediaRecorder(stream, options);
+      const chunks: Blob[] = [];
+      
+      console.log(`🎬 MediaRecorder creado con mimeType: ${options.mimeType}`);
+      
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          chunks.push(event.data);
+          console.log(`📦 Chunk recibido: ${event.data.size} bytes`);
+        }
       };
       
-      // Solicitar permisos antes de crear la llamada
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
-      
-      // Crear llamada simulada (en producción usar callManager.startCall)
-      const mockCall: Call = {
-        id: 'test-call-' + Date.now(),
-        chatId: match.id,
-        callerId: currentUserId,
-        receiverId: match.user.id,
-        type,
-        status: 'active', // Directamente activa para pruebas
-        startTime: Date.now()
+      mediaRecorder.onstop = async () => {
+        console.log('📹 Grabación detenida, procesando...');
+        
+        // Detener todos los tracks del stream
+        stream.getTracks().forEach(track => {
+          track.stop();
+          console.log(`🛑 Track detenido: ${track.kind}`);
+        });
+        
+        // Limpiar vista previa
+        if (videoPreviewRef.current) {
+          videoPreviewRef.current.srcObject = null;
+          console.log('🧹 Vista previa limpiada');
+        }
+        
+        // Crear blob del video
+        const videoBlob = new Blob(chunks, { type: 'video/webm' });
+        console.log('📹 Video blob creado:', {
+          size: videoBlob.size,
+          sizeKB: (videoBlob.size / 1024).toFixed(2) + 'KB',
+          sizeMB: (videoBlob.size / (1024 * 1024)).toFixed(2) + 'MB',
+          type: videoBlob.type,
+          duration: videoRecordingDuration
+        });
+        
+        // Verificar tamaño ANTES de intentar subir
+        const MAX_SIZE = 1024 * 1024; // 1MB
+        if (videoBlob.size > MAX_SIZE) {
+          const sizeMB = (videoBlob.size / (1024 * 1024)).toFixed(2);
+          const errorMsg = `El video es demasiado grande (${sizeMB}MB). El límite es 1MB.\n\nPor favor, graba un video más corto (máximo 5-10 segundos).`;
+          console.error('❌', errorMsg);
+          alert(errorMsg);
+          setIsRecordingVideo(false);
+          setVideoRecordingDuration(0);
+          return;
+        }
+        
+        try {
+          // Convertir a Base64 y enviar
+          console.log('📦 Convirtiendo video a Base64...');
+          const { uploadVoiceMessage } = await import('../../services/voiceMessageService');
+          const videoUrl = await uploadVoiceMessage(videoBlob, match.id, currentUserId);
+          
+          console.log('✅ Video convertido exitosamente');
+          console.log('📤 Enviando mensaje de video...');
+          
+          // Enviar como mensaje de video
+          onSendMessage(undefined, 'video', videoUrl, videoRecordingDuration);
+          
+          console.log('✅ Mensaje de video enviado correctamente');
+          
+          setIsRecordingVideo(false);
+          setVideoRecordingDuration(0);
+          
+        } catch (error) {
+          console.error('❌ Error procesando videomensaje:', error);
+          console.error('❌ Error completo:', {
+            name: error instanceof Error ? error.name : 'Unknown',
+            message: error instanceof Error ? error.message : String(error),
+            stack: error instanceof Error ? error.stack : undefined
+          });
+          alert(`Error procesando video: ${error instanceof Error ? error.message : 'Error desconocido'}`);
+          setIsRecordingVideo(false);
+          setVideoRecordingDuration(0);
+        }
       };
       
-      setCurrentCall(mockCall);
+      mediaRecorder.onerror = (error) => {
+        console.error('❌ Error en MediaRecorder:', error);
+        stream.getTracks().forEach(track => track.stop());
+        if (videoPreviewRef.current) {
+          videoPreviewRef.current.srcObject = null;
+        }
+        setIsRecordingVideo(false);
+        setVideoRecordingDuration(0);
+      };
       
-      // No limpiar el stream inmediatamente, dejarlo para CallInterface
+      // Iniciar grabación
+      mediaRecorder.start();
+      console.log('🎬 Grabación iniciada');
+      
+      // Contador de duración
+      videoRecordingIntervalRef.current = setInterval(() => {
+        setVideoRecordingDuration(prev => {
+          // Límite de 30 segundos
+          if (prev >= 30) {
+            handleStopVideoRecording();
+            return 30;
+          }
+          return prev + 1;
+        });
+      }, 1000);
+      
+      // Guardar referencia
+      (window as any).currentVideoRecorder = mediaRecorder;
+      (window as any).currentVideoStream = stream;
       
     } catch (error) {
-      console.error('Error iniciando llamada:', error);
+      console.error('❌ Error iniciando grabación de video:', error);
       
       let errorMessage = 'Error desconocido';
       if (error instanceof Error) {
         if (error.name === 'NotAllowedError') {
-          errorMessage = 'Permisos denegados. Por favor, permite el acceso a la cámara y micrófono.';
+          errorMessage = 'Permisos de cámara denegados. Por favor, permite el acceso a la cámara y micrófono.';
         } else if (error.name === 'NotFoundError') {
-          errorMessage = 'No se encontró cámara o micrófono disponible.';
+          errorMessage = 'No se encontró cámara disponible.';
         } else if (error.name === 'NotReadableError') {
           errorMessage = 'La cámara está siendo usada por otra aplicación.';
         } else {
@@ -436,8 +560,65 @@ const ChatView: React.FC<ChatViewProps> = ({
         }
       }
       
-      console.error('Error iniciando llamada:', errorMessage);
+      alert(errorMessage);
+      setIsRecordingVideo(false);
+      setVideoRecordingDuration(0);
     }
+  };
+
+  const handleStopVideoRecording = () => {
+    console.log('📹 Deteniendo grabación de video...');
+    
+    // Detener contador
+    if (videoRecordingIntervalRef.current) {
+      clearInterval(videoRecordingIntervalRef.current);
+      videoRecordingIntervalRef.current = null;
+    }
+    
+    // Limpiar vista previa
+    if (videoPreviewRef.current) {
+      videoPreviewRef.current.srcObject = null;
+    }
+    
+    // Detener grabación
+    const mediaRecorder = (window as any).currentVideoRecorder;
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+      mediaRecorder.stop();
+      (window as any).currentVideoRecorder = null;
+    }
+  };
+
+  const handleCancelVideoRecording = () => {
+    console.log('📹 Cancelando grabación de video...');
+    
+    // Detener contador
+    if (videoRecordingIntervalRef.current) {
+      clearInterval(videoRecordingIntervalRef.current);
+      videoRecordingIntervalRef.current = null;
+    }
+    
+    // Limpiar vista previa
+    if (videoPreviewRef.current) {
+      videoPreviewRef.current.srcObject = null;
+    }
+    
+    // Detener y limpiar
+    const mediaRecorder = (window as any).currentVideoRecorder;
+    const stream = (window as any).currentVideoStream;
+    
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+      mediaRecorder.stop();
+    }
+    
+    if (stream) {
+      stream.getTracks().forEach((track: MediaStreamTrack) => track.stop());
+    }
+    
+    (window as any).currentVideoRecorder = null;
+    (window as any).currentVideoStream = null;
+    
+    setIsRecordingVideo(false);
+    setVideoRecordingDuration(0);
   };
 
   const formatRecordingDuration = (seconds: number): string => {
@@ -449,6 +630,83 @@ const ChatView: React.FC<ChatViewProps> = ({
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       handleSendMessage();
+    }
+  };
+
+  // Funciones para envío de fotos
+  const handlePhotoButtonClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handlePhotoSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    console.log('📸 Fotos seleccionadas:', files.length);
+
+    // Validar que sean imágenes
+    const imageFiles = files.filter(file => file.type.startsWith('image/'));
+    
+    if (imageFiles.length === 0) {
+      alert('Por favor selecciona solo archivos de imagen');
+      return;
+    }
+
+    // Limitar a 5 fotos
+    const limitedFiles = imageFiles.slice(0, 5);
+    
+    if (imageFiles.length > 5) {
+      alert('Máximo 5 fotos por mensaje. Se seleccionaron las primeras 5.');
+    }
+
+    console.log('✅ Abriendo modal de preview con', limitedFiles.length, 'fotos');
+
+    // Mostrar modal de preview
+    setSelectedFiles(limitedFiles);
+    setShowPhotoPreview(true);
+
+    // Limpiar input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleSendPhotos = async (photos: Array<{ base64: string; caption?: string; filter: string }>) => {
+    console.log('📤 Enviando fotos con filtros:', {
+      cantidad: photos.length,
+      filtros: photos.map(p => p.filter),
+      tieneCaption: photos.some(p => p.caption)
+    });
+
+    try {
+      // Si es una sola foto, enviar con caption
+      if (photos.length === 1) {
+        const photo = photos[0];
+        console.log('📸 Enviando foto única:', {
+          filter: photo.filter,
+          caption: photo.caption,
+          base64Length: photo.base64.length
+        });
+        onSendMessage(photo.caption, 'image', photo.base64);
+      } else {
+        // Múltiples fotos: enviar cada una por separado
+        console.log('📸 Enviando múltiples fotos:', photos.length);
+        for (let i = 0; i < photos.length; i++) {
+          const photo = photos[i];
+          console.log(`📸 Enviando foto ${i + 1}/${photos.length}:`, {
+            filter: photo.filter,
+            base64Length: photo.base64.length
+          });
+          onSendMessage(undefined, 'image', photo.base64);
+          // Pequeño delay entre fotos para mantener el orden
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+      }
+
+      console.log('✅ Todas las fotos enviadas exitosamente');
+    } catch (error) {
+      console.error('❌ Error enviando fotos:', error);
+      alert('Error enviando fotos. Por favor intenta de nuevo.');
     }
   };
 
@@ -498,19 +756,6 @@ const ChatView: React.FC<ChatViewProps> = ({
             {(currentEmotion || conversationInsights) && !isAnalyzing && (
               <div className="absolute -top-1 -right-1 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-green-500 rounded-full"></div>
             )}
-          </button>
-          
-          <button 
-            onClick={() => handleStartCall('voice')}
-            className="p-2 hover:bg-slate-100 rounded-full transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
-          >
-            <Phone size={18} className="sm:w-5 sm:h-5 cursor-pointer hover:text-slate-600 transition-colors" />
-          </button>
-          <button 
-            onClick={() => handleStartCall('video')}
-            className="p-2 hover:bg-slate-100 rounded-full transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
-          >
-            <Video size={18} className="sm:w-5 sm:h-5 cursor-pointer hover:text-slate-600 transition-colors" />
           </button>
         </div>
       </div>
@@ -567,6 +812,26 @@ const ChatView: React.FC<ChatViewProps> = ({
                   duration={msg.duration}
                   isOwn={msg.senderId === currentUserId}
                   timestamp={msg.timestamp}
+                />
+              )}
+
+              {/* Videomensaje */}
+              {msg.type === 'video' && msg.content && (
+                <VideoMessage
+                  videoUrl={msg.content}
+                  duration={msg.duration}
+                  isOwn={msg.senderId === currentUserId}
+                  timestamp={msg.timestamp}
+                />
+              )}
+
+              {/* Mensaje de foto */}
+              {msg.type === 'image' && msg.content && (
+                <PhotoMessage
+                  photoUrl={msg.content}
+                  isOwn={msg.senderId === currentUserId}
+                  timestamp={msg.timestamp}
+                  caption={msg.text}
                 />
               )}
 
@@ -675,7 +940,7 @@ const ChatView: React.FC<ChatViewProps> = ({
           <div className="mb-3 sm:mb-4 bg-red-50 border border-red-200 rounded-2xl p-3 sm:p-4 flex items-center justify-between">
             <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
               <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-red-500 rounded-full animate-pulse flex-shrink-0"></div>
-              <span className="text-red-700 font-medium text-sm">Grabando...</span>
+              <span className="text-red-700 font-medium text-sm">Grabando audio...</span>
               <span className="text-red-600 text-sm">{formatRecordingDuration(recordingDuration)}</span>
             </div>
             <div className="flex gap-2 flex-shrink-0">
@@ -696,14 +961,104 @@ const ChatView: React.FC<ChatViewProps> = ({
           </div>
         )}
 
+        {/* Grabación de video activa - Responsive */}
+        {isRecordingVideo && (
+          <div className="mb-3 sm:mb-4 bg-purple-50 border border-purple-200 rounded-2xl p-3 sm:p-4">
+            {/* Vista previa de video */}
+            <div className="relative mb-3 rounded-xl overflow-hidden bg-black mx-auto" style={{ maxWidth: '360px' }}>
+              <video
+                ref={videoPreviewRef}
+                autoPlay
+                playsInline
+                muted
+                className="w-full h-auto object-cover"
+                style={{ 
+                  transform: 'scaleX(-1)', // Efecto espejo
+                  aspectRatio: '9/16' // Mantener proporción vertical
+                }}
+              />
+              {/* Overlay con información */}
+              <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
+                <div className="flex items-center gap-2 bg-black/70 backdrop-blur-sm px-3 py-1.5 rounded-full">
+                  <div className="w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse"></div>
+                  <span className="text-white text-sm font-medium">REC</span>
+                </div>
+                <div className="bg-black/70 backdrop-blur-sm px-3 py-1.5 rounded-full">
+                  <span className="text-white text-sm font-mono">
+                    {formatRecordingDuration(videoRecordingDuration)} / 0:30
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            {/* Botones de control */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-purple-700">
+                <VideoIcon size={18} />
+                <span className="text-sm font-medium">Grabando videomensaje...</span>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleCancelVideoRecording}
+                  className="px-3 py-1.5 text-purple-600 text-sm hover:bg-purple-100 rounded-lg transition-colors min-h-[44px] flex items-center"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleStopVideoRecording}
+                  className="px-3 py-1.5 bg-purple-500 text-white text-sm rounded-lg hover:bg-purple-600 transition-colors flex items-center gap-1 min-h-[44px]"
+                >
+                  <StopCircle size={14} />
+                  Enviar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="flex items-center gap-2 bg-slate-100 rounded-full px-3 sm:px-4 py-1 focus-within:bg-white focus-within:ring-2 focus-within:ring-rose-500 focus-within:border-rose-500 transition-all">
           
+          {/* Input file oculto para fotos */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={handlePhotoSelect}
+            className="hidden"
+          />
+
           {/* Botón de emoji - Touch optimized */}
           <button
             onClick={() => setShowEmojiPicker(true)}
             className="text-slate-400 hover:text-slate-600 transition-colors p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
+            disabled={isRecording || isRecordingVideo}
           >
             <Smile size={18} className="sm:w-5 sm:h-5" />
+          </button>
+
+          {/* Botón de foto - Touch optimized */}
+          <button
+            onClick={handlePhotoButtonClick}
+            className="text-slate-400 hover:text-slate-600 transition-colors p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
+            title="Enviar foto"
+            disabled={isRecording || isRecordingVideo}
+          >
+            <ImageIcon size={18} className="sm:w-5 sm:h-5" />
+          </button>
+
+          {/* Botón de videomensaje - Touch optimized */}
+          <button
+            onClick={isRecordingVideo ? handleStopVideoRecording : handleStartVideoRecording}
+            className={`transition-colors p-2 min-w-[44px] min-h-[44px] flex items-center justify-center ${
+              isRecordingVideo 
+                ? 'text-purple-500 hover:text-purple-600' 
+                : 'text-slate-400 hover:text-slate-600'
+            }`}
+            title={isRecordingVideo ? 'Detener grabación de video' : 'Grabar videomensaje'}
+            disabled={isRecording}
+          >
+            <VideoIcon size={18} className="sm:w-5 sm:h-5" />
           </button>
 
           {/* Botón de micrófono - Touch optimized */}
@@ -714,7 +1069,8 @@ const ChatView: React.FC<ChatViewProps> = ({
                 ? 'text-red-500 hover:text-red-600' 
                 : 'text-slate-400 hover:text-slate-600'
             }`}
-            title={isRecording ? 'Detener grabación' : 'Iniciar grabación de voz'}
+            title={isRecording ? 'Detener grabación' : 'Grabar mensaje de voz'}
+            disabled={isRecordingVideo}
           >
             {isRecording ? <MicOff size={18} className="sm:w-5 sm:h-5" /> : <Mic size={18} className="sm:w-5 sm:h-5" />}
           </button>
@@ -725,14 +1081,14 @@ const ChatView: React.FC<ChatViewProps> = ({
             onKeyDown={handleKeyDown}
             placeholder={t('typeSomethingCool')}
             className="flex-1 bg-transparent border-none focus:ring-0 py-3 text-sm outline-none placeholder-slate-400 min-h-[44px]"
-            disabled={isRecording}
+            disabled={isRecording || isRecordingVideo}
           />
           
           <button 
             onClick={handleSendMessage}
-            disabled={!inputValue.trim() || isRecording}
+            disabled={!inputValue.trim() || isRecording || isRecordingVideo}
             className={`p-2 rounded-full transition-all min-w-[44px] min-h-[44px] flex items-center justify-center ${
-              inputValue.trim() && !isRecording
+              inputValue.trim() && !isRecording && !isRecordingVideo
                 ? 'text-white bg-rose-500 hover:bg-rose-600 shadow-md' 
                 : 'text-slate-300'
             }`}
@@ -760,24 +1116,16 @@ const ChatView: React.FC<ChatViewProps> = ({
         onSuggestionSelect={handleSuggestionSelect}
       />
 
-      {/* Call Interface */}
-      {currentCall && (
-        <CallInterface
-          call={currentCall}
-          isIncoming={currentCall?.receiverId === currentUserId}
-          onAnswer={() => {
-            // Llamada respondida
-          }}
-          onDecline={() => {
-            setCurrentCall(null);
-          }}
-          onEnd={() => {
-            setCurrentCall(null);
-          }}
-          otherUserName={match.user.name}
-          otherUserImage={match.user.images[0]}
-        />
-      )}
+      {/* Photo Preview Modal */}
+      <PhotoPreviewModal
+        isOpen={showPhotoPreview}
+        files={selectedFiles}
+        onClose={() => {
+          setShowPhotoPreview(false);
+          setSelectedFiles([]);
+        }}
+        onSend={handleSendPhotos}
+      />
     </div>
   );
 };

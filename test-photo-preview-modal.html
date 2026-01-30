@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test: Photo Preview Modal - Ta' Pa' Ti</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 min-h-screen">
+  
+  <!-- Header -->
+  <div class="bg-white border-b border-slate-200 p-4">
+    <h1 class="text-2xl font-bold text-slate-800">📸 Test: Photo Preview Modal</h1>
+    <p class="text-sm text-slate-600 mt-1">Prueba el modal de preview de fotos con filtros y caption</p>
+  </div>
+
+  <!-- Main Content -->
+  <div class="max-w-4xl mx-auto p-4 space-y-4">
+    
+    <!-- Instructions -->
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+      <h2 class="font-bold text-blue-900 mb-2">📋 Instrucciones:</h2>
+      <ol class="text-sm text-blue-800 space-y-1 list-decimal list-inside">
+        <li>Haz click en "Seleccionar Fotos" para elegir 1-5 imágenes</li>
+        <li>El modal se abrirá automáticamente mostrando la primera foto</li>
+        <li>Navega entre fotos con las flechas ← →</li>
+        <li>Aplica diferentes filtros a cada foto</li>
+        <li>Agrega un caption opcional (máximo 200 caracteres)</li>
+        <li>Elimina fotos individuales si quieres</li>
+        <li>Haz click en "Enviar" para ver el resultado en la consola</li>
+      </ol>
+    </div>
+
+    <!-- Test Button -->
+    <div class="bg-white rounded-lg shadow-md p-6 text-center">
+      <input 
+        type="file" 
+        id="fileInput" 
+        accept="image/*" 
+        multiple 
+        class="hidden"
+      />
+      <button 
+        onclick="handleSelectPhotos()"
+        class="bg-rose-500 hover:bg-rose-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transition-all transform hover:scale-105 flex items-center gap-2 mx-auto"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+          <circle cx="8.5" cy="8.5" r="1.5"></circle>
+          <polyline points="21 15 16 10 5 21"></polyline>
+        </svg>
+        Seleccionar Fotos (1-5)
+      </button>
+      <p class="text-sm text-slate-500 mt-3">Formatos: JPG, PNG, GIF, WebP</p>
+    </div>
+
+    <!-- Results -->
+    <div id="results" class="bg-white rounded-lg shadow-md p-6 hidden">
+      <h3 class="font-bold text-slate-800 mb-3">✅ Fotos Enviadas:</h3>
+      <div id="resultsList" class="space-y-2"></div>
+    </div>
+
+    <!-- Console Log -->
+    <div class="bg-slate-800 rounded-lg shadow-md p-4">
+      <h3 class="font-bold text-white mb-2">📝 Console Log:</h3>
+      <div id="consoleLog" class="text-xs text-green-400 font-mono space-y-1 max-h-64 overflow-y-auto">
+        <div>Esperando selección de fotos...</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Photo Preview Modal -->
+  <div id="photoModal" class="fixed inset-0 z-50 bg-black/95 hidden flex-col">
+    
+    <!-- Canvas oculto para aplicar filtros -->
+    <canvas id="filterCanvas" class="hidden"></canvas>
+
+    <!-- Header -->
+    <div class="flex items-center justify-between p-4 text-white">
+      <button 
+        onclick="closeModal()"
+        class="p-2 hover:bg-white/10 rounded-full transition-colors"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+      <div class="text-center">
+        <p id="photoCounter" class="text-sm font-medium">Vista previa</p>
+      </div>
+      <button 
+        onclick="sendPhotos()"
+        class="px-4 py-2 bg-rose-500 hover:bg-rose-600 rounded-full font-medium flex items-center gap-2 transition-colors"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"></line>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+        </svg>
+        Enviar
+      </button>
+    </div>
+
+    <!-- Imagen principal -->
+    <div class="flex-1 flex items-center justify-center p-4 relative">
+      <!-- Navegación izquierda -->
+      <button 
+        id="prevBtn"
+        onclick="previousPhoto()"
+        class="absolute left-4 p-3 bg-black/50 hover:bg-black/70 rounded-full text-white transition-colors z-10 hidden"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+
+      <!-- Imagen -->
+      <div class="max-w-2xl max-h-full">
+        <img 
+          id="mainImage"
+          src="" 
+          alt="Preview" 
+          class="max-w-full max-h-full object-contain rounded-lg"
+        />
+      </div>
+
+      <!-- Navegación derecha -->
+      <button 
+        id="nextBtn"
+        onclick="nextPhoto()"
+        class="absolute right-4 p-3 bg-black/50 hover:bg-black/70 rounded-full text-white transition-colors z-10 hidden"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+
+      <!-- Botón eliminar -->
+      <button 
+        id="deleteBtn"
+        onclick="deleteCurrentPhoto()"
+        class="absolute top-4 right-4 p-2 bg-red-500 hover:bg-red-600 rounded-full text-white transition-colors hidden"
+        title="Eliminar foto"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="3 6 5 6 21 6"></polyline>
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Filtros -->
+    <div class="px-4 py-3 bg-black/50 backdrop-blur-sm">
+      <p class="text-white text-xs font-medium mb-2 uppercase tracking-wide">Filtros</p>
+      <div id="filtersContainer" class="flex gap-2 overflow-x-auto no-scrollbar pb-2">
+        <!-- Filtros se generan dinámicamente -->
+      </div>
+    </div>
+
+    <!-- Miniaturas -->
+    <div id="thumbnailsContainer" class="px-4 py-3 bg-black/50 backdrop-blur-sm hidden">
+      <div id="thumbnails" class="flex gap-2 overflow-x-auto no-scrollbar">
+        <!-- Miniaturas se generan dinámicamente -->
+      </div>
+    </div>
+
+    <!-- Caption -->
+    <div class="p-4 bg-black/50 backdrop-blur-sm">
+      <input 
+        id="captionInput"
+        type="text" 
+        placeholder="Agregar un comentario..."
+        maxlength="200"
+        class="w-full bg-white/10 text-white placeholder-white/50 px-4 py-3 rounded-full border border-white/20 focus:border-rose-500 focus:outline-none transition-colors"
+      />
+      <p id="captionCounter" class="text-white/50 text-xs mt-2 text-right hidden">0/200</p>
+    </div>
+
+  </div>
+
+  <script>
+    // Estado global
+    let photos = [];
+    let currentIndex = 0;
+    let selectedFilter = 'none';
+
+    // Filtros disponibles
+    const filters = [
+      { id: 'none', name: 'Original', preview: '🖼️', css: 'none' },
+      { id: 'grayscale', name: 'B&N', preview: '⚫', css: 'grayscale(100%)' },
+      { id: 'sepia', name: 'Sepia', preview: '🟤', css: 'sepia(100%)' },
+      { id: 'vintage', name: 'Vintage', preview: '📷', css: 'sepia(50%) contrast(110%) brightness(110%)' },
+      { id: 'warm', name: 'Cálido', preview: '🔥', css: 'sepia(30%) saturate(130%) brightness(105%)' },
+      { id: 'cool', name: 'Frío', preview: '❄️', css: 'hue-rotate(180deg) saturate(120%)' }
+    ];
+
+    // Función para agregar log
+    function addLog(message, type = 'info') {
+      const logDiv = document.getElementById('consoleLog');
+      const timestamp = new Date().toLocaleTimeString();
+      const color = type === 'error' ? 'text-red-400' : type === 'success' ? 'text-green-400' : 'text-blue-400';
+      logDiv.innerHTML += `<div class="${color}">[${timestamp}] ${message}</div>`;
+      logDiv.scrollTop = logDiv.scrollHeight;
+    }
+
+    // Seleccionar fotos
+    function handleSelectPhotos() {
+      document.getElementById('fileInput').click();
+    }
+
+    document.getElementById('fileInput').addEventListener('change', async (e) => {
+      const files = Array.from(e.target.files || []);
+      if (files.length === 0) return;
+
+      addLog(`📸 ${files.length} archivo(s) seleccionado(s)`);
+
+      // Validar imágenes
+      const imageFiles = files.filter(file => file.type.startsWith('image/'));
+      
+      if (imageFiles.length === 0) {
+        addLog('❌ No se seleccionaron imágenes válidas', 'error');
+        alert('Por favor selecciona solo archivos de imagen');
+        return;
+      }
+
+      // Limitar a 5
+      const limitedFiles = imageFiles.slice(0, 5);
+      
+      if (imageFiles.length > 5) {
+        addLog('⚠️ Máximo 5 fotos. Se seleccionaron las primeras 5');
+        alert('Máximo 5 fotos por mensaje. Se seleccionaron las primeras 5.');
+      }
+
+      // Cargar fotos
+      addLog(`✅ Cargando ${limitedFiles.length} foto(s)...`);
+      await loadPhotos(limitedFiles);
+      
+      // Abrir modal
+      openModal();
+      
+      // Limpiar input
+      e.target.value = '';
+    });
+
+    // Cargar fotos
+    async function loadPhotos(files) {
+      photos = [];
+      
+      for (const file of files) {
+        const preview = await fileToDataURL(file);
+        photos.push({
+          file,
+          preview,
+          filtered: preview,
+          filter: 'none'
+        });
+      }
+      
+      currentIndex = 0;
+      selectedFilter = 'none';
+      
+      addLog(`✅ ${photos.length} foto(s) cargada(s)`);
+    }
+
+    // Convertir File a Data URL
+    function fileToDataURL(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // Abrir modal
+    function openModal() {
+      document.getElementById('photoModal').classList.remove('hidden');
+      document.getElementById('photoModal').classList.add('flex');
+      renderModal();
+      addLog('🎨 Modal abierto');
+    }
+
+    // Cerrar modal
+    function closeModal() {
+      document.getElementById('photoModal').classList.add('hidden');
+      document.getElementById('photoModal').classList.remove('flex');
+      photos = [];
+      currentIndex = 0;
+      addLog('❌ Modal cerrado');
+    }
+
+    // Renderizar modal
+    function renderModal() {
+      // Actualizar contador
+      const counter = document.getElementById('photoCounter');
+      counter.textContent = photos.length > 1 ? `${currentIndex + 1} de ${photos.length}` : 'Vista previa';
+
+      // Mostrar imagen actual
+      const mainImage = document.getElementById('mainImage');
+      mainImage.src = photos[currentIndex].filtered;
+
+      // Botones de navegación
+      document.getElementById('prevBtn').classList.toggle('hidden', photos.length <= 1 || currentIndex === 0);
+      document.getElementById('nextBtn').classList.toggle('hidden', photos.length <= 1 || currentIndex === photos.length - 1);
+      document.getElementById('deleteBtn').classList.toggle('hidden', photos.length <= 1);
+
+      // Renderizar filtros
+      renderFilters();
+
+      // Renderizar miniaturas
+      if (photos.length > 1) {
+        renderThumbnails();
+        document.getElementById('thumbnailsContainer').classList.remove('hidden');
+      } else {
+        document.getElementById('thumbnailsContainer').classList.add('hidden');
+      }
+
+      // Caption
+      const captionInput = document.getElementById('captionInput');
+      captionInput.value = '';
+      
+      captionInput.oninput = () => {
+        const counter = document.getElementById('captionCounter');
+        if (captionInput.value.length > 0) {
+          counter.textContent = `${captionInput.value.length}/200`;
+          counter.classList.remove('hidden');
+        } else {
+          counter.classList.add('hidden');
+        }
+      };
+    }
+
+    // Renderizar filtros
+    function renderFilters() {
+      const container = document.getElementById('filtersContainer');
+      container.innerHTML = '';
+      
+      filters.forEach(filter => {
+        const btn = document.createElement('button');
+        btn.className = `flex-shrink-0 flex flex-col items-center gap-1 p-2 rounded-lg transition-all ${
+          selectedFilter === filter.id
+            ? 'bg-rose-500 text-white'
+            : 'bg-white/10 text-white/70 hover:bg-white/20'
+        }`;
+        btn.innerHTML = `
+          <span class="text-2xl">${filter.preview}</span>
+          <span class="text-xs font-medium">${filter.name}</span>
+        `;
+        btn.onclick = () => applyFilter(filter.id);
+        container.appendChild(btn);
+      });
+    }
+
+    // Aplicar filtro
+    async function applyFilter(filterId) {
+      selectedFilter = filterId;
+      addLog(`🎨 Aplicando filtro: ${filterId}`);
+      
+      const filter = filters.find(f => f.id === filterId);
+      const canvas = document.getElementById('filterCanvas');
+      const ctx = canvas.getContext('2d');
+      
+      // Cargar imagen
+      const img = new Image();
+      img.src = photos[currentIndex].preview;
+      
+      await new Promise(resolve => {
+        img.onload = resolve;
+      });
+      
+      // Configurar canvas
+      canvas.width = img.width;
+      canvas.height = img.height;
+      
+      // Aplicar filtro
+      ctx.filter = filter.css;
+      ctx.drawImage(img, 0, 0);
+      
+      // Obtener imagen filtrada
+      const filtered = canvas.toDataURL('image/jpeg', 0.9);
+      
+      // Actualizar foto
+      photos[currentIndex].filtered = filtered;
+      photos[currentIndex].filter = filterId;
+      
+      // Actualizar UI
+      renderModal();
+      
+      addLog(`✅ Filtro aplicado: ${filter.name}`);
+    }
+
+    // Renderizar miniaturas
+    function renderThumbnails() {
+      const container = document.getElementById('thumbnails');
+      container.innerHTML = '';
+      
+      photos.forEach((photo, index) => {
+        const btn = document.createElement('button');
+        btn.className = `flex-shrink-0 relative ${
+          index === currentIndex ? 'ring-2 ring-rose-500' : 'opacity-60'
+        } rounded-lg overflow-hidden transition-all`;
+        btn.innerHTML = `
+          <img src="${photo.filtered}" alt="Foto ${index + 1}" class="w-16 h-16 object-cover" />
+        `;
+        btn.onclick = () => {
+          currentIndex = index;
+          selectedFilter = photo.filter;
+          renderModal();
+        };
+        container.appendChild(btn);
+      });
+    }
+
+    // Navegación
+    function previousPhoto() {
+      if (currentIndex > 0) {
+        currentIndex--;
+        selectedFilter = photos[currentIndex].filter;
+        renderModal();
+        addLog(`⬅️ Foto anterior (${currentIndex + 1}/${photos.length})`);
+      }
+    }
+
+    function nextPhoto() {
+      if (currentIndex < photos.length - 1) {
+        currentIndex++;
+        selectedFilter = photos[currentIndex].filter;
+        renderModal();
+        addLog(`➡️ Foto siguiente (${currentIndex + 1}/${photos.length})`);
+      }
+    }
+
+    // Eliminar foto actual
+    function deleteCurrentPhoto() {
+      if (photos.length <= 1) return;
+      
+      addLog(`🗑️ Eliminando foto ${currentIndex + 1}`);
+      photos.splice(currentIndex, 1);
+      
+      if (currentIndex >= photos.length) {
+        currentIndex = photos.length - 1;
+      }
+      
+      renderModal();
+      addLog(`✅ Foto eliminada. Quedan ${photos.length} foto(s)`);
+    }
+
+    // Enviar fotos
+    function sendPhotos() {
+      const caption = document.getElementById('captionInput').value;
+      
+      addLog('📤 Enviando fotos...');
+      
+      const result = photos.map((photo, index) => ({
+        base64: photo.filtered,
+        caption: index === 0 ? caption : undefined,
+        filter: photo.filter,
+        size: Math.round(photo.filtered.length * 0.75 / 1024) + 'KB'
+      }));
+      
+      console.log('📸 Fotos enviadas:', result);
+      
+      // Mostrar resultados
+      const resultsDiv = document.getElementById('results');
+      const resultsList = document.getElementById('resultsList');
+      resultsDiv.classList.remove('hidden');
+      resultsList.innerHTML = '';
+      
+      result.forEach((photo, index) => {
+        const div = document.createElement('div');
+        div.className = 'bg-slate-50 p-3 rounded-lg';
+        div.innerHTML = `
+          <div class="flex items-center gap-3">
+            <img src="${photo.base64}" class="w-16 h-16 object-cover rounded" />
+            <div class="flex-1">
+              <p class="font-medium text-slate-800">Foto ${index + 1}</p>
+              <p class="text-xs text-slate-600">Filtro: ${photo.filter} | Tamaño: ${photo.size}</p>
+              ${photo.caption ? `<p class="text-xs text-slate-500 mt-1">"${photo.caption}"</p>` : ''}
+            </div>
+          </div>
+        `;
+        resultsList.appendChild(div);
+      });
+      
+      addLog(`✅ ${result.length} foto(s) enviada(s) exitosamente`, 'success');
+      
+      // Cerrar modal
+      closeModal();
+    }
+
+    // Atajos de teclado
+    document.addEventListener('keydown', (e) => {
+      if (!document.getElementById('photoModal').classList.contains('hidden')) {
+        if (e.key === 'ArrowLeft') previousPhoto();
+        if (e.key === 'ArrowRight') nextPhoto();
+        if (e.key === 'Escape') closeModal();
+      }
+    });
+
+    addLog('✅ Sistema listo. Selecciona fotos para comenzar.', 'success');
+  </script>
+
+</body>
+</html>

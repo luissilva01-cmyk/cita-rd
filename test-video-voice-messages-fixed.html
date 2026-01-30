@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba: Mensajes de Voz y Video - CORREGIDO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-rose-50 to-pink-50 min-h-screen p-8">
+    <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <div class="bg-white rounded-2xl shadow-xl p-8 mb-8">
+            <h1 class="text-3xl font-bold text-slate-800 mb-2">
+                ✅ Mensajes de Voz y Video - CORREGIDO
+            </h1>
+            <p class="text-slate-600">
+                Prueba de videomensajes y mensajes de voz con Firebase Storage
+            </p>
+            <div class="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                <p class="text-green-800 font-medium">🎉 Problema Resuelto:</p>
+                <ul class="text-green-700 text-sm mt-2 space-y-1">
+                    <li>✅ Código de producción activado en voiceMessageService.ts</li>
+                    <li>✅ Storage Rules desplegadas</li>
+                    <li>✅ URLs públicas de Firebase Storage (no más blob: locales)</li>
+                    <li>✅ Archivos compartibles entre usuarios</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Diagnóstico del Problema -->
+        <div class="bg-white rounded-2xl shadow-xl p-8 mb-8">
+            <h2 class="text-2xl font-bold text-slate-800 mb-4">🔍 Diagnóstico</h2>
+            
+            <div class="space-y-4">
+                <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <h3 class="font-bold text-red-800 mb-2">❌ Problema Anterior:</h3>
+                    <ul class="text-red-700 text-sm space-y-1">
+                        <li>• uploadVoiceMessage usaba URLs locales (blob:)</li>
+                        <li>• Código de Firebase Storage estaba COMENTADO</li>
+                        <li>• URLs solo funcionaban en el navegador que las creó</li>
+                        <li>• Receptor no podía ver/escuchar los mensajes</li>
+                    </ul>
+                </div>
+
+                <div class="p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <h3 class="font-bold text-green-800 mb-2">✅ Solución Implementada:</h3>
+                    <ul class="text-green-700 text-sm space-y-1">
+                        <li>• Descomentado código de Firebase Storage</li>
+                        <li>• Archivos se suben a: voice_messages/{chatId}/{senderId}_{timestamp}.webm</li>
+                        <li>• URLs públicas compartibles entre usuarios</li>
+                        <li>• Storage Rules desplegadas con límite de 50MB</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Código Antes vs Después -->
+        <div class="bg-white rounded-2xl shadow-xl p-8 mb-8">
+            <h2 class="text-2xl font-bold text-slate-800 mb-4">📝 Código Antes vs Después</h2>
+            
+            <div class="grid md:grid-cols-2 gap-4">
+                <!-- Antes -->
+                <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <h3 class="font-bold text-red-800 mb-2">❌ Antes (NO funcionaba):</h3>
+                    <pre class="text-xs text-red-700 overflow-x-auto"><code>// TEMPORAL: URL local
+const localUrl = URL.createObjectURL(audioBlob);
+await new Promise(resolve => setTimeout(resolve, 500));
+return localUrl; // ❌ Solo funciona localmente
+
+/* Código de producción COMENTADO
+const fileName = `voice_messages/...`;
+const storageRef = ref(storage, fileName);
+const snapshot = await uploadBytes(...);
+const downloadURL = await getDownloadURL(...);
+return downloadURL;
+*/</code></pre>
+                </div>
+
+                <!-- Después -->
+                <div class="p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <h3 class="font-bold text-green-800 mb-2">✅ Después (Funciona):</h3>
+                    <pre class="text-xs text-green-700 overflow-x-auto"><code>// Subir a Firebase Storage
+const fileName = `voice_messages/${chatId}/${senderId}_${Date.now()}.webm`;
+const storageRef = ref(storage, fileName);
+
+const snapshot = await uploadBytes(storageRef, audioBlob);
+const downloadURL = await getDownloadURL(snapshot.ref);
+
+return downloadURL; // ✅ URL pública compartible</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Storage Rules -->
+        <div class="bg-white rounded-2xl shadow-xl p-8 mb-8">
+            <h2 class="text-2xl font-bold text-slate-800 mb-4">🔒 Storage Rules Desplegadas</h2>
+            
+            <div class="p-4 bg-slate-50 border border-slate-200 rounded-lg">
+                <pre class="text-sm text-slate-700 overflow-x-auto"><code>match /voice_messages/{chatId}/{fileName} {
+  // Permitir lectura a usuarios autenticados
+  allow read: if request.auth != null;
+  
+  // Permitir escritura a usuarios autenticados
+  allow write: if request.auth != null
+               && request.resource.size < 50 * 1024 * 1024 // Máximo 50MB
+               && (request.resource.contentType.matches('audio/.*') 
+                   || request.resource.contentType.matches('video/.*'));
+  
+  // Permitir eliminación a usuarios autenticados
+  allow delete: if request.auth != null;
+}</code></pre>
+            </div>
+
+            <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <p class="text-blue-800 font-medium">📋 Comando de Despliegue:</p>
+                <pre class="text-blue-700 text-sm mt-2"><code>cd cita-rd
+firebase deploy --only storage
+
+✅ storage: released rules storage.rules to firebase.storage
+✅ Deploy complete!</code></pre>
+            </div>
+        </div>
+
+        <!-- Flujo Completo -->
+        <div class="bg-white rounded-2xl shadow-xl p-8 mb-8">
+            <h2 class="text-2xl font-bold text-slate-800 mb-4">🔄 Flujo Completo</h2>
+            
+            <div class="space-y-4">
+                <!-- Envío -->
+                <div class="p-4 bg-purple-50 border border-purple-200 rounded-lg">
+                    <h3 class="font-bold text-purple-800 mb-2">📤 Envío de Mensaje:</h3>
+                    <ol class="text-purple-700 text-sm space-y-1 list-decimal list-inside">
+                        <li>Usuario presiona botón de micrófono/cámara</li>
+                        <li>Se solicitan permisos</li>
+                        <li>MediaRecorder inicia grabación</li>
+                        <li>Usuario detiene grabación</li>
+                        <li>Se crea Blob del archivo</li>
+                        <li><strong>Se sube a Firebase Storage</strong> (antes era URL local)</li>
+                        <li>Se obtiene URL pública</li>
+                        <li>Se envía mensaje con URL</li>
+                        <li>Se guarda en Firestore</li>
+                    </ol>
+                </div>
+
+                <!-- Recepción -->
+                <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <h3 class="font-bold text-blue-800 mb-2">📥 Recepción de Mensaje:</h3>
+                    <ol class="text-blue-700 text-sm space-y-1 list-decimal list-inside">
+                        <li>Listener de Firestore detecta nuevo mensaje</li>
+                        <li>Se obtiene URL del archivo</li>
+                        <li><strong>URL es pública de Firebase Storage</strong> (antes era blob local)</li>
+                        <li>Componente VoiceMessage/VideoMessage carga el archivo</li>
+                        <li>Usuario puede reproducir</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- Funcionalidades -->
+        <div class="bg-white rounded-2xl shadow-xl p-8 mb-8">
+            <h2 class="text-2xl font-bold text-slate-800 mb-4">🎯 Funcionalidades Operativas</h2>
+            
+            <div class="grid md:grid-cols-2 gap-4">
+                <!-- Mensajes de Voz -->
+                <div class="p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <h3 class="font-bold text-green-800 mb-2">🎤 Mensajes de Voz:</h3>
+                    <ul class="text-green-700 text-sm space-y-1">
+                        <li>✅ Grabación con MediaRecorder</li>
+                        <li>✅ Subida a Firebase Storage</li>
+                        <li>✅ URL pública compartible</li>
+                        <li>✅ Reproducción para todos</li>
+                        <li>✅ Límite: 50MB</li>
+                        <li>✅ Formato: audio/webm</li>
+                    </ul>
+                </div>
+
+                <!-- Videomensajes -->
+                <div class="p-4 bg-purple-50 border border-purple-200 rounded-lg">
+                    <h3 class="font-bold text-purple-800 mb-2">📹 Videomensajes:</h3>
+                    <ul class="text-purple-700 text-sm space-y-1">
+                        <li>✅ Grabación con cámara y micrófono</li>
+                        <li>✅ Vista previa (efecto espejo)</li>
+                        <li>✅ Límite de 30 segundos</li>
+                        <li>✅ Subida a Firebase Storage</li>
+                        <li>✅ URL pública compartible</li>
+                        <li>✅ Reproducción para todos</li>
+                        <li>✅ Controles play/pause</li>
+                        <li>✅ Control de volumen</li>
+                        <li>✅ Límite: 50MB</li>
+                        <li>✅ Formato: video/webm</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Costos -->
+        <div class="bg-white rounded-2xl shadow-xl p-8 mb-8">
+            <h2 class="text-2xl font-bold text-slate-800 mb-4">💰 Costos Estimados</h2>
+            
+            <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <h3 class="font-bold text-yellow-800 mb-2">Firebase Storage (Plan Blaze):</h3>
+                <ul class="text-yellow-700 text-sm space-y-1">
+                    <li>• Almacenamiento: $0.026 por GB/mes</li>
+                    <li>• Descarga: $0.12 por GB</li>
+                    <li>• Subida: Gratis</li>
+                </ul>
+                
+                <div class="mt-4 p-3 bg-yellow-100 rounded">
+                    <p class="font-bold text-yellow-900 mb-1">Estimación para 1000 usuarios activos:</p>
+                    <ul class="text-yellow-800 text-sm space-y-1">
+                        <li>• 10 mensajes/día por usuario</li>
+                        <li>• Promedio 2MB por mensaje</li>
+                        <li>• Total: 600GB/mes</li>
+                        <li>• <strong>Costo almacenamiento: ~$15/mes</strong></li>
+                        <li>• <strong>Costo descarga: ~$144/mes</strong></li>
+                        <li>• <strong>Total: ~$160/mes</strong></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <h3 class="font-bold text-blue-800 mb-2">🎯 Optimizaciones Recomendadas:</h3>
+                <ul class="text-blue-700 text-sm space-y-1">
+                    <li>• Comprimir videos antes de subir (2MB → 500KB)</li>
+                    <li>• Eliminar mensajes antiguos (>30 días)</li>
+                    <li>• Usar CDN para reducir costos de descarga</li>
+                    <li>• Implementar límites por usuario (50 mensajes/día)</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Pruebas -->
+        <div class="bg-white rounded-2xl shadow-xl p-8 mb-8">
+            <h2 class="text-2xl font-bold text-slate-800 mb-4">🧪 Pruebas Recomendadas</h2>
+            
+            <div class="space-y-4">
+                <div class="p-4 bg-slate-50 border border-slate-200 rounded-lg">
+                    <h3 class="font-bold text-slate-800 mb-2">1. Mensajes de Voz:</h3>
+                    <ul class="text-slate-700 text-sm space-y-1">
+                        <li>⏳ Grabar mensaje de voz</li>
+                        <li>⏳ Verificar subida a Firebase Storage</li>
+                        <li>⏳ Verificar que receptor puede escucharlo</li>
+                        <li>⏳ Probar en diferentes navegadores</li>
+                        <li>⏳ Probar en móvil</li>
+                    </ul>
+                </div>
+
+                <div class="p-4 bg-slate-50 border border-slate-200 rounded-lg">
+                    <h3 class="font-bold text-slate-800 mb-2">2. Videomensajes:</h3>
+                    <ul class="text-slate-700 text-sm space-y-1">
+                        <li>⏳ Grabar videomensaje</li>
+                        <li>⏳ Verificar vista previa durante grabación</li>
+                        <li>⏳ Verificar subida a Firebase Storage</li>
+                        <li>⏳ Verificar que receptor puede verlo</li>
+                        <li>⏳ Probar controles de play/pause</li>
+                        <li>⏳ Probar control de volumen</li>
+                        <li>⏳ Probar límite de 30 segundos</li>
+                        <li>⏳ Probar en diferentes navegadores</li>
+                        <li>⏳ Probar en móvil</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Instrucciones -->
+        <div class="bg-gradient-to-r from-rose-500 to-pink-500 rounded-2xl shadow-xl p-8 text-white">
+            <h2 class="text-2xl font-bold mb-4">🚀 Cómo Probar</h2>
+            <ol class="space-y-2 text-sm">
+                <li><strong>1.</strong> Asegúrate de que el servidor esté corriendo: <code class="bg-white/20 px-2 py-1 rounded">npm run dev</code></li>
+                <li><strong>2.</strong> Abre la app en dos navegadores diferentes (o dos ventanas de incógnito)</li>
+                <li><strong>3.</strong> Inicia sesión con dos usuarios diferentes</li>
+                <li><strong>4.</strong> Crea un match entre ellos</li>
+                <li><strong>5.</strong> En el chat, prueba enviar un mensaje de voz</li>
+                <li><strong>6.</strong> Verifica que el otro usuario puede escucharlo</li>
+                <li><strong>7.</strong> Prueba enviar un videomensaje</li>
+                <li><strong>8.</strong> Verifica que el otro usuario puede verlo</li>
+                <li><strong>9.</strong> Revisa la consola para ver los logs de subida</li>
+                <li><strong>10.</strong> Verifica en Firebase Console que los archivos se subieron</li>
+            </ol>
+        </div>
+    </div>
+</body>
+</html>

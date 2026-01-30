@@ -141,8 +141,8 @@ class StoriesService {
             id: `group_${userId}`,
             userId,
             user: {
-              name: perfilData.nombre || 'Usuario',
-              avatar: perfilData.fotos?.[0] || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=face'
+              name: perfilData.name || perfilData.nombre || 'Usuario',
+              avatar: perfilData.images?.[0] || perfilData.fotos?.[0] || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=face'
             },
             stories: userStories.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime()),
             hasUnviewed,

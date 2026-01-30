@@ -29,7 +29,7 @@ class PrivacyService {
     const demoSettings: PrivacySettings[] = [
       {
         userId: 'KU5ZalR92QcPV7RGbLFTjEjTXZm2', // Usuario actual
-        storiesVisibility: 'everyone',
+        storiesVisibility: 'matches_only', // 🔒 Solo matches
         allowStoryReplies: true,
         showOnlineStatus: true,
         allowProfileViews: 'everyone',
@@ -38,7 +38,7 @@ class PrivacyService {
       },
       {
         userId: '1', // Carolina
-        storiesVisibility: 'everyone',
+        storiesVisibility: 'matches_only', // 🔒 Solo matches
         allowStoryReplies: true,
         showOnlineStatus: true,
         allowProfileViews: 'everyone',
@@ -47,7 +47,7 @@ class PrivacyService {
       },
       {
         userId: '2', // Marcos
-        storiesVisibility: 'everyone',
+        storiesVisibility: 'matches_only', // 🔒 Solo matches
         allowStoryReplies: true,
         showOnlineStatus: true,
         allowProfileViews: 'everyone',
@@ -56,7 +56,7 @@ class PrivacyService {
       },
       {
         userId: '3', // Isabella
-        storiesVisibility: 'everyone',
+        storiesVisibility: 'matches_only', // 🔒 Solo matches
         allowStoryReplies: true,
         showOnlineStatus: true,
         allowProfileViews: 'everyone',
@@ -65,7 +65,7 @@ class PrivacyService {
       },
       {
         userId: '4', // Rafael
-        storiesVisibility: 'everyone',
+        storiesVisibility: 'matches_only', // 🔒 Solo matches
         allowStoryReplies: true,
         showOnlineStatus: true,
         allowProfileViews: 'everyone',
@@ -74,7 +74,7 @@ class PrivacyService {
       },
       {
         userId: '5', // Sofía
-        storiesVisibility: 'everyone',
+        storiesVisibility: 'matches_only', // 🔒 Solo matches
         allowStoryReplies: true,
         showOnlineStatus: true,
         allowProfileViews: 'everyone',
@@ -83,7 +83,7 @@ class PrivacyService {
       },
       {
         userId: '6', // Diego
-        storiesVisibility: 'everyone',
+        storiesVisibility: 'matches_only', // 🔒 Solo matches
         allowStoryReplies: true,
         showOnlineStatus: true,
         allowProfileViews: 'everyone',
@@ -92,7 +92,7 @@ class PrivacyService {
       },
       {
         userId: 'demo-user',
-        storiesVisibility: 'everyone',
+        storiesVisibility: 'matches_only', // 🔒 Solo matches
         allowStoryReplies: true,
         showOnlineStatus: true,
         allowProfileViews: 'everyone',
@@ -153,10 +153,10 @@ class PrivacyService {
     let settings = this.privacySettings.get(userId);
     
     if (!settings) {
-      // Crear configuración por defecto - SIEMPRE PÚBLICO para nuevos usuarios
+      // Crear configuración por defecto - PRIVADO (solo matches) para nuevos usuarios
       settings = {
         userId,
-        storiesVisibility: 'everyone', // ✅ Por defecto, todos pueden ver
+        storiesVisibility: 'matches_only', // 🔒 Por defecto, solo matches pueden ver
         allowStoryReplies: true,
         showOnlineStatus: true,
         allowProfileViews: 'everyone',
@@ -164,7 +164,7 @@ class PrivacyService {
         updatedAt: new Date()
       };
       this.privacySettings.set(userId, settings);
-      console.log('✅ Configuración por defecto creada (público)');
+      console.log('✅ Configuración por defecto creada (privado - solo matches)');
     }
 
     console.log('✅ Configuración obtenida:', settings);

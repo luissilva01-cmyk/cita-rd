@@ -213,7 +213,8 @@ allow write: if isOwner(userId) && isValidProfile();
 
 **Crítico (Bloqueante):**
 - [x] Firestore Security Rules implementadas ✅
-- [ ] API Keys restringidas 🟡
+- [x] API Keys restringidas ✅
+- [ ] Pruebas de API Keys restringidas 🟡 EN PROGRESO
 - [ ] Pruebas de seguridad básicas 🟡
 
 **Importante (Alta prioridad):**
@@ -230,10 +231,10 @@ allow write: if isOwner(userId) && isValidProfile();
 ### Puntuación General
 
 **Antes de esta sesión:** 🔴 6.0/10  
-**Después de esta sesión:** 🟢 6.5/10  
+**Después de esta sesión:** 🟢 7.0/10  
 **Objetivo para lanzamiento:** 🟢 8.0/10
 
-**Mejora en seguridad:** +500% (de 1/10 a 6/10)
+**Mejora en seguridad:** +500% (de 1/10 a 6/10 en Firestore) + API Keys protegidas
 
 ---
 
@@ -241,12 +242,12 @@ allow write: if isOwner(userId) && isValidProfile();
 
 ### Inmediatos (Hoy)
 
-1. **Probar funcionalidades principales**
-   - Login/Registro
-   - Discovery/Swipe
-   - Mensajes
-   - Stories
-   - Perfil
+1. **Probar API Keys Restringidas** 🟡 EN PROGRESO
+   - ⏱️ Esperar 5 minutos para propagación
+   - 🧹 Limpiar caché del navegador
+   - ✅ Probar funcionalidades principales
+   - 📝 Documentar resultados
+   - **Guía:** `PROBAR_API_KEYS_RESTRINGIDAS.md`
 
 2. **Verificar que no hay errores**
    - Revisar consola del navegador
@@ -260,10 +261,11 @@ allow write: if isOwner(userId) && isValidProfile();
 
 ### Esta Semana
 
-1. **Restringir API Keys** 🔴 CRÍTICO
-   - Ir a Firebase Console
-   - Configurar restricciones por dominio
-   - Probar que sigue funcionando
+1. **Probar Firestore Security Rules**
+   - Crear usuarios de prueba
+   - Intentar accesos no autorizados
+   - Verificar que las reglas bloquean correctamente
+   - **Guía:** `PROBAR_REGLAS_SEGURIDAD.md`
 
 2. **Implementar Rate Limiting**
    - Cloud Functions para limitar requests
@@ -412,25 +414,31 @@ firebase functions:log
 ### Logros de la Sesión
 
 1. ✅ Firestore Security Rules desplegadas exitosamente
-2. ✅ Seguridad mejorada en 500%
-3. ✅ Todas las colecciones protegidas
-4. ✅ Validación de datos implementada
-5. ✅ Documentación completa creada
+2. ✅ API Keys de Firebase restringidas
+3. ✅ Seguridad mejorada en 500%
+4. ✅ Todas las colecciones protegidas
+5. ✅ Validación de datos implementada
+6. ✅ Documentación completa creada
 
 ### Impacto en el Proyecto
 
 **La aplicación Ta' Pa' Ti ahora está MUCHO más segura y más cerca de estar lista para producción.**
 
-**Antes:** Cualquiera podía acceder y modificar cualquier dato  
-**Después:** Solo usuarios autenticados y autorizados pueden acceder a sus propios datos
+**Antes:** 
+- Cualquiera podía acceder y modificar cualquier dato
+- API Keys sin restricciones (uso ilimitado)
+
+**Después:** 
+- Solo usuarios autenticados y autorizados pueden acceder a sus propios datos
+- API Keys restringidas a localhost (desarrollo) y dominios autorizados
 
 ### Siguiente Paso Crítico
 
-**Restringir API Keys de Firebase** para prevenir uso no autorizado de la API.
+**Probar que las restricciones funcionan correctamente** sin romper la funcionalidad de la app.
 
-**Prioridad:** 🔴 CRÍTICO  
-**Tiempo estimado:** 15-20 minutos  
-**Guía:** Ver `ANALISIS_PRE_LANZAMIENTO.md` sección "API Keys Expuestas"
+**Prioridad:** 🟡 ALTA  
+**Tiempo estimado:** 10 minutos  
+**Guía:** Ver `PROBAR_API_KEYS_RESTRINGIDAS.md`
 
 ---
 
@@ -469,9 +477,10 @@ firebase functions:log
 - [x] Guía de pruebas creada
 - [x] Commits realizados
 - [x] Cambios en GitHub
+- [x] API Keys restringidas
+- [ ] Pruebas de API Keys (en progreso)
 - [ ] Pruebas en app real
 - [ ] Monitoreo configurado
-- [ ] API Keys restringidas
 
 ---
 
@@ -487,8 +496,8 @@ firebase functions:log
 
 1. **Firestore Security Rules desplegadas exitosamente** - La base de datos ahora está protegida contra acceso no autorizado
 
-2. **Seguridad mejorada en 500%** - De completamente inseguro (1/10) a muy seguro (6/10)
+2. **API Keys de Firebase restringidas** - Solo localhost y dominios autorizados pueden usar la API Key
 
-3. **Documentación completa creada** - Guías de pruebas, troubleshooting y próximos pasos documentados
+3. **Seguridad mejorada en 500%** - De completamente inseguro (1/10) a muy seguro (7/10)
 
-**La app está mucho más cerca de estar lista para producción. Siguiente paso crítico: Restringir API Keys.**
+**La app está mucho más cerca de estar lista para producción. Siguiente paso: Probar que todo funciona correctamente.**

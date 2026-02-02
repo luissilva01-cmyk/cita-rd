@@ -184,16 +184,8 @@ const App: React.FC = () => {
       }
     };
   }, [selectedChatId]);
-    });
 
-    return () => {
-      if (unsubscribe && typeof unsubscribe === 'function') {
-        unsubscribe();
-      }
-    };
-  }, [selectedChatId]);
-
-  // Crear perfil del usuario actual si no existe
+  // Crear perfil del usuario actual si no existe  // Crear perfil del usuario actual si no existe
   useEffect(() => {
     if (!currentUser) return;
     

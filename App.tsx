@@ -18,7 +18,7 @@ import { privacyService } from './services/privacyService';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { StoryGroup } from './services/storiesService';
 import { auth } from './services/firebase';
-import { setupPresenceSystem } from './services/presenceService';
+import { setUserOnline, setUserOffline } from './services/presenceService';
 
 const INITIAL_POTENTIAL_MATCHES: UserProfile[] = [];
 
@@ -95,13 +95,27 @@ const App: React.FC = () => {
     if (!currentUser) return;
     
     console.log('🟢 Setting up presence system for user:', currentUser.id);
-    const cleanup = setupPresenceSystem(currentUser.id);
+    
+    // Set user online immediately
+    setUserOnline(currentUser.id);
+    
+    // Handle page visibility changes
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        setUserOffline(currentUser.id);
+      } else {
+        setUserOnline(currentUser.id);
+      }
+    };
+    
+    // Add event listeners
+    document.addEventListener('visibilitychange', handleVisibilityChange);
     
     return () => {
       console.log('🔴 Cleaning up presence system for user:', currentUser.id);
-      if (cleanup && typeof cleanup === 'function') {
-        cleanup();
-      }
+      // IMPORTANTE: Solo limpiar listeners, NO actualizar Firestore
+      // El logout ya maneja setUserOffline() ANTES de cerrar sesión
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [currentUser]);
 

@@ -36,11 +36,29 @@
 
 ## 🔐 FASE 1: AUTENTICACIÓN
 
+### ✅ PROGRESO ACTUAL
+**Estado:** En progreso  
+**Última actualización:** 2 de Febrero 2026 - 23:45
+
+**Bugs encontrados y corregidos:**
+1. ✅ **Bug #1:** Error de permisos al cerrar sesión (Profile.tsx) - CORREGIDO
+2. ✅ **Bug #2:** Variable no definida en logout (Profile.tsx) - CORREGIDO  
+3. ✅ **Bug #3:** Error de permisos desde App.tsx cleanup - CORREGIDO
+
+**Commits:**
+- `498d806` - Fix presence update before logout
+- `bbbb67c` - Fix user variable reference
+- `cf66be3` - Fix App.tsx cleanup to not update Firestore after logout
+
+**Próximo paso:** Re-testear logout para confirmar que el error desaparece
+
+---
+
 ### 1.1 Página de Login
 **URL:** http://localhost:3000
 
 **Verificar:**
-- [ ] Página carga correctamente
+- [✅] Página carga correctamente (confirmado por usuario)
 - [ ] Logo "Ta' Pa' Ti" visible
 - [ ] Campos de email y contraseña presentes
 - [ ] Botón "Iniciar Sesión" visible

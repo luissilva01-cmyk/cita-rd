@@ -101,6 +101,16 @@ const ProfileView: React.FC<ProfileViewProps> = ({ user, onUpdate }) => {
           await setUserOffline(user.uid);
         }
         
+        // Terminar conexión de Firestore para evitar errores de reconexión
+        const { terminate } = await import('firebase/firestore');
+        const { db } = await import('../../services/firebase');
+        try {
+          await terminate(db);
+        } catch (error) {
+          // Ignorar errores al terminar Firestore (puede ya estar terminado)
+          console.log('Firestore termination (expected)');
+        }
+        
         // Ahora sí cerrar sesión
         await signOut(auth);
         // El AuthProvider se encargará de limpiar el estado y redirigir

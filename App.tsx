@@ -128,8 +128,14 @@ const App: React.FC = () => {
     });
 
     return () => {
+      // Cancelar listener inmediatamente para evitar errores de permisos después del logout
       if (unsubscribe && typeof unsubscribe === 'function') {
-        unsubscribe();
+        try {
+          unsubscribe();
+        } catch (error) {
+          // Ignorar errores al cancelar listeners después del logout
+          console.log('Listener cleanup (expected after logout)');
+        }
       }
     };
   }, [currentUser]);
@@ -146,8 +152,14 @@ const App: React.FC = () => {
     });
 
     return () => {
+      // Cancelar listener inmediatamente para evitar errores de permisos después del logout
       if (unsubscribe && typeof unsubscribe === 'function') {
-        unsubscribe();
+        try {
+          unsubscribe();
+        } catch (error) {
+          // Ignorar errores al cancelar listeners después del logout
+          console.log('Listener cleanup (expected after logout)');
+        }
       }
     };
   }, [currentUser]);
@@ -158,6 +170,20 @@ const App: React.FC = () => {
 
     const unsubscribe = listenToMessages(selectedChatId, (messages) => {
       setChatMessages(prev => ({ ...prev, [selectedChatId]: messages }));
+    });
+
+    return () => {
+      // Cancelar listener inmediatamente para evitar errores de permisos después del logout
+      if (unsubscribe && typeof unsubscribe === 'function') {
+        try {
+          unsubscribe();
+        } catch (error) {
+          // Ignorar errores al cancelar listeners después del logout
+          console.log('Listener cleanup (expected after logout)');
+        }
+      }
+    };
+  }, [selectedChatId]);
     });
 
     return () => {

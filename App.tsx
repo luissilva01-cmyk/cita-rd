@@ -144,12 +144,18 @@ const App: React.FC = () => {
   useEffect(() => {
     if (!currentUser) return;
 
-    const unsubscribe = getDiscoveryProfiles(currentUser.id, (profiles) => {
-      if (profiles.length > 0) {
-        setPotentialMatches(profiles);
-      }
-      // Si no hay perfiles en Firebase, usar los mock
-    });
+    let unsubscribe: (() => void) | undefined;
+
+    const setupDiscoveryListener = async () => {
+      unsubscribe = await getDiscoveryProfiles(currentUser.id, (profiles) => {
+        if (profiles.length > 0) {
+          setPotentialMatches(profiles);
+        }
+        // Si no hay perfiles en Firebase, usar los mock
+      });
+    };
+
+    setupDiscoveryListener();
 
     return () => {
       // Cancelar listener inmediatamente para evitar errores de permisos después del logout
@@ -185,7 +191,7 @@ const App: React.FC = () => {
     };
   }, [selectedChatId]);
 
-  // Crear perfil del usuario actual si no existe  // Crear perfil del usuario actual si no existe
+  // Crear perfil del usuario actual si no existe
   useEffect(() => {
     if (!currentUser) return;
     

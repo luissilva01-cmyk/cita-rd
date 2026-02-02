@@ -102,13 +102,18 @@ const ProfileView: React.FC<ProfileViewProps> = ({ user, onUpdate }) => {
         }
         
         // Terminar conexión de Firestore para evitar errores de reconexión
+        // Nota: Esto generará un warning "Firestore shutting down" en consola - es esperado y benigno
         const { terminate } = await import('firebase/firestore');
         const { db } = await import('../../services/firebase');
         try {
           await terminate(db);
-        } catch (error) {
-          // Ignorar errores al terminar Firestore (puede ya estar terminado)
-          console.log('Firestore termination (expected)');
+        } catch (error: any) {
+          // Ignorar errores esperados al terminar Firestore
+          // - "Firestore shutting down" es normal
+          // - "already terminated" puede ocurrir si se llama múltiples veces
+          if (error?.code !== 'aborted' && error?.message?.indexOf('shutting down') === -1) {
+            console.log('Unexpected Firestore termination error:', error);
+          }
         }
         
         // Ahora sí cerrar sesión

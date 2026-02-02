@@ -2,24 +2,26 @@
 
 **Fecha:** 2 de Febrero 2026  
 **Descubierto durante:** Testing Session  
-**Severidad:** 🟡 Media (no bloquea funcionalidad pero genera error en consola)
+**Severidad:** 🟡 Media (no bloquea funcionalidad pero genera error en consola)  
+**Estado:** ✅ CORREGIDO
 
 ---
 
-## 📋 Descripción del Bug
+## 📋 Bugs Encontrados
 
-Al cerrar sesión, aparece un error en la consola:
+### Bug #1: Error de Permisos
+**Error:** `FirebaseError: Missing or insufficient permissions`
 
-```
-FirebaseError: Missing or insufficient permissions
-presenceService.ts:41 Error setting user offline
-```
+### Bug #2: Variable No Definida  
+**Error:** `ReferenceError: currentUser is not defined`
 
 ---
 
 ## 🔍 Causa Raíz
 
-**Problema:** El sistema intentaba actualizar el estado de presencia (online/offline) **DESPUÉS** de cerrar sesión.
+**Bug #1 - Problema:** El sistema intentaba actualizar el estado de presencia (online/offline) **DESPUÉS** de cerrar sesión.
+
+**Bug #2 - Problema:** Se usaba `currentUser` pero la variable correcta es `user` (prop del componente).
 
 **Flujo incorrecto:**
 ```
@@ -44,12 +46,13 @@ match /presence/{userId} {
 
 ## ✅ Solución Implementada
 
-**Cambio:** Actualizar presencia **ANTES** de cerrar sesión.
+**Cambio 1:** Actualizar presencia **ANTES** de cerrar sesión.  
+**Cambio 2:** Usar la variable correcta `user` en lugar de `currentUser`.
 
 **Flujo correcto:**
 ```
 1. Usuario click en "Cerrar Sesión"
-2. setUserOffline(userId) → Actualiza presencia mientras está autenticado
+2. setUserOffline(user.uid) → Actualiza presencia mientras está autenticado
 3. signOut(auth) → Cierra sesión
 4. ✅ Sin errores
 ```
@@ -62,9 +65,9 @@ const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
       // IMPORTANTE: Actualizar presencia ANTES de cerrar sesión
-      if (currentUser?.uid) {
+      if (user?.uid) {  // ✅ Usar 'user' (prop) no 'currentUser'
         const { setUserOffline } = await import('../../services/presenceService');
-        await setUserOffline(currentUser.uid);
+        await setUserOffline(user.uid);
       }
       
       // Ahora sí cerrar sesión
@@ -84,18 +87,20 @@ const handleLogout = async () => {
 
 ## 🧪 Cómo Probar
 
-1. Iniciar sesión en la app
-2. Ir a Perfil
-3. Click en "Cerrar Sesión"
-4. Abrir DevTools → Console
-5. ✅ Verificar que NO aparece el error de permisos
+1. Recargar la app (Ctrl + Shift + R)
+2. Iniciar sesión en la app
+3. Ir a Perfil
+4. Click en "Cerrar Sesión"
+5. Abrir DevTools → Console
+6. ✅ Verificar que NO aparecen errores
 
 ---
 
 ## 📊 Impacto
 
 **Antes:**
-- ❌ Error en consola al cerrar sesión
+- ❌ Error de permisos en consola al cerrar sesión
+- ❌ Error de variable no definida
 - ⚠️ Estado de presencia no se actualizaba correctamente
 - ⚠️ Usuario aparecía como "online" después de cerrar sesión
 
@@ -103,14 +108,16 @@ const handleLogout = async () => {
 - ✅ Sin errores en consola
 - ✅ Estado de presencia se actualiza correctamente
 - ✅ Usuario aparece como "offline" inmediatamente
+- ✅ Logout funciona perfectamente
 
 ---
 
 ## 🎯 Lecciones Aprendidas
 
 1. **Orden de operaciones importa:** Siempre actualizar datos en Firestore ANTES de cerrar sesión
-2. **Testing descubre bugs:** Este bug solo se descubre probando la funcionalidad
+2. **Testing descubre bugs:** Estos bugs solo se descubren probando la funcionalidad
 3. **Firestore Rules funcionan:** Las reglas de seguridad están bloqueando correctamente accesos no autorizados
+4. **Revisar nombres de variables:** Usar las variables correctas del scope
 
 ---
 
@@ -122,9 +129,13 @@ const handleLogout = async () => {
 
 ## ✅ Estado
 
-**Corregido:** ✅ Sí  
+**Corregido:** ✅ Sí (2 commits)  
 **Testeado:** ⏳ Pendiente de re-test  
 **Documentado:** ✅ Sí
+
+**Commits:**
+- `498d806` - Fix presence update before logout
+- `bbbb67c` - Fix user variable reference
 
 ---
 

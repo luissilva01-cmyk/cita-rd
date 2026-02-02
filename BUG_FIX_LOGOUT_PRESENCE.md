@@ -84,7 +84,85 @@ const handleLogout = async () => {
 };
 ```
 
-### Corrección #2: App.tsx (SOLUCIÓN FINAL)
+### Corrección #3: Terminar Firestore antes del logout (SOLUCIÓN FINAL)
+**Cambio:** Llamar a `terminate(db)` antes de `signOut()` para cerrar todas las conexiones de Firestore.
+
+**Por qué es necesario:**
+Firestore mantiene conexiones activas y listeners que intentan reconectarse automáticamente cuando cambia el estado de autenticación. Esto causa errores de permisos porque los listeners intentan acceder a Firestore después de que el usuario ya no está autenticado.
+
+**Código corregido en `Profile.tsx`:**
+
+```typescript
+const handleLogout = async () => {
+  if (window.confirm(t('confirmLogout') || '¿Estás seguro de que quieres cerrar sesión?')) {
+    setIsLoggingOut(true);
+    try {
+      // IMPORTANTE: Actualizar presencia ANTES de cerrar sesión
+      if (user?.uid) {
+        const { setUserOffline } = await import('../../services/presenceService');
+        await setUserOffline(user.uid);
+      }
+      
+      // Terminar conexión de Firestore para evitar errores de reconexión
+      const { terminate } = await import('firebase/firestore');
+      const { db } = await import('../../services/firebase');
+      try {
+        await terminate(db);
+      } catch (error) {
+        // Ignorar errores al terminar Firestore (puede ya estar terminado)
+        console.log('Firestore termination (expected)');
+      }
+      
+      // Ahora sí cerrar sesión
+      await signOut(auth);
+      // El AuthProvider se encargará de limpiar el estado y redirigir
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error);
+      alert(t('logoutError') || 'Error al cerrar sesión. Inténtalo de nuevo.');
+    } finally {
+      setIsLoggingOut(false);
+    }
+  }
+};
+```
+
+**Código corregido en `App.tsx` (listeners con try-catch):**
+
+```typescript
+// Cargar chats del usuario en tiempo real
+useEffect(() => {
+  if (!currentUser) return;
+  
+  const unsubscribe = getUserChats(currentUser.id, (userChats) => {
+    setChats(userChats);
+  });
+
+  return () => {
+    // Cancelar listener inmediatamente para evitar errores de permisos después del logout
+    if (unsubscribe && typeof unsubscribe === 'function') {
+      try {
+        unsubscribe();
+      } catch (error) {
+        // Ignorar errores al cancelar listeners después del logout
+        console.log('Listener cleanup (expected after logout)');
+      }
+    }
+  };
+}, [currentUser]);
+```
+
+**Flujo correcto final:**
+```
+1. Usuario click en "Cerrar Sesión"
+2. Profile.tsx: setUserOffline(user.uid) → Actualiza presencia ✅
+3. Profile.tsx: terminate(db) → Cierra todas las conexiones de Firestore ✅
+4. Profile.tsx: signOut(auth) → Cierra sesión ✅
+5. React desmonta componentes
+6. App.tsx cleanups: Intentan cancelar listeners (con try-catch) ✅
+7. ✅ Sin errores, Firestore no intenta reconectarse
+```
+
+---
 **Cambio:** Modificar el cleanup effect para que solo limpie listeners, NO actualice Firestore.
 
 **Código corregido en `App.tsx`:**
@@ -188,7 +266,8 @@ useEffect(() => {
 **Commits:**
 - `498d806` - Fix presence update before logout (Profile.tsx)
 - `bbbb67c` - Fix user variable reference (Profile.tsx)
-- `[NUEVO]` - Fix App.tsx cleanup to not update Firestore after logout
+- `cf66be3` - Fix App.tsx cleanup to not update Firestore after logout
+- `23826cc` - Terminate Firestore before logout to prevent reconnection errors (SOLUCIÓN FINAL)
 
 ---
 

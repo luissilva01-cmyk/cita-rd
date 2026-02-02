@@ -96,9 +96,9 @@ const ProfileView: React.FC<ProfileViewProps> = ({ user, onUpdate }) => {
       setIsLoggingOut(true);
       try {
         // IMPORTANTE: Actualizar presencia ANTES de cerrar sesión
-        if (currentUser?.uid) {
+        if (user?.uid) {
           const { setUserOffline } = await import('../../services/presenceService');
-          await setUserOffline(currentUser.uid);
+          await setUserOffline(user.uid);
         }
         
         // Ahora sí cerrar sesión

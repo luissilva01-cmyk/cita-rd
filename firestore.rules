@@ -43,8 +43,18 @@ service cloud.firestore {
       // Crear: Solo el propio usuario con datos válidos
       allow create: if isOwner(userId) && isValidProfile();
       
-      // Actualizar: Solo el propio usuario con datos válidos
-      allow update: if isOwner(userId) && isValidProfile();
+      // Actualizar: Solo el propio usuario
+      // Permitir actualizaciones parciales (ej: solo fotos)
+      allow update: if isOwner(userId) && (
+        // Si se actualizan todos los campos, validar
+        (request.resource.data.keys().hasAll(['name', 'age', 'bio', 'location', 'interests', 'images']) && isValidProfile()) ||
+        // Si solo se actualizan fotos, validar solo fotos
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['images', 'photosInfo', 'updatedAt']) &&
+         request.resource.data.images is list && 
+         request.resource.data.images.size() <= 6) ||
+        // Si se actualizan otros campos específicos, permitir
+        (request.resource.data.diff(resource.data).affectedKeys().hasAny(['lastActive', 'online', 'updatedAt']))
+      );
       
       // Eliminar: Solo el propio usuario
       allow delete: if isOwner(userId);

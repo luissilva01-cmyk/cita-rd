@@ -1,6 +1,7 @@
 // cita-rd/components/CallInterface.tsx
 import React, { useState, useEffect, useRef } from 'react';
 import { Call } from '../types';
+import { logger } from '../utils/logger';
 
 interface CallInterfaceProps {
   call: Call | null;
@@ -51,15 +52,14 @@ const CallInterface: React.FC<CallInterfaceProps> = ({
     const startCamera = async () => {
       if (call?.status === 'active' && call.type === 'video') {
         try {
-          console.log('📹 Activando cámara para videollamada...');
-          console.log('📹 Estado actual:', { call, localStream });
+          logger.ui.info('Activating camera for video call', { call });
           
           // Si ya tenemos un stream, no crear otro
           if (localStream) {
-            console.log('📹 Stream ya existe, reutilizando');
+            logger.ui.debug('Stream already exists, reusing');
             if (localVideoRef.current && !localVideoRef.current.srcObject) {
               localVideoRef.current.srcObject = localStream;
-              console.log('📹 Stream reasignado al video element');
+              logger.ui.debug('Stream reassigned to video element');
             }
             return;
           }
@@ -73,30 +73,31 @@ const CallInterface: React.FC<CallInterfaceProps> = ({
             }
           };
 
-          console.log('📹 Solicitando permisos de cámara...');
+          logger.ui.debug('Requesting camera permissions');
           const stream = await navigator.mediaDevices.getUserMedia(constraints);
-          console.log('📹 Stream de cámara obtenido:', stream);
-          console.log('📹 Video tracks:', stream.getVideoTracks());
-          console.log('📹 Audio tracks:', stream.getAudioTracks());
+          logger.ui.success('Camera stream obtained', {
+            videoTracks: stream.getVideoTracks().length,
+            audioTracks: stream.getAudioTracks().length
+          });
           
           setLocalStream(stream);
           
           // Asignar stream al video element inmediatamente
           if (localVideoRef.current) {
             localVideoRef.current.srcObject = stream;
-            console.log('📹 Stream asignado al video element');
+            logger.ui.debug('Stream assigned to video element');
             
             // Forzar reproducción
             try {
               await localVideoRef.current.play();
-              console.log('📹 Video iniciado correctamente');
+              logger.ui.success('Video started successfully');
             } catch (playError) {
-              console.warn('📹 Error iniciando video (puede ser normal):', playError);
+              logger.ui.warn('Error starting video (may be normal)', { playError });
             }
           }
           
         } catch (error) {
-          console.error('❌ Error activando cámara:', error);
+          logger.ui.error('Error activating camera', { error });
           
           // Mostrar error más específico
           let errorMessage = 'Error desconocido';
@@ -112,7 +113,7 @@ const CallInterface: React.FC<CallInterfaceProps> = ({
             }
           }
           
-          console.error('Error activando cámara:', errorMessage);
+          logger.ui.error('Camera activation error details', { errorMessage });
         }
       }
     };
@@ -122,10 +123,10 @@ const CallInterface: React.FC<CallInterfaceProps> = ({
     // Cleanup: detener stream cuando el componente se desmonte o la llamada termine
     return () => {
       if (localStream && call?.status !== 'active') {
-        console.log('📹 Limpiando stream de cámara...');
+        logger.ui.debug('Cleaning up camera stream');
         localStream.getTracks().forEach(track => {
           track.stop();
-          console.log('📹 Track detenido:', track.kind);
+          logger.ui.debug('Track stopped', { kind: track.kind });
         });
         setLocalStream(null);
       }
@@ -136,7 +137,7 @@ const CallInterface: React.FC<CallInterfaceProps> = ({
   useEffect(() => {
     if (localStream && localVideoRef.current) {
       localVideoRef.current.srcObject = localStream;
-      console.log('📹 Stream asignado al video ref');
+      logger.ui.debug('Stream assigned to video ref');
     }
   }, [localStream]);
 
@@ -147,12 +148,12 @@ const CallInterface: React.FC<CallInterfaceProps> = ({
       if (videoTrack) {
         // Escuchar cambios en el track
         const handleTrackChange = () => {
-          console.log('📹 Track cambió, estado:', videoTrack.enabled);
+          logger.ui.debug('Track changed', { enabled: videoTrack.enabled });
           
           if (videoTrack.enabled && localVideoRef.current) {
             // Cuando se reactiva, forzar reproducción
             localVideoRef.current.play().catch(e => 
-              console.warn('📹 Error reproduciendo video:', e)
+              logger.ui.warn('Error playing video', { error: e })
             );
           }
         };
@@ -194,11 +195,11 @@ const CallInterface: React.FC<CallInterfaceProps> = ({
       if (videoTrack) {
         videoTrack.enabled = !videoTrack.enabled;
         setIsCameraOn(videoTrack.enabled);
-        console.log('📹 Cámara:', videoTrack.enabled ? 'activada' : 'desactivada');
+        logger.ui.info('Camera toggled', { enabled: videoTrack.enabled });
         
         // Forzar actualización del video element cuando se reactiva
         if (videoTrack.enabled && localVideoRef.current) {
-          console.log('📹 Forzando actualización del video element...');
+          logger.ui.debug('Forcing video element update');
           
           // Método 1: Reasignar el stream
           const currentStream = localVideoRef.current.srcObject;
@@ -208,9 +209,9 @@ const CallInterface: React.FC<CallInterfaceProps> = ({
             if (localVideoRef.current && currentStream) {
               localVideoRef.current.srcObject = currentStream;
               localVideoRef.current.play().catch(e => 
-                console.warn('📹 Error reproduciendo video:', e)
+                logger.ui.warn('Error playing video', { error: e })
               );
-              console.log('📹 ✅ Video element actualizado');
+              logger.ui.success('Video element updated');
             }
           }, 100);
         }
@@ -224,7 +225,7 @@ const CallInterface: React.FC<CallInterfaceProps> = ({
       if (audioTrack) {
         audioTrack.enabled = !audioTrack.enabled;
         setIsMicOn(audioTrack.enabled);
-        console.log('🎤 Micrófono:', audioTrack.enabled ? 'activado' : 'desactivado');
+        logger.ui.info('Microphone toggled', { enabled: audioTrack.enabled });
       }
     }
   };
@@ -239,7 +240,7 @@ const CallInterface: React.FC<CallInterfaceProps> = ({
 
   if (!call) return null;
 
-  console.log('🎬 CallInterface render:', { call, isIncoming, localStream });
+  logger.ui.debug('CallInterface render', { call, isIncoming, hasLocalStream: !!localStream });
 
   // Llamada entrante
   if (isIncoming && call.status === 'ringing') {
@@ -283,7 +284,7 @@ const CallInterface: React.FC<CallInterfaceProps> = ({
 
   // Llamada activa
   if (call.status === 'active') {
-    console.log('🎬 Renderizando llamada activa:', call);
+    logger.ui.debug('Rendering active call', { call });
     
     return (
       <div className="fixed inset-0 bg-black z-50 flex flex-col">
@@ -328,9 +329,9 @@ const CallInterface: React.FC<CallInterfaceProps> = ({
                   isCameraOn ? 'opacity-100' : 'opacity-0'
                 }`}
                 style={{ transform: 'scaleX(-1)' }} // Efecto espejo para video local
-                onLoadedMetadata={() => console.log('📹 Video metadata cargada')}
-                onCanPlay={() => console.log('📹 Video listo para reproducir')}
-                onError={(e) => console.error('📹 Error en video element:', e)}
+                onLoadedMetadata={() => logger.ui.debug('Video metadata loaded')}
+                onCanPlay={() => logger.ui.debug('Video ready to play')}
+                onError={(e) => logger.ui.error('Error in video element', { error: e })}
               />
               
               {/* Overlay cuando la cámara está desactivada */}

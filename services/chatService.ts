@@ -10,9 +10,13 @@ import {
   serverTimestamp,
   where,
   getDocs,
-  setDoc
+  setDoc,
+  limit,
+  startAfter,
+  DocumentSnapshot
 } from "firebase/firestore";
 import { UserProfile, Message } from '../types';
+import { logger } from '../utils/logger';
 
 export interface Chat {
   id: string;
@@ -38,10 +42,16 @@ export const createChat = async (currentUserId: string, otherUserId: string): Pr
 };
 
 // Obtener chats del usuario actual
-export const getUserChats = (userId: string, callback: (chats: Chat[]) => void) => {
+export const getUserChats = (
+  userId: string, 
+  callback: (chats: Chat[]) => void,
+  chatLimit: number = 20
+) => {
   const q = query(
     collection(db, "chats"), 
-    where("participants", "array-contains", userId)
+    where("participants", "array-contains", userId),
+    orderBy("timestamp", "desc"),
+    limit(chatLimit)
   );
   
   return onSnapshot(q, (querySnapshot) => {
@@ -50,9 +60,7 @@ export const getUserChats = (userId: string, callback: (chats: Chat[]) => void) 
       chats.push({ id: doc.id, ...doc.data() } as Chat);
     });
     
-    // Ordenar manualmente por timestamp
-    chats.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-    
+    logger.chat.success('Chats cargados', { count: chats.length, limit: chatLimit });
     callback(chats);
   });
 };
@@ -108,10 +116,15 @@ export const sendMessage = async (
 };
 
 // Escuchar mensajes de un chat en tiempo real
-export const listenToMessages = (chatId: string, callback: (messages: Message[]) => void) => {
+export const listenToMessages = (
+  chatId: string, 
+  callback: (messages: Message[]) => void,
+  messageLimit: number = 50
+) => {
   const q = query(
     collection(db, "chats", chatId, "messages"), 
-    orderBy("timestamp", "asc")
+    orderBy("timestamp", "desc"),
+    limit(messageLimit)
   );
   
   return onSnapshot(q, (querySnapshot) => {
@@ -119,6 +132,11 @@ export const listenToMessages = (chatId: string, callback: (messages: Message[])
     querySnapshot.forEach((doc) => {
       messages.push({ id: doc.id, ...doc.data() } as Message);
     });
+    
+    // Invertir orden para mostrar más antiguos primero
+    messages.reverse();
+    
+    logger.chat.success('Mensajes cargados', { count: messages.length, limit: messageLimit });
     callback(messages);
   });
 };
@@ -135,7 +153,7 @@ export const getUserProfile = async (userId: string): Promise<UserProfile | null
     }
     return null;
   } catch (error) {
-    console.error("Error getting user profile:", error);
+    logger.chat.error("Error obteniendo perfil de usuario", error);
     return null;
   }
 };
@@ -170,7 +188,7 @@ export const updateTypingStatus = async (
   isTyping: boolean
 ): Promise<void> => {
   try {
-    console.log('🔥 updateTypingStatus llamado:', { chatId, userId, isTyping });
+    logger.chat.debug('Actualizando typing status', { chatId, userId, isTyping });
     const typingRef = doc(db, "chats", chatId, "typingStatus", userId);
     await updateDoc(typingRef, {
       isTyping,
@@ -186,9 +204,9 @@ export const updateTypingStatus = async (
         throw error;
       }
     });
-    console.log('✅ Typing status actualizado en Firebase:', isTyping);
+    logger.chat.success('Typing status actualizado', { isTyping });
   } catch (error) {
-    console.error('Error updating typing status:', error);
+    logger.chat.error('Error actualizando typing status', error);
   }
 };
 
@@ -198,12 +216,7 @@ export const listenToTypingStatus = (
   userId: string, 
   callback: (isTyping: boolean) => void
 ) => {
-  console.log('👂 ========================================');
-  console.log('👂 CONFIGURANDO LISTENER PARA TYPING');
-  console.log('👂 chatId:', chatId);
-  console.log('👂 userId (escuchando a):', userId);
-  console.log('👂 Path:', `chats/${chatId}/typingStatus/${userId}`);
-  console.log('👂 ========================================');
+  logger.chat.debug('Configurando listener para typing', { chatId, userId });
   
   const typingRef = doc(db, "chats", chatId, "typingStatus", userId);
   
@@ -212,37 +225,29 @@ export const listenToTypingStatus = (
     typingRef,
     { includeMetadataChanges: true },
     (docSnapshot) => {
-      console.log('👂 ========================================');
-      console.log('👂 SNAPSHOT RECIBIDO!');
-      console.log('👂 Timestamp:', new Date().toISOString());
-      console.log('👂 Exists:', docSnapshot.exists());
-      console.log('👂 Data:', docSnapshot.data());
-      console.log('👂 From cache:', docSnapshot.metadata.fromCache);
-      console.log('👂 Has pending writes:', docSnapshot.metadata.hasPendingWrites);
-      console.log('👂 userId:', userId);
-      console.log('👂 ========================================');
+      logger.chat.debug('Snapshot de typing recibido', { 
+        exists: docSnapshot.exists(),
+        fromCache: docSnapshot.metadata.fromCache,
+        hasPendingWrites: docSnapshot.metadata.hasPendingWrites
+      });
       
       // Solo procesar cambios que vienen del servidor (no del cache local)
       if (!docSnapshot.metadata.hasPendingWrites) {
         if (docSnapshot.exists()) {
           const data = docSnapshot.data();
           const isTyping = data.isTyping || false;
-          console.log('👂 ✅ Llamando callback con isTyping=', isTyping);
+          logger.chat.debug('Typing status actualizado', { isTyping });
           callback(isTyping);
         } else {
-          console.log('👂 ⚠️ Documento no existe, callback con false');
           callback(false);
         }
-      } else {
-        console.log('👂 ⏭️ Ignorando cambio local (pending writes)');
       }
     },
     (error) => {
-      console.error('👂 ❌ ERROR en listener:', error);
+      logger.chat.error('Error en listener de typing', error);
       callback(false);
     }
   );
   
-  console.log('👂 ✅ Listener configurado exitosamente');
   return unsubscribe;
 };

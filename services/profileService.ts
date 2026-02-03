@@ -10,9 +10,13 @@ import {
   serverTimestamp,
   where,
   getDocs,
-  setDoc
+  setDoc,
+  limit,
+  startAfter,
+  DocumentSnapshot
 } from "firebase/firestore";
 import { UserProfile } from '../types';
+import { logger } from '../utils/logger';
 
 // Crear o actualizar perfil de usuario
 export const createOrUpdateProfile = async (userId: string, profileData: Partial<UserProfile>) => {
@@ -40,7 +44,7 @@ export const getUserProfile = async (userId: string): Promise<UserProfile | null
     }
     return null;
   } catch (error) {
-    console.error("Error getting user profile:", error);
+    logger.profile.error("Error obteniendo perfil de usuario", error);
     return null;
   }
 };
@@ -48,18 +52,20 @@ export const getUserProfile = async (userId: string): Promise<UserProfile | null
 // Obtener perfiles para Discovery (excluir el usuario actual y matches)
 export const getDiscoveryProfiles = async (
   currentUserId: string, 
-  callback: (profiles: UserProfile[]) => void
+  callback: (profiles: UserProfile[]) => void,
+  profileLimit: number = 20
 ) => {
   // Importar privacyService para obtener matches
   const { privacyService } = await import('./privacyService');
   
   // Obtener matches del usuario actual
   const matchedUserIds = await privacyService.getUserMatches(currentUserId);
-  console.log('🔍 Discovery - Excluyendo matches:', matchedUserIds);
+  logger.profile.debug('Discovery - Excluyendo matches', { count: matchedUserIds.length });
   
   const q = query(
     collection(db, "perfiles"),
-    orderBy("timestamp", "desc")
+    orderBy("timestamp", "desc"),
+    limit(profileLimit)
   );
   
   return onSnapshot(q, (querySnapshot) => {
@@ -74,14 +80,14 @@ export const getDiscoveryProfiles = async (
       
       // Excluir perfiles con los que ya hizo match
       if (matchedUserIds.includes(profile.id)) {
-        console.log('🚫 Excluyendo match:', profile.name || profile.id);
+        logger.profile.debug('Excluyendo match', { name: profile.name || profile.id });
         return;
       }
       
       profiles.push(profile);
     });
     
-    console.log('✅ Perfiles para Discovery:', profiles.length);
+    logger.profile.success('Perfiles cargados para Discovery', { count: profiles.length, limit: profileLimit });
     callback(profiles);
   });
 };
@@ -125,9 +131,10 @@ export const searchProfiles = async (searchCriteria: {
       profiles.push(profile);
     });
     
+    logger.profile.success('Búsqueda de perfiles completada', { found: profiles.length });
     return profiles;
   } catch (error) {
-    console.error("Error searching profiles:", error);
+    logger.profile.error("Error buscando perfiles", error);
     return [];
   }
 };

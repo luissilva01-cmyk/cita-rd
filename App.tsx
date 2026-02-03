@@ -82,7 +82,9 @@ const App: React.FC = () => {
           setActiveView('profile');
         }
       } catch (error) {
-        console.error('Error cargando perfil:', error);
+        logger.profile.error('Error cargando perfil', error);
+        // Mostrar mensaje al usuario
+        alert('Error al cargar tu perfil. Por favor recarga la página.');
       } finally {
         setLoading(false);
       }
@@ -216,28 +218,29 @@ const App: React.FC = () => {
       await privacyService.createMatch(currentUser.id, '1'); // Match con Carolina
       await privacyService.createMatch(currentUser.id, '3'); // Match con Isabella
     } catch (error) {
-      console.error('Error creando matches de demo:', error);
+      logger.match.error('Error creando matches de demo', error);
     }
   };
 
   const handleLike = async (user: UserProfile) => {
     if (!currentUser) return false;
     
-    // 100% chance of match for testing purposes
-    if (Math.random() > 0.0) {
-      try {
+    try {
+      // 100% chance of match for testing purposes
+      if (Math.random() > 0.0) {
         // Crear o encontrar chat existente
         const chatId = await findOrCreateChat(currentUser.id, user.id);
         
         // Enviar mensaje inicial
         await sendMessage(chatId, currentUser.id, '¡Hola! Me gustó tu perfil 😊');
         
+        logger.match.success('Match created successfully', { userId: user.id });
         return true;
-      } catch (error) {
-        console.error('Error creating match:', error);
+      } else {
         return false;
       }
-    } else {
+    } catch (error) {
+      logger.match.error('Error creating match', error);
       return false;
     }
   };
@@ -253,8 +256,11 @@ const App: React.FC = () => {
     
     try {
       await sendMessage(chatId, currentUser.id, text, type, content, duration);
+      logger.chat.success('Message sent successfully', { chatId, type });
     } catch (error) {
-      console.error('Error sending message:', error);
+      logger.chat.error('Error sending message', error);
+      // Mostrar mensaje al usuario
+      alert('Error al enviar mensaje. Por favor intenta de nuevo.');
     }
   };
 
@@ -274,8 +280,10 @@ const App: React.FC = () => {
       // Enviar mensaje
       await sendMessage(chatId, currentUser!.id, message, type);
       
+      logger.chat.success('Story message sent successfully', { userId, type });
     } catch (error) {
-      console.error('Error enviando mensaje:', error);
+      logger.chat.error('Error enviando mensaje de story', error);
+      alert('Error al enviar mensaje. Por favor intenta de nuevo.');
     }
   };
 

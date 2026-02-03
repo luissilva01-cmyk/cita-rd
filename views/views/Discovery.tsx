@@ -13,6 +13,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { useMatchingAI } from '../../hooks/useMatchingAI';
 import { MatchPrediction } from '../../services/matchingAI';
 import { useToast } from '../../components/Toast';
+import { logger } from '../../utils/logger';
 
 interface DiscoveryProps {
   users?: UserProfile[];
@@ -169,7 +170,7 @@ const Discovery: React.FC<DiscoveryProps> = ({
 
   // Función para ordenar usuarios con IA
   const optimizeUsersWithAI = async (users: UserProfile[]): Promise<UserProfile[]> => {
-    console.log('🤖 Optimizando usuarios con IA para', users.length, 'candidatos...');
+    logger.match.debug('Optimizando usuarios con IA', { count: users.length });
     
     try {
       // Generar predicciones de matching
@@ -186,7 +187,7 @@ const Discovery: React.FC<DiscoveryProps> = ({
               profileScore: profileScore.totalScore
             };
           } catch (error) {
-            console.error('Error calculando score para usuario', user.name, ':', error);
+            logger.match.error('Error calculando score para usuario', { userName: user.name, error });
             return {
               ...user,
               visibilityBoost: 1.0,
@@ -229,18 +230,18 @@ const Discovery: React.FC<DiscoveryProps> = ({
         return (b.profileScore || 0) - (a.profileScore || 0);
       });
 
-      console.log('🎯 Usuarios optimizados con IA:', 
-        sorted.slice(0, 3).map(u => ({ 
+      logger.match.success('Usuarios optimizados con IA', { 
+        topUsers: sorted.slice(0, 3).map(u => ({ 
           name: u.name, 
           aiScore: u.aiCompatibility ? Math.round(u.aiCompatibility * 100) : 'N/A',
           priority: u.aiPriority || 'N/A',
           boost: u.visibilityBoost 
         }))
-      );
+      });
 
       return sorted;
     } catch (error) {
-      console.error('Error optimizando con IA:', error);
+      logger.match.error('Error optimizando con IA', error);
       return users;
     }
   };
@@ -254,8 +255,12 @@ const Discovery: React.FC<DiscoveryProps> = ({
         setSortedUsers(optimized);
         setAiOptimizedUsers(optimized);
       } catch (error) {
-        console.error('Error optimizando usuarios:', error);
+        logger.match.error('Error optimizando usuarios', error);
         setSortedUsers(availableUsers);
+        // Mostrar mensaje al usuario solo si es un error crítico
+        if (availableUsers.length === 0) {
+          alert('Error al cargar perfiles. Por favor recarga la página.');
+        }
       } finally {
         setIsLoadingScores(false);
       }
@@ -282,32 +287,32 @@ const Discovery: React.FC<DiscoveryProps> = ({
     if (!currentUser) return;
     
     const timeSpent = Date.now() - swipeStartTime;
-    console.log(`🎯 Acción: ${action} en usuario:`, currentUser.name, 'Tiempo:', timeSpent + 'ms');
+    logger.match.debug('Acción de swipe', { action, userName: currentUser.name, timeSpent });
     
-    // Si es super like, mostrar animación PRIMERO
-    if (action === 'superlike') {
-      console.log('⭐ SUPER LIKE enviado a:', currentUser.name);
-      
-      // Mostrar animación especial
-      setShowSuperLikeAnimation(true);
-      
-      // Mostrar toast de notificación
-      showToast({
-        type: 'info',
-        title: '⭐ Super Like enviado!',
-        message: `Le has enviado un Super Like a ${currentUser.name}. Serás priorizado en su lista.`,
-        duration: 4000
-      });
-      
-      // Esperar a que la animación termine antes de continuar
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      setShowSuperLikeAnimation(false);
-    }
-    
-    // Registrar swipe en el sistema de IA
     try {
+      // Si es super like, mostrar animación PRIMERO
+      if (action === 'superlike') {
+        logger.match.info('Super Like enviado', { userName: currentUser.name });
+        
+        // Mostrar animación especial
+        setShowSuperLikeAnimation(true);
+        
+        // Mostrar toast de notificación
+        showToast({
+          type: 'info',
+          title: '⭐ Super Like enviado!',
+          message: `Le has enviado un Super Like a ${currentUser.name}. Serás priorizado en su lista.`,
+          duration: 4000
+        });
+        
+        // Esperar a que la animación termine antes de continuar
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        setShowSuperLikeAnimation(false);
+      }
+      
+      // Registrar swipe en el sistema de IA
       await recordSwipe(currentUserId, currentUser.id, action === 'superlike' ? 'like' : action, currentUser, timeSpent);
-      console.log('🤖 Swipe registrado en IA');
+      logger.match.success('Swipe registrado en IA');
     } catch (error) {
       console.error('Error registrando swipe en IA:', error);
     }

@@ -6,6 +6,7 @@ import { UserProfile } from '../../types';
 import PhotoUploader from '../../components/PhotoUploader';
 import ProfileScore from '../../components/ProfileScore';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { logger } from '../../utils/logger';
 
 // 🇩🇴 Provincias de República Dominicana organizadas por región
 const DOMINICAN_PROVINCES = {
@@ -96,17 +97,19 @@ const ProfileView: React.FC<ProfileViewProps> = ({ user, onUpdate }) => {
       setIsLoggingOut(true);
       try {
         // IMPORTANTE: Actualizar presencia ANTES de cerrar sesión
-        if (user?.uid) {
+        if (user?.id) {
           const { setUserOffline } = await import('../../services/presenceService');
-          await setUserOffline(user.uid);
+          await setUserOffline(user.id);
+          logger.auth.info('User presence set to offline before logout', { userId: user.id });
         }
         
         // Cerrar sesión
         // Nota: Puede aparecer un mensaje "Firestore shutting down" en consola - es esperado y benigno
         await signOut(auth);
+        logger.auth.success('User logged out successfully');
         // El AuthProvider se encargará de limpiar el estado y redirigir
       } catch (error) {
-        console.error('Error al cerrar sesión:', error);
+        logger.auth.error('Error al cerrar sesión', error);
         alert(t('logoutError') || 'Error al cerrar sesión. Inténtalo de nuevo.');
       } finally {
         setIsLoggingOut(false);

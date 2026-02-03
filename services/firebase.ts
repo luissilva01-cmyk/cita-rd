@@ -3,17 +3,27 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
-// Configuración completa para el proyecto Firebase: Citard (citard-fbc26)
+// Configuración de Firebase usando variables de entorno
+// Las credenciales están en .env.local (no se suben a Git)
 const firebaseConfig = {
-  apiKey: "AIzaSyDy2tLpXr3v6llyXGfQVhVlnmZtMgCDRhg",
-  authDomain: "citard-fbc26.firebaseapp.com",
-  projectId: "citard-fbc26",
-  storageBucket: "citard-fbc26.appspot.com",
-  messagingSenderId: "564769541768",
-  appId: "1:564769541768:web:07013924da206d8b37593d"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 
+// Validar que las variables de entorno estén configuradas
+if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
+  throw new Error(
+    '❌ Firebase no está configurado correctamente. ' +
+    'Verifica que .env.local exista y contenga todas las variables VITE_FIREBASE_*'
+  );
+}
+
 console.log('🔧 Inicializando Firebase...');
+console.log('📦 Proyecto:', firebaseConfig.projectId);
 
 // Initialize Firebase using the modular SDK (v9+).
 const app = initializeApp(firebaseConfig);

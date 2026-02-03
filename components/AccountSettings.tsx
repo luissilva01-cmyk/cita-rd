@@ -10,6 +10,7 @@ import { verificationService } from '../services/verificationService';
 import { languageService } from '../services/languageService';
 import { useTranslation } from '../hooks/useTranslation';
 import { deleteUserAccount, reauthenticateUser } from '../services/accountDeletionService';
+import { logger } from '../utils/logger';
 
 interface AccountSettingsProps {
   isOpen: boolean;
@@ -98,17 +99,17 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({
       setIsDeleting(true);
 
       try {
-        console.log('🔐 Reautenticando usuario...');
+        logger.auth.info('Reauthenticating user for account deletion', { userId: currentUserId });
         
         // Reautenticar usuario
         await reauthenticateUser(deletePassword);
         
-        console.log('🗑️ Iniciando eliminación de cuenta:', currentUserId);
+        logger.auth.info('Starting account deletion', { userId: currentUserId });
         
         // Eliminar cuenta
         await deleteUserAccount(currentUserId);
         
-        console.log('✅ Cuenta eliminada exitosamente');
+        logger.auth.success('Account deleted successfully', { userId: currentUserId });
         
         // Cerrar modal
         setShowDeleteModal(false);

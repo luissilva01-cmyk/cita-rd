@@ -3,6 +3,7 @@ import React, { useState, useRef } from 'react';
 import { X, Camera, Type, Upload, Palette } from 'lucide-react';
 import { storiesService } from '../services/storiesService';
 import { useTranslation } from '../hooks/useTranslation';
+import { logger } from '../utils/logger';
 
 interface CreateStoryModalProps {
   isOpen: boolean;
@@ -61,7 +62,7 @@ const CreateStoryModal: React.FC<CreateStoryModalProps> = ({
           userProfile
         );
         
-        console.log('✅ Story de texto creada');
+        logger.stories.success('Text story created', { userId: currentUserId });
         
       } else if (mode === 'image' && selectedImage) {
         await storiesService.createStory(
@@ -72,9 +73,9 @@ const CreateStoryModal: React.FC<CreateStoryModalProps> = ({
           userProfile
         );
         
-        console.log('✅ Story de imagen creada');
+        logger.stories.success('Image story created', { userId: currentUserId });
       } else {
-        console.log('❌ Contenido inválido para crear story');
+        logger.stories.warn('Invalid content for story creation', { mode, hasText: !!textContent, hasImage: !!selectedImage });
         return;
       }
       

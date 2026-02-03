@@ -182,17 +182,25 @@ if (compatibility > 0.7) { // 70% threshold
 ## 🟢 PRIORIDAD BAJA (Opcional)
 
 ### 8. Implementar Índices de Firestore
-**Tiempo estimado:** 30 minutos  
+**Tiempo estimado:** ~~30 minutos~~ ✅ COMPLETADO  
 **Asignado a:** Desarrollador  
-**Estado:** ⏳ Pendiente
+**Estado:** ✅ Completado (4 Feb 2026)
 
-**Crear índices para:**
-- [ ] Perfiles por location + age
-- [ ] Chats por participants + timestamp
-- [ ] Messages por chatId + timestamp
-- [ ] Stories por userId + createdAt
+**Índices desplegados:**
+- [x] Perfiles por location + age
+- [x] Chats por participants + timestamp
+- [x] Stories por userId + createdAt
+- [x] Likes por fromUserId/toUserId + timestamp
+- [x] Matches por user1/user2 + timestamp
+- [x] Calls por receiverId + status + timestamp
+- [x] Swipes por userId + deshecho + timestamp
+- [x] Bloqueos por bloqueador + bloqueado
 
-**Archivo:** `firestore.indexes.json`
+**Total:** 18 índices compuestos desplegados
+
+**Archivo:** `firestore.indexes.json`  
+**Documentación:** `FIRESTORE_INDEXES_DEPLOYED.md`  
+**Commit:** `482f21e`
 
 ---
 
@@ -230,11 +238,11 @@ if (compatibility > 0.7) { // 70% threshold
 | Prioridad | Items | Tiempo Total | Estado |
 |-----------|-------|--------------|--------|
 | 🔴 Crítica | 0 | 0h | ✅ N/A |
-| 🟡 Alta | 4 | 9-14h | ⏳ Pendiente |
+| 🟡 Alta | 4 | 9-14h | 1/4 completado |
 | 🟢 Media | 3 | 3.5-4.5h | ⏳ Pendiente |
-| 🟢 Baja | 3 | 4.5-5.5h | ⏳ Pendiente |
+| 🟢 Baja | 3 | 4.5-5.5h | 1/3 completado |
 
-**Total:** 17-24 horas de trabajo
+**Total:** 16-23.5 horas de trabajo (1.5h completado)
 
 ---
 

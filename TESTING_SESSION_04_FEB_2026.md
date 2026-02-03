@@ -262,7 +262,18 @@
 ## 🐛 FASE 7: BUGS CONOCIDOS
 
 ### 7.1 Bugs Críticos
-**Estado:** ✅ Ninguno encontrado
+**Estado:** ✅ 1 encontrado y resuelto
+
+**Bug #1: Permisos de Subida de Fotos** ✅ RESUELTO
+- **Error:** FirebaseError: Missing or insufficient permissions
+- **Causa:** Firestore Rules requerían todos los campos en updates
+- **Solución:** Modificadas rules para permitir actualizaciones parciales
+- **Archivo:** `firestore.rules` líneas 38-52
+- **Deploy:** `firebase deploy --only firestore:rules`
+- **Commit:** `1176eb8`
+- **Documentación:** `PHOTO_UPLOAD_PERMISSIONS_FIX.md`
+- **Tiempo de resolución:** 10 minutos
+- **Testing:** ⏳ Pendiente por usuario
 
 ### 7.2 Bugs Menores
 **Estado:** ✅ Ninguno encontrado
@@ -432,7 +443,7 @@
 
 **Total de verificaciones:** 150+  
 **Verificaciones exitosas:** 150+  
-**Bugs críticos encontrados:** 0  
+**Bugs críticos encontrados:** 1 (resuelto)  
 **Bugs menores encontrados:** 0  
 **Warnings aceptables:** 2 (Tailwind CDN, React DevTools)
 

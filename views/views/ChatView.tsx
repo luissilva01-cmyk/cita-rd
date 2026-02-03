@@ -27,6 +27,7 @@ import { useEmotionalAI } from '../../hooks/useEmotionalAI';
 import TypingIndicator from '../../components/TypingIndicator';
 import { SmartSuggestion } from '../../services/emotionalAI';
 import { listenToUserPresence, formatPresenceStatus, PresenceStatus } from '../../services/presenceService';
+import { logger } from '../../utils/logger';
 
 interface ChatViewProps {
   match: Match;
@@ -45,12 +46,11 @@ const ChatView: React.FC<ChatViewProps> = ({
   currentUserId,
   chatId
 }) => {
-  console.log('🚀 ChatView montado:', { 
+  logger.chat.debug('ChatView mounted', { 
     chatId, 
     currentUserId, 
     matchUserId: match.user.id, 
-    matchUserName: match.user.name,
-    'Escuchando typing de': match.user.id
+    matchUserName: match.user.name
   });
   
   const { t } = useLanguage();
@@ -135,29 +135,28 @@ const ChatView: React.FC<ChatViewProps> = ({
 
   // Escuchar typing status del otro usuario
   useEffect(() => {
-    console.log('='.repeat(50));
-    console.log('🎯 TYPING LISTENER USEEFFECT EJECUTÁNDOSE');
-    console.log('chatId:', chatId);
-    console.log('match.user.id:', match.user.id);
-    console.log('match.user.name:', match.user.name);
-    console.log('='.repeat(50));
+    logger.chat.debug('Setting up typing listener', { 
+      chatId, 
+      matchUserId: match.user.id, 
+      matchUserName: match.user.name 
+    });
     
     if (!chatId || !match.user.id) {
-      console.log('❌ Falta chatId o match.user.id, saliendo');
+      logger.chat.warn('Missing chatId or match.user.id, skipping typing listener setup');
       return;
     }
     
-    console.log('✅ Configurando listener de typing...');
+    logger.chat.debug('Configuring typing listener');
     
     const unsubscribe = listenToTypingStatus(chatId, match.user.id, (isTyping) => {
-      console.log('🔔 Typing status changed:', { userName: match.user.name, isTyping });
+      logger.chat.debug('Typing status changed', { userName: match.user.name, isTyping });
       setOtherUserTyping(isTyping);
     });
     
-    console.log('✅ Listener configurado exitosamente');
+    logger.chat.debug('Typing listener configured successfully');
     
     return () => {
-      console.log('🧹 Limpiando listener de typing');
+      logger.firebase.debug('Cleaning up typing listener');
       if (unsubscribe && typeof unsubscribe === 'function') {
         unsubscribe();
       }
@@ -166,19 +165,19 @@ const ChatView: React.FC<ChatViewProps> = ({
 
   // Listen to other user's presence status
   useEffect(() => {
-    console.log('👁️ Setting up presence listener for:', match.user.id);
+    logger.chat.debug('Setting up presence listener', { userId: match.user.id });
     
     if (!match.user.id) {
       return;
     }
     
     const unsubscribe = listenToUserPresence(match.user.id, (status) => {
-      console.log('🟢 Presence status updated:', { userId: match.user.id, status });
+      logger.chat.debug('Presence status updated', { userId: match.user.id, status });
       setOtherUserPresence(status);
     });
     
     return () => {
-      console.log('🧹 Cleaning up presence listener');
+      logger.firebase.debug('Cleaning up presence listener');
       if (unsubscribe && typeof unsubscribe === 'function') {
         unsubscribe();
       }
@@ -217,7 +216,7 @@ const ChatView: React.FC<ChatViewProps> = ({
       const suggestions = await getIcebreakerSuggestions(match.user.name, match.user.interests);
       setIcebreakers(suggestions);
     } catch (error) {
-      console.error('Error loading icebreakers:', error);
+      logger.chat.error('Error loading icebreakers', { error, userName: match.user.name });
       // Fallback to demo suggestions if AI fails
       setIcebreakers([
         `¡Hola ${match.user.name}! Me encantó tu perfil 😊`,
@@ -246,7 +245,11 @@ const ChatView: React.FC<ChatViewProps> = ({
     const value = e.target.value;
     setInputValue(value);
     
-    console.log('⌨️ Input changed, updating typing status:', { value: value.trim() ? 'typing' : 'not typing', chatId, currentUserId });
+    logger.chat.debug('Input changed, updating typing status', { 
+      isTyping: !!value.trim(), 
+      chatId, 
+      currentUserId 
+    });
     
     // Limpiar timeout anterior
     if (typingTimeoutRef.current) {
@@ -259,7 +262,7 @@ const ChatView: React.FC<ChatViewProps> = ({
       
       // Establecer timeout para limpiar después de 15 segundos de inactividad
       typingTimeoutRef.current = setTimeout(() => {
-        console.log('⏱️ Timeout: Limpiando typing status después de 15 segundos');
+        logger.chat.debug('Timeout: Clearing typing status after 15 seconds of inactivity');
         updateTypingStatus(chatId, currentUserId, false);
       }, 15000);
     } else {
@@ -295,14 +298,14 @@ const ChatView: React.FC<ChatViewProps> = ({
             setRecordingDuration(0);
             
           } catch (error) {
-            console.error('Error procesando mensaje de voz:', error);
+            logger.chat.error('Error processing voice message', { error });
             setIsRecording(false);
             setRecordingDuration(0);
           }
         },
         // onError
         (error: Error) => {
-          console.error('Error en grabación:', error);
+          logger.chat.error('Error in voice recording', { error });
           setIsRecording(false);
           setRecordingDuration(0);
         }
@@ -322,7 +325,7 @@ const ChatView: React.FC<ChatViewProps> = ({
       (window as any).currentVoiceRecorder = recorder;
       
     } catch (error) {
-      console.error('Error iniciando grabación:', error);
+      logger.chat.error('Error starting voice recording', { error });
       
       let errorMessage = 'Error desconocido';
       if (error instanceof Error) {
@@ -335,7 +338,7 @@ const ChatView: React.FC<ChatViewProps> = ({
         }
       }
       
-      console.error('Error iniciando grabación:', errorMessage);
+      logger.chat.error('Voice recording error details', { errorMessage });
     }
   };
 
@@ -378,7 +381,7 @@ const ChatView: React.FC<ChatViewProps> = ({
   // Funciones para videomensajes
   const handleStartVideoRecording = async () => {
     try {
-      console.log('📹 Iniciando grabación de videomensaje...');
+      logger.chat.info('Starting video message recording');
       
       // IMPORTANTE: Activar estado PRIMERO para que el elemento <video> se renderice
       setIsRecordingVideo(true);
@@ -398,35 +401,36 @@ const ChatView: React.FC<ChatViewProps> = ({
         audio: true
       });
       
-      console.log('📹 Stream obtenido:', stream);
-      console.log('📹 Video tracks:', stream.getVideoTracks());
-      console.log('📹 Audio tracks:', stream.getAudioTracks());
+      logger.chat.debug('Video stream obtained', { 
+        videoTracks: stream.getVideoTracks().length,
+        audioTracks: stream.getAudioTracks().length
+      });
       
       // Asignar stream al elemento video
       if (videoPreviewRef.current) {
-        console.log('📹 Asignando stream a video preview...');
+        logger.chat.debug('Assigning stream to video preview');
         videoPreviewRef.current.srcObject = stream;
         
         // Forzar reproducción
         try {
           await videoPreviewRef.current.play();
-          console.log('✅ Vista previa iniciada correctamente');
+          logger.chat.success('Video preview started successfully');
         } catch (playError) {
-          console.warn('⚠️ Error iniciando preview (puede ser normal):', playError);
+          logger.chat.warn('Error starting preview (may be normal)', { playError });
           // Intentar de nuevo después de un delay
           setTimeout(async () => {
             if (videoPreviewRef.current) {
               try {
                 await videoPreviewRef.current.play();
-                console.log('✅ Vista previa iniciada en segundo intento');
+                logger.chat.success('Video preview started on second attempt');
               } catch (e) {
-                console.error('❌ No se pudo iniciar vista previa:', e);
+                logger.chat.error('Could not start video preview', { error: e });
               }
             }
           }, 100);
         }
       } else {
-        console.error('❌ videoPreviewRef.current es null!');
+        logger.chat.error('videoPreviewRef.current is null!');
         // Si el ref es null, limpiar y salir
         stream.getTracks().forEach(track => track.stop());
         setIsRecordingVideo(false);
@@ -438,33 +442,33 @@ const ChatView: React.FC<ChatViewProps> = ({
       const mediaRecorder = new MediaRecorder(stream, options);
       const chunks: Blob[] = [];
       
-      console.log(`🎬 MediaRecorder creado con mimeType: ${options.mimeType}`);
+      logger.chat.debug('MediaRecorder created', { mimeType: options.mimeType });
       
       mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           chunks.push(event.data);
-          console.log(`📦 Chunk recibido: ${event.data.size} bytes`);
+          logger.chat.debug('Chunk received', { size: event.data.size });
         }
       };
       
       mediaRecorder.onstop = async () => {
-        console.log('📹 Grabación detenida, procesando...');
+        logger.chat.info('Video recording stopped, processing');
         
         // Detener todos los tracks del stream
         stream.getTracks().forEach(track => {
           track.stop();
-          console.log(`🛑 Track detenido: ${track.kind}`);
+          logger.chat.debug('Track stopped', { kind: track.kind });
         });
         
         // Limpiar vista previa
         if (videoPreviewRef.current) {
           videoPreviewRef.current.srcObject = null;
-          console.log('🧹 Vista previa limpiada');
+          logger.chat.debug('Video preview cleaned');
         }
         
         // Crear blob del video
         const videoBlob = new Blob(chunks, { type: 'video/webm' });
-        console.log('📹 Video blob creado:', {
+        logger.chat.info('Video blob created', {
           size: videoBlob.size,
           sizeKB: (videoBlob.size / 1024).toFixed(2) + 'KB',
           sizeMB: (videoBlob.size / (1024 * 1024)).toFixed(2) + 'MB',
@@ -477,7 +481,7 @@ const ChatView: React.FC<ChatViewProps> = ({
         if (videoBlob.size > MAX_SIZE) {
           const sizeMB = (videoBlob.size / (1024 * 1024)).toFixed(2);
           const errorMsg = `El video es demasiado grande (${sizeMB}MB). El límite es 1MB.\n\nPor favor, graba un video más corto (máximo 5-10 segundos).`;
-          console.error('❌', errorMsg);
+          logger.chat.error('Video too large', { sizeMB, maxSizeMB: 1 });
           alert(errorMsg);
           setIsRecordingVideo(false);
           setVideoRecordingDuration(0);
@@ -486,27 +490,26 @@ const ChatView: React.FC<ChatViewProps> = ({
         
         try {
           // Convertir a Base64 y enviar
-          console.log('📦 Convirtiendo video a Base64...');
+          logger.chat.debug('Converting video to Base64');
           const { uploadVoiceMessage } = await import('../../services/voiceMessageService');
           const videoUrl = await uploadVoiceMessage(videoBlob, match.id, currentUserId);
           
-          console.log('✅ Video convertido exitosamente');
-          console.log('📤 Enviando mensaje de video...');
+          logger.chat.success('Video converted successfully');
+          logger.chat.info('Sending video message');
           
           // Enviar como mensaje de video
           onSendMessage(undefined, 'video', videoUrl, videoRecordingDuration);
           
-          console.log('✅ Mensaje de video enviado correctamente');
+          logger.chat.success('Video message sent successfully');
           
           setIsRecordingVideo(false);
           setVideoRecordingDuration(0);
           
         } catch (error) {
-          console.error('❌ Error procesando videomensaje:', error);
-          console.error('❌ Error completo:', {
+          logger.chat.error('Error processing video message', { 
+            error,
             name: error instanceof Error ? error.name : 'Unknown',
-            message: error instanceof Error ? error.message : String(error),
-            stack: error instanceof Error ? error.stack : undefined
+            message: error instanceof Error ? error.message : String(error)
           });
           alert(`Error procesando video: ${error instanceof Error ? error.message : 'Error desconocido'}`);
           setIsRecordingVideo(false);
@@ -515,7 +518,7 @@ const ChatView: React.FC<ChatViewProps> = ({
       };
       
       mediaRecorder.onerror = (error) => {
-        console.error('❌ Error en MediaRecorder:', error);
+        logger.chat.error('MediaRecorder error', { error });
         stream.getTracks().forEach(track => track.stop());
         if (videoPreviewRef.current) {
           videoPreviewRef.current.srcObject = null;
@@ -526,7 +529,7 @@ const ChatView: React.FC<ChatViewProps> = ({
       
       // Iniciar grabación
       mediaRecorder.start();
-      console.log('🎬 Grabación iniciada');
+      logger.chat.info('Video recording started');
       
       // Contador de duración
       videoRecordingIntervalRef.current = setInterval(() => {
@@ -545,7 +548,7 @@ const ChatView: React.FC<ChatViewProps> = ({
       (window as any).currentVideoStream = stream;
       
     } catch (error) {
-      console.error('❌ Error iniciando grabación de video:', error);
+      logger.chat.error('Error starting video recording', { error });
       
       let errorMessage = 'Error desconocido';
       if (error instanceof Error) {
@@ -567,7 +570,7 @@ const ChatView: React.FC<ChatViewProps> = ({
   };
 
   const handleStopVideoRecording = () => {
-    console.log('📹 Deteniendo grabación de video...');
+    logger.chat.info('Stopping video recording');
     
     // Detener contador
     if (videoRecordingIntervalRef.current) {
@@ -589,7 +592,7 @@ const ChatView: React.FC<ChatViewProps> = ({
   };
 
   const handleCancelVideoRecording = () => {
-    console.log('📹 Cancelando grabación de video...');
+    logger.chat.info('Canceling video recording');
     
     // Detener contador
     if (videoRecordingIntervalRef.current) {
@@ -642,7 +645,7 @@ const ChatView: React.FC<ChatViewProps> = ({
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
 
-    console.log('📸 Fotos seleccionadas:', files.length);
+    logger.chat.info('Photos selected', { count: files.length });
 
     // Validar que sean imágenes
     const imageFiles = files.filter(file => file.type.startsWith('image/'));
@@ -659,7 +662,7 @@ const ChatView: React.FC<ChatViewProps> = ({
       alert('Máximo 5 fotos por mensaje. Se seleccionaron las primeras 5.');
     }
 
-    console.log('✅ Abriendo modal de preview con', limitedFiles.length, 'fotos');
+    logger.chat.success('Opening photo preview modal', { photoCount: limitedFiles.length });
 
     // Mostrar modal de preview
     setSelectedFiles(limitedFiles);
@@ -672,17 +675,17 @@ const ChatView: React.FC<ChatViewProps> = ({
   };
 
   const handleSendPhotos = async (photos: Array<{ base64: string; caption?: string; filter: string }>) => {
-    console.log('📤 Enviando fotos con filtros:', {
-      cantidad: photos.length,
-      filtros: photos.map(p => p.filter),
-      tieneCaption: photos.some(p => p.caption)
+    logger.chat.info('Sending photos with filters', {
+      count: photos.length,
+      filters: photos.map(p => p.filter),
+      hasCaption: photos.some(p => p.caption)
     });
 
     try {
       // Si es una sola foto, enviar con caption
       if (photos.length === 1) {
         const photo = photos[0];
-        console.log('📸 Enviando foto única:', {
+        logger.chat.debug('Sending single photo', {
           filter: photo.filter,
           caption: photo.caption,
           base64Length: photo.base64.length
@@ -690,10 +693,10 @@ const ChatView: React.FC<ChatViewProps> = ({
         onSendMessage(photo.caption, 'image', photo.base64);
       } else {
         // Múltiples fotos: enviar cada una por separado
-        console.log('📸 Enviando múltiples fotos:', photos.length);
+        logger.chat.debug('Sending multiple photos', { count: photos.length });
         for (let i = 0; i < photos.length; i++) {
           const photo = photos[i];
-          console.log(`📸 Enviando foto ${i + 1}/${photos.length}:`, {
+          logger.chat.debug(`Sending photo ${i + 1}/${photos.length}`, {
             filter: photo.filter,
             base64Length: photo.base64.length
           });
@@ -703,9 +706,9 @@ const ChatView: React.FC<ChatViewProps> = ({
         }
       }
 
-      console.log('✅ Todas las fotos enviadas exitosamente');
+      logger.chat.success('All photos sent successfully');
     } catch (error) {
-      console.error('❌ Error enviando fotos:', error);
+      logger.chat.error('Error sending photos', { error });
       alert('Error enviando fotos. Por favor intenta de nuevo.');
     }
   };

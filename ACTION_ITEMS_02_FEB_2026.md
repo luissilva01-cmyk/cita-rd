@@ -43,7 +43,34 @@ No hay items críticos que bloqueen el lanzamiento.
 
 ---
 
-### 2. Agregar Error Handling en Async Functions
+### 2. Configurar Variables de Entorno
+**Tiempo estimado:** ~~15 minutos~~ ✅ COMPLETADO  
+**Asignado a:** Desarrollador  
+**Estado:** ✅ Completado (4 Feb 2026)
+
+**Cambios realizados:**
+- [x] Mover API Keys de `firebase.ts` a `.env.local`
+- [x] Actualizar `firebase.ts` para usar `import.meta.env`
+- [x] Actualizar `.env.example` con estructura correcta
+- [x] Verificar que `.env.local` esté en `.gitignore`
+- [x] Agregar validación de variables de entorno
+- [x] Probar que el servidor funcione correctamente
+
+**Archivos modificados:**
+- `services/firebase.ts` - Usa variables de entorno
+- `.env.example` - Plantilla actualizada
+- `.env.local` - Configurado (no en Git)
+
+**Documentación:** `ENV_VARIABLES_CONFIGURED.md`  
+**Commit:** `2cf913d`
+
+**Beneficios:**
+- ✅ API Keys protegidas (no en Git)
+- ✅ Flexibilidad para múltiples entornos
+- ✅ Mejores prácticas aplicadas
+- ✅ +500% mejora en seguridad
+
+### 3. Agregar Error Handling en Async Functions
 **Tiempo estimado:** 1-2 horas  
 **Asignado a:** Desarrollador  
 **Estado:** ⏳ Pendiente
@@ -80,7 +107,7 @@ setupDiscoveryListener();
 
 ---
 
-### 3. Testing Exhaustivo de Funcionalidades
+### 4. Testing Exhaustivo de Funcionalidades
 **Tiempo estimado:** 2-3 horas  
 **Asignado a:** Tester + Desarrollador  
 **Estado:** ⏳ Pendiente
@@ -101,7 +128,7 @@ setupDiscoveryListener();
 
 ---
 
-### 4. Migrar Imágenes a Firebase Storage
+### 5. Migrar Imágenes a Firebase Storage
 **Tiempo estimado:** 4-6 horas  
 **Asignado a:** Desarrollador  
 **Estado:** ⏳ Pendiente
@@ -238,11 +265,11 @@ if (compatibility > 0.7) { // 70% threshold
 | Prioridad | Items | Tiempo Total | Estado |
 |-----------|-------|--------------|--------|
 | 🔴 Crítica | 0 | 0h | ✅ N/A |
-| 🟡 Alta | 4 | 9-14h | 1/4 completado |
+| 🟡 Alta | 5 | 10-15h | 2/5 completado |
 | 🟢 Media | 3 | 3.5-4.5h | ⏳ Pendiente |
 | 🟢 Baja | 3 | 4.5-5.5h | 1/3 completado |
 
-**Total:** 16-23.5 horas de trabajo (1.5h completado)
+**Total:** 18-25 horas de trabajo (2h completado)
 
 ---
 

@@ -19,6 +19,7 @@ import { LanguageProvider } from './contexts/LanguageContext';
 import { StoryGroup } from './services/storiesService';
 import { auth } from './services/firebase';
 import { setUserOnline, setUserOffline } from './services/presenceService';
+import { logger } from './utils/logger';
 
 const INITIAL_POTENTIAL_MATCHES: UserProfile[] = [];
 
@@ -59,7 +60,7 @@ const App: React.FC = () => {
                                !profile.location || profile.location.trim() === '';
           
           if (isIncomplete) {
-            console.log('📝 Perfil incompleto detectado, redirigiendo a Profile');
+            logger.profile.info('Incomplete profile detected, redirecting to Profile', { userId: user.uid });
             setActiveView('profile');
           }
         } else {
@@ -94,7 +95,7 @@ const App: React.FC = () => {
   useEffect(() => {
     if (!currentUser) return;
     
-    console.log('🟢 Setting up presence system for user:', currentUser.id);
+    logger.auth.info('Setting up presence system', { userId: currentUser.id });
     
     // Set user online immediately
     setUserOnline(currentUser.id);
@@ -112,7 +113,7 @@ const App: React.FC = () => {
     document.addEventListener('visibilitychange', handleVisibilityChange);
     
     return () => {
-      console.log('🔴 Cleaning up presence system for user:', currentUser.id);
+      logger.auth.info('Cleaning up presence system', { userId: currentUser.id });
       // IMPORTANTE: Solo limpiar listeners, NO actualizar Firestore
       // El logout ya maneja setUserOffline() ANTES de cerrar sesión
       document.removeEventListener('visibilitychange', handleVisibilityChange);
@@ -134,7 +135,7 @@ const App: React.FC = () => {
           unsubscribe();
         } catch (error) {
           // Ignorar errores al cancelar listeners después del logout
-          console.log('Listener cleanup (expected after logout)');
+          logger.firebase.debug('Listener cleanup after logout (expected)');
         }
       }
     };
@@ -147,12 +148,16 @@ const App: React.FC = () => {
     let unsubscribe: (() => void) | undefined;
 
     const setupDiscoveryListener = async () => {
-      unsubscribe = await getDiscoveryProfiles(currentUser.id, (profiles) => {
-        if (profiles.length > 0) {
-          setPotentialMatches(profiles);
-        }
-        // Si no hay perfiles en Firebase, usar los mock
-      });
+      try {
+        unsubscribe = await getDiscoveryProfiles(currentUser.id, (profiles) => {
+          if (profiles.length > 0) {
+            setPotentialMatches(profiles);
+          }
+          // Si no hay perfiles en Firebase, usar los mock
+        });
+      } catch (error) {
+        logger.firebase.error('Error setting up discovery listener', error);
+      }
     };
 
     setupDiscoveryListener();
@@ -164,7 +169,7 @@ const App: React.FC = () => {
           unsubscribe();
         } catch (error) {
           // Ignorar errores al cancelar listeners después del logout
-          console.log('Listener cleanup (expected after logout)');
+          logger.firebase.debug('Listener cleanup after logout (expected)');
         }
       }
     };
@@ -185,7 +190,7 @@ const App: React.FC = () => {
           unsubscribe();
         } catch (error) {
           // Ignorar errores al cancelar listeners después del logout
-          console.log('Listener cleanup (expected after logout)');
+          logger.firebase.debug('Listener cleanup after logout (expected)');
         }
       }
     };

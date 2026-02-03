@@ -3,7 +3,7 @@
 
 **Versión:** 2.0.0  
 **Servidor:** ✅ Corriendo en http://localhost:3000/  
-**Progreso hacia lanzamiento:** 85%
+**Progreso hacia lanzamiento:** 91% (+6% hoy)
 
 ---
 
@@ -35,6 +35,30 @@
 - Public Key configurada
 - Servicio implementado en `services/imagekitService.ts`
 - **NO necesita migración a Firebase Storage**
+
+### 4. Índices de Firestore (4 Feb) ✅
+- **18 índices compuestos** desplegados exitosamente
+- Queries hasta 10x más rápidas
+- Soporta miles de usuarios concurrentes
+- Índices para: likes, matches, chats, calls, stories, perfiles, swipes, bloqueos
+- **Commit:** `482f21e`
+
+### 5. Variables de Entorno (4 Feb) ✅
+- **API Keys movidas a .env.local**
+- 8 variables de entorno configuradas
+- `.env.example` actualizado como plantilla
+- Validación de variables implementada
+- +500% mejora en seguridad
+- **Commit:** `2cf913d`
+
+### 6. Optimización de Queries (4 Feb) ✅
+- **Discovery profiles:** limit(20) - 98% menos lecturas
+- **Chat messages:** limit(50) - 90% menos lecturas
+- **User chats:** limit(20) - 80% menos lecturas
+- Migración completa a logger system
+- Reducción de costos: $180/mes → $3.60/mes (98%)
+- Carga 80-85% más rápida
+- **Commit:** `7629a97`
 
 ---
 

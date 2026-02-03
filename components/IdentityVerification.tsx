@@ -4,6 +4,7 @@ import { X, Camera, Shield, CheckCircle, AlertCircle, Clock, Star } from 'lucide
 import { verificationService, VerificationAttempt, UserVerification } from '../services/verificationService';
 import { useTranslation } from '../hooks/useTranslation';
 import ReliableCamera, { ReliableCameraRef } from './ReliableCamera';
+import { logger } from '../utils/logger';
 
 interface IdentityVerificationProps {
   isOpen: boolean;
@@ -65,30 +66,32 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
         setAttemptInfo(attemptCheck.reason || '');
       }
     } catch (error) {
-      console.error('Error cargando información de verificación:', error);
+      logger.verification.error('Error loading verification info', { error, userId: currentUserId });
     }
   };
 
   const startCamera = async () => {
     try {
-      console.log('🎥 Iniciando cámara - método directo...');
+      logger.verification.info('Starting camera for identity verification');
       setCameraError(null);
       setIsVideoReady(false);
       
       // Cambiar al paso de captura inmediatamente
       setCurrentStep('capture');
       
-      console.log('✅ Cambiado a paso capture, el componente ReliableCamera se renderizará ahora');
+      logger.verification.debug('Changed to capture step, ReliableCamera will render now');
       
     } catch (error) {
-      console.error('❌ Error en startCamera:', error);
+      logger.verification.error('Error in startCamera', { error });
       
       let errorMessage = 'Error desconocido';
       
       if (error instanceof Error) {
-        console.error('❌ Error name:', error.name);
-        console.error('❌ Error message:', error.message);
-        console.error('❌ Error stack:', error.stack);
+        logger.verification.error('Camera error details', { 
+          name: error.name, 
+          message: error.message,
+          stack: error.stack
+        });
         
         switch (error.name) {
           case 'NotAllowedError':
@@ -104,7 +107,7 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
             errorMessage = `Error: ${error.message}`;
         }
       } else {
-        console.error('❌ Error no es instancia de Error:', typeof error, error);
+        logger.verification.error('Unknown camera error', { error: typeof error, value: error });
         errorMessage = 'Error desconocido en la cámara';
       }
       
@@ -124,7 +127,7 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
       setCapturedImage(imageUrl);
 
       // Detener cámara completamente
-      console.log('📸 Foto capturada, deteniendo cámara...');
+      logger.verification.success('Photo captured, stopping camera');
       if (cameraRef.current) {
         cameraRef.current.stopCamera();
       }
@@ -151,11 +154,11 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
         monitorVerificationProgress(attempt.id);
         
       } catch (error) {
-        console.error('Error iniciando verificación:', error);
+        logger.verification.error('Error starting verification', { error });
         setCurrentStep('result');
       }
     } catch (error) {
-      console.error('Error capturando foto:', error);
+      logger.verification.error('Error capturing photo', { error });
       setCameraError('Error capturando la foto');
     }
   };
@@ -183,7 +186,7 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
         setTimeout(checkProgress, 1000);
         
       } catch (error) {
-        console.error('Error monitoreando progreso:', error);
+        logger.verification.error('Error monitoring verification progress', { error, attemptId });
         setCurrentStep('result');
       }
     };
@@ -192,7 +195,7 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
   };
 
   const resetVerification = () => {
-    console.log('🧹 Limpiando verificación...');
+    logger.verification.debug('Cleaning up verification');
     
     // Detener cámara usando el método del ReliableCamera
     if (cameraRef.current) {
@@ -212,7 +215,7 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
     setIsVideoReady(false);
     setCameraError(null);
     
-    console.log('✅ Verificación limpiada completamente');
+    logger.verification.debug('Verification cleaned up successfully');
   };
 
   const handleClose = () => {
@@ -417,15 +420,15 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
                   ref={cameraRef}
                   onStreamReady={(stream) => {
                     setCameraStream(stream);
-                    console.log('🎯 Stream listo desde ReliableCamera');
+                    logger.verification.debug('Stream ready from ReliableCamera');
                   }}
                   onVideoReady={() => {
                     setIsVideoReady(true);
-                    console.log('🎯 Video listo desde ReliableCamera');
+                    logger.verification.debug('Video ready from ReliableCamera');
                   }}
                   onError={(error) => {
                     setCameraError(error);
-                    console.error('🎯 Error desde ReliableCamera:', error);
+                    logger.verification.error('Error from ReliableCamera', { error });
                   }}
                   className="w-full h-48 sm:h-64 object-cover rounded-xl bg-gray-900"
                   autoStart={true}
@@ -487,7 +490,7 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
               <div className="flex gap-2 sm:gap-3">
                 <button
                   onClick={() => {
-                    console.log('❌ Cancelando captura, deteniendo cámara...');
+                    logger.verification.debug('Canceling capture, stopping camera');
                     
                     // Detener cámara usando ReliableCamera
                     if (cameraRef.current) {

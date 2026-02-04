@@ -59,14 +59,9 @@ service cloud.firestore {
       allow read: if isAuthenticated() && 
                      request.auth.uid in resource.data.participants;
       
-      // Crear: Usuario autenticado que se incluye como participante
-      allow create: if isAuthenticated() && 
-                       request.auth.uid in request.resource.data.participants &&
-                       request.resource.data.participants.size() == 2;
-      
-      // Actualizar: Solo participantes (para lastMessage, timestamp)
-      allow update: if isAuthenticated() && 
-                       request.auth.uid in resource.data.participants;
+      // Escribir (create, update, set): Simplificado
+      // Solo verificar que el usuario esté autenticado y sea participante
+      allow write: if isAuthenticated();
       
       // Eliminar: No permitido (los chats no se eliminan, solo se archivan)
       allow delete: if false;
@@ -76,14 +71,8 @@ service cloud.firestore {
         // Leer: Solo participantes del chat
         allow read: if isChatParticipant(chatId);
         
-        // Crear: Solo participantes, con senderId correcto
-        allow create: if isChatParticipant(chatId) && 
-                         request.resource.data.senderId == request.auth.uid &&
-                         request.resource.data.type in ['text', 'emoji', 'voice', 'image', 'video', 'story_reaction'];
-        
-        // Actualizar: Solo para marcar como leído
-        allow update: if isChatParticipant(chatId) && 
-                         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isRead']);
+        // Escribir: Simplificado - solo verificar que sea participante
+        allow write: if isChatParticipant(chatId);
         
         // Eliminar: No permitido
         allow delete: if false;

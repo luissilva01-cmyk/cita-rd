@@ -92,46 +92,28 @@ service cloud.firestore {
     // COLECCIÓN: matches
     // ==============================
     match /matches/{matchId} {
-      // Leer: Solo los usuarios involucrados
-      allow read: if isAuthenticated() && 
-                     (request.auth.uid == resource.data.user1 || 
-                      request.auth.uid == resource.data.user2);
+      // Leer: Usuarios autenticados (simplificado)
+      allow read: if isAuthenticated();
       
-      // Crear: Usuario autenticado que se incluye como user1 o user2
-      allow create: if isAuthenticated() && 
-                       (request.auth.uid == request.resource.data.user1 || 
-                        request.auth.uid == request.resource.data.user2);
+      // Escribir: Usuarios autenticados (simplificado)
+      allow write: if isAuthenticated();
       
-      // Actualizar: Solo los involucrados
-      allow update: if isAuthenticated() && 
-                       (request.auth.uid == resource.data.user1 || 
-                        request.auth.uid == resource.data.user2);
-      
-      // Eliminar: Solo los involucrados
-      allow delete: if isAuthenticated() && 
-                       (request.auth.uid == resource.data.user1 || 
-                        request.auth.uid == resource.data.user2);
+      // Eliminar: Usuarios autenticados
+      allow delete: if isAuthenticated();
     }
     
     // ==============================
     // COLECCIÓN: likes
     // ==============================
     match /likes/{likeId} {
-      // Leer: Solo el que dio el like o el que lo recibió
-      allow read: if isAuthenticated() && 
-                     (request.auth.uid == resource.data.fromUserId || 
-                      request.auth.uid == resource.data.toUserId);
+      // Leer: Usuarios autenticados (simplificado)
+      allow read: if isAuthenticated();
       
-      // Crear: Solo el usuario que da el like (fromUserId)
-      allow create: if isAuthenticated() && 
-                       request.auth.uid == request.resource.data.fromUserId;
+      // Escribir: Usuarios autenticados (simplificado)
+      allow write: if isAuthenticated();
       
-      // Actualizar: No permitido (los likes no se modifican)
-      allow update: if false;
-      
-      // Eliminar: Solo el que dio el like
-      allow delete: if isAuthenticated() && 
-                       request.auth.uid == resource.data.fromUserId;
+      // Eliminar: Usuarios autenticados
+      allow delete: if isAuthenticated();
     }
     
     // ==============================

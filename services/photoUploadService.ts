@@ -110,46 +110,25 @@ export const updateUserPhotos = async (
     console.log('   - images:', photoUrls);
     console.log('   - photosInfo:', JSON.stringify(photosData, null, 2));
     
-    await updateDoc(userRef, {
+    // Usar setDoc con merge: true en lugar de updateDoc
+    // Esto funciona tanto si el documento existe como si no
+    // Y solo actualiza los campos especificados
+    await setDoc(userRef, {
       images: photoUrls,           // Array de URLs (compatibilidad)
       photosInfo: photosData,      // Array de objetos PhotoInfo
       updatedAt: Date.now()
-    });
+    }, { merge: true });
     
     console.log('✅ Fotos del perfil actualizadas en Firestore');
     return true;
   } catch (error) {
     console.error('❌ Error actualizando fotos del perfil:', error);
+    console.error('❌ Detalles del error:', error);
     
-    // Si el documento no existe, intentar crearlo
-    if (error instanceof Error && error.message.includes('No document to update')) {
-      console.log('⚠️ Documento no existe, intentando crear...');
-      try {
-        const userRef = doc(db, 'perfiles', userId);
-        const photoUrls = extractUrls(photos);
-        const photosData = photos
-          .filter(p => p && p.url) // Solo fotos válidas
-          .map(p => ({
-            url: p.url,
-            fileId: p.fileId || '', // Asegurar que nunca sea undefined
-            isMain: p.isMain || false,
-            createdAt: p.createdAt,
-            analyzed: p.analyzed || false
-          }));
-        
-        await setDoc(userRef, {
-          id: userId,
-          images: photoUrls,
-          photosInfo: photosData,
-          updatedAt: Date.now(),
-          createdAt: Date.now()
-        }, { merge: true });
-        console.log('✅ Documento creado con fotos');
-        return true;
-      } catch (createError) {
-        console.error('❌ Error creando documento:', createError);
-        return false;
-      }
+    // Log adicional para debugging
+    if (error instanceof Error) {
+      console.error('❌ Error message:', error.message);
+      console.error('❌ Error stack:', error.stack);
     }
     
     return false;

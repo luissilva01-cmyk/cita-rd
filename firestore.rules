@@ -56,6 +56,17 @@ service cloud.firestore {
         (request.resource.data.diff(resource.data).affectedKeys().hasAny(['lastActive', 'online', 'updatedAt']))
       );
       
+      // Write (para setDoc con merge): Solo el propio usuario
+      // Permitir merge de fotos sin validar todos los campos
+      allow write: if isOwner(userId) && (
+        // Si es una creación completa, validar todo
+        (!exists(/databases/$(database)/documents/perfiles/$(userId)) && isValidProfile()) ||
+        // Si es un merge (documento existe), permitir actualización de fotos
+        (exists(/databases/$(database)/documents/perfiles/$(userId)) && 
+         request.resource.data.images is list && 
+         request.resource.data.images.size() <= 6)
+      );
+      
       // Eliminar: Solo el propio usuario
       allow delete: if isOwner(userId);
     }

@@ -367,12 +367,24 @@ const App: React.FC = () => {
           />
         );
       case 'messages':
+        logger.chat.debug('Renderizando Messages', { 
+          chatsCount: chats.length, 
+          potentialMatchesCount: potentialMatches.length,
+          chatParticipants: chats.map(c => c.participants)
+        });
+        
         return (
           <Messages 
             currentUserId={currentUser!.id}
             matches={chats.map(chat => {
               // Encontrar el ID del otro usuario
               const otherUserId = chat.participants.find(p => p !== currentUser!.id) || '';
+              
+              logger.chat.debug('Procesando chat para Messages', { 
+                chatId: chat.id, 
+                otherUserId,
+                foundInPotentialMatches: !!potentialMatches.find(u => u.id === otherUserId)
+              });
               
               // Buscar el usuario en potentialMatches
               let otherUser = potentialMatches.find(u => u.id === otherUserId);

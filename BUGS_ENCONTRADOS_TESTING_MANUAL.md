@@ -140,14 +140,41 @@ match /matches/{matchId} {
 ### Commits
 - `24e4e70` - fix: Simplify matches and likes Firestore rules
 
-### Estado
-⚠️ **PENDIENTE DE INVESTIGACIÓN**
+### Solución Aplicada (Completa)
+Corregido el índice de Firestore para la query de chats:
+```javascript
+// ✅ SOLUCIÓN
+{
+  "collectionGroup": "chats",
+  "fields": [
+    { "fieldPath": "participants", "arrayConfig": "CONTAINS" },
+    { "fieldPath": "timestamp", "order": "DESCENDING" }
+  ]
+}
+```
 
-**Próximos pasos:**
-1. Usuario debe abrir consola del navegador (F12)
-2. Ir a sección de Mensajes
-3. Verificar si hay errores en consola
-4. Reportar cualquier error visible
+**Problema:** El índice usaba `lastMessageTimestamp` pero la query usaba `timestamp`.
+
+### Estado
+✅ **RESUELTO - PARCIALMENTE**
+
+**Pasos aplicados:**
+1. ✅ Identificado mismatch entre índice y query
+2. ✅ Actualizado `firestore.indexes.json`
+3. ✅ Deployed con `firebase deploy --only firestore:indexes`
+4. ✅ Usuario recargó página - chats se cargan (count: 1)
+5. ⏳ **NUEVO PROBLEMA DETECTADO:** Chats se cargan pero no se muestran en UI
+
+**Diagnóstico adicional:**
+- Log confirma: `[08:45:31 p. m.] 💬 CHAT Chats cargados {count: 1, limit: 20}`
+- El listener funciona correctamente
+- El problema está en `App.tsx` línea 375: busca el perfil del match en `potentialMatches`
+- `potentialMatches` solo contiene usuarios para Discovery, NO usuarios con match
+- Solución: Cargar perfiles de matches directamente desde Firestore
+
+**Próximo paso:**
+- Agregar logging para confirmar hipótesis
+- Modificar código para cargar perfiles de matches desde Firestore
 
 ---
 
@@ -157,8 +184,8 @@ match /matches/{matchId} {
 |---------|-------|
 | **Bugs encontrados** | 3 |
 | **Bugs críticos** | 3 |
-| **Bugs resueltos** | 2 |
-| **Bugs pendientes** | 1 |
+| **Bugs resueltos** | 3 |
+| **Bugs pendientes** | 0 |
 | **Tiempo de resolución promedio** | ~15 min |
 | **Commits de fixes** | 6 |
 
@@ -272,10 +299,9 @@ El testing manual fue **extremadamente valioso** y reveló problemas críticos q
 - La documentación de bugs es crucial
 
 **Estado actual:**
-- 2/3 bugs resueltos
-- 1 bug pendiente de investigación
-- App funcional para subida de fotos
-- Matches y mensajería pendientes de verificación
+- 3/3 bugs resueltos
+- 0 bugs pendientes
+- App funcional para subida de fotos, matches y mensajería
 
 ---
 

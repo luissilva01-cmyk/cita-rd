@@ -30,11 +30,31 @@ service cloud.firestore {
              data.bio is string && data.bio.size() <= 500 &&
              data.location is string && data.location.size() > 0 &&
              data.interests is list && data.interests.size() <= 20 &&
-             data.images is list && data.images.size() <= 6;
+             data.images is list && 
+             data.images.size() >= 1 &&  // ✅ MÍNIMO 1 FOTO OBLIGATORIA
+             data.images.size() <= 6;    // ✅ MÁXIMO 6 FOTOS
     }
     
     // ==============================
-    // COLECCIÓN: perfiles
+    // COLECCIÓN: users (perfiles de usuario)
+    // ==============================
+    match /users/{userId} {
+      // Leer: Solo usuarios autenticados
+      allow read: if isAuthenticated();
+      
+      // Crear: Solo el propio usuario con datos válidos
+      allow create: if isOwner(userId) && isValidProfile();
+      
+      // Escribir (update, set, merge): Solo el propio usuario
+      // Simplificado para permitir actualizaciones parciales
+      allow write: if isOwner(userId);
+      
+      // Eliminar: Solo el propio usuario
+      allow delete: if isOwner(userId);
+    }
+    
+    // ==============================
+    // COLECCIÓN: perfiles (alias de users)
     // ==============================
     match /perfiles/{userId} {
       // Leer: Solo usuarios autenticados
@@ -167,6 +187,17 @@ service cloud.firestore {
     match /verifications/{userId} {
       // Leer: Usuarios autenticados (para ver badges)
       allow read: if isAuthenticated();
+      
+      // Escribir: Solo el propio usuario
+      allow write: if isOwner(userId);
+    }
+    
+    // ==============================
+    // COLECCIÓN: fcmTokens
+    // ==============================
+    match /fcmTokens/{userId} {
+      // Leer: Solo el propio usuario
+      allow read: if isOwner(userId);
       
       // Escribir: Solo el propio usuario
       allow write: if isOwner(userId);

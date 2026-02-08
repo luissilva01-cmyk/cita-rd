@@ -14,6 +14,7 @@ type LogCategory =
   | 'ui'          // Interacciones de UI
   | 'privacy'     // Configuración de privacidad
   | 'verification' // Verificación de identidad
+  | 'notification' // Push notifications
   | 'general';    // General
 
 interface LogConfig {
@@ -40,6 +41,7 @@ class Logger {
     ui: '🎨',
     privacy: '🔒',
     verification: '✅',
+    notification: '🔔',
     general: '📋'
   };
 
@@ -278,6 +280,14 @@ class Logger {
     warn: (msg: string, data?: any) => this.warn('verification', msg, data),
     error: (msg: string, error?: any) => this.error('verification', msg, error),
     success: (msg: string, data?: any) => this.success('verification', msg, data)
+  };
+
+  notification = {
+    debug: (msg: string, data?: any) => this.debug('notification', msg, data),
+    info: (msg: string, data?: any) => this.info('notification', msg, data),
+    warn: (msg: string, data?: any) => this.warn('notification', msg, data),
+    error: (msg: string, error?: any) => this.error('notification', msg, error),
+    success: (msg: string, data?: any) => this.success('notification', msg, data)
   };
 
   // Reportar a servicio de monitoreo (placeholder para Sentry, etc.)

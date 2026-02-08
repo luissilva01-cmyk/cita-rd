@@ -58,6 +58,11 @@ const simulatePhotoAnalysis = async (imageUrl: string): Promise<PhotoAnalysis> =
   const isRandomUser = urlLower.includes('randomuser.me');
   const isUIAvatar = urlLower.includes('ui-avatars.com');
   
+  // Detectar patrones de fotos no válidas
+  const isLandscape = urlLower.includes('landscape') || urlLower.includes('nature') || urlLower.includes('scenery');
+  const isBlackBackground = urlLower.includes('black') || urlLower.includes('dark');
+  const isGenericAvatar = urlLower.includes('avatar') || urlLower.includes('placeholder');
+  
   let analysis: PhotoAnalysis;
   
   if (isRandomUser) {
@@ -70,18 +75,47 @@ const simulatePhotoAnalysis = async (imageUrl: string): Promise<PhotoAnalysis> =
       suggestions: ['¡Excelente foto! Perfecta para foto principal.'],
       score: 90 + Math.random() * 10 // 90-100
     };
-  } else if (isUIAvatar) {
-    // UI Avatars son avatares, no fotos reales
+  } else if (isUIAvatar || isGenericAvatar) {
+    // Avatares genéricos - RECHAZAR
     analysis = {
       hasFace: false,
       faceClarity: 0,
-      photoQuality: 60,
+      photoQuality: 20,
       isMainPhotoWorthy: false,
       suggestions: [
-        'Esta parece ser un avatar. Sube una foto real para mejor visibilidad.',
-        'Las fotos reales obtienen 3x más matches.'
+        '❌ Esta parece ser un avatar. Sube una foto real de tu rostro.',
+        'Las fotos reales obtienen 10x más matches.',
+        'Usa una foto donde se vea tu cara claramente.'
       ],
-      score: 20
+      score: 10
+    };
+  } else if (isLandscape) {
+    // Paisajes - RECHAZAR
+    analysis = {
+      hasFace: false,
+      faceClarity: 0,
+      photoQuality: 50,
+      isMainPhotoWorthy: false,
+      suggestions: [
+        '❌ Esta parece ser una foto de paisaje. Necesitamos ver tu rostro.',
+        'Sube una foto donde aparezcas tú.',
+        'Las fotos de perfil deben mostrar tu cara.'
+      ],
+      score: 15
+    };
+  } else if (isBlackBackground) {
+    // Fondos negros/oscuros - ADVERTENCIA
+    analysis = {
+      hasFace: false,
+      faceClarity: 20,
+      photoQuality: 30,
+      isMainPhotoWorthy: false,
+      suggestions: [
+        '⚠️ Foto muy oscura. Usa mejor iluminación.',
+        'Las fotos claras obtienen más matches.',
+        'Intenta con luz natural o buena iluminación.'
+      ],
+      score: 25
     };
   } else {
     // Análisis aleatorio para otras URLs

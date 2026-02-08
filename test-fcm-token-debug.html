@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🔍 Debug FCM Tokens - Ta' Pa' Ti</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    h1 {
+      color: #667eea;
+      margin-bottom: 10px;
+      font-size: 28px;
+    }
+
+    .subtitle {
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+
+    .section {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 15px;
+      font-size: 16px;
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      background: white;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      border-left: 4px solid #ddd;
+    }
+
+    .status.success {
+      border-left-color: #10b981;
+      background: #f0fdf4;
+    }
+
+    .status.error {
+      border-left-color: #ef4444;
+      background: #fef2f2;
+    }
+
+    .status.warning {
+      border-left-color: #f59e0b;
+      background: #fffbeb;
+    }
+
+    .status.info {
+      border-left-color: #3b82f6;
+      background: #eff6ff;
+    }
+
+    .icon {
+      font-size: 20px;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 10px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-secondary {
+      background: #6b7280;
+    }
+
+    .code-block {
+      background: #1f2937;
+      color: #10b981;
+      padding: 15px;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      overflow-x: auto;
+      margin-top: 10px;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .log-entry {
+      padding: 8px 12px;
+      background: white;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      font-size: 13px;
+      border-left: 3px solid #ddd;
+    }
+
+    .log-entry.success { border-left-color: #10b981; }
+    .log-entry.error { border-left-color: #ef4444; }
+    .log-entry.warning { border-left-color: #f59e0b; }
+    .log-entry.info { border-left-color: #3b82f6; }
+
+    .timestamp {
+      color: #6b7280;
+      font-size: 11px;
+      margin-right: 8px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .alert {
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+
+    .alert-error {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #991b1b;
+    }
+
+    .alert-success {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      color: #166534;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔍 Debug FCM Tokens</h1>
+    <p class="subtitle">Diagnóstico completo del sistema de notificaciones push</p>
+
+    <!-- Estado del Sistema -->
+    <div class="section">
+      <div class="section-title">📊 Estado del Sistema</div>
+      <div id="systemStatus"></div>
+    </div>
+
+    <!-- Autenticación -->
+    <div class="section">
+      <div class="section-title">🔐 Autenticación</div>
+      <div id="authStatus"></div>
+      <input type="text" id="userIdInput" placeholder="User ID (opcional para testing)" />
+      <button class="btn" onclick="testAuth()">Verificar Autenticación</button>
+    </div>
+
+    <!-- Permisos -->
+    <div class="section">
+      <div class="section-title">🔔 Permisos de Notificaciones</div>
+      <div id="permissionStatus"></div>
+      <button class="btn" onclick="requestPermission()">Solicitar Permiso</button>
+    </div>
+
+    <!-- Token FCM -->
+    <div class="section">
+      <div class="section-title">🎫 Token FCM</div>
+      <div id="tokenStatus"></div>
+      <button class="btn" onclick="getToken()">Obtener Token</button>
+      <button class="btn btn-secondary" onclick="saveToken()">Guardar Token en Firestore</button>
+    </div>
+
+    <!-- Verificar Firestore -->
+    <div class="section">
+      <div class="section-title">💾 Verificar Firestore</div>
+      <div id="firestoreStatus"></div>
+      <button class="btn" onclick="checkFirestore()">Verificar Colección fcmTokens</button>
+    </div>
+
+    <!-- Logs -->
+    <div class="section">
+      <div class="section-title">📝 Logs de Ejecución</div>
+      <div id="logs"></div>
+      <button class="btn btn-secondary" onclick="clearLogs()">Limpiar Logs</button>
+    </div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+    import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+    import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+    import { getMessaging, getToken } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging.js';
+
+    // Configuración de Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyDSwo4JqfyJBN-Aq_Aq-Aq-Aq-Aq-Aq-Aq",
+      authDomain: "citard-f7f7f.firebaseapp.com",
+      projectId: "citard-f7f7f",
+      storageBucket: "citard-f7f7f.firebasestorage.app",
+      messagingSenderId: "123456789012",
+      appId: "1:123456789012:web:abcdef1234567890abcdef"
+    };
+
+    const VAPID_KEY = 'BPYyFAePfkeyT_bRq5IkbHLYRtbffQtN2lXJIlcGmiCEUhn96ODpanN98M4kMpgOs7oHFIMOvI6Y7uu_G597Cw0';
+
+    // Inicializar Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    let messaging = null;
+
+    // Variables globales
+    window.currentUser = null;
+    window.currentToken = null;
+
+    // Función de logging
+    function addLog(message, type = 'info') {
+      const logsDiv = document.getElementById('logs');
+      const timestamp = new Date().toLocaleTimeString();
+      const logEntry = document.createElement('div');
+      logEntry.className = `log-entry ${type}`;
+      logEntry.innerHTML = `<span class="timestamp">${timestamp}</span>${message}`;
+      logsDiv.insertBefore(logEntry, logsDiv.firstChild);
+    }
+
+    window.clearLogs = function() {
+      document.getElementById('logs').innerHTML = '';
+      addLog('Logs limpiados', 'info');
+    };
+
+    // Verificar soporte del sistema
+    function checkSystemSupport() {
+      const statusDiv = document.getElementById('systemStatus');
+      let html = '';
+
+      const checks = [
+        { name: 'Notification API', supported: 'Notification' in window },
+        { name: 'Service Worker', supported: 'serviceWorker' in navigator },
+        { name: 'Push Manager', supported: 'PushManager' in window },
+        { name: 'HTTPS', supported: location.protocol === 'https:' || location.hostname === 'localhost' }
+      ];
+
+      checks.forEach(check => {
+        const icon = check.supported ? '✅' : '❌';
+        const className = check.supported ? 'success' : 'error';
+        html += `<div class="status ${className}">
+          <span class="icon">${icon}</span>
+          <span>${check.name}: ${check.supported ? 'Soportado' : 'No soportado'}</span>
+        </div>`;
+      });
+
+      statusDiv.innerHTML = html;
+
+      const allSupported = checks.every(c => c.supported);
+      if (allSupported) {
+        addLog('✅ Sistema completamente soportado', 'success');
+      } else {
+        addLog('❌ Sistema no soportado completamente', 'error');
+      }
+    }
+
+    // Verificar autenticación
+    window.testAuth = function() {
+      const userId = document.getElementById('userIdInput').value;
+      
+      if (userId) {
+        // Modo testing con userId manual
+        window.currentUser = { uid: userId };
+        updateAuthStatus();
+        addLog(`🧪 Modo testing: userId = ${userId}`, 'warning');
+      } else {
+        // Verificar autenticación real
+        onAuthStateChanged(auth, (user) => {
+          window.currentUser = user;
+          updateAuthStatus();
+          if (user) {
+            addLog(`✅ Usuario autenticado: ${user.uid}`, 'success');
+          } else {
+            addLog('❌ Usuario no autenticado', 'error');
+          }
+        });
+      }
+    };
+
+    function updateAuthStatus() {
+      const statusDiv = document.getElementById('authStatus');
+      if (window.currentUser) {
+        statusDiv.innerHTML = `
+          <div class="status success">
+            <span class="icon">✅</span>
+            <span>Usuario autenticado: ${window.currentUser.uid}</span>
+          </div>
+          <div class="code-block">${window.currentUser.uid}</div>
+        `;
+      } else {
+        statusDiv.innerHTML = `
+          <div class="status error">
+            <span class="icon">❌</span>
+            <span>No hay usuario autenticado</span>
+          </div>
+        `;
+      }
+    }
+
+    // Verificar permisos
+    window.requestPermission = async function() {
+      addLog('🔔 Solicitando permiso de notificaciones...', 'info');
+      
+      try {
+        const permission = await Notification.requestPermission();
+        updatePermissionStatus();
+        
+        if (permission === 'granted') {
+          addLog('✅ Permiso concedido', 'success');
+        } else if (permission === 'denied') {
+          addLog('❌ Permiso denegado', 'error');
+        } else {
+          addLog('⚠️ Permiso pendiente', 'warning');
+        }
+      } catch (error) {
+        addLog(`❌ Error solicitando permiso: ${error.message}`, 'error');
+      }
+    };
+
+    function updatePermissionStatus() {
+      const statusDiv = document.getElementById('permissionStatus');
+      const permission = Notification.permission;
+      
+      let className = 'info';
+      let icon = 'ℹ️';
+      let message = 'Permiso no solicitado';
+      
+      if (permission === 'granted') {
+        className = 'success';
+        icon = '✅';
+        message = 'Permiso concedido';
+      } else if (permission === 'denied') {
+        className = 'error';
+        icon = '❌';
+        message = 'Permiso denegado';
+      } else if (permission === 'default') {
+        className = 'warning';
+        icon = '⚠️';
+        message = 'Permiso pendiente';
+      }
+      
+      statusDiv.innerHTML = `
+        <div class="status ${className}">
+          <span class="icon">${icon}</span>
+          <span>${message}</span>
+        </div>
+      `;
+    }
+
+    // Obtener token FCM
+    window.getToken = async function() {
+      addLog('🎫 Obteniendo token FCM...', 'info');
+      
+      if (Notification.permission !== 'granted') {
+        addLog('❌ Permiso de notificaciones no concedido', 'error');
+        alert('Primero debes conceder el permiso de notificaciones');
+        return;
+      }
+
+      try {
+        // Inicializar messaging si no está inicializado
+        if (!messaging) {
+          messaging = getMessaging(app);
+          addLog('✅ Firebase Messaging inicializado', 'success');
+        }
+
+        // Registrar service worker
+        addLog('📝 Registrando Service Worker...', 'info');
+        const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+        addLog('✅ Service Worker registrado', 'success');
+
+        // Esperar a que esté activo
+        await navigator.serviceWorker.ready;
+        addLog('✅ Service Worker activo', 'success');
+
+        // Obtener token
+        addLog('🔑 Solicitando token FCM...', 'info');
+        const token = await getToken(messaging, {
+          vapidKey: VAPID_KEY,
+          serviceWorkerRegistration: registration
+        });
+
+        if (token) {
+          window.currentToken = token;
+          updateTokenStatus();
+          addLog(`✅ Token FCM obtenido: ${token.substring(0, 30)}...`, 'success');
+        } else {
+          addLog('❌ No se pudo obtener el token FCM', 'error');
+        }
+      } catch (error) {
+        addLog(`❌ Error obteniendo token: ${error.message}`, 'error');
+        console.error('Error completo:', error);
+      }
+    };
+
+    function updateTokenStatus() {
+      const statusDiv = document.getElementById('tokenStatus');
+      if (window.currentToken) {
+        statusDiv.innerHTML = `
+          <div class="status success">
+            <span class="icon">✅</span>
+            <span>Token FCM obtenido</span>
+          </div>
+          <div class="code-block">${window.currentToken}</div>
+        `;
+      } else {
+        statusDiv.innerHTML = `
+          <div class="status warning">
+            <span class="icon">⚠️</span>
+            <span>Token FCM no obtenido</span>
+          </div>
+        `;
+      }
+    }
+
+    // Guardar token en Firestore
+    window.saveToken = async function() {
+      if (!window.currentUser) {
+        addLog('❌ No hay usuario autenticado', 'error');
+        alert('Primero debes autenticarte o ingresar un userId');
+        return;
+      }
+
+      if (!window.currentToken) {
+        addLog('❌ No hay token FCM', 'error');
+        alert('Primero debes obtener el token FCM');
+        return;
+      }
+
+      addLog('💾 Guardando token en Firestore...', 'info');
+
+      try {
+        const userId = window.currentUser.uid;
+        const tokenRef = doc(db, 'fcmTokens', userId);
+
+        const tokenData = {
+          token: window.currentToken,
+          userId: userId,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+          platform: 'web',
+          userAgent: navigator.userAgent
+        };
+
+        addLog(`📝 Datos a guardar: ${JSON.stringify({ userId, tokenLength: window.currentToken.length })}`, 'info');
+
+        await setDoc(tokenRef, tokenData, { merge: true });
+
+        addLog('✅ Token guardado exitosamente en Firestore', 'success');
+        alert('✅ Token guardado exitosamente en Firestore!');
+
+        // Verificar que se guardó
+        setTimeout(() => checkFirestore(), 1000);
+      } catch (error) {
+        addLog(`❌ Error guardando token: ${error.message}`, 'error');
+        console.error('Error completo:', error);
+        alert(`Error: ${error.message}`);
+      }
+    };
+
+    // Verificar Firestore
+    window.checkFirestore = async function() {
+      if (!window.currentUser) {
+        addLog('❌ No hay usuario autenticado', 'error');
+        alert('Primero debes autenticarte o ingresar un userId');
+        return;
+      }
+
+      addLog('🔍 Verificando colección fcmTokens en Firestore...', 'info');
+
+      try {
+        const userId = window.currentUser.uid;
+        const tokenRef = doc(db, 'fcmTokens', userId);
+        const tokenSnap = await getDoc(tokenRef);
+
+        const statusDiv = document.getElementById('firestoreStatus');
+
+        if (tokenSnap.exists()) {
+          const data = tokenSnap.data();
+          statusDiv.innerHTML = `
+            <div class="status success">
+              <span class="icon">✅</span>
+              <span>Token encontrado en Firestore</span>
+            </div>
+            <div class="code-block">${JSON.stringify(data, null, 2)}</div>
+          `;
+          addLog('✅ Token encontrado en Firestore', 'success');
+        } else {
+          statusDiv.innerHTML = `
+            <div class="status error">
+              <span class="icon">❌</span>
+              <span>Token NO encontrado en Firestore</span>
+            </div>
+          `;
+          addLog('❌ Token NO encontrado en Firestore', 'error');
+        }
+      } catch (error) {
+        addLog(`❌ Error verificando Firestore: ${error.message}`, 'error');
+        console.error('Error completo:', error);
+        
+        const statusDiv = document.getElementById('firestoreStatus');
+        statusDiv.innerHTML = `
+          <div class="status error">
+            <span class="icon">❌</span>
+            <span>Error: ${error.message}</span>
+          </div>
+        `;
+      }
+    };
+
+    // Inicialización
+    window.addEventListener('load', () => {
+      checkSystemSupport();
+      updatePermissionStatus();
+      updateAuthStatus();
+      updateTokenStatus();
+      addLog('🚀 Sistema de debug inicializado', 'info');
+    });
+  </script>
+</body>
+</html>

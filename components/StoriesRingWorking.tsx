@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Settings } from 'lucide-react';
-import AccountSettings from './AccountSettings';
+import { Plus } from 'lucide-react';
 import VerificationBadge from './VerificationBadge';
 import { useLanguage } from '../contexts/LanguageContext';
 import { storiesService, StoryGroup } from '../services/storiesService';
@@ -33,7 +32,6 @@ const StoriesRingWorking: React.FC<StoriesRingWorkingProps> = ({
   const { t } = useLanguage();
   const [storyGroups, setStoryGroups] = useState<StoryGroup[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showAccountSettings, setShowAccountSettings] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
   const [storiesKey, setStoriesKey] = useState(0);
 
@@ -76,10 +74,6 @@ const StoriesRingWorking: React.FC<StoriesRingWorkingProps> = ({
     } else {
       alert('📸 ¡Crear Story!\n\n🎨 Opciones disponibles:\n• Foto desde cámara\n• Foto desde galería\n• Story de texto\n• Story con música\n\n✅ Modal de creación listo!');
     }
-  };
-
-  const handleAccountSettings = () => {
-    setShowAccountSettings(true);
   };
 
   const handlePrivacyUpdated = () => {
@@ -176,46 +170,7 @@ const StoriesRingWorking: React.FC<StoriesRingWorkingProps> = ({
             )}
           </div>
         ))}
-
-        {/* Configuración de Cuenta - Solo mostrar si no es compacto */}
-        {!compact && (
-          <div className="flex-shrink-0 text-center ml-auto">
-            <button
-              onClick={handleAccountSettings}
-              className="relative w-16 h-16 rounded-full overflow-hidden border-4 border-gray-300 hover:border-blue-500 hover:scale-105 transition-all shadow-lg group"
-            >
-              <div className="w-full h-full bg-gradient-to-br from-slate-600 to-slate-800 group-hover:from-blue-500 group-hover:to-indigo-600 flex items-center justify-center transition-all">
-                <Settings size={20} className="text-white" />
-              </div>
-              
-              {/* Indicador de verificación pendiente */}
-              {!isVerified && (
-                <div className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold border-2 border-white animate-pulse">
-                  !
-                </div>
-              )}
-              
-              {/* Badge de verificación si está verificado */}
-              {isVerified && (
-                <div className="absolute -top-1 -right-1">
-                  <VerificationBadge isVerified={true} size="sm" />
-                </div>
-              )}
-            </button>
-            <p className="text-xs font-semibold text-slate-700 mt-1 truncate w-16">
-              {t('account')}
-            </p>
-          </div>
-        )}
       </div>
-
-      {/* Modal de configuración de cuenta unificado */}
-      <AccountSettings
-        isOpen={showAccountSettings}
-        currentUserId={currentUserId}
-        onClose={() => setShowAccountSettings(false)}
-        onSettingsUpdated={handlePrivacyUpdated}
-      />
     </div>
   );
 };

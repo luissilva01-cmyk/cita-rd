@@ -5,6 +5,7 @@ import { auth } from '../../services/firebase';
 import { UserProfile } from '../../types';
 import PhotoUploader from '../../components/PhotoUploader';
 import ProfileScore from '../../components/ProfileScore';
+import AccountSettings from '../../components/AccountSettings';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { logger } from '../../utils/logger';
 
@@ -78,6 +79,7 @@ const ProfileView: React.FC<ProfileViewProps> = ({ user, onUpdate }) => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [newInterest, setNewInterest] = useState('');
   const [showInterestSuggestions, setShowInterestSuggestions] = useState(false);
+  const [showAccountSettings, setShowAccountSettings] = useState(false);
 
   // Detectar si el perfil está incompleto
   const isProfileIncomplete = !user.images || user.images.length === 0 || 
@@ -171,10 +173,18 @@ const ProfileView: React.FC<ProfileViewProps> = ({ user, onUpdate }) => {
         <h2 className="text-xl sm:text-2xl font-bold text-slate-800">{t('myProfile')}</h2>
         <div className="flex items-center gap-2">
           <button
+            onClick={() => setShowAccountSettings(true)}
+            className="p-2 rounded-full hover:bg-slate-100 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+            title="Configuración de cuenta"
+          >
+            <Settings className="text-slate-600" size={18} />
+          </button>
+          <button
             onClick={() => setIsEditing(!isEditing)}
             className="p-2 rounded-full hover:bg-slate-100 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+            title={isEditing ? 'Cancelar edición' : 'Editar perfil'}
           >
-            {isEditing ? <Settings className="text-slate-600" size={18} /> : <Edit3 className="text-slate-600" size={18} />}
+            <Edit3 className="text-slate-600" size={18} />
           </button>
           <button
             onClick={handleLogout}
@@ -490,6 +500,21 @@ const ProfileView: React.FC<ProfileViewProps> = ({ user, onUpdate }) => {
           </div>
         )}
       </div>
+
+      {/* Account Settings Modal */}
+      <AccountSettings
+        isOpen={showAccountSettings}
+        currentUserId={user.id}
+        onClose={() => setShowAccountSettings(false)}
+        onSettingsUpdated={() => {
+          // Recargar datos del usuario si es necesario
+          console.log('⚙️ Configuración actualizada');
+        }}
+        onAccountDeleted={async () => {
+          // El usuario será redirigido automáticamente por el AuthProvider
+          console.log('🗑️ Cuenta eliminada');
+        }}
+      />
     </div>
   );
 };

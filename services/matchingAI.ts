@@ -1,5 +1,7 @@
 // cita-rd/services/matchingAI.ts
 import { UserProfile } from '../types';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from './firebase';
 
 // Tipos para el sistema de IA
 export interface UserBehavior {
@@ -452,13 +454,37 @@ class MatchingAIService {
     console.log('🎯 Generando predicciones para:', userId, 'con', candidates.length, 'candidatos');
     
     try {
-      const user = candidates.find(c => c.id === userId);
-      if (!user) throw new Error('Usuario no encontrado');
+      // Obtener el perfil del usuario actual desde Firestore
+      const userDoc = await getDoc(doc(db, 'users', userId));
+      if (!userDoc.exists()) {
+        console.warn('⚠️ Usuario no encontrado en Firestore:', userId);
+        console.log('⚠️ Retornando array vacío de predicciones');
+        return []; // Retornar array vacío en lugar de lanzar error
+      }
+      
+      const userData = userDoc.data();
+      const user = { id: userDoc.id, ...userData } as UserProfile;
+      
+      // Validar que el perfil tenga los campos mínimos necesarios
+      if (!user.name || !user.age || !user.interests) {
+        console.warn('⚠️ Perfil incompleto para usuario:', userId);
+        console.log('⚠️ Datos del perfil:', { name: user.name, age: user.age, hasInterests: !!user.interests });
+        console.log('⚠️ Retornando array vacío de predicciones');
+        return []; // Retornar array vacío si el perfil está incompleto
+      }
+      
+      console.log('✅ Perfil del usuario obtenido:', user.name);
       
       const predictions: MatchPrediction[] = [];
       
       for (const candidate of candidates) {
         if (candidate.id === userId) continue;
+        
+        // Validar que el candidato también tenga perfil completo
+        if (!candidate.name || !candidate.age || !candidate.interests) {
+          console.warn('⚠️ Candidato con perfil incompleto, saltando:', candidate.id);
+          continue;
+        }
         
         const compatibility = await this.calculateCompatibility(user, candidate);
         const behavior = await this.analyzeUserBehavior(userId);
@@ -493,9 +519,10 @@ class MatchingAIService {
       // Guardar predicciones
       this.matchHistory.set(userId, predictions);
       
+      console.log(`✅ ${predictions.length} predicciones generadas exitosamente`);
       return predictions;
     } catch (error) {
-      console.error('Error generando predicciones:', error);
+      console.error('❌ Error generando predicciones:', error);
       return [];
     }
   }

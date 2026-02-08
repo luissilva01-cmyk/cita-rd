@@ -223,16 +223,44 @@
 
 ---
 
+#### Bug #4: Stories Solo Muestran Propias (No de Matches) ⏳
+
+**Problema:** Solo se ven las propias stories, no las de los matches
+
+**Causa:** `privacyService.ts` usaba datos demo hardcodeados que no se sincronizaban con matches reales de Firestore
+
+**Solución:**
+1. Modificada función `getUserMatches()` para obtener matches desde Firestore
+2. Modificada función `areUsersMatched()` para verificar matches en Firestore
+3. Ambas funciones tienen fallback a datos demo si falla
+
+**Estado:** ⏳ Código modificado - Pendiente testing del usuario
+
+**Archivos:**
+- `services/privacyService.ts`
+- `STORIES_MATCHES_BUG_FIX.md`
+- `TESTING_STORIES_MATCHES.md`
+- `RESUMEN_BUG_STORIES.md`
+
+**Testing Pendiente:**
+1. Recargar app (Ctrl + Shift + R)
+2. Verificar logs: "Matches reales encontrados"
+3. Crear story con usuario match
+4. Verificar visibilidad
+
+---
+
 ## 📊 ESTADÍSTICAS DE BUGS
 
 | Métrica | Valor |
 |---------|-------|
-| Bugs encontrados | 3 críticos |
-| Bugs resueltos | 3 (100%) |
+| Bugs encontrados | 4 críticos |
+| Bugs resueltos | 3 (75%) |
+| Bugs en testing | 1 (25%) |
 | Tiempo promedio de resolución | ~20 min |
 | Commits de fixes | 8 |
-| Archivos modificados | 5 |
-| Testing manual | 1 hora |
+| Archivos modificados | 6 |
+| Testing manual | 1.5 horas |
 | Testing técnico | 30 min |
 
 ---
@@ -324,7 +352,7 @@ allow write: if isOwner(userId);
 
 ## 📁 ARCHIVOS CREADOS/MODIFICADOS
 
-### Creados (9)
+### Creados (12)
 1. `firestore.indexes.json` - Índices de Firestore
 2. `FIRESTORE_INDEXES_DEPLOYED.md` - Documentación de índices
 3. `ENV_VARIABLES_CONFIGURED.md` - Documentación de variables de entorno
@@ -333,14 +361,18 @@ allow write: if isOwner(userId);
 6. `ERROR_HANDLING_IMPLEMENTATION.md` - Error handling implementado
 7. `BUGS_ENCONTRADOS_TESTING_MANUAL.md` - Bugs y soluciones
 8. `MATCHES_BUG_RESOLVED.md` - Documentación detallada Bug #3
-9. `RESUMEN_SESION_04_FEB_2026_FINAL.md` - Este documento
+9. `STORIES_MATCHES_BUG_FIX.md` - Documentación técnica Bug #4
+10. `TESTING_STORIES_MATCHES.md` - Guía de testing Bug #4
+11. `RESUMEN_BUG_STORIES.md` - Resumen ejecutivo Bug #4
+12. `RESUMEN_SESION_04_FEB_2026_FINAL.md` - Este documento
 
-### Modificados (5)
+### Modificados (6)
 1. `services/firebase.ts` - Variables de entorno
 2. `services/profileService.ts` - Query optimization + error handling
 3. `services/chatService.ts` - Query optimization
-4. `firestore.rules` - Simplificadas reglas de seguridad
-5. `App.tsx` - Error handling + debug logging
+4. `services/privacyService.ts` - Matches reales de Firestore
+5. `firestore.rules` - Simplificadas reglas de seguridad
+6. `App.tsx` - Error handling + debug logging
 
 ---
 
@@ -455,12 +487,15 @@ allow write: if isOwner(userId);
 **Sesión extremadamente productiva:**
 - ✅ 6 objetivos principales completados
 - ✅ 3 bugs críticos resueltos
+- ⏳ 1 bug en testing (stories de matches)
 - ✅ 11% progreso hacia lanzamiento
 - ✅ App funcional y estable
 - ✅ Performance optimizada
 - ✅ Seguridad mejorada
 
-**Estado actual:** App lista para testing beta con usuarios reales
+**Estado actual:** App lista para testing beta con usuarios reales (pendiente verificación de stories)
+
+**Próximo paso inmediato:** Testing del bug #4 (stories de matches)
 
 **Próximo hito:** Lanzamiento beta privado (96% → 100%)
 
@@ -468,6 +503,6 @@ allow write: if isOwner(userId);
 
 **Documentado por:** Kiro AI  
 **Fecha:** 4 de Febrero 2026  
-**Hora:** 9:00 PM  
+**Hora:** 8:55 PM  
 **Progreso:** 96% hacia lanzamiento  
-**Estado:** ✅ Sesión completada exitosamente
+**Estado:** ⏳ Sesión en progreso - Esperando testing de stories

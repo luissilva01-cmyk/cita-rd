@@ -137,11 +137,14 @@ class StoriesService {
           );
           
           // Crear grupo
+          // Obtener nombre del perfil con mejor fallback
+          const userName = perfilData.name || perfilData.nombre || perfilData.displayName || `Usuario ${userId.substring(0, 6)}`;
+          
           const group: StoryGroup = {
             id: `group_${userId}`,
             userId,
             user: {
-              name: perfilData.name || perfilData.nombre || 'Usuario',
+              name: userName,
               avatar: perfilData.images?.[0] || perfilData.fotos?.[0] || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=face'
             },
             stories: userStories.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime()),

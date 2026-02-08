@@ -21,129 +21,13 @@ class PrivacyService {
   private userMatches: UserMatch[] = [];
 
   constructor() {
-    this.initializeDemoData();
+    // Servicio limpio - sin datos demo hardcodeados
+    // Los datos de privacidad se crearán dinámicamente cuando se necesiten
   }
 
   private initializeDemoData() {
-    // Configuraciones de privacidad demo
-    const demoSettings: PrivacySettings[] = [
-      {
-        userId: 'KU5ZalR92QcPV7RGbLFTjEjTXZm2', // Usuario actual
-        storiesVisibility: 'matches_only', // 🔒 Solo matches
-        allowStoryReplies: true,
-        showOnlineStatus: true,
-        allowProfileViews: 'everyone',
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
-      {
-        userId: '1', // Carolina
-        storiesVisibility: 'matches_only', // 🔒 Solo matches
-        allowStoryReplies: true,
-        showOnlineStatus: true,
-        allowProfileViews: 'everyone',
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
-      {
-        userId: '2', // Marcos
-        storiesVisibility: 'matches_only', // 🔒 Solo matches
-        allowStoryReplies: true,
-        showOnlineStatus: true,
-        allowProfileViews: 'everyone',
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
-      {
-        userId: '3', // Isabella
-        storiesVisibility: 'matches_only', // 🔒 Solo matches
-        allowStoryReplies: true,
-        showOnlineStatus: true,
-        allowProfileViews: 'everyone',
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
-      {
-        userId: '4', // Rafael
-        storiesVisibility: 'matches_only', // 🔒 Solo matches
-        allowStoryReplies: true,
-        showOnlineStatus: true,
-        allowProfileViews: 'everyone',
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
-      {
-        userId: '5', // Sofía
-        storiesVisibility: 'matches_only', // 🔒 Solo matches
-        allowStoryReplies: true,
-        showOnlineStatus: true,
-        allowProfileViews: 'everyone',
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
-      {
-        userId: '6', // Diego
-        storiesVisibility: 'matches_only', // 🔒 Solo matches
-        allowStoryReplies: true,
-        showOnlineStatus: true,
-        allowProfileViews: 'everyone',
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
-      {
-        userId: 'demo-user',
-        storiesVisibility: 'matches_only', // 🔒 Solo matches
-        allowStoryReplies: true,
-        showOnlineStatus: true,
-        allowProfileViews: 'everyone',
-        createdAt: new Date(),
-        updatedAt: new Date()
-      }
-    ];
-
-    demoSettings.forEach(setting => {
-      this.privacySettings.set(setting.userId, setting);
-    });
-
-    // Matches demo - simular que el usuario actual tiene matches con todos los usuarios
-    this.userMatches = [
-      {
-        userId1: 'KU5ZalR92QcPV7RGbLFTjEjTXZm2',
-        userId2: '1', // Carolina
-        matchedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-        isActive: true
-      },
-      {
-        userId1: 'KU5ZalR92QcPV7RGbLFTjEjTXZm2',
-        userId2: '2', // Marcos
-        matchedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
-        isActive: true
-      },
-      {
-        userId1: 'KU5ZalR92QcPV7RGbLFTjEjTXZm2',
-        userId2: '3', // Isabella
-        matchedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
-        isActive: true
-      },
-      {
-        userId1: 'KU5ZalR92QcPV7RGbLFTjEjTXZm2',
-        userId2: '4', // Rafael
-        matchedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
-        isActive: true
-      },
-      {
-        userId1: 'KU5ZalR92QcPV7RGbLFTjEjTXZm2',
-        userId2: '5', // Sofía
-        matchedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-        isActive: true
-      },
-      {
-        userId1: 'KU5ZalR92QcPV7RGbLFTjEjTXZm2',
-        userId2: '6', // Diego
-        matchedAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000),
-        isActive: true
-      }
-    ];
+    // Método vacío - mantenido por compatibilidad pero sin datos demo
+    // Los usuarios reales tendrán configuraciones creadas automáticamente
   }
 
   // Obtener configuración de privacidad de un usuario
@@ -190,15 +74,44 @@ class PrivacyService {
 
   // Verificar si dos usuarios tienen match
   async areUsersMatched(userId1: string, userId2: string): Promise<boolean> {
-    const isMatched = this.userMatches.some(match => 
-      match.isActive && (
-        (match.userId1 === userId1 && match.userId2 === userId2) ||
-        (match.userId1 === userId2 && match.userId2 === userId1)
-      )
-    );
+    console.log('🔍 Verificando match real en Firestore entre', userId1, 'y', userId2);
+    
+    try {
+      // Importar Firestore si no está disponible
+      const { db } = await import('./firebase');
+      const { collection, query, where, getDocs } = await import('firebase/firestore');
+      
+      // Buscar chats donde ambos usuarios son participantes
+      const chatsRef = collection(db, 'chats');
+      const q = query(chatsRef, where('participants', 'array-contains', userId1));
+      const querySnapshot = await getDocs(q);
+      
+      // Verificar si algún chat incluye a ambos usuarios
+      let isMatched = false;
+      querySnapshot.forEach((doc) => {
+        const participants = doc.data().participants as string[];
+        if (participants.includes(userId2)) {
+          isMatched = true;
+        }
+      });
+      
+      console.log('✅ Match real encontrado:', isMatched);
+      return isMatched;
+      
+    } catch (error) {
+      console.error('❌ Error verificando match en Firestore:', error);
+      
+      // Fallback a matches demo si falla
+      const isMatched = this.userMatches.some(match => 
+        match.isActive && (
+          (match.userId1 === userId1 && match.userId2 === userId2) ||
+          (match.userId1 === userId2 && match.userId2 === userId1)
+        )
+      );
 
-    console.log('🔍 Verificando match entre', userId1, 'y', userId2, ':', isMatched);
-    return isMatched;
+      console.log('⚠️ Usando matches demo como fallback:', isMatched);
+      return isMatched;
+    }
   }
 
   // Verificar si un usuario puede ver las stories de otro
@@ -319,12 +232,42 @@ class PrivacyService {
 
   // Obtener todos los matches de un usuario
   async getUserMatches(userId: string): Promise<string[]> {
-    const matchedUserIds = this.userMatches
-      .filter(match => match.isActive && (match.userId1 === userId || match.userId2 === userId))
-      .map(match => match.userId1 === userId ? match.userId2 : match.userId1);
+    console.log('👥 Obteniendo matches reales de Firestore para:', userId);
+    
+    try {
+      // Importar Firestore si no está disponible
+      const { db } = await import('./firebase');
+      const { collection, query, where, getDocs } = await import('firebase/firestore');
+      
+      // Buscar chats donde el usuario es participante
+      const chatsRef = collection(db, 'chats');
+      const q = query(chatsRef, where('participants', 'array-contains', userId));
+      const querySnapshot = await getDocs(q);
+      
+      // Extraer los IDs de los otros usuarios
+      const matchedUserIds: string[] = [];
+      querySnapshot.forEach((doc) => {
+        const participants = doc.data().participants as string[];
+        const otherUserId = participants.find(p => p !== userId);
+        if (otherUserId && !matchedUserIds.includes(otherUserId)) {
+          matchedUserIds.push(otherUserId);
+        }
+      });
+      
+      console.log('✅ Matches reales encontrados:', matchedUserIds.length, matchedUserIds);
+      return matchedUserIds;
+      
+    } catch (error) {
+      console.error('❌ Error obteniendo matches de Firestore:', error);
+      
+      // Fallback a matches demo si falla
+      const matchedUserIds = this.userMatches
+        .filter(match => match.isActive && (match.userId1 === userId || match.userId2 === userId))
+        .map(match => match.userId1 === userId ? match.userId2 : match.userId1);
 
-    console.log('👥 Matches de', userId, ':', matchedUserIds);
-    return matchedUserIds;
+      console.log('⚠️ Usando matches demo como fallback:', matchedUserIds);
+      return matchedUserIds;
+    }
   }
 
   // Obtener estadísticas de privacidad

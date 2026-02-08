@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test FCM - API Key Verification</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 800px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    h1 {
+      color: #667eea;
+      margin-bottom: 10px;
+      font-size: 28px;
+    }
+
+    .subtitle {
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+
+    .info-box {
+      background: #f0f4ff;
+      border-left: 4px solid #667eea;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+    }
+
+    .info-box strong {
+      color: #667eea;
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .info-box code {
+      background: white;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 12px;
+      color: #333;
+    }
+
+    .button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      margin-bottom: 15px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .log-container {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 20px;
+      border-radius: 12px;
+      max-height: 400px;
+      overflow-y: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      margin-top: 20px;
+    }
+
+    .log-entry {
+      margin-bottom: 8px;
+      padding: 4px 0;
+    }
+
+    .log-success {
+      color: #4ade80;
+    }
+
+    .log-error {
+      color: #f87171;
+    }
+
+    .log-info {
+      color: #60a5fa;
+    }
+
+    .log-warning {
+      color: #fbbf24;
+    }
+
+    .status {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-left: 10px;
+    }
+
+    .status-pending {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .status-success {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .status-error {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .clear-btn {
+      background: #ef4444;
+      padding: 8px 16px;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+
+    .steps {
+      background: #fef3c7;
+      border-left: 4px solid #f59e0b;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 8px;
+    }
+
+    .steps h3 {
+      color: #92400e;
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+
+    .steps ol {
+      margin-left: 20px;
+      color: #78350f;
+    }
+
+    .steps li {
+      margin-bottom: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔔 Test FCM - Verificación de API Key</h1>
+    <p class="subtitle">Prueba las notificaciones push y verifica si la API Key está configurada correctamente</p>
+
+    <div class="info-box">
+      <strong>📋 Tu API Key:</strong>
+      <code>AIzaSyDy2tLpXr3v6llyXGfQVhVlnmZtMgCDRhg</code>
+    </div>
+
+    <div class="info-box">
+      <strong>🎯 Proyecto Firebase:</strong>
+      <code>citard-fbc26</code>
+    </div>
+
+    <div class="steps">
+      <h3>⚠️ Antes de Probar:</h3>
+      <ol>
+        <li>Ve a Google Cloud Console → Credenciales</li>
+        <li>Busca la API Key que termina en <strong>...CRhg</strong></li>
+        <li>Verifica que tenga las 7 APIs en las restricciones</li>
+        <li>Si hiciste cambios, espera 10-15 minutos</li>
+        <li>Limpia caché del navegador (Ctrl+Shift+R)</li>
+      </ol>
+    </div>
+
+    <button class="button" onclick="testNotifications()">
+      🚀 Probar Notificaciones Push
+    </button>
+
+    <button class="button clear-btn" onclick="clearLogs()">
+      🗑️ Limpiar Logs
+    </button>
+
+    <div class="log-container" id="logContainer">
+      <div class="log-info">📝 Esperando prueba...</div>
+    </div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+    import { getMessaging, getToken } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging.js';
+
+    // Configuración de Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyDy2tLpXr3v6llyXGfQVhVlnmZtMgCDRhg",
+      authDomain: "citard-fbc26.firebaseapp.com",
+      projectId: "citard-fbc26",
+      storageBucket: "citard-fbc26.appspot.com",
+      messagingSenderId: "564769541768",
+      appId: "1:564769541768:web:07013924da206d8b37593d"
+    };
+
+    const VAPID_KEY = 'BPYyFAePfkeyT_bRq5IkbHLYRtbffQtN2lXJIlcGmiCEUhn96ODpanN98M4kMpgOs7oHFIMOvI6Y7uu_G597Cw0';
+
+    let app, messaging;
+
+    function addLog(message, type = 'info') {
+      const logContainer = document.getElementById('logContainer');
+      const logEntry = document.createElement('div');
+      logEntry.className = `log-entry log-${type}`;
+      
+      const timestamp = new Date().toLocaleTimeString();
+      const icon = {
+        success: '✅',
+        error: '❌',
+        info: 'ℹ️',
+        warning: '⚠️'
+      }[type] || 'ℹ️';
+      
+      logEntry.textContent = `[${timestamp}] ${icon} ${message}`;
+      logContainer.appendChild(logEntry);
+      logContainer.scrollTop = logContainer.scrollHeight;
+    }
+
+    window.clearLogs = function() {
+      const logContainer = document.getElementById('logContainer');
+      logContainer.innerHTML = '<div class="log-info">📝 Logs limpiados. Listo para nueva prueba...</div>';
+    };
+
+    window.testNotifications = async function() {
+      addLog('🚀 Iniciando prueba de notificaciones...', 'info');
+      
+      try {
+        // 1. Verificar soporte
+        addLog('1️⃣ Verificando soporte del navegador...', 'info');
+        if (!('Notification' in window)) {
+          addLog('❌ Este navegador no soporta notificaciones', 'error');
+          return;
+        }
+        if (!('serviceWorker' in navigator)) {
+          addLog('❌ Este navegador no soporta Service Workers', 'error');
+          return;
+        }
+        addLog('✅ Navegador compatible', 'success');
+
+        // 2. Inicializar Firebase
+        addLog('2️⃣ Inicializando Firebase...', 'info');
+        app = initializeApp(firebaseConfig);
+        addLog('✅ Firebase inicializado', 'success');
+
+        // 3. Solicitar permiso
+        addLog('3️⃣ Solicitando permiso de notificaciones...', 'info');
+        const permission = await Notification.requestPermission();
+        addLog(`📋 Permiso: ${permission}`, permission === 'granted' ? 'success' : 'error');
+        
+        if (permission !== 'granted') {
+          addLog('❌ Permiso denegado. No se puede continuar.', 'error');
+          return;
+        }
+
+        // 4. Registrar Service Worker
+        addLog('4️⃣ Registrando Service Worker...', 'info');
+        let registration;
+        try {
+          registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+          addLog('✅ Service Worker registrado', 'success');
+        } catch (swError) {
+          addLog(`⚠️ Service Worker no encontrado (normal en testing): ${swError.message}`, 'warning');
+          addLog('ℹ️ Continuando sin Service Worker...', 'info');
+        }
+
+        // 5. Obtener Messaging
+        addLog('5️⃣ Obteniendo Firebase Messaging...', 'info');
+        messaging = getMessaging(app);
+        addLog('✅ Messaging obtenido', 'success');
+
+        // 6. Obtener Token FCM - AQUÍ ES DONDE FALLA CON 403
+        addLog('6️⃣ Obteniendo token FCM...', 'info');
+        addLog('⏳ Esto puede tardar unos segundos...', 'info');
+        addLog('🔍 Si falla con 403, la API Key no tiene las restricciones correctas', 'warning');
+        
+        try {
+          const token = await getToken(messaging, {
+            vapidKey: VAPID_KEY,
+            serviceWorkerRegistration: registration
+          });
+
+          if (token) {
+            addLog('🎉 ¡TOKEN FCM OBTENIDO EXITOSAMENTE!', 'success');
+            addLog(`📝 Token: ${token.substring(0, 50)}...`, 'success');
+            addLog('', 'info');
+            addLog('✅ ¡LA API KEY ESTÁ CONFIGURADA CORRECTAMENTE!', 'success');
+            addLog('✅ Las restricciones están bien aplicadas', 'success');
+            addLog('✅ Las notificaciones funcionarán en tu app', 'success');
+            
+            // Mostrar notificación de prueba
+            new Notification('🎉 Ta\' Pa\' Ti', {
+              body: '¡Las notificaciones están funcionando correctamente!',
+              icon: '/logo192.png'
+            });
+          } else {
+            addLog('⚠️ No se pudo obtener el token (pero no hubo error 403)', 'warning');
+          }
+        } catch (tokenError) {
+          addLog('❌ ERROR AL OBTENER TOKEN FCM', 'error');
+          addLog(`📋 Código de error: ${tokenError.code}`, 'error');
+          addLog(`📋 Mensaje: ${tokenError.message}`, 'error');
+          
+          if (tokenError.message.includes('403') || tokenError.message.includes('Forbidden')) {
+            addLog('', 'error');
+            addLog('🔴 ERROR 403 - PROBLEMA CON LA API KEY', 'error');
+            addLog('', 'error');
+            addLog('📋 Posibles causas:', 'warning');
+            addLog('1. La API Key no tiene Firebase Cloud Messaging API habilitada', 'warning');
+            addLog('2. La API Key no tiene Firebase Installations API habilitada', 'warning');
+            addLog('3. Los cambios en Google Cloud aún no se han propagado', 'warning');
+            addLog('4. Estás editando una API Key diferente a la que usa la app', 'warning');
+            addLog('', 'warning');
+            addLog('🔧 Soluciones:', 'info');
+            addLog('1. Ve a Google Cloud Console → Credenciales', 'info');
+            addLog('2. Busca la API Key que termina en ...CRhg', 'info');
+            addLog('3. Verifica que tenga las 7 APIs en las restricciones', 'info');
+            addLog('4. Si hiciste cambios, espera 10-15 minutos', 'info');
+            addLog('5. Limpia caché del navegador (Ctrl+Shift+R)', 'info');
+          }
+        }
+
+      } catch (error) {
+        addLog(`❌ Error general: ${error.message}`, 'error');
+        console.error('Error completo:', error);
+      }
+    };
+
+    // Log inicial
+    addLog('🔧 Sistema de testing cargado', 'success');
+    addLog('📋 API Key: AIzaSyDy2tLpXr3v6llyXGfQVhVlnmZtMgCDRhg', 'info');
+    addLog('📋 Proyecto: citard-fbc26', 'info');
+    addLog('', 'info');
+    addLog('👆 Click en "Probar Notificaciones Push" para empezar', 'info');
+  </script>
+</body>
+</html>

@@ -17,11 +17,35 @@ import { getDiscoveryProfiles, createOrUpdateProfile, getUserProfile } from './s
 import { privacyService } from './services/privacyService';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { StoryGroup } from './services/storiesService';
-import { auth } from './services/firebase';
+import { auth, db } from './services/firebase';
+import { doc, getDoc } from 'firebase/firestore';
 import { setUserOnline, setUserOffline } from './services/presenceService';
 import { logger } from './utils/logger';
+import NotificationPermissionPrompt from './components/NotificationPermissionPrompt';
 
 const INITIAL_POTENTIAL_MATCHES: UserProfile[] = [];
+
+// Helper function para obtener perfil completo desde Firestore
+const getUserProfileFromFirestore = async (userId: string): Promise<Partial<UserProfile> | null> => {
+  try {
+    const perfilDoc = await getDoc(doc(db, 'perfiles', userId));
+    if (perfilDoc.exists()) {
+      const data = perfilDoc.data();
+      return {
+        id: userId,
+        name: data.name || data.nombre || data.displayName || `Usuario ${userId.substring(0, 6)}`,
+        age: data.age || data.edad || 25,
+        bio: data.bio || data.biografia || '',
+        location: data.location || data.ubicacion || '',
+        images: data.images || data.fotos || [],
+        interests: data.interests || data.intereses || []
+      };
+    }
+  } catch (error) {
+    logger.profile.error('Error obteniendo perfil de usuario', { userId, error });
+  }
+  return null;
+};
 
 const App: React.FC = () => {
   const [activeView, setActiveView] = useState<View>('home');
@@ -33,11 +57,17 @@ const App: React.FC = () => {
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
   const [chatMessages, setChatMessages] = useState<Record<string, Message[]>>({});
   
+  // Cache de perfiles de usuarios obtenidos de Firestore
+  const [userProfilesCache, setUserProfilesCache] = useState<Record<string, Partial<UserProfile>>>({});
+  
   // Estados para Stories
   const [showStoriesViewer, setShowStoriesViewer] = useState(false);
   const [selectedStoryGroup, setSelectedStoryGroup] = useState<StoryGroup | null>(null);
   const [showCreateStoryModal, setShowCreateStoryModal] = useState(false);
   const [storiesRefreshKey, setStoriesRefreshKey] = useState(0);
+  
+  // Estado para mostrar prompt de notificaciones
+  const [showNotificationPrompt, setShowNotificationPrompt] = useState(false);
 
   // Cargar perfil del usuario autenticado
   useEffect(() => {
@@ -62,6 +92,11 @@ const App: React.FC = () => {
           if (isIncomplete) {
             logger.profile.info('Incomplete profile detected, redirecting to Profile', { userId: user.uid });
             setActiveView('profile');
+          } else {
+            // Perfil completo - mostrar prompt de notificaciones después de 3 segundos
+            setTimeout(() => {
+              setShowNotificationPrompt(true);
+            }, 3000);
           }
         } else {
           // Crear perfil básico si no existe
@@ -128,6 +163,17 @@ const App: React.FC = () => {
     
     const unsubscribe = getUserChats(currentUser.id, (userChats) => {
       setChats(userChats);
+      
+      // Cargar perfiles completos de usuarios de los chats
+      userChats.forEach(async (chat) => {
+        const otherUserId = chat.participants.find(p => p !== currentUser.id);
+        if (otherUserId && !userProfilesCache[otherUserId]) {
+          const userProfile = await getUserProfileFromFirestore(otherUserId);
+          if (userProfile) {
+            setUserProfilesCache(prev => ({ ...prev, [otherUserId]: userProfile }));
+          }
+        }
+      });
     });
 
     return () => {
@@ -203,24 +249,7 @@ const App: React.FC = () => {
     if (!currentUser) return;
     
     createOrUpdateProfile(currentUser.id, currentUser);
-    
-    // Crear algunos matches de demo para probar el sistema de privacidad
-    // Comentado para no crear matches automáticamente
-    // initializeDemoMatches();
   }, [currentUser]);
-
-  // Inicializar matches de demo
-  const initializeDemoMatches = async () => {
-    if (!currentUser) return;
-    
-    try {
-      // Crear matches con algunos usuarios
-      await privacyService.createMatch(currentUser.id, '1'); // Match con Carolina
-      await privacyService.createMatch(currentUser.id, '3'); // Match con Isabella
-    } catch (error) {
-      logger.match.error('Error creando matches de demo', error);
-    }
-  };
 
   const handleLike = async (user: UserProfile) => {
     if (!currentUser) return false;
@@ -311,18 +340,20 @@ const App: React.FC = () => {
         // Convertir chats reales a UserProfile[] para recentMatches
         const recentMatchesFromChats = chats.slice(0, 3).map(chat => {
           const otherUserId = chat.participants.find(p => p !== user.id) || '';
-          // Buscar en potentialMatches o crear perfil básico
+          // Buscar en potentialMatches o en cache
           let matchUser = potentialMatches.find(u => u.id === otherUserId);
           
           if (!matchUser) {
+            // Usar perfil del cache o crear perfil básico
+            const cachedProfile = userProfilesCache[otherUserId];
             matchUser = {
               id: otherUserId,
-              name: 'Usuario',
-              age: 25,
-              bio: '',
-              location: '',
-              images: [],
-              interests: []
+              name: cachedProfile?.name || `Usuario ${otherUserId.substring(0, 6)}`,
+              age: cachedProfile?.age || 25,
+              bio: cachedProfile?.bio || '',
+              location: cachedProfile?.location || '',
+              images: cachedProfile?.images || [],
+              interests: cachedProfile?.interests || []
             };
           }
           
@@ -374,19 +405,20 @@ const App: React.FC = () => {
               // Encontrar el ID del otro usuario
               const otherUserId = chat.participants.find(p => p !== currentUser!.id) || '';
               
-              // Buscar el usuario en potentialMatches
+              // Buscar el usuario en potentialMatches o en cache
               let otherUser = potentialMatches.find(u => u.id === otherUserId);
               
-              // Si no se encuentra, crear un perfil básico (esto solo debería pasar si hay un chat pero el perfil no se cargó)
+              // Si no se encuentra, usar perfil del cache o crear básico
               if (!otherUser) {
+                const cachedProfile = userProfilesCache[otherUserId];
                 otherUser = {
                   id: otherUserId,
-                  name: 'Usuario',
-                  age: 25,
-                  bio: '',
-                  location: '',
-                  images: ['https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=face'],
-                  interests: []
+                  name: cachedProfile?.name || `Usuario ${otherUserId.substring(0, 6)}`,
+                  age: cachedProfile?.age || 25,
+                  bio: cachedProfile?.bio || '',
+                  location: cachedProfile?.location || '',
+                  images: cachedProfile?.images || ['https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=face'],
+                  interests: cachedProfile?.interests || []
                 };
               }
               
@@ -410,19 +442,20 @@ const App: React.FC = () => {
               // Encontrar el ID del otro usuario
               const otherUserId = chat.participants.find(p => p !== currentUser!.id) || '';
               
-              // Buscar el usuario en potentialMatches
+              // Buscar el usuario en potentialMatches o en cache
               let otherUser = potentialMatches.find(u => u.id === otherUserId);
               
-              // Si no se encuentra, crear un perfil básico (esto solo debería pasar si hay un chat pero el perfil no se cargó)
+              // Si no se encuentra, usar perfil del cache o crear básico
               if (!otherUser) {
+                const cachedProfile = userProfilesCache[otherUserId];
                 otherUser = {
                   id: otherUserId,
-                  name: 'Usuario',
-                  age: 25,
-                  bio: '',
-                  location: '',
-                  images: ['https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=face'],
-                  interests: []
+                  name: cachedProfile?.name || `Usuario ${otherUserId.substring(0, 6)}`,
+                  age: cachedProfile?.age || 25,
+                  bio: cachedProfile?.bio || '',
+                  location: cachedProfile?.location || '',
+                  images: cachedProfile?.images || ['https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=face'],
+                  interests: cachedProfile?.interests || []
                 };
               }
               
@@ -451,19 +484,20 @@ const App: React.FC = () => {
         // Encontrar el ID del otro usuario
         const otherUserId = currentChat.participants.find(p => p !== currentUser!.id) || '';
         
-        // Buscar el usuario en potentialMatches
+        // Buscar el usuario en potentialMatches o en cache
         let otherUser = potentialMatches.find(u => u.id === otherUserId);
         
-        // Si no se encuentra, crear un perfil básico (esto solo debería pasar si hay un chat pero el perfil no se cargó)
+        // Si no se encuentra, usar perfil del cache o crear básico
         if (!otherUser) {
+          const cachedProfile = userProfilesCache[otherUserId];
           otherUser = {
             id: otherUserId,
-            name: 'Usuario',
-            age: 25,
-            bio: '',
-            location: '',
-            images: ['https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=face'],
-            interests: []
+            name: cachedProfile?.name || `Usuario ${otherUserId.substring(0, 6)}`,
+            age: cachedProfile?.age || 25,
+            bio: cachedProfile?.bio || '',
+            location: cachedProfile?.location || '',
+            images: cachedProfile?.images || ['https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=face'],
+            interests: cachedProfile?.interests || []
           };
         }
         
@@ -528,6 +562,21 @@ const App: React.FC = () => {
         >
           {renderView()}
         </Layout>
+        
+        {/* Notification Permission Prompt */}
+        {showNotificationPrompt && (
+          <NotificationPermissionPrompt
+            userId={currentUser!.id}
+            onPermissionGranted={() => {
+              logger.notification.success('User granted notification permission');
+              setShowNotificationPrompt(false);
+            }}
+            onPermissionDenied={() => {
+              logger.notification.info('User denied notification permission');
+              setShowNotificationPrompt(false);
+            }}
+          />
+        )}
         
         {/* Stories Viewer */}
         <StoriesViewer

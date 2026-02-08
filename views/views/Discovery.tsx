@@ -24,7 +24,7 @@ interface DiscoveryProps {
   currentUserId?: string;
 }
 
-// Mock user para el usuario actual
+// Mock user para el usuario actual (solo para sistema de matching IA)
 const CURRENT_USER_MOCK: UserProfile = {
   id: 'current-user',
   name: 'Usuario Actual',
@@ -37,98 +37,6 @@ const CURRENT_USER_MOCK: UserProfile = {
   job: 'Desarrollador',
   isVerified: true
 };
-const MOCK_USERS: UserProfile[] = [
-  {
-    id: '1',
-    name: 'Carolina',
-    age: 24,
-    bio: 'Amo el mofongo y bailar bachata en la Zona Colonial. Busco a alguien para ir de aventura a Samaná.',
-    location: 'Santo Domingo',
-    distance: '3km',
-    images: ['https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&q=95&w=1200&h=1600'],
-    interests: ['Bachata', 'Playa', 'Gastronomía', 'Viajes', 'Fotografía'],
-    job: 'Arquitecta',
-    isVerified: true,
-    education: 'Universidad Autónoma de Santo Domingo',
-    height: '1.65m',
-    relationshipGoal: 'Relación seria'
-  },
-  {
-    id: '2',
-    name: 'Marcos',
-    age: 27,
-    bio: 'Emprendedor digital. Fanático de las Águilas Cibaeñas. Si no estamos viendo pelota, estamos en la playa.',
-    location: 'Santiago de los Caballeros',
-    distance: '15km',
-    images: ['https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=95&w=1200&h=1600'],
-    interests: ['Béisbol', 'Tecnología', 'Café', 'Emprendimiento', 'Deportes'],
-    job: 'Desarrollador',
-    isVerified: true,
-    education: 'PUCMM',
-    height: '1.78m',
-    relationshipGoal: 'Conocer gente nueva'
-  },
-  {
-    id: '3',
-    name: 'Isabella',
-    age: 26,
-    bio: 'Doctora apasionada por ayudar a otros. Me encanta la salsa y los atardeceres en el Malecón.',
-    location: 'Santo Domingo',
-    distance: '5km',
-    images: ['https://images.unsplash.com/photo-1494790108755-2616b612b786?auto=format&fit=crop&q=95&w=1200&h=1600'],
-    interests: ['Medicina', 'Salsa', 'Fotografía', 'Yoga', 'Lectura'],
-    job: 'Doctora',
-    isVerified: true,
-    education: 'UNPHU - Medicina',
-    height: '1.62m',
-    relationshipGoal: 'Relación seria'
-  },
-  {
-    id: '4',
-    name: 'Rafael',
-    age: 29,
-    bio: 'Chef profesional. Si quieres probar el mejor mangú de la ciudad, ya sabes a quién llamar.',
-    location: 'Santiago',
-    distance: '12km',
-    images: ['https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=95&w=1200&h=1600'],
-    interests: ['Cocina', 'Música', 'Viajes', 'Gastronomía', 'Vino'],
-    job: 'Chef',
-    isVerified: false,
-    education: 'Instituto Culinario de América',
-    height: '1.75m',
-    relationshipGoal: 'Algo casual'
-  },
-  {
-    id: '5',
-    name: 'Sofía',
-    age: 23,
-    bio: 'Estudiante de arte. Me encanta pintar y explorar galerías en la Zona Colonial.',
-    location: 'Santo Domingo',
-    distance: '2km',
-    images: ['https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=95&w=1200&h=1600'],
-    interests: ['Arte', 'Pintura', 'Cultura', 'Museos', 'Cine'],
-    job: 'Estudiante',
-    isVerified: false,
-    education: 'Escuela de Diseño Altos de Chavón',
-    height: '1.60m',
-    relationshipGoal: 'Conocer gente nueva'
-  },
-  {
-    id: '6',
-    name: 'Diego',
-    age: 30,
-    bio: 'Ingeniero y surfista. Los fines de semana me encuentras en las playas de Cabarete.',
-    location: 'Puerto Plata',
-    distance: '25km',
-    images: ['https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=95&w=1200&h=1600'],
-    interests: ['Surf', 'Ingeniería', 'Aventura', 'Naturaleza', 'Deportes extremos'],
-    job: 'Ingeniero',
-    isVerified: true,
-    education: 'INTEC - Ingeniería Civil',
-    height: '1.82m',
-    relationshipGoal: 'Relación seria'
-  }
-];
 
 const Discovery: React.FC<DiscoveryProps> = ({ 
   users, 
@@ -148,8 +56,8 @@ const Discovery: React.FC<DiscoveryProps> = ({
     error: aiError 
   } = useMatchingAI();
   
-  // Usar los usuarios pasados como prop, o fallback a MOCK_USERS
-  const availableUsers = users && users.length > 0 ? users : MOCK_USERS;
+  // Usar solo los usuarios pasados como prop (usuarios reales de Firebase)
+  const availableUsers = users || [];
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showMatch, setShowMatch] = useState(false);
   const [matchedUser, setMatchedUser] = useState<UserProfile | null>(null);
@@ -417,11 +325,16 @@ const Discovery: React.FC<DiscoveryProps> = ({
     console.log('❌ No hay usuarios disponibles');
     return (
       <div className="flex flex-col items-center justify-center h-full text-center px-6">
-        <div className="w-24 h-24 bg-linear-to-br from-orange-400 to-rose-500 rounded-full flex items-center justify-center mb-6">
+        <div className="w-24 h-24 bg-gradient-to-br from-orange-400 to-rose-500 rounded-full flex items-center justify-center mb-6">
           <Heart className="text-white" size={40} />
         </div>
-        <h2 className="text-2xl font-bold text-slate-800 mb-4">{t('noProfilesAvailable')}</h2>
-        <p className="text-slate-600 mb-6">{t('comeBackLater')}</p>
+        <h2 className="text-2xl font-bold text-slate-800 mb-4">Sé de los primeros en Ta' Pa' Ti</h2>
+        <p className="text-slate-600 mb-6">
+          Estamos creciendo rápidamente. Vuelve pronto para descubrir nuevos perfiles en tu área.
+        </p>
+        <p className="text-sm text-slate-500">
+          💡 Mientras tanto, completa tu perfil y activa las notificaciones para no perderte nuevos matches.
+        </p>
       </div>
     );
   }

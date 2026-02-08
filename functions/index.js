@@ -19,6 +19,302 @@ const imagekit = new ImageKit({
   urlEndpoint: functions.config().imagekit.url_endpoint
 });
 
+// ==============================
+// FUNCIONES DE NOTIFICACIONES PUSH
+// ==============================
+
+/**
+ * Envía notificación push cuando hay un nuevo mensaje
+ * 
+ * Trigger: onCreate en /chats/{chatId}/messages/{messageId}
+ */
+exports.sendMessageNotification = functions.firestore
+  .document('chats/{chatId}/messages/{messageId}')
+  .onCreate(async (snap, context) => {
+    const message = snap.data();
+    const { chatId } = context.params;
+    
+    try {
+      // Obtener información del chat
+      const chatDoc = await admin.firestore()
+        .collection('chats')
+        .doc(chatId)
+        .get();
+      
+      if (!chatDoc.exists) {
+        console.log('Chat no encontrado');
+        return null;
+      }
+      
+      const chatData = chatDoc.data();
+      const participants = chatData.participants || [];
+      
+      // Encontrar el receptor (el que NO envió el mensaje)
+      const recipientId = participants.find(id => id !== message.senderId);
+      
+      if (!recipientId) {
+        console.log('Receptor no encontrado');
+        return null;
+      }
+      
+      // Obtener token FCM del receptor
+      const tokenDoc = await admin.firestore()
+        .collection('fcmTokens')
+        .doc(recipientId)
+        .get();
+      
+      if (!tokenDoc.exists || !tokenDoc.data().token) {
+        console.log('Token FCM no encontrado para usuario:', recipientId);
+        return null;
+      }
+      
+      const fcmToken = tokenDoc.data().token;
+      
+      // Obtener nombre del remitente
+      const senderDoc = await admin.firestore()
+        .collection('perfiles')
+        .doc(message.senderId)
+        .get();
+      
+      const senderName = senderDoc.exists ? 
+        (senderDoc.data().name || 'Alguien') : 
+        'Alguien';
+      
+      // Preparar contenido del mensaje
+      let messageBody = '';
+      switch (message.type) {
+        case 'text':
+          messageBody = message.text || 'Nuevo mensaje';
+          break;
+        case 'photo':
+          messageBody = '📷 Foto';
+          break;
+        case 'voice':
+          messageBody = '🎤 Mensaje de voz';
+          break;
+        case 'video':
+          messageBody = '🎥 Video mensaje';
+          break;
+        case 'story_reaction':
+          messageBody = '❤️ Reaccionó a tu historia';
+          break;
+        default:
+          messageBody = 'Nuevo mensaje';
+      }
+      
+      // Enviar notificación
+      const payload = {
+        notification: {
+          title: senderName,
+          body: messageBody,
+          icon: '/logo192.png',
+          badge: '/logo192.png',
+          tag: 'message',
+          clickAction: `https://tapapati.app/chat/${chatId}`
+        },
+        data: {
+          type: 'message',
+          chatId: chatId,
+          senderId: message.senderId,
+          senderName: senderName
+        },
+        token: fcmToken
+      };
+      
+      await admin.messaging().send(payload);
+      console.log('✅ Notificación de mensaje enviada a:', recipientId);
+      
+      return null;
+    } catch (error) {
+      console.error('❌ Error enviando notificación de mensaje:', error);
+      return null;
+    }
+  });
+
+/**
+ * Envía notificación push cuando hay un nuevo match
+ * 
+ * Trigger: onCreate en /chats/{chatId}
+ */
+exports.sendMatchNotification = functions.firestore
+  .document('chats/{chatId}')
+  .onCreate(async (snap, context) => {
+    const chat = snap.data();
+    
+    try {
+      const participants = chat.participants || [];
+      
+      if (participants.length !== 2) {
+        console.log('Chat no tiene exactamente 2 participantes');
+        return null;
+      }
+      
+      // Enviar notificación a ambos participantes
+      for (const userId of participants) {
+        // Obtener token FCM
+        const tokenDoc = await admin.firestore()
+          .collection('fcmTokens')
+          .doc(userId)
+          .get();
+        
+        if (!tokenDoc.exists || !tokenDoc.data().token) {
+          console.log('Token FCM no encontrado para usuario:', userId);
+          continue;
+        }
+        
+        const fcmToken = tokenDoc.data().token;
+        
+        // Obtener nombre del otro usuario
+        const otherUserId = participants.find(id => id !== userId);
+        const otherUserDoc = await admin.firestore()
+          .collection('perfiles')
+          .doc(otherUserId)
+          .get();
+        
+        const otherUserName = otherUserDoc.exists ? 
+          (otherUserDoc.data().name || 'Alguien') : 
+          'Alguien';
+        
+        // Enviar notificación
+        const payload = {
+          notification: {
+            title: '🎉 ¡Nuevo Match!',
+            body: `¡Hiciste match con ${otherUserName}!`,
+            icon: '/logo192.png',
+            badge: '/logo192.png',
+            tag: 'match',
+            clickAction: 'https://tapapati.app/matches'
+          },
+          data: {
+            type: 'match',
+            chatId: context.params.chatId,
+            matchUserId: otherUserId,
+            matchUserName: otherUserName
+          },
+          token: fcmToken
+        };
+        
+        await admin.messaging().send(payload);
+        console.log('✅ Notificación de match enviada a:', userId);
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('❌ Error enviando notificación de match:', error);
+      return null;
+    }
+  });
+
+/**
+ * Envía notificación push cuando alguien crea una nueva story
+ * 
+ * Trigger: onCreate en /stories/{storyId}
+ */
+exports.sendStoryNotification = functions.firestore
+  .document('stories/{storyId}')
+  .onCreate(async (snap, context) => {
+    const story = snap.data();
+    
+    try {
+      // Obtener nombre del creador de la story
+      const creatorDoc = await admin.firestore()
+        .collection('perfiles')
+        .doc(story.userId)
+        .get();
+      
+      const creatorName = creatorDoc.exists ? 
+        (creatorDoc.data().name || 'Alguien') : 
+        'Alguien';
+      
+      // Obtener configuración de privacidad
+      const privacyDoc = await admin.firestore()
+        .collection('privacySettings')
+        .doc(story.userId)
+        .get();
+      
+      let targetUserIds = [];
+      
+      if (privacyDoc.exists) {
+        const privacy = privacyDoc.data();
+        const storyPrivacy = privacy.stories || 'matches';
+        
+        if (storyPrivacy === 'everyone') {
+          // Obtener todos los usuarios (limitado a 100 para evitar sobrecarga)
+          const usersSnapshot = await admin.firestore()
+            .collection('perfiles')
+            .limit(100)
+            .get();
+          
+          targetUserIds = usersSnapshot.docs
+            .map(doc => doc.id)
+            .filter(id => id !== story.userId);
+        } else if (storyPrivacy === 'matches') {
+          // Obtener matches del usuario
+          const chatsSnapshot = await admin.firestore()
+            .collection('chats')
+            .where('participants', 'array-contains', story.userId)
+            .get();
+          
+          targetUserIds = chatsSnapshot.docs
+            .map(doc => {
+              const participants = doc.data().participants || [];
+              return participants.find(id => id !== story.userId);
+            })
+            .filter(id => id);
+        }
+      }
+      
+      // Enviar notificaciones a usuarios objetivo (máximo 10 por story)
+      const limitedTargets = targetUserIds.slice(0, 10);
+      
+      for (const userId of limitedTargets) {
+        // Obtener token FCM
+        const tokenDoc = await admin.firestore()
+          .collection('fcmTokens')
+          .doc(userId)
+          .get();
+        
+        if (!tokenDoc.exists || !tokenDoc.data().token) {
+          continue;
+        }
+        
+        const fcmToken = tokenDoc.data().token;
+        
+        // Enviar notificación
+        const payload = {
+          notification: {
+            title: `${creatorName} publicó una historia`,
+            body: '¡Mírala antes de que desaparezca!',
+            icon: '/logo192.png',
+            badge: '/logo192.png',
+            tag: 'story',
+            clickAction: 'https://tapapati.app/'
+          },
+          data: {
+            type: 'story',
+            storyId: context.params.storyId,
+            creatorId: story.userId,
+            creatorName: creatorName
+          },
+          token: fcmToken
+        };
+        
+        await admin.messaging().send(payload);
+      }
+      
+      console.log(`✅ Notificaciones de story enviadas a ${limitedTargets.length} usuarios`);
+      
+      return null;
+    } catch (error) {
+      console.error('❌ Error enviando notificación de story:', error);
+      return null;
+    }
+  });
+
+// ==============================
+// FUNCIONES DE IMAGEKIT
+// ==============================
+
 /**
  * Elimina una foto de ImageKit
  * 

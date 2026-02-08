@@ -1,6 +1,7 @@
 // cita-rd/components/AccountSettings.tsx
 import React, { useState, useEffect } from 'react';
-import { X, Shield, Globe, Lock, CheckCircle, AlertCircle, Settings, Trash2, AlertTriangle } from 'lucide-react';
+import { X, Shield, Globe, Lock, CheckCircle, AlertCircle, Settings, Trash2, AlertTriangle, Bell, BellOff } from 'lucide-react';
+import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import IdentityVerification from './IdentityVerification';
 import LanguageSettings from './LanguageSettings';
 import StoriesPrivacySettings from './StoriesPrivacySettings';
@@ -8,6 +9,7 @@ import PrivacyDashboard from './PrivacyDashboard';
 import VerificationBadge from './VerificationBadge';
 import { verificationService } from '../services/verificationService';
 import { languageService } from '../services/languageService';
+import { notificationService } from '../services/notificationService';
 import { useTranslation } from '../hooks/useTranslation';
 import { deleteUserAccount, reauthenticateUser } from '../services/accountDeletionService';
 import { logger } from '../utils/logger';
@@ -39,13 +41,29 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({
   const [deletePassword, setDeletePassword] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteStep, setDeleteStep] = useState<'confirm' | 'password'>('confirm');
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [notificationsSupported, setNotificationsSupported] = useState(false);
+  const [isEnablingNotifications, setIsEnablingNotifications] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
       checkVerificationStatus();
       setCurrentLanguage(languageService.getCurrentLanguage());
+      checkNotificationStatus();
     }
   }, [isOpen, currentUserId]);
+
+  const checkNotificationStatus = () => {
+    // Verificar si las notificaciones están soportadas
+    const supported = notificationService.isSupported();
+    setNotificationsSupported(supported);
+
+    if (supported) {
+      // Verificar si están habilitadas
+      const status = notificationService.getPermissionStatus();
+      setNotificationsEnabled(status.granted);
+    }
+  };
 
   const checkVerificationStatus = async () => {
     try {
@@ -72,15 +90,72 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({
     if (onSettingsUpdated) onSettingsUpdated();
   };
 
+  const handleToggleNotifications = async () => {
+    if (!notificationsSupported) {
+      alert('Las notificaciones push no están soportadas en este navegador.');
+      return;
+    }
+
+    if (notificationsEnabled) {
+      // Desactivar notificaciones
+      if (confirm('¿Deseas desactivar las notificaciones push? Dejarás de recibir alertas de nuevos mensajes y matches.')) {
+        try {
+          await notificationService.deleteToken(currentUserId);
+          setNotificationsEnabled(false);
+          logger.notification.info('Notifications disabled by user');
+        } catch (error) {
+          logger.notification.error('Error disabling notifications', error);
+          alert('Error al desactivar las notificaciones. Por favor, intenta de nuevo.');
+        }
+      }
+    } else {
+      // Activar notificaciones
+      setIsEnablingNotifications(true);
+      try {
+        console.log('🔔 [AccountSettings] Solicitando permiso de notificaciones...');
+        const granted = await notificationService.requestPermission();
+        console.log('🔔 [AccountSettings] Permiso concedido:', granted);
+        
+        if (granted) {
+          console.log('🎫 [AccountSettings] Obteniendo y guardando token para userId:', currentUserId);
+          const token = await notificationService.getAndSaveToken(currentUserId);
+          console.log('✅ [AccountSettings] Token obtenido y guardado:', token ? 'SÍ' : 'NO');
+          
+          // Verificar que se guardó en Firestore
+          console.log('🔍 [AccountSettings] Verificando que el token se guardó en Firestore...');
+          const db = getFirestore();
+          const tokenDoc = await getDoc(doc(db, 'fcmTokens', currentUserId));
+          console.log('📄 [AccountSettings] Token existe en Firestore:', tokenDoc.exists());
+          if (tokenDoc.exists()) {
+            console.log('📄 [AccountSettings] Datos del token:', tokenDoc.data());
+          }
+          
+          await notificationService.showTestNotification();
+          setNotificationsEnabled(true);
+          logger.notification.success('Notifications enabled by user');
+          alert('✅ Notificaciones activadas correctamente. Revisa la consola para ver los detalles.');
+        } else {
+          alert('Permiso de notificaciones denegado. Puedes habilitarlo desde la configuración de tu navegador.');
+        }
+      } catch (error) {
+        console.error('❌ [AccountSettings] Error completo:', error);
+        logger.notification.error('Error enabling notifications', error);
+        alert('Error al activar las notificaciones: ' + (error as Error).message);
+      } finally {
+        setIsEnablingNotifications(false);
+      }
+    }
+  };
+
   const handleDeleteAccount = async () => {
     // Paso 1: Confirmar escribiendo "ELIMINAR"
     if (deleteStep === 'confirm') {
       if (deleteConfirmText !== 'ELIMINAR') {
-        alert(t('deleteConfirmError') || 'Debes escribir ELIMINAR para confirmar');
+        alert('Debes escribir ELIMINAR para confirmar');
         return;
       }
 
-      if (!confirm(t('deleteAccountFinalWarning') || '⚠️ ÚLTIMA ADVERTENCIA: Esta acción es IRREVERSIBLE. ¿Estás completamente seguro?')) {
+      if (!confirm('⚠️ ÚLTIMA ADVERTENCIA: Esta acción es IRREVERSIBLE. ¿Estás completamente seguro?')) {
         return;
       }
 
@@ -129,7 +204,7 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({
         console.error('❌ Error eliminando cuenta:', error);
         
         // Mostrar mensaje de error específico
-        let errorMessage = t('deleteAccountError') || 'Error al eliminar la cuenta. Por favor, intenta de nuevo o contacta a soporte.';
+        let errorMessage = 'Error al eliminar la cuenta. Por favor, intenta de nuevo o contacta a soporte.';
         
         if (error.message) {
           errorMessage = error.message;
@@ -263,11 +338,82 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({
                 >
                   <div className="flex items-center justify-center gap-2">
                     <Trash2 size={14} />
-                    {t('deleteAccount') || 'Eliminar Cuenta'}
+                    Eliminar Cuenta
                   </div>
                 </button>
               </div>
             </div>
+
+            {/* Notificaciones Push */}
+            {notificationsSupported && (
+              <div className={`bg-gradient-to-r rounded-2xl p-4 border ${
+                notificationsEnabled 
+                  ? 'from-green-50 to-emerald-50 border-green-100' 
+                  : 'from-orange-50 to-amber-50 border-orange-100'
+              }`}>
+                <div className="flex items-center gap-3 mb-3">
+                  <div className={`p-2 rounded-full ${
+                    notificationsEnabled ? 'bg-green-500' : 'bg-orange-500'
+                  }`}>
+                    {notificationsEnabled ? (
+                      <Bell size={20} className="text-white" />
+                    ) : (
+                      <BellOff size={20} className="text-white" />
+                    )}
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">
+                      {notificationsEnabled ? 'Notificaciones Activas' : 'Notificaciones Push'}
+                    </h3>
+                    <p className="text-sm text-gray-600">
+                      {notificationsEnabled 
+                        ? 'Recibes alertas de mensajes y matches' 
+                        : 'Activa para no perderte nada'}
+                    </p>
+                  </div>
+                </div>
+                
+                <button
+                  onClick={handleToggleNotifications}
+                  disabled={isEnablingNotifications}
+                  className={`w-full py-3 px-4 rounded-xl font-medium transition-all shadow-lg ${
+                    notificationsEnabled
+                      ? 'bg-red-100 text-red-700 hover:bg-red-200 border border-red-200'
+                      : 'bg-orange-500 text-white hover:bg-orange-600'
+                  }`}
+                >
+                  {isEnablingNotifications ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      Activando...
+                    </div>
+                  ) : notificationsEnabled ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <BellOff size={16} />
+                      Desactivar Notificaciones
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center gap-2">
+                      <Bell size={16} />
+                      Activar Notificaciones
+                    </div>
+                  )}
+                </button>
+
+                {notificationsEnabled && (
+                  <div className="mt-3 bg-green-100 border border-green-200 rounded-xl p-3">
+                    <p className="text-xs text-green-800">
+                      ✅ Recibirás notificaciones de:
+                    </p>
+                    <ul className="mt-2 space-y-1 text-xs text-green-700">
+                      <li>• Nuevos mensajes</li>
+                      <li>• Nuevos matches</li>
+                      <li>• Stories de tus matches</li>
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Idioma */}
             <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-3 sm:p-4 border border-green-100">
@@ -357,11 +503,11 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({
               </div>
               <div>
                 <h3 className="text-xl font-bold text-gray-900">
-                  {t('deleteAccountTitle') || 'Eliminar Cuenta'}
+                  Eliminar Cuenta
                 </h3>
                 <p className="text-sm text-red-600 font-medium">
                   {deleteStep === 'confirm' 
-                    ? (t('irreversibleAction') || 'Esta acción es irreversible')
+                    ? 'Esta acción es irreversible'
                     : 'Paso 2: Verifica tu identidad'}
                 </p>
               </div>
@@ -372,24 +518,24 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({
                 {/* Advertencias */}
                 <div className="bg-red-50 border border-red-200 rounded-xl p-4 space-y-2">
                   <p className="text-sm font-semibold text-red-900">
-                    {t('deleteAccountWarning') || 'Al eliminar tu cuenta:'}
+                    Al eliminar tu cuenta:
                   </p>
                   <ul className="space-y-1 text-sm text-red-800">
                     <li className="flex items-start gap-2">
                       <span className="text-red-600 mt-0.5">•</span>
-                      <span>{t('deleteWarning1') || 'Se eliminarán todos tus datos personales'}</span>
+                      <span>Se eliminarán todos tus datos personales</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-red-600 mt-0.5">•</span>
-                      <span>{t('deleteWarning2') || 'Perderás todos tus matches y conversaciones'}</span>
+                      <span>Perderás todos tus matches y conversaciones</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-red-600 mt-0.5">•</span>
-                      <span>{t('deleteWarning3') || 'Se eliminarán todas tus fotos y stories'}</span>
+                      <span>Se eliminarán todas tus fotos y stories</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-red-600 mt-0.5">•</span>
-                      <span>{t('deleteWarning4') || 'No podrás recuperar tu cuenta'}</span>
+                      <span>No podrás recuperar tu cuenta</span>
                     </li>
                   </ul>
                 </div>
@@ -397,7 +543,7 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({
                 {/* Campo de confirmación */}
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700">
-                    {t('deleteConfirmLabel') || 'Para confirmar, escribe'} <span className="font-bold text-red-600">ELIMINAR</span>
+                    Para confirmar, escribe <span className="font-bold text-red-600">ELIMINAR</span>
                   </label>
                   <input
                     type="text"
@@ -447,7 +593,7 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({
                 className="flex-1 py-3 px-4 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-all"
                 disabled={isDeleting}
               >
-                {t('cancel') || 'Cancelar'}
+                Cancelar
               </button>
               <button
                 onClick={handleDeleteAccount}
@@ -466,16 +612,16 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({
                 {isDeleting ? (
                   <div className="flex items-center justify-center gap-2">
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    {t('deleting') || 'Eliminando...'}
+                    Eliminando...
                   </div>
                 ) : deleteStep === 'confirm' ? (
                   <div className="flex items-center justify-center gap-2">
-                    {t('continue') || 'Continuar'}
+                    Continuar
                   </div>
                 ) : (
                   <div className="flex items-center justify-center gap-2">
                     <Trash2 size={16} />
-                    {t('deleteAccountPermanently') || 'Eliminar Permanentemente'}
+                    Eliminar Permanentemente
                   </div>
                 )}
               </button>
@@ -483,7 +629,7 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({
 
             {/* Nota de soporte */}
             <p className="text-xs text-center text-gray-500">
-              {t('deleteAccountSupport') || '¿Necesitas ayuda? Contacta a'} <a href="mailto:tapapatisoporte@gmail.com" className="text-purple-600 hover:underline">tapapatisoporte@gmail.com</a>
+              ¿Necesitas ayuda? Contacta a <a href="mailto:tapapatisoporte@gmail.com" className="text-purple-600 hover:underline">tapapatisoporte@gmail.com</a>
             </p>
           </div>
         </div>

@@ -186,7 +186,7 @@ const Matches: React.FC<MatchesProps> = ({
 
               {/* Interests Preview */}
               <div className="mt-3 flex flex-wrap gap-1">
-                {match.user.interests.slice(0, 3).map((interest, index) => (
+                {Array.isArray(match.user.interests) && match.user.interests.slice(0, 3).map((interest, index) => (
                   <span
                     key={index}
                     className="px-2 py-1 bg-orange-50 text-orange-700 rounded-full text-xs font-medium"
@@ -194,7 +194,7 @@ const Matches: React.FC<MatchesProps> = ({
                     {interest}
                   </span>
                 ))}
-                {match.user.interests.length > 3 && (
+                {Array.isArray(match.user.interests) && match.user.interests.length > 3 && (
                   <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-medium">
                     +{match.user.interests.length - 3}
                   </span>

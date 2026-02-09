@@ -3,6 +3,7 @@ import { Camera, Plus, X, Upload, AlertCircle, BarChart3 } from 'lucide-react';
 import { uploadPhoto, resizeImage, updateUserPhotos, deletePhoto } from '../services/photoUploadService';
 import { PhotoInfo, normalizePhotos, extractUrls } from '../types/PhotoInfo';
 import PhotoAnalysisCard from './PhotoAnalysisCard';
+import { validateProfilePhoto } from '../services/photoValidationService';
 
 interface PhotoUploaderProps {
   userId: string;
@@ -39,7 +40,41 @@ const PhotoUploader: React.FC<PhotoUploaderProps> = ({
       console.log('📤 Subiendo foto...');
       const result = await uploadPhoto(resizedFile, userId, index);
       
+      console.log('📤 Resultado de subida:', { success: result.success, hasUrl: !!result.url, hasFileId: !!result.fileId });
+      
       if (result.success && result.url && result.fileId) {
+        // VALIDAR LA FOTO SUBIDA
+        console.log('🔍 INICIANDO VALIDACIÓN de foto subida...');
+        console.log('🔍 URL a validar:', result.url);
+        
+        try {
+          const validation = await validateProfilePhoto(result.url);
+          console.log('🔍 Resultado de validación:', validation);
+          
+          if (!validation.isValid) {
+            // Foto no válida - eliminar de ImageKit y mostrar error
+            console.log('❌ Foto NO VÁLIDA, eliminando de ImageKit...');
+            console.log('❌ Errores:', validation.errors);
+            await deletePhoto(result.url, result.fileId);
+            
+            setError(validation.errors.join('. '));
+            setUploading(null);
+            return;
+          }
+          
+          // Mostrar advertencias si las hay
+          if (validation.warnings.length > 0) {
+            console.log('⚠️ Advertencias:', validation.warnings);
+          }
+          
+          console.log('✅ Foto VÁLIDA, continuando con guardado...');
+        } catch (validationError) {
+          console.error('❌ ERROR en validación:', validationError);
+          setError('Error validando la foto. Intenta de nuevo.');
+          await deletePhoto(result.url, result.fileId);
+          setUploading(null);
+          return;
+        }
         // Obtener photosInfo actual de Firestore
         const { doc: docFunc, getDoc } = await import('firebase/firestore');
         const { db } = await import('../services/firebase');
@@ -249,14 +284,20 @@ const PhotoUploader: React.FC<PhotoUploaderProps> = ({
     <div className="space-y-4">
       {/* Error message */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-center gap-2 text-red-700">
-          <AlertCircle size={16} />
-          <span className="text-sm">{error}</span>
+        <div className="bg-red-50 border-2 border-red-300 rounded-lg p-4 flex items-start gap-3 text-red-800 shadow-sm">
+          <AlertCircle size={20} className="shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="font-semibold text-sm mb-1">❌ Foto no válida</p>
+            <p className="text-sm">{error}</p>
+            <p className="text-xs mt-2 text-red-600">
+              💡 Tip: Usa una foto donde se vea tu rostro claramente con buena iluminación
+            </p>
+          </div>
           <button 
             onClick={() => setError(null)}
-            className="ml-auto text-red-500 hover:text-red-700"
+            className="text-red-500 hover:text-red-700 shrink-0"
           >
-            <X size={16} />
+            <X size={18} />
           </button>
         </div>
       )}

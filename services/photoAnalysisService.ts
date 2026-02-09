@@ -1,3 +1,5 @@
+import { detectFaceAdvanced, FaceDetectionResult } from './advancedFaceDetection';
+
 export interface PhotoAnalysis {
   hasFace: boolean;
   faceClarity: number; // 0-100
@@ -5,6 +7,7 @@ export interface PhotoAnalysis {
   isMainPhotoWorthy: boolean;
   suggestions: string[];
   score: number; // 0-100 overall score
+  advancedDetection?: FaceDetectionResult; // Detalles del análisis avanzado
 }
 
 export interface ProfileScore {
@@ -47,114 +50,127 @@ export const analyzePhoto = async (imageUrl: string): Promise<PhotoAnalysis> => 
 };
 
 /**
- * Simula el análisis de foto (reemplazar con API real en producción)
+ * Analiza la foto usando el sistema avanzado de detección de rostros
  */
 const simulatePhotoAnalysis = async (imageUrl: string): Promise<PhotoAnalysis> => {
-  // Simular delay de API
-  await new Promise(resolve => setTimeout(resolve, 1000));
+  console.log('🔍 [ANALYSIS] Iniciando análisis avanzado de foto...');
   
-  // Análisis simulado basado en características de la URL
-  const urlLower = imageUrl.toLowerCase();
-  const isRandomUser = urlLower.includes('randomuser.me');
-  const isUIAvatar = urlLower.includes('ui-avatars.com');
-  
-  // Detectar patrones de fotos no válidas
-  const isLandscape = urlLower.includes('landscape') || urlLower.includes('nature') || urlLower.includes('scenery');
-  const isBlackBackground = urlLower.includes('black') || urlLower.includes('dark');
-  const isGenericAvatar = urlLower.includes('avatar') || urlLower.includes('placeholder');
-  
-  let analysis: PhotoAnalysis;
-  
-  if (isRandomUser) {
-    // RandomUser siempre tiene caras claras
-    analysis = {
-      hasFace: true,
-      faceClarity: 85 + Math.random() * 15, // 85-100
-      photoQuality: 80 + Math.random() * 20, // 80-100
-      isMainPhotoWorthy: true,
-      suggestions: ['¡Excelente foto! Perfecta para foto principal.'],
-      score: 90 + Math.random() * 10 // 90-100
+  try {
+    // Usar el sistema avanzado de detección de rostros
+    const faceDetection = await detectFaceAdvanced(imageUrl);
+    
+    console.log('🔍 [ANALYSIS] Detección avanzada completada:', {
+      hasFace: faceDetection.hasFace,
+      confidence: faceDetection.confidence,
+      reasons: faceDetection.reasons
+    });
+    
+    // Calcular calidad de la foto basada en los detalles de detección
+    let photoQuality = 50; // Base
+    
+    if (faceDetection.details.skinToneDetected) photoQuality += 15;
+    if (faceDetection.details.facialFeaturesDetected) photoQuality += 15;
+    if (faceDetection.details.contrastValid) photoQuality += 10;
+    if (faceDetection.details.proportionsValid) photoQuality += 10;
+    
+    // Usar la confianza como claridad del rostro
+    const faceClarity = faceDetection.confidence;
+    
+    // Determinar si es apta para foto principal
+    const isMainPhotoWorthy = faceDetection.hasFace && faceClarity >= 70 && photoQuality >= 70;
+    
+    // Generar sugerencias basadas en el análisis
+    const suggestions = generateAdvancedSuggestions(faceDetection, photoQuality);
+    
+    // Calcular score general
+    const score = Math.round((faceClarity * 0.6) + (photoQuality * 0.4));
+    
+    const analysis: PhotoAnalysis = {
+      hasFace: faceDetection.hasFace,
+      faceClarity,
+      photoQuality,
+      isMainPhotoWorthy,
+      suggestions,
+      score,
+      advancedDetection: faceDetection
     };
-  } else if (isUIAvatar || isGenericAvatar) {
-    // Avatares genéricos - RECHAZAR
-    analysis = {
+    
+    console.log('✅ [ANALYSIS] Análisis final:', {
+      hasFace: analysis.hasFace,
+      faceClarity: analysis.faceClarity.toFixed(2),
+      photoQuality: analysis.photoQuality,
+      isMainPhotoWorthy: analysis.isMainPhotoWorthy,
+      score: analysis.score
+    });
+    
+    return analysis;
+  } catch (error) {
+    console.error('❌ [ANALYSIS] Error en análisis:', error);
+    
+    // Fallback en caso de error
+    return {
       hasFace: false,
       faceClarity: 0,
-      photoQuality: 20,
-      isMainPhotoWorthy: false,
-      suggestions: [
-        '❌ Esta parece ser un avatar. Sube una foto real de tu rostro.',
-        'Las fotos reales obtienen 10x más matches.',
-        'Usa una foto donde se vea tu cara claramente.'
-      ],
-      score: 10
-    };
-  } else if (isLandscape) {
-    // Paisajes - RECHAZAR
-    analysis = {
-      hasFace: false,
-      faceClarity: 0,
-      photoQuality: 50,
-      isMainPhotoWorthy: false,
-      suggestions: [
-        '❌ Esta parece ser una foto de paisaje. Necesitamos ver tu rostro.',
-        'Sube una foto donde aparezcas tú.',
-        'Las fotos de perfil deben mostrar tu cara.'
-      ],
-      score: 15
-    };
-  } else if (isBlackBackground) {
-    // Fondos negros/oscuros - ADVERTENCIA
-    analysis = {
-      hasFace: false,
-      faceClarity: 20,
       photoQuality: 30,
       isMainPhotoWorthy: false,
       suggestions: [
-        '⚠️ Foto muy oscura. Usa mejor iluminación.',
-        'Las fotos claras obtienen más matches.',
-        'Intenta con luz natural o buena iluminación.'
+        '❌ Error al analizar la foto',
+        'Intenta con otra imagen',
+        'Asegúrate de que la foto sea clara y muestre tu rostro'
       ],
-      score: 25
-    };
-  } else {
-    // Análisis aleatorio para otras URLs
-    const hasGoodFace = Math.random() > 0.3;
-    const quality = hasGoodFace ? 60 + Math.random() * 40 : 30 + Math.random() * 40;
-    
-    analysis = {
-      hasFace: hasGoodFace,
-      faceClarity: hasGoodFace ? 50 + Math.random() * 50 : Math.random() * 30,
-      photoQuality: quality,
-      isMainPhotoWorthy: hasGoodFace && quality > 70,
-      suggestions: generateSuggestions(hasGoodFace, quality),
-      score: Math.round((hasGoodFace ? 60 : 30) + (quality * 0.4))
+      score: 0
     };
   }
-  
-  return analysis;
 };
 
 /**
- * Genera sugerencias basadas en el análisis
+ * Genera sugerencias basadas en el análisis avanzado
  */
-const generateSuggestions = (hasFace: boolean, quality: number): string[] => {
+const generateAdvancedSuggestions = (detection: FaceDetectionResult, quality: number): string[] => {
   const suggestions: string[] = [];
   
-  if (!hasFace) {
-    suggestions.push('Sube una foto donde se vea tu cara claramente');
-    suggestions.push('Las fotos con cara obtienen 5x más matches');
-  } else if (quality < 50) {
-    suggestions.push('Intenta con mejor iluminación');
-    suggestions.push('Usa una foto más nítida');
-  } else if (quality < 70) {
-    suggestions.push('¡Buena foto! Podrías mejorar la iluminación');
+  if (!detection.hasFace) {
+    // Foto rechazada - dar razones específicas
+    suggestions.push('❌ No se detectó un rostro humano en esta foto');
+    
+    // Agregar razones específicas del análisis
+    if (!detection.details.skinToneDetected) {
+      suggestions.push('No se detectaron tonos de piel humana');
+    }
+    if (!detection.details.facialFeaturesDetected) {
+      suggestions.push('No se detectaron características faciales (ojos, nariz, boca)');
+    }
+    if (!detection.details.contrastValid) {
+      suggestions.push('La imagen es muy uniforme u oscura');
+    }
+    if (!detection.details.proportionsValid) {
+      suggestions.push('Las proporciones no corresponden a un rostro');
+    }
+    
+    suggestions.push('💡 Usa una foto donde se vea tu cara claramente');
+    suggestions.push('Las fotos con rostro obtienen 10x más matches');
   } else {
-    suggestions.push('¡Excelente foto!');
-  }
-  
-  if (quality < 60) {
-    suggestions.push('Evita fotos borrosas o muy oscuras');
+    // Foto aceptada - dar consejos de mejora
+    if (detection.confidence >= 80) {
+      suggestions.push('✅ ¡Excelente foto! Perfecta para tu perfil');
+    } else if (detection.confidence >= 60) {
+      suggestions.push('✅ Buena foto, se detectó tu rostro correctamente');
+      
+      if (quality < 70) {
+        suggestions.push('💡 Podrías mejorar la iluminación para mejor calidad');
+      }
+    } else {
+      suggestions.push('✅ Foto aceptada, pero podría mejorar');
+      suggestions.push('💡 Intenta con mejor iluminación y enfoque');
+    }
+    
+    // Sugerencias específicas de mejora
+    if (!detection.details.contrastValid) {
+      suggestions.push('Usa mejor iluminación para más contraste');
+    }
+    if (quality < 60) {
+      suggestions.push('Evita fotos borrosas o muy oscuras');
+    }
   }
   
   return suggestions;

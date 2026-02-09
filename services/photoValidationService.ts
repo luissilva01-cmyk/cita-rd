@@ -15,49 +15,68 @@ export interface PhotoValidationResult {
  * - Debe tener calidad mínima
  */
 export const validateProfilePhoto = async (imageUrl: string): Promise<PhotoValidationResult> => {
-  console.log('🔍 Validando foto de perfil:', imageUrl);
+  console.log('🔍 [VALIDATION] Iniciando validación de foto:', imageUrl.substring(0, 80) + '...');
   
   try {
     // Analizar la foto
+    console.log('🔍 [VALIDATION] Llamando a analyzePhoto...');
     const analysis = await analyzePhoto(imageUrl);
+    console.log('🔍 [VALIDATION] Análisis recibido:', {
+      hasFace: analysis.hasFace,
+      faceClarity: analysis.faceClarity,
+      photoQuality: analysis.photoQuality
+    });
     
     const errors: string[] = [];
     const warnings: string[] = [];
     
     // VALIDACIÓN CRÍTICA: Debe tener rostro
     if (!analysis.hasFace) {
-      errors.push('La foto debe mostrar tu rostro claramente');
-      errors.push('No se permiten paisajes, avatares o fondos oscuros');
+      errors.push('❌ No se detectó un rostro en la foto');
+      errors.push('Por favor usa una foto donde se vea tu cara claramente');
+      errors.push('No se permiten paisajes, avatares, dibujos o fondos oscuros');
     }
     
-    // VALIDACIÓN CRÍTICA: Claridad mínima del rostro
-    if (analysis.hasFace && analysis.faceClarity < 40) {
-      errors.push('El rostro no se ve con suficiente claridad');
-      errors.push('Usa una foto con mejor iluminación');
+    // VALIDACIÓN CRÍTICA: Claridad mínima del rostro (más estricto)
+    if (analysis.hasFace && analysis.faceClarity < 50) {
+      errors.push('❌ El rostro no se ve con suficiente claridad');
+      errors.push('Usa una foto con mejor iluminación y enfoque');
     }
     
     // VALIDACIÓN CRÍTICA: Calidad mínima
-    if (analysis.photoQuality < 30) {
-      errors.push('La calidad de la foto es muy baja');
+    if (analysis.photoQuality < 40) {
+      errors.push('❌ La calidad de la foto es muy baja');
       errors.push('Usa una foto más nítida y con mejor resolución');
     }
     
     // ADVERTENCIAS: Mejoras recomendadas
-    if (analysis.hasFace && analysis.faceClarity < 60) {
-      warnings.push('La foto podría ser más clara');
+    if (analysis.hasFace && analysis.faceClarity >= 50 && analysis.faceClarity < 70) {
+      warnings.push('⚠️ La foto podría ser más clara para mejores resultados');
     }
     
-    if (analysis.photoQuality < 60) {
-      warnings.push('Considera usar una foto de mejor calidad');
+    if (analysis.photoQuality >= 40 && analysis.photoQuality < 70) {
+      warnings.push('⚠️ Considera usar una foto de mejor calidad');
     }
     
-    if (!analysis.isMainPhotoWorthy) {
-      warnings.push('Esta foto no es ideal para foto principal');
+    if (!analysis.isMainPhotoWorthy && analysis.hasFace) {
+      warnings.push('💡 Esta foto no es ideal para foto principal');
     }
     
     const isValid = errors.length === 0;
     
-    console.log(isValid ? '✅ Foto válida' : '❌ Foto no válida', { errors, warnings });
+    console.log('🔍 [VALIDATION] Resultado final:', {
+      isValid,
+      errorsCount: errors.length,
+      warningsCount: warnings.length,
+      errors,
+      warnings
+    });
+    
+    if (!isValid) {
+      console.log('❌ [VALIDATION] FOTO RECHAZADA');
+    } else {
+      console.log('✅ [VALIDATION] FOTO ACEPTADA');
+    }
     
     return {
       isValid,

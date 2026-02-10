@@ -76,36 +76,68 @@ private async saveTokenToFirestore(userId: string, token: string): Promise<void>
 
 ---
 
-## 🐛 Bug #2: Matching AI - Usuario no encontrado ✅
+## 🐛 Bug #2: Matching AI - Perfiles Incompletos ✅
 
 ### Problema:
-Error "Usuario no encontrado" al generar predicciones de compatibilidad.
+El Matching AI fallaba cuando encontraba usuarios con perfiles incompletos o inexistentes:
 
-```typescript
-// ❌ ANTES (Bug)
-const user = candidates.find(c => c.id === userId);
-if (!user) throw new Error('Usuario no encontrado');
-// El usuario actual NO está en el array de candidatos
+**Caso 1**: Perfil existe pero falta campo `name`
+```
+✅ Perfil del usuario obtenido: undefined
+💕 Calculando compatibilidad entre: undefined y Usuario Actual
+```
+
+**Caso 2**: Documento del usuario no existe
+```
+❌ Error: Usuario no encontrado
+✅ Predicciones generadas: 0
 ```
 
 ### Causa:
-El código buscaba el perfil del usuario actual dentro del array de `candidates` (otros usuarios para swipe), pero el usuario actual no está en esa lista.
+1. El código buscaba el perfil del usuario actual dentro del array de `candidates` (otros usuarios), pero el usuario actual no está en esa lista
+2. Algunos usuarios se registraron pero no completaron su perfil
+3. El código lanzaba error y detenía todo el proceso
 
 ### Solución:
+
+#### 1. Obtener perfil desde Firestore
 ```typescript
-// ✅ DESPUÉS (Fix)
-// Obtener el perfil del usuario actual desde Firestore
+// ✅ Obtener el perfil del usuario actual desde Firestore
 const userDoc = await getDoc(doc(db, 'users', userId));
 if (!userDoc.exists()) {
   console.warn('⚠️ Usuario no encontrado en Firestore:', userId);
-  throw new Error('Usuario no encontrado');
+  return []; // No rompe la app
 }
-
-const user = { id: userDoc.id, ...userDoc.data() } as UserProfile;
-console.log('✅ Perfil del usuario obtenido:', user.name);
 ```
 
-**Estado**: ✅ **CÓDIGO CORREGIDO**
+#### 2. Validar perfil completo
+```typescript
+// ✅ Validar que el perfil tenga los campos mínimos necesarios
+if (!user.name || !user.age || !user.interests) {
+  console.warn('⚠️ Perfil incompleto para usuario:', userId);
+  console.log('⚠️ Datos del perfil:', { 
+    name: user.name, 
+    age: user.age, 
+    hasInterests: !!user.interests 
+  });
+  return []; // No rompe la app
+}
+```
+
+#### 3. Validar candidatos
+```typescript
+// ✅ Saltar candidatos con perfiles incompletos
+for (const candidate of candidates) {
+  if (!candidate.name || !candidate.age || !candidate.interests) {
+    console.warn('⚠️ Candidato con perfil incompleto, saltando:', candidate.id);
+    continue; // Saltar este candidato
+  }
+  // Continuar con el cálculo...
+}
+```
+
+### Resultado:
+- ✅ Usuario sin perfil → Retorna
 
 ---
 

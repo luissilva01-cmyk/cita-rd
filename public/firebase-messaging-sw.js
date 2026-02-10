@@ -7,12 +7,12 @@ importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-comp
 
 // Configuración de Firebase (debe coincidir con tu config)
 const firebaseConfig = {
-  apiKey: "AIzaSyBXSLcUbXD5fJ5oNVYEbZ_ijH8cN-OqYhI",
+  apiKey: "AIzaSyB-w84pDXdqj_73Z16FM7aehFTQQy1RnXs",
   authDomain: "citard-fbc26.firebaseapp.com",
   projectId: "citard-fbc26",
-  storageBucket: "citard-fbc26.firebasestorage.app",
-  messagingSenderId: "211883945351",
-  appId: "1:211883945351:web:c5e3f5e5e5e5e5e5e5e5e5"
+  storageBucket: "citard-fbc26.appspot.com",
+  messagingSenderId: "564769541768",
+  appId: "1:564769541768:web:07013924da206d8b37593d"
 };
 
 // Inicializar Firebase en el Service Worker

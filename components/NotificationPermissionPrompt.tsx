@@ -44,9 +44,14 @@ const NotificationPermissionPrompt: React.FC<NotificationPermissionPromptProps> 
     setIsRequesting(true);
     
     try {
-      const granted = await notificationService.requestPermission();
+      // IMPORTANTE: Solicitar permiso DIRECTAMENTE aquí (no a través del servicio)
+      // Esto asegura que la solicitud viene de una interacción directa del usuario
+      logger.notification.info('Solicitando permiso de notificaciones...');
       
-      if (granted) {
+      const permission = await Notification.requestPermission();
+      logger.notification.info(`Permiso resultado: ${permission}`);
+      
+      if (permission === 'granted') {
         logger.notification.success('Notification permission granted');
         
         // Obtener y guardar token
@@ -65,6 +70,7 @@ const NotificationPermissionPrompt: React.FC<NotificationPermissionPromptProps> 
       }
     } catch (error) {
       logger.notification.error('Error requesting notification permission', error);
+      setShowPrompt(false);
     } finally {
       setIsRequesting(false);
     }

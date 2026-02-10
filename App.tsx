@@ -22,6 +22,9 @@ import { doc, getDoc } from 'firebase/firestore';
 import { setUserOnline, setUserOffline } from './services/presenceService';
 import { logger } from './utils/logger';
 import NotificationPermissionPrompt from './components/NotificationPermissionPrompt';
+import { analyticsService } from './services/analyticsService';
+import { errorTrackingService } from './services/errorTrackingService';
+import { AnalyticsDashboard } from './components/AnalyticsDashboard';
 
 const INITIAL_POTENTIAL_MATCHES: UserProfile[] = [];
 
@@ -69,6 +72,25 @@ const App: React.FC = () => {
   // Estado para mostrar prompt de notificaciones
   const [showNotificationPrompt, setShowNotificationPrompt] = useState(false);
 
+  // Inicializar Analytics y Error Tracking
+  useEffect(() => {
+    // Inicializar Google Analytics 4
+    const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID;
+    if (GA_MEASUREMENT_ID) {
+      analyticsService.initialize(GA_MEASUREMENT_ID);
+      logger.analytics.info('Analytics initialized');
+    } else {
+      logger.analytics.warn('GA_MEASUREMENT_ID not found in environment variables');
+    }
+
+    // Inicializar Error Tracking
+    errorTrackingService.initialize();
+    logger.error.info('Error tracking initialized');
+
+    // Track app open
+    analyticsService.trackEvent('app_open' as any);
+  }, []);
+
   // Cargar perfil del usuario autenticado
   useEffect(() => {
     const loadUserProfile = async () => {
@@ -83,6 +105,9 @@ const App: React.FC = () => {
         
         if (profile) {
           setCurrentUser(profile);
+          
+          // Set user ID in analytics
+          analyticsService.setUserId(user.uid);
           
           // Verificar si el perfil está incompleto y redirigir a Profile
           const isIncomplete = !profile.images || profile.images.length === 0 || 
@@ -602,6 +627,9 @@ const App: React.FC = () => {
             avatar: currentUser!.images?.[0] || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=face'
           }}
         />
+        
+        {/* Analytics Dashboard (Dev Only) */}
+        <AnalyticsDashboard />
       </LanguageProvider>
     </ErrorBoundary>
   );

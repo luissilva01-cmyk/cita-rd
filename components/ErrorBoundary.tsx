@@ -1,4 +1,6 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { errorTrackingService } from '../services/errorTrackingService';
+import { auth } from '../services/firebase';
 
 interface Props {
   children: ReactNode;
@@ -26,6 +28,10 @@ class ErrorBoundary extends Component<Props, State> {
     // Registrar el error
     console.error('🚨 Error capturado por ErrorBoundary:', error);
     console.error('🚨 Error Info:', errorInfo);
+    
+    // Enviar a error tracking service
+    const userId = auth.currentUser?.uid;
+    errorTrackingService.captureReactError(error, errorInfo, userId);
     
     this.setState({
       error,

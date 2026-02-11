@@ -1022,7 +1022,7 @@ const ChatView: React.FC<ChatViewProps> = ({
           </div>
         )}
 
-        <div className="flex items-center gap-2 bg-slate-100 rounded-full px-3 sm:px-4 py-1 focus-within:bg-white focus-within:ring-2 focus-within:ring-rose-500 focus-within:border-rose-500 transition-all" style={{ maxWidth: '100%', boxSizing: 'border-box' }}>
+        <div className="flex items-center gap-1 bg-slate-100 rounded-full px-2 sm:px-3 py-1 focus-within:bg-white focus-within:ring-2 focus-within:ring-rose-500 focus-within:border-rose-500 transition-all w-full" style={{ maxWidth: '100%', width: '100%', boxSizing: 'border-box' }}>
           
           {/* Input file oculto para fotos */}
           <input
@@ -1037,26 +1037,26 @@ const ChatView: React.FC<ChatViewProps> = ({
           {/* Botón de emoji - Touch optimized */}
           <button
             onClick={() => setShowEmojiPicker(true)}
-            className="text-slate-400 hover:text-slate-600 transition-colors p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
+            className="text-slate-400 hover:text-slate-600 transition-colors p-1.5 sm:p-2 min-w-[40px] min-h-[40px] sm:min-w-[44px] sm:min-h-[44px] flex items-center justify-center flex-shrink-0"
             disabled={isRecording || isRecordingVideo}
           >
-            <Smile size={18} className="sm:w-5 sm:h-5" />
+            <Smile size={16} className="sm:w-5 sm:h-5" />
           </button>
 
           {/* Botón de foto - Touch optimized */}
           <button
             onClick={handlePhotoButtonClick}
-            className="text-slate-400 hover:text-slate-600 transition-colors p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
+            className="text-slate-400 hover:text-slate-600 transition-colors p-1.5 sm:p-2 min-w-[40px] min-h-[40px] sm:min-w-[44px] sm:min-h-[44px] flex items-center justify-center flex-shrink-0"
             title="Enviar foto"
             disabled={isRecording || isRecordingVideo}
           >
-            <ImageIcon size={18} className="sm:w-5 sm:h-5" />
+            <ImageIcon size={16} className="sm:w-5 sm:h-5" />
           </button>
 
           {/* Botón de videomensaje - Touch optimized */}
           <button
             onClick={isRecordingVideo ? handleStopVideoRecording : handleStartVideoRecording}
-            className={`transition-colors p-2 min-w-[44px] min-h-[44px] flex items-center justify-center ${
+            className={`transition-colors p-1.5 sm:p-2 min-w-[40px] min-h-[40px] sm:min-w-[44px] sm:min-h-[44px] flex items-center justify-center flex-shrink-0 ${
               isRecordingVideo 
                 ? 'text-purple-500 hover:text-purple-600' 
                 : 'text-slate-400 hover:text-slate-600'
@@ -1064,13 +1064,13 @@ const ChatView: React.FC<ChatViewProps> = ({
             title={isRecordingVideo ? 'Detener grabación de video' : 'Grabar videomensaje'}
             disabled={isRecording}
           >
-            <VideoIcon size={18} className="sm:w-5 sm:h-5" />
+            <VideoIcon size={16} className="sm:w-5 sm:h-5" />
           </button>
 
           {/* Botón de micrófono - Touch optimized */}
           <button
             onClick={isRecording ? handleStopVoiceRecording : handleStartVoiceRecording}
-            className={`transition-colors p-2 min-w-[44px] min-h-[44px] flex items-center justify-center ${
+            className={`transition-colors p-1.5 sm:p-2 min-w-[40px] min-h-[40px] sm:min-w-[44px] sm:min-h-[44px] flex items-center justify-center flex-shrink-0 ${
               isRecording 
                 ? 'text-red-500 hover:text-red-600' 
                 : 'text-slate-400 hover:text-slate-600'
@@ -1078,7 +1078,7 @@ const ChatView: React.FC<ChatViewProps> = ({
             title={isRecording ? 'Detener grabación' : 'Grabar mensaje de voz'}
             disabled={isRecordingVideo}
           >
-            {isRecording ? <MicOff size={18} className="sm:w-5 sm:h-5" /> : <Mic size={18} className="sm:w-5 sm:h-5" />}
+            {isRecording ? <MicOff size={16} className="sm:w-5 sm:h-5" /> : <Mic size={16} className="sm:w-5 sm:h-5" />}
           </button>
 
           <input 
@@ -1086,14 +1086,15 @@ const ChatView: React.FC<ChatViewProps> = ({
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
             placeholder={t('typeSomethingCool')}
-            className="flex-1 bg-transparent border-none focus:ring-0 py-3 text-sm outline-none placeholder-slate-400 min-h-[44px]"
+            className="flex-1 bg-transparent border-none focus:ring-0 py-2 sm:py-3 text-sm outline-none placeholder-slate-400 min-h-[40px] sm:min-h-[44px] min-w-0"
+            style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}
             disabled={isRecording || isRecordingVideo}
           />
           
           <button 
             onClick={handleSendMessage}
             disabled={!inputValue.trim() || isRecording || isRecordingVideo}
-            className={`p-2 rounded-full transition-all min-w-[44px] min-h-[44px] flex items-center justify-center ${
+            className={`p-1.5 sm:p-2 rounded-full transition-all min-w-[40px] min-h-[40px] sm:min-w-[44px] sm:min-h-[44px] flex items-center justify-center flex-shrink-0 ${
               inputValue.trim() && !isRecording && !isRecordingVideo
                 ? 'text-white bg-rose-500 hover:bg-rose-600 shadow-md' 
                 : 'text-slate-300'

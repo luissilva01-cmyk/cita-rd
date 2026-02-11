@@ -714,9 +714,9 @@ const ChatView: React.FC<ChatViewProps> = ({
   };
 
   return (
-    <div className="flex flex-col h-full bg-white animate-in slide-in-from-right duration-300">
+    <div className="flex flex-col h-full bg-white animate-in slide-in-from-right duration-300 chat-view-container">
       {/* Header - Responsive */}
-      <div className="bg-white/90 backdrop-blur-md border-b border-slate-100 px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between sticky top-0 z-20 safe-area-top">
+      <div className="bg-white/90 backdrop-blur-md border-b border-slate-100 px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between sticky top-0 z-20 safe-area-top" style={{ maxWidth: '100vw', width: '100%', boxSizing: 'border-box' }}>
         <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
           <button 
             onClick={onBack} 
@@ -766,7 +766,8 @@ const ChatView: React.FC<ChatViewProps> = ({
       {/* Messages - Responsive */}
       <div 
         ref={scrollRef} 
-        className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4 bg-slate-50/50 no-scrollbar"
+        className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4 bg-slate-50/50 no-scrollbar chat-messages-area"
+        style={{ maxWidth: '100vw', width: '100%', boxSizing: 'border-box', overflowX: 'hidden' }}
       >
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center py-6 sm:py-8 px-4">
@@ -781,15 +782,17 @@ const ChatView: React.FC<ChatViewProps> = ({
             <div 
               key={msg.id} 
               className={`flex ${msg.senderId === currentUserId ? 'justify-end' : 'justify-start'}`}
+              style={{ maxWidth: '100%', width: '100%', boxSizing: 'border-box' }}
             >
               {/* Mensaje de texto */}
               {msg.type === 'text' && (
                 <div 
-                  className={`max-w-[85%] sm:max-w-[75%] px-3 sm:px-4 py-2 sm:py-2.5 rounded-2xl text-sm ${
+                  className={`max-w-[85%] sm:max-w-[75%] px-3 sm:px-4 py-2 sm:py-2.5 rounded-2xl text-sm message-bubble ${
                     msg.senderId === currentUserId 
                       ? 'bg-rose-500 text-white rounded-tr-none shadow-md shadow-rose-100' 
                       : 'bg-white text-slate-800 rounded-tl-none border border-slate-100 shadow-sm'
                   }`}
+                  style={{ wordWrap: 'break-word', overflowWrap: 'break-word', boxSizing: 'border-box' }}
                 >
                   {msg.text}
                 </div>
@@ -936,11 +939,11 @@ const ChatView: React.FC<ChatViewProps> = ({
       </div>
 
       {/* Input - Responsive */}
-      <div className="p-3 sm:p-4 bg-white border-t border-slate-100 safe-area-bottom">
+      <div className="p-3 sm:p-4 bg-white border-t border-slate-100 safe-area-bottom chat-input-area" style={{ maxWidth: '100vw', width: '100%', boxSizing: 'border-box' }}>
         
         {/* Grabación de voz activa - Responsive */}
         {isRecording && (
-          <div className="mb-3 sm:mb-4 bg-red-50 border border-red-200 rounded-2xl p-3 sm:p-4 flex items-center justify-between">
+          <div className="mb-3 sm:mb-4 bg-red-50 border border-red-200 rounded-2xl p-3 sm:p-4 flex items-center justify-between recording-indicator-mobile" style={{ maxWidth: '100%', boxSizing: 'border-box' }}>
             <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
               <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-red-500 rounded-full animate-pulse flex-shrink-0"></div>
               <span className="text-red-700 font-medium text-sm">Grabando audio...</span>
@@ -966,9 +969,9 @@ const ChatView: React.FC<ChatViewProps> = ({
 
         {/* Grabación de video activa - Responsive */}
         {isRecordingVideo && (
-          <div className="mb-3 sm:mb-4 bg-purple-50 border border-purple-200 rounded-2xl p-3 sm:p-4">
+          <div className="mb-3 sm:mb-4 bg-purple-50 border border-purple-200 rounded-2xl p-3 sm:p-4" style={{ maxWidth: '100%', boxSizing: 'border-box' }}>
             {/* Vista previa de video */}
-            <div className="relative mb-3 rounded-xl overflow-hidden bg-black mx-auto" style={{ maxWidth: '360px' }}>
+            <div className="relative mb-3 rounded-xl overflow-hidden bg-black mx-auto" style={{ maxWidth: 'min(360px, calc(100vw - 4rem))' }}>
               <video
                 ref={videoPreviewRef}
                 autoPlay
@@ -1019,7 +1022,7 @@ const ChatView: React.FC<ChatViewProps> = ({
           </div>
         )}
 
-        <div className="flex items-center gap-2 bg-slate-100 rounded-full px-3 sm:px-4 py-1 focus-within:bg-white focus-within:ring-2 focus-within:ring-rose-500 focus-within:border-rose-500 transition-all">
+        <div className="flex items-center gap-2 bg-slate-100 rounded-full px-3 sm:px-4 py-1 focus-within:bg-white focus-within:ring-2 focus-within:ring-rose-500 focus-within:border-rose-500 transition-all" style={{ maxWidth: '100%', boxSizing: 'border-box' }}>
           
           {/* Input file oculto para fotos */}
           <input

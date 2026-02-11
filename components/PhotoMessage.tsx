@@ -58,9 +58,10 @@ const PhotoMessage: React.FC<PhotoMessageProps> = ({
   return (
     <>
       <div 
-        className={`max-w-[85%] sm:max-w-[300px] ${
+        className={`max-w-[85%] sm:max-w-[300px] photo-message-mobile ${
           isOwn ? 'ml-auto' : 'mr-auto'
         }`}
+        style={{ maxWidth: 'min(85%, calc(100vw - 4rem))', boxSizing: 'border-box' }}
       >
         <div 
           className={`rounded-2xl overflow-hidden shadow-md ${
@@ -88,7 +89,7 @@ const PhotoMessage: React.FC<PhotoMessageProps> = ({
               }`}
               onLoad={() => setImageLoaded(true)}
               onError={() => setImageError(true)}
-              style={{ maxHeight: '400px' }}
+              style={{ maxHeight: '400px', maxWidth: '100%', display: 'block' }}
             />
             
             {/* Overlay al hacer hover */}

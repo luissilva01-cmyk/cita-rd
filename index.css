@@ -628,66 +628,102 @@ body {
 }
 
 
-/* Mobile Chat View Fixes - 10 Feb 2026 */
+/* Mobile Chat View Fixes - 10 Feb 2026 - AGGRESSIVE FIX */
 @media (max-width: 640px) {
+  /* CRITICAL: Prevent ALL horizontal overflow */
+  body, html {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+    position: relative;
+  }
+  
+  #root {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+    position: relative;
+    contain: layout style;
+  }
+  
+  /* Prevent horizontal scroll on touch */
+  * {
+    touch-action: pan-y pinch-zoom !important;
+  }
+  
+  /* Allow normal touch on inputs */
+  input, textarea, select, button, a {
+    touch-action: manipulation !important;
+  }
+  
   /* Chat container */
   .chat-view-container {
-    max-width: 100vw;
-    width: 100%;
-    overflow-x: hidden;
+    max-width: 100vw !important;
+    width: 100% !important;
+    overflow-x: hidden !important;
     display: flex;
     flex-direction: column;
     height: 100vh;
     height: 100dvh;
+    position: relative;
+    contain: layout style;
   }
   
   /* Chat messages area */
   .chat-messages-area {
     flex: 1;
     overflow-y: auto;
-    overflow-x: hidden;
+    overflow-x: hidden !important;
     padding: 1rem;
-    max-width: 100vw;
+    max-width: 100vw !important;
+    width: 100%;
+    box-sizing: border-box;
+    contain: layout style;
   }
   
   /* Individual message bubbles */
   .message-bubble {
-    max-width: 80%;
+    max-width: 80% !important;
     word-wrap: break-word;
     overflow-wrap: break-word;
     hyphens: auto;
+    box-sizing: border-box;
   }
   
   /* Voice message component */
   .voice-message-mobile {
-    max-width: calc(100vw - 6rem);
+    max-width: calc(100vw - 6rem) !important;
     width: 100%;
+    box-sizing: border-box;
   }
   
   /* Photo message component */
   .photo-message-mobile {
-    max-width: calc(100vw - 4rem);
+    max-width: calc(100vw - 4rem) !important;
     width: 100%;
+    box-sizing: border-box;
   }
   
   .photo-message-mobile img {
-    max-width: 100%;
+    max-width: 100% !important;
     height: auto;
     border-radius: 12px;
+    display: block;
   }
   
   /* Video message component */
   .video-message-mobile {
-    max-width: calc(100vw - 4rem);
+    max-width: calc(100vw - 4rem) !important;
     width: 100%;
     aspect-ratio: 16 / 9;
+    box-sizing: border-box;
   }
   
   .video-message-mobile video {
-    width: 100%;
+    width: 100% !important;
+    max-width: 100% !important;
     height: 100%;
     object-fit: cover;
     border-radius: 12px;
+    display: block;
   }
   
   /* Chat input area */
@@ -700,15 +736,15 @@ body {
     border-top: 1px solid #e5e7eb;
     padding: 0.75rem 1rem;
     padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
-    max-width: 100vw;
+    max-width: 100vw !important;
     width: 100%;
     box-sizing: border-box;
   }
   
   /* Chat input field */
   .chat-input-field {
-    width: 100%;
-    max-width: 100%;
+    width: 100% !important;
+    max-width: 100% !important;
     font-size: 16px; /* Prevent zoom on iOS */
     padding: 0.75rem 1rem;
     border-radius: 24px;
@@ -729,15 +765,51 @@ body {
     bottom: 0;
     left: 0;
     right: 0;
-    max-width: 100vw;
+    max-width: 100vw !important;
     width: 100%;
     z-index: 50;
+    box-sizing: border-box;
   }
   
   /* Recording indicator */
   .recording-indicator-mobile {
-    max-width: calc(100vw - 2rem);
+    max-width: calc(100vw - 2rem) !important;
     margin: 0 auto;
+    box-sizing: border-box;
+  }
+  
+  /* AGGRESSIVE: Force all children to respect viewport */
+  .chat-view-container > *,
+  .chat-messages-area > *,
+  .chat-input-area > * {
+    max-width: 100% !important;
+    box-sizing: border-box;
+  }
+  
+  /* Video preview in recording */
+  video {
+    max-width: 100% !important;
+    height: auto;
+    display: block;
+  }
+  
+  /* All images */
+  img {
+    max-width: 100% !important;
+    height: auto;
+    display: block;
+  }
+  
+  /* Flex containers */
+  .flex, [class*="flex"] {
+    max-width: 100% !important;
+    box-sizing: border-box;
+  }
+  
+  /* Grid containers */
+  .grid, [class*="grid"] {
+    max-width: 100% !important;
+    box-sizing: border-box;
   }
 }
 

@@ -106,15 +106,17 @@ const VideoMessage: React.FC<VideoMessageProps> = ({
 
   return (
     <div 
-      className={`max-w-[85%] sm:max-w-[75%] rounded-2xl overflow-hidden shadow-lg ${
+      className={`max-w-[85%] sm:max-w-[75%] rounded-2xl overflow-hidden shadow-lg video-message-mobile ${
         isOwn ? 'rounded-tr-none' : 'rounded-tl-none'
       }`}
+      style={{ maxWidth: 'min(75%, calc(100vw - 4rem))', boxSizing: 'border-box' }}
     >
       <div className="relative bg-black">
         <video
           ref={videoRef}
           src={videoUrl}
           className="w-full max-h-96 object-contain"
+          style={{ maxWidth: '100%', display: 'block' }}
           preload="metadata"
           playsInline
           onLoadedMetadata={handleLoadedMetadata}

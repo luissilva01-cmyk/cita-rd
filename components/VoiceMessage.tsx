@@ -43,11 +43,11 @@ const VoiceMessage: React.FC<VoiceMessageProps> = ({
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   return (
-    <div className={`flex items-center gap-3 p-3 rounded-2xl max-w-xs ${
+    <div className={`flex items-center gap-3 p-3 rounded-2xl max-w-xs voice-message-mobile ${
       isOwn 
         ? 'bg-rose-500 text-white ml-auto' 
         : 'bg-white border border-gray-200 text-gray-800'
-    }`}>
+    }`} style={{ maxWidth: 'min(300px, calc(100vw - 6rem))', boxSizing: 'border-box' }}>
       
       {/* Botón play/pause */}
       <button

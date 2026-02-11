@@ -643,12 +643,8 @@ const ChatView: React.FC<ChatViewProps> = ({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    // Enter sin Shift envía el mensaje
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
-    }
-    // Enter con Shift agrega nueva línea (comportamiento por defecto)
+    // Enter agrega nueva línea (comportamiento por defecto del textarea)
+    // No hacemos nada, dejamos que el textarea maneje Enter naturalmente
   };
 
   // Funciones para envío de fotos

@@ -757,6 +757,7 @@ body {
   /* Chat input field - CRITICAL */
   .chat-input-field,
   .chat-input-area input[type="text"],
+  .chat-input-area textarea,
   .chat-input-area input:not([type="file"]) {
     width: 100% !important;
     max-width: 100% !important;
@@ -769,6 +770,15 @@ body {
     box-sizing: border-box !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
+    line-height: 1.5 !important;
+  }
+  
+  /* Textarea specific */
+  .chat-input-area textarea {
+    overflow-y: auto !important;
+    resize: none !important;
+    min-height: 40px !important;
+    max-height: 120px !important;
   }
   
   /* Buttons in input area */

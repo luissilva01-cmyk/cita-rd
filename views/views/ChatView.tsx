@@ -76,6 +76,7 @@ const ChatView: React.FC<ChatViewProps> = ({
   // Estados para preview de fotos
   const [showPhotoPreview, setShowPhotoPreview] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Estados para IA Emocional
   const [showEmotionalInsights, setShowEmotionalInsights] = useState(false);
@@ -232,6 +233,11 @@ const ChatView: React.FC<ChatViewProps> = ({
       onSendMessage(inputValue, 'text');
       setInputValue('');
       
+      // Reset textarea height
+      if (textareaRef.current) {
+        textareaRef.current.style.height = 'auto';
+      }
+      
       // Limpiar typing status
       if (typingTimeoutRef.current) {
         clearTimeout(typingTimeoutRef.current);
@@ -241,9 +247,15 @@ const ChatView: React.FC<ChatViewProps> = ({
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
     setInputValue(value);
+    
+    // Auto-resize textarea
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`;
+    }
     
     logger.chat.debug('Input changed, updating typing status', { 
       isTyping: !!value.trim(), 
@@ -631,9 +643,12 @@ const ChatView: React.FC<ChatViewProps> = ({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
+    // Enter sin Shift envía el mensaje
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
       handleSendMessage();
     }
+    // Enter con Shift agrega nueva línea (comportamiento por defecto)
   };
 
   // Funciones para envío de fotos
@@ -1081,12 +1096,14 @@ const ChatView: React.FC<ChatViewProps> = ({
             {isRecording ? <MicOff size={16} className="sm:w-5 sm:h-5" /> : <Mic size={16} className="sm:w-5 sm:h-5" />}
           </button>
 
-          <input 
+          <textarea 
+            ref={textareaRef}
             value={inputValue}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
             placeholder={t('typeSomethingCool')}
-            className="flex-1 bg-transparent border-none focus:ring-0 py-2 sm:py-3 text-sm outline-none placeholder-slate-400 min-h-[40px] sm:min-h-[44px] min-w-0"
+            rows={1}
+            className="flex-1 bg-transparent border-none focus:ring-0 py-2 sm:py-3 text-sm outline-none placeholder-slate-400 min-h-[40px] sm:min-h-[44px] max-h-[120px] min-w-0 resize-none overflow-y-auto"
             style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}
             disabled={isRecording || isRecordingVideo}
           />

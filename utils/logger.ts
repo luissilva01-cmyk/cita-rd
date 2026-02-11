@@ -61,7 +61,7 @@ class Logger {
     
     // Configuración por defecto
     this.config = {
-      enabled: this.isDevelopment,
+      enabled: true, // ✅ SIEMPRE HABILITADO (analytics se loggea siempre)
       level: 'debug',
       categories: [], // Vacío = todas las categorías
       showTimestamp: true,
@@ -100,6 +100,9 @@ class Logger {
   // Verificar si debe loggear
   private shouldLog(level: LogLevel, category: LogCategory): boolean {
     if (!this.config.enabled) return false;
+    
+    // EXCEPCIÓN: Analytics SIEMPRE se loggea (incluso en producción)
+    if (category === 'analytics') return true;
     
     // En producción, solo errores
     if (!this.isDevelopment && level !== 'error') return false;

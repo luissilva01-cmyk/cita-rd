@@ -50,7 +50,7 @@ class ErrorTrackingService {
     });
 
     this.isInitialized = true;
-    logger.error.info('Error tracking initialized');
+    logger.analytics.info('Error tracking initialized');
   }
 
   /**
@@ -84,7 +84,7 @@ class ErrorTrackingService {
     }
 
     // Log local
-    logger.error.error('Error captured', errorReport);
+    logger.analytics.error('Error captured', errorReport);
 
     // Enviar a analytics
     analyticsService.trackError(error, options.context);
@@ -146,7 +146,7 @@ class ErrorTrackingService {
    */
   clearErrors() {
     this.errors = [];
-    logger.error.info('Errors cleared');
+    logger.analytics.info('Errors cleared');
   }
 
   /**
@@ -173,7 +173,7 @@ class ErrorTrackingService {
         console.error('Error Report:', errorReport);
       }
     } catch (error) {
-      logger.error.error('Failed to send error to service', error);
+      logger.analytics.error('Failed to send error to service', error);
     }
   }
 

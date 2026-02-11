@@ -15,6 +15,7 @@ type LogCategory =
   | 'privacy'     // Configuración de privacidad
   | 'verification' // Verificación de identidad
   | 'notification' // Push notifications
+  | 'analytics'   // Google Analytics y métricas
   | 'general';    // General
 
 interface LogConfig {
@@ -42,6 +43,7 @@ class Logger {
     privacy: '🔒',
     verification: '✅',
     notification: '🔔',
+    analytics: '📊',
     general: '📋'
   };
 
@@ -288,6 +290,14 @@ class Logger {
     warn: (msg: string, data?: any) => this.warn('notification', msg, data),
     error: (msg: string, error?: any) => this.error('notification', msg, error),
     success: (msg: string, data?: any) => this.success('notification', msg, data)
+  };
+
+  analytics = {
+    debug: (msg: string, data?: any) => this.debug('analytics', msg, data),
+    info: (msg: string, data?: any) => this.info('analytics', msg, data),
+    warn: (msg: string, data?: any) => this.warn('analytics', msg, data),
+    error: (msg: string, error?: any) => this.error('analytics', msg, error),
+    success: (msg: string, data?: any) => this.success('analytics', msg, data)
   };
 
   // Reportar a servicio de monitoreo (placeholder para Sentry, etc.)

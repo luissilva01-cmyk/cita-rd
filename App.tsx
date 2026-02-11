@@ -85,7 +85,7 @@ const App: React.FC = () => {
 
     // Inicializar Error Tracking
     errorTrackingService.initialize();
-    logger.error.info('Error tracking initialized');
+    logger.analytics.info('Error tracking initialized');
 
     // Track app open
     analyticsService.trackEvent('app_open' as any);

@@ -39,9 +39,9 @@ const DesktopLayout: React.FC<DesktopLayoutProps> = ({
         />
       </aside>
 
-      {/* Main Content - Centrado con ancho máximo como WhatsApp Web */}
+      {/* Main Content - Centrado con ancho profesional */}
       <main className="flex-1 flex items-center justify-center p-8">
-        <div className="w-full max-w-5xl h-full bg-white rounded-2xl shadow-2xl overflow-hidden">
+        <div className="w-full max-w-lg">
           {children}
         </div>
       </main>

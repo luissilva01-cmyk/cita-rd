@@ -73,8 +73,8 @@ const Layout: React.FC<LayoutProps> = ({
         </button>
       </header>
 
-      {/* Main Content */}
-      <main className="flex-1 overflow-hidden">
+      {/* Main Content - CRITICAL: overflow-hidden para que el chat respete el espacio */}
+      <main className="flex-1 overflow-hidden" style={{ minHeight: 0 }}>
         {children}
       </main>
 

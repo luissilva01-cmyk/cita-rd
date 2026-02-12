@@ -39,9 +39,9 @@ const DesktopLayout: React.FC<DesktopLayoutProps> = ({
         />
       </aside>
 
-      {/* Main Content - Centrado con ancho profesional */}
+      {/* Main Content */}
       <main className="flex-1 flex items-center justify-center p-8">
-        <div className="w-full max-w-lg">
+        <div className="w-full h-full">
           {children}
         </div>
       </main>

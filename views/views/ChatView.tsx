@@ -813,8 +813,11 @@ const ChatView: React.FC<ChatViewProps> = ({
   };
 
   return (
-    <div className="flex flex-col h-full bg-white animate-in slide-in-from-right duration-300 chat-view-container">
-      {/* Header - Responsive */}
+    // Wrapper para centrar el chat solo en desktop
+    <div className="w-full h-full flex items-center justify-center">
+      <div className="w-full lg:max-w-2xl h-full">
+        <div className="flex flex-col h-full bg-white animate-in slide-in-from-right duration-300 chat-view-container lg:rounded-2xl lg:shadow-2xl lg:overflow-hidden">
+          {/* Header - Responsive */}
       <div className="bg-white/90 backdrop-blur-md border-b border-slate-100 px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between flex-shrink-0 z-20 safe-area-top" style={{ maxWidth: '100vw', width: '100%', boxSizing: 'border-box' }}>
         <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
           <button 
@@ -1320,6 +1323,8 @@ const ChatView: React.FC<ChatViewProps> = ({
         onCopy={handleCopyMessage}
         onClose={() => setContextMenu({ ...contextMenu, isOpen: false })}
       />
+        </div>
+      </div>
     </div>
   );
 };

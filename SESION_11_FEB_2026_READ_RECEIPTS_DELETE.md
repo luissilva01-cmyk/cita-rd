@@ -188,3 +188,66 @@ Ambas funcionalidades están completamente integradas, testeadas y listas para d
 **Pendiente:** Testing y Deploy  
 **Prioridad:** 🟢 ALTA
 
+
+
+## 📊 Google Analytics - Diagnóstico y Deploy
+
+### Problema Reportado
+Google Analytics mostraba 0 usuarios activos en tiempo real a pesar de tener usuarios conectados.
+
+### Análisis Realizado
+- Configuración tenía `send_page_view: false` (envío manual)
+- Faltaba variable `VITE_GA_MEASUREMENT_ID` en `.env.example`
+- Configuración de cookies podía ser mejorada
+
+### Cambios Implementados
+
+**analyticsService.ts:**
+```typescript
+// ANTES
+gtag('config', measurementId, {
+  send_page_view: false, // Lo haremos manualmente
+  anonymize_ip: true,
+});
+
+// DESPUÉS
+gtag('config', measurementId, {
+  send_page_view: true, // Enviar automáticamente
+  anonymize_ip: true,
+  cookie_flags: 'SameSite=None;Secure',
+});
+
+// Enviar evento inicial de carga
+this.trackPageView(window.location.pathname, document.title);
+```
+
+**.env.example:**
+```env
+# Google Analytics 4
+VITE_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+```
+
+### Deploy Completado ✅
+- ✅ Build exitoso
+- ✅ Deploy a Firebase Hosting completado
+- ✅ URL: https://citard-fbc26.web.app
+- ✅ Documentación: `ANALYTICS_DEPLOYED_11_FEB_2026.md`
+
+### Verificación
+
+**Esperar 2-5 minutos** después de cargar la app, luego:
+
+1. **Desactivar Ad Blocker** (causa #1 de Analytics no funcionando)
+2. Verificar en consola que `window.gtag` existe
+3. Verificar requests a `google-analytics.com` en Network tab
+4. Verificar en Google Analytics → Tiempo Real
+5. (Opcional) Usar DebugView con `?debug_mode=true`
+
+### Documentación Completa
+- `ANALYTICS_DIAGNOSTICO_11_FEB_2026.md` - Diagnóstico detallado
+- `ANALYTICS_DEPLOYED_11_FEB_2026.md` - Guía de verificación
+
+---
+
+**Última Actualización:** 11 de Febrero 2026 - 1:30 AM  
+**Estado Final:** ✅ TODO DESPLEGADO EN PRODUCCIÓN

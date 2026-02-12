@@ -101,12 +101,16 @@ class AnalyticsService {
 
       gtag('js', new Date());
       gtag('config', measurementId, {
-        send_page_view: false, // Lo haremos manualmente
+        send_page_view: true, // Enviar automáticamente
         anonymize_ip: true, // GDPR compliance
+        cookie_flags: 'SameSite=None;Secure',
       });
 
       this.isInitialized = true;
       logger.analytics.info('Analytics initialized', { measurementId });
+      
+      // Enviar evento inicial de carga
+      this.trackPageView(window.location.pathname, document.title);
     } catch (error) {
       logger.analytics.error('Failed to initialize analytics', error);
     }

@@ -53,9 +53,9 @@ const Layout: React.FC<LayoutProps> = ({
   
   // Layout móvil/tablet (existente)
   return (
-    <div className="flex flex-col min-h-screen w-full max-w-md lg:max-w-6xl mx-auto bg-white shadow-2xl relative overflow-hidden">
+    <div className="flex flex-col h-screen w-full max-w-md lg:max-w-6xl mx-auto bg-white shadow-2xl relative overflow-hidden">
       {/* Header */}
-      <header className="px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center bg-white/80 backdrop-blur-md z-10 sticky top-0 border-b border-slate-100 flex-shrink-0">
+      <header className="px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center bg-white/80 backdrop-blur-md z-10 border-b border-slate-100 flex-shrink-0">
         <div className="flex items-center gap-2">
           <div className="bg-gradient-to-tr p-1.5 rounded-lg" style={{background: 'linear-gradient(to top right, #FF6B6B, #FFD93D)'}}>
             <Flame className="text-white" size={18} />
@@ -74,7 +74,7 @@ const Layout: React.FC<LayoutProps> = ({
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto no-scrollbar">
+      <main className="flex-1 overflow-hidden">
         {children}
       </main>
 

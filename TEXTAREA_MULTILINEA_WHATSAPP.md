@@ -1,8 +1,8 @@
-# ✅ Textarea Multilinea Estilo WhatsApp - 10 Feb 2026
+# ✅ Textarea Multilinea Estilo Intuitivo - 10 Feb 2026
 
 ## 🎯 Funcionalidad Implementada
 
-El input del chat ahora es un `textarea` multilinea como WhatsApp, permitiendo escribir mensajes largos sin perder el texto durante la redacción.
+El input del chat ahora es un `textarea` multilinea con comportamiento intuitivo, permitiendo escribir mensajes largos sin perder el texto durante la redacción.
 
 ## 📝 Características
 
@@ -11,15 +11,15 @@ El input del chat ahora es un `textarea` multilinea como WhatsApp, permitiendo e
 - Permite múltiples líneas de texto
 - Auto-resize dinámico
 
-### 2. Comportamiento de Teclas
+### 2. Comportamiento Intuitivo de Teclas
 
-**Enter (sin Shift):**
-- Envía el mensaje
-- Comportamiento estándar de WhatsApp
-
-**Shift + Enter:**
+**Enter:**
 - Agrega nueva línea
-- Permite escribir mensajes largos
+- Comportamiento natural al escribir
+
+**Click en botón enviar (ícono de cometa):**
+- Envía el mensaje
+- Más intuitivo para usuarios
 
 ### 3. Auto-Resize
 - Comienza con 1 línea (40px)
@@ -83,20 +83,31 @@ const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
 3. Aplica el menor valor entre scrollHeight y 120px
 4. Resultado: textarea crece hasta 120px, luego scroll
 
-### 3. Manejo de Enter
+### 3. Manejo de Enter (SIMPLIFICADO)
 
 ```tsx
 const handleKeyDown = (e: React.KeyboardEvent) => {
-  // Enter sin Shift envía el mensaje
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    handleSendMessage();
-  }
-  // Enter con Shift agrega nueva línea (comportamiento por defecto)
+  // Enter agrega nueva línea (comportamiento por defecto del textarea)
+  // No hacemos nada, dejamos que el textarea maneje Enter naturalmente
 };
 ```
 
-### 4. Reset al Enviar
+**Ventaja:** Comportamiento natural y esperado por los usuarios.
+
+### 4. Envío de Mensaje
+
+```tsx
+// Solo se envía al hacer click en el botón
+<button 
+  onClick={handleSendMessage}
+  disabled={!inputValue.trim() || isRecording || isRecordingVideo}
+  className="..."
+>
+  <Send size={16} />
+</button>
+```
+
+### 5. Reset al Enviar
 
 ```tsx
 const handleSendMessage = () => {
@@ -114,32 +125,20 @@ const handleSendMessage = () => {
 };
 ```
 
-### 5. CSS Específico
-
-```css
-/* Textarea specific */
-.chat-input-area textarea {
-  overflow-y: auto !important;
-  resize: none !important;
-  min-height: 40px !important;
-  max-height: 120px !important;
-  line-height: 1.5 !important;
-}
-```
-
 ## 📊 Comparación: Antes vs Después
 
 ### Antes ❌
 - Input de una sola línea
 - Texto largo se cortaba
 - No se podía ver todo el mensaje
-- Enter siempre enviaba
+- Enter enviaba (confuso para mensajes largos)
 
 ### Después ✅
 - Textarea multilinea
 - Texto largo visible completo
 - Auto-resize hasta 5 líneas
-- Enter envía, Shift+Enter nueva línea
+- **Enter agrega nueva línea (intuitivo)**
+- **Click en botón envía mensaje (claro)**
 - Scroll interno después de 5 líneas
 
 ## 🎨 Detalles de UX
@@ -166,10 +165,10 @@ const handleSendMessage = () => {
 ## 🚀 Deploy
 
 ```
-Build: ✅ 9.55s
+Build: ✅ 9.08s
 Deploy: ✅ https://citard-fbc26.web.app
-Commit: 5d5f641
-Message: "feat: Implementar textarea multilinea estilo WhatsApp - Enter envía, Shift+Enter nueva línea"
+Commit: 00aae6b
+Message: "feat: Cambiar comportamiento Enter - Enter nueva linea, Click enviar mensaje"
 ```
 
 ## 🧪 Cómo Probar
@@ -181,14 +180,16 @@ URL: https://citard-fbc26.web.app
 
 ### 2. Escribir Mensaje Corto
 - Escribe "Hola"
-- Presiona Enter
+- Presiona **Click en botón enviar**
 - ✅ Mensaje se envía
 
 ### 3. Escribir Mensaje Largo
 - Escribe varias líneas
-- Presiona Shift+Enter para nueva línea
+- Presiona **Enter** para nueva línea
 - ✅ Textarea crece automáticamente
 - ✅ Puedes ver todo el texto
+- Presiona **Click en botón enviar**
+- ✅ Mensaje se envía
 
 ### 4. Verificar Auto-Resize
 - Escribe 1 línea: 40px
@@ -198,10 +199,10 @@ URL: https://citard-fbc26.web.app
 - Escribe 5 líneas: 120px
 - Escribe 6+ líneas: 120px + scroll
 
-### 5. Verificar Enter
-- Enter solo: Envía mensaje
-- Shift+Enter: Nueva línea
-- ✅ Comportamiento como WhatsApp
+### 5. Verificar Comportamiento
+- **Enter:** Nueva línea
+- **Click botón:** Envía mensaje
+- ✅ Comportamiento intuitivo y natural
 
 ## 📱 Responsive
 
@@ -217,18 +218,18 @@ URL: https://citard-fbc26.web.app
 
 ## 🎯 Beneficios
 
-1. **UX Mejorada**
-   - Escribir mensajes largos es más fácil
-   - Puedes ver todo el texto antes de enviar
-   - Comportamiento familiar (WhatsApp)
+1. **UX Más Intuitiva**
+   - Enter agrega línea (comportamiento esperado)
+   - Click envía mensaje (acción explícita)
+   - Menos confusión para usuarios
 
 2. **Menos Errores**
-   - No se pierde texto al escribir
+   - No se envía mensaje accidentalmente
    - Puedes revisar antes de enviar
-   - Shift+Enter para nueva línea
+   - Control total sobre el envío
 
-3. **Más Profesional**
-   - Comportamiento estándar de apps de chat
+3. **Más Natural**
+   - Comportamiento familiar
    - Auto-resize suave
    - UX pulida
 
@@ -242,61 +243,59 @@ URL: https://citard-fbc26.web.app
 
 ### Enter
 1. Usuario presiona Enter
-2. Si NO hay Shift: Envía mensaje
-3. Si hay Shift: Nueva línea
+2. Se agrega nueva línea
+3. Textarea crece (si hay espacio)
+4. Continúa escribiendo
 
 ### Enviar
-1. Mensaje se envía
-2. Textarea se limpia
-3. Height vuelve a 40px
-4. Listo para nuevo mensaje
+1. Usuario hace click en botón
+2. Mensaje se envía
+3. Textarea se limpia
+4. Height vuelve a 40px
+5. Listo para nuevo mensaje
 
 ### Typing Indicator
 - Funciona igual que antes
 - Se actualiza al escribir
 - Se limpia al enviar
 
-## 📝 Notas Técnicas
+## 📝 Ventajas del Nuevo Comportamiento
 
-### 1. useRef para Textarea
-```tsx
-const textareaRef = useRef<HTMLTextAreaElement>(null);
-```
-Necesario para manipular height directamente.
+### 1. Más Intuitivo
+- Enter = Nueva línea (como en cualquier editor de texto)
+- Click = Enviar (acción explícita y clara)
 
-### 2. scrollHeight
-```tsx
-textareaRef.current.scrollHeight
-```
-Altura real del contenido, incluyendo overflow.
+### 2. Menos Accidentes
+- No se envía mensaje por error al presionar Enter
+- Usuario tiene control total
 
-### 3. Math.min
-```tsx
-Math.min(scrollHeight, 120)
-```
-Limita crecimiento a 120px máximo.
+### 3. Mejor para Mensajes Largos
+- Fácil escribir párrafos
+- Fácil formatear texto
+- Fácil revisar antes de enviar
 
-### 4. preventDefault
-```tsx
-e.preventDefault()
-```
-Previene nueva línea cuando Enter sin Shift.
+### 4. Comportamiento Estándar
+- Similar a Telegram Desktop
+- Similar a Slack
+- Similar a Discord
 
 ## 🎉 Conclusión
 
-El chat ahora tiene un textarea multilinea estilo WhatsApp que permite escribir mensajes largos sin perder el texto. El comportamiento es familiar y profesional:
+El chat ahora tiene un textarea multilinea con comportamiento intuitivo:
 
-- **Enter:** Envía mensaje
-- **Shift+Enter:** Nueva línea
+- **Enter:** Agrega nueva línea (natural)
+- **Click botón:** Envía mensaje (explícito)
 - **Auto-resize:** Hasta 5 líneas
 - **Scroll:** Después de 5 líneas
 
-**Por favor, prueba la nueva funcionalidad y verifica que funciona como WhatsApp.**
+Este comportamiento es más intuitivo y reduce errores de envío accidental.
+
+**Por favor, prueba la nueva funcionalidad y verifica que es más fácil de usar.**
 
 ---
 
 **Fecha:** 10 de Febrero 2026  
-**Hora:** ~11:45 PM  
+**Hora:** ~12:00 AM  
 **Estado:** ✅ DESPLEGADO  
 **URL:** https://citard-fbc26.web.app  
-**Commit:** `5d5f641`
+**Commit:** `00aae6b`

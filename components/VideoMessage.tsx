@@ -7,13 +7,19 @@ interface VideoMessageProps {
   duration?: number;
   isOwn: boolean;
   timestamp?: number;
+  onContextMenu?: (e: React.MouseEvent) => void;
+  onTouchStart?: (e: React.TouchEvent) => void;
+  onTouchEnd?: (e: React.TouchEvent) => void;
 }
 
 const VideoMessage: React.FC<VideoMessageProps> = ({
   videoUrl,
   duration,
   isOwn,
-  timestamp
+  timestamp,
+  onContextMenu,
+  onTouchStart,
+  onTouchEnd
 }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
@@ -106,10 +112,13 @@ const VideoMessage: React.FC<VideoMessageProps> = ({
 
   return (
     <div 
-      className={`max-w-[85%] sm:max-w-[75%] rounded-2xl overflow-hidden shadow-lg video-message-mobile ${
+      className={`max-w-[85%] sm:max-w-[75%] rounded-2xl overflow-hidden shadow-lg video-message-mobile cursor-pointer ${
         isOwn ? 'rounded-tr-none' : 'rounded-tl-none'
       }`}
       style={{ maxWidth: 'min(75%, calc(100vw - 4rem))', boxSizing: 'border-box' }}
+      onContextMenu={onContextMenu}
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
     >
       <div className="relative bg-black">
         <video

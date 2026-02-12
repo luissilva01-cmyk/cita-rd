@@ -37,6 +37,10 @@ export interface Message {
   timestamp: number;
   serverTimestamp?: any; // Firebase serverTimestamp
   isRead?: boolean;
+  readBy?: string[]; // IDs de usuarios que han leído el mensaje
+  readAt?: number; // Timestamp de cuando fue leído
+  deletedFor?: string[]; // IDs de usuarios que han borrado el mensaje
+  deletedForEveryone?: boolean; // Si fue borrado para todos
 }
 
 export interface Match {

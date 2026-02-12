@@ -7,13 +7,19 @@ interface PhotoMessageProps {
   isOwn: boolean;
   timestamp: number;
   caption?: string;
+  onContextMenu?: (e: React.MouseEvent) => void;
+  onTouchStart?: (e: React.TouchEvent) => void;
+  onTouchEnd?: (e: React.TouchEvent) => void;
 }
 
 const PhotoMessage: React.FC<PhotoMessageProps> = ({ 
   photoUrl, 
   isOwn, 
   timestamp,
-  caption 
+  caption,
+  onContextMenu,
+  onTouchStart,
+  onTouchEnd
 }) => {
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -58,10 +64,13 @@ const PhotoMessage: React.FC<PhotoMessageProps> = ({
   return (
     <>
       <div 
-        className={`max-w-[85%] sm:max-w-[300px] photo-message-mobile ${
+        className={`max-w-[85%] sm:max-w-[300px] photo-message-mobile cursor-pointer ${
           isOwn ? 'ml-auto' : 'mr-auto'
         }`}
         style={{ maxWidth: 'min(85%, calc(100vw - 4rem))', boxSizing: 'border-box' }}
+        onContextMenu={onContextMenu}
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
       >
         <div 
           className={`rounded-2xl overflow-hidden shadow-md ${

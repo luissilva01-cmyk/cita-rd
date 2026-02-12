@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test: Mensajes Vistos y Borrar Mensajes</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .animate-fadeIn {
+      animation: fadeIn 0.2s ease-out;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 p-4">
+  <div class="max-w-4xl mx-auto">
+    <h1 class="text-3xl font-bold text-slate-800 mb-2">🎯 Test: Mensajes Vistos y Borrar Mensajes</h1>
+    <p class="text-slate-600 mb-6">Prueba las nuevas funcionalidades del sistema de chat</p>
+
+    <div class="grid md:grid-cols-2 gap-6">
+      <!-- Chat Usuario A -->
+      <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+        <div class="bg-gradient-to-r from-rose-500 to-pink-500 p-4 text-white">
+          <h2 class="text-xl font-bold">👤 Usuario A (Tú)</h2>
+          <p class="text-sm opacity-90">Envía mensajes y bórralos</p>
+        </div>
+        
+        <div id="chatA" class="h-96 overflow-y-auto p-4 space-y-3 bg-slate-50">
+          <!-- Mensajes aparecerán aquí -->
+        </div>
+
+        <div class="p-4 bg-white border-t border-slate-200">
+          <div class="flex gap-2">
+            <input 
+              id="inputA" 
+              type="text" 
+              placeholder="Escribe un mensaje..."
+              class="flex-1 px-4 py-2 border border-slate-300 rounded-full focus:outline-none focus:ring-2 focus:ring-rose-500"
+              onkeypress="if(event.key==='Enter') sendMessage('A')"
+            >
+            <button 
+              onclick="sendMessage('A')"
+              class="px-6 py-2 bg-rose-500 text-white rounded-full hover:bg-rose-600 transition-colors font-medium"
+            >
+              Enviar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chat Usuario B -->
+      <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+        <div class="bg-gradient-to-r from-blue-500 to-cyan-500 p-4 text-white">
+          <h2 class="text-xl font-bold">👤 Usuario B (Otro)</h2>
+          <p class="text-sm opacity-90">Recibe mensajes y responde</p>
+        </div>
+        
+        <div id="chatB" class="h-96 overflow-y-auto p-4 space-y-3 bg-slate-50">
+          <!-- Mensajes aparecerán aquí -->
+        </div>
+
+        <div class="p-4 bg-white border-t border-slate-200">
+          <div class="flex gap-2">
+            <input 
+              id="inputB" 
+              type="text" 
+              placeholder="Escribe un mensaje..."
+              class="flex-1 px-4 py-2 border border-slate-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onkeypress="if(event.key==='Enter') sendMessage('B')"
+            >
+            <button 
+              onclick="sendMessage('B')"
+              class="px-6 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors font-medium"
+            >
+              Enviar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Instrucciones -->
+    <div class="mt-6 bg-white rounded-2xl shadow-lg p-6">
+      <h3 class="text-xl font-bold text-slate-800 mb-4">📖 Instrucciones</h3>
+      
+      <div class="space-y-4">
+        <div>
+          <h4 class="font-bold text-slate-700 mb-2">✅ Mensajes Vistos:</h4>
+          <ol class="list-decimal list-inside space-y-1 text-slate-600">
+            <li>Usuario A envía un mensaje → Verás un check gris (✓)</li>
+            <li>Usuario B abre el chat (automático) → El check se vuelve azul (✓✓)</li>
+            <li>Esto indica que el mensaje fue leído</li>
+          </ol>
+        </div>
+
+        <div>
+          <h4 class="font-bold text-slate-700 mb-2">🗑️ Borrar Mensajes:</h4>
+          <ol class="list-decimal list-inside space-y-1 text-slate-600">
+            <li>Haz click derecho en cualquier mensaje</li>
+            <li>Selecciona "Borrar para mí" → Solo tú dejas de verlo</li>
+            <li>Selecciona "Borrar para todos" (solo tus mensajes) → Todos dejan de verlo</li>
+            <li>Selecciona "Copiar mensaje" → Se copia al portapapeles</li>
+          </ol>
+        </div>
+
+        <div>
+          <h4 class="font-bold text-slate-700 mb-2">📱 En Móvil:</h4>
+          <p class="text-slate-600">Mantén presionado el mensaje por 500ms para abrir el menú contextual</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Leyenda -->
+    <div class="mt-6 bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6 border border-purple-200">
+      <h3 class="text-lg font-bold text-purple-800 mb-3">🎨 Leyenda de Indicadores</h3>
+      <div class="grid md:grid-cols-2 gap-4">
+        <div class="flex items-center gap-3">
+          <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+          <span class="text-slate-700">Mensaje enviado (no leído)</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7M5 13l4 4L19 7"></path>
+          </svg>
+          <span class="text-slate-700">Mensaje leído</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-slate-500 italic">Este mensaje fue eliminado</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-slate-700">Mensaje borrado para todos</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Context Menu -->
+  <div id="contextMenu" class="hidden fixed bg-white rounded-xl shadow-2xl border border-slate-200 py-2 min-w-[200px] z-50">
+    <button onclick="copyMessage()" class="w-full px-4 py-2.5 text-left text-sm text-slate-700 hover:bg-slate-50 transition-colors flex items-center gap-3">
+      <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+      </svg>
+      Copiar mensaje
+    </button>
+    <button onclick="deleteForMe()" class="w-full px-4 py-2.5 text-left text-sm text-slate-700 hover:bg-slate-50 transition-colors flex items-center gap-3">
+      <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7a4 4 0 11-8 0 4 4 0 018 0zM9 14a6 6 0 00-6 6v1h12v-1a6 6 0 00-6-6z"></path>
+      </svg>
+      Borrar para mí
+    </button>
+    <button id="deleteForEveryoneBtn" onclick="deleteForEveryone()" class="w-full px-4 py-2.5 text-left text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center gap-3 border-t border-slate-100">
+      <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+      </svg>
+      Borrar para todos
+    </button>
+  </div>
+
+  <script>
+    let messages = [];
+    let messageIdCounter = 0;
+    let currentContextMessage = null;
+
+    // Simular que Usuario B siempre está "viendo" el chat
+    setInterval(() => {
+      markMessagesAsRead('B');
+    }, 1000);
+
+    function sendMessage(sender) {
+      const input = document.getElementById(`input${sender}`);
+      const text = input.value.trim();
+      
+      if (!text) return;
+
+      const message = {
+        id: ++messageIdCounter,
+        sender: sender,
+        text: text,
+        timestamp: Date.now(),
+        isRead: false,
+        deletedFor: [],
+        deletedForEveryone: false
+      };
+
+      messages.push(message);
+      input.value = '';
+      
+      renderChats();
+      scrollToBottom();
+    }
+
+    function markMessagesAsRead(viewer) {
+      let updated = false;
+      messages.forEach(msg => {
+        if (msg.sender !== viewer && !msg.isRead) {
+          msg.isRead = true;
+          msg.readAt = Date.now();
+          updated = true;
+        }
+      });
+      
+      if (updated) {
+        renderChats();
+      }
+    }
+
+    function renderChats() {
+      renderChat('A');
+      renderChat('B');
+    }
+
+    function renderChat(user) {
+      const chatDiv = document.getElementById(`chat${user}`);
+      chatDiv.innerHTML = '';
+
+      messages.forEach(msg => {
+        // Filtrar mensajes borrados para este usuario
+        if (msg.deletedFor.includes(user)) {
+          return;
+        }
+
+        const isOwn = msg.sender === user;
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `flex ${isOwn ? 'justify-end' : 'justify-start'} animate-fadeIn`;
+
+        const bubble = document.createElement('div');
+        bubble.className = `max-w-[75%] px-4 py-2.5 rounded-2xl text-sm cursor-pointer ${
+          isOwn 
+            ? 'bg-rose-500 text-white rounded-tr-none shadow-md' 
+            : 'bg-white text-slate-800 rounded-tl-none border border-slate-200 shadow-sm'
+        } ${msg.deletedForEveryone ? 'italic opacity-60' : ''}`;
+        
+        bubble.textContent = msg.text;
+        bubble.oncontextmenu = (e) => {
+          e.preventDefault();
+          showContextMenu(e, msg, user);
+        };
+
+        const container = document.createElement('div');
+        container.className = 'flex flex-col gap-1';
+        container.appendChild(bubble);
+
+        // Indicador de visto (solo para mensajes propios)
+        if (isOwn) {
+          const readIndicator = document.createElement('div');
+          readIndicator.className = 'flex items-center justify-end gap-1 px-1';
+          
+          if (msg.isRead) {
+            readIndicator.innerHTML = `
+              <svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" transform="translate(3, 0)"></path>
+              </svg>
+            `;
+          } else {
+            readIndicator.innerHTML = `
+              <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+            `;
+          }
+          
+          container.appendChild(readIndicator);
+        }
+
+        messageDiv.appendChild(container);
+        chatDiv.appendChild(messageDiv);
+      });
+    }
+
+    function showContextMenu(e, message, viewer) {
+      currentContextMessage = { message, viewer };
+      
+      const menu = document.getElementById('contextMenu');
+      const deleteForEveryoneBtn = document.getElementById('deleteForEveryoneBtn');
+      
+      // Solo mostrar "Borrar para todos" si es mensaje propio
+      deleteForEveryoneBtn.style.display = message.sender === viewer ? 'flex' : 'none';
+      
+      menu.style.left = `${e.clientX}px`;
+      menu.style.top = `${e.clientY}px`;
+      menu.classList.remove('hidden');
+      
+      // Cerrar al hacer click fuera
+      setTimeout(() => {
+        document.addEventListener('click', closeContextMenu);
+      }, 100);
+    }
+
+    function closeContextMenu() {
+      document.getElementById('contextMenu').classList.add('hidden');
+      document.removeEventListener('click', closeContextMenu);
+    }
+
+    function copyMessage() {
+      if (currentContextMessage) {
+        navigator.clipboard.writeText(currentContextMessage.message.text);
+        alert('✅ Mensaje copiado al portapapeles');
+      }
+      closeContextMenu();
+    }
+
+    function deleteForMe() {
+      if (currentContextMessage) {
+        const { message, viewer } = currentContextMessage;
+        message.deletedFor.push(viewer);
+        renderChats();
+        alert(`✅ Mensaje borrado para ${viewer}`);
+      }
+      closeContextMenu();
+    }
+
+    function deleteForEveryone() {
+      if (currentContextMessage) {
+        const { message, viewer } = currentContextMessage;
+        
+        if (message.sender !== viewer) {
+          alert('❌ Solo el remitente puede borrar el mensaje para todos');
+          closeContextMenu();
+          return;
+        }
+        
+        message.deletedForEveryone = true;
+        message.text = 'Este mensaje fue eliminado';
+        renderChats();
+        alert('✅ Mensaje borrado para todos');
+      }
+      closeContextMenu();
+    }
+
+    function scrollToBottom() {
+      ['A', 'B'].forEach(user => {
+        const chat = document.getElementById(`chat${user}`);
+        chat.scrollTop = chat.scrollHeight;
+      });
+    }
+
+    // Mensajes de ejemplo
+    setTimeout(() => {
+      document.getElementById('inputA').value = '¡Hola! ¿Cómo estás?';
+      sendMessage('A');
+    }, 500);
+
+    setTimeout(() => {
+      document.getElementById('inputB').value = '¡Muy bien! ¿Y tú?';
+      sendMessage('B');
+    }, 2000);
+
+    setTimeout(() => {
+      document.getElementById('inputA').value = 'Genial! Probando las nuevas funcionalidades 😊';
+      sendMessage('A');
+    }, 3500);
+  </script>
+</body>
+</html>

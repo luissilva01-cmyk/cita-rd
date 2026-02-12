@@ -8,13 +8,19 @@ interface VoiceMessageProps {
   duration: number;
   isOwn: boolean;
   timestamp: number;
+  onContextMenu?: (e: React.MouseEvent) => void;
+  onTouchStart?: (e: React.TouchEvent) => void;
+  onTouchEnd?: (e: React.TouchEvent) => void;
 }
 
 const VoiceMessage: React.FC<VoiceMessageProps> = ({ 
   audioUrl, 
   duration, 
   isOwn, 
-  timestamp 
+  timestamp,
+  onContextMenu,
+  onTouchStart,
+  onTouchEnd
 }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -43,11 +49,17 @@ const VoiceMessage: React.FC<VoiceMessageProps> = ({
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   return (
-    <div className={`flex items-center gap-3 p-3 rounded-2xl max-w-xs voice-message-mobile ${
-      isOwn 
-        ? 'bg-rose-500 text-white ml-auto' 
-        : 'bg-white border border-gray-200 text-gray-800'
-    }`} style={{ maxWidth: 'min(300px, calc(100vw - 6rem))', boxSizing: 'border-box' }}>
+    <div 
+      className={`flex items-center gap-3 p-3 rounded-2xl max-w-xs voice-message-mobile cursor-pointer ${
+        isOwn 
+          ? 'bg-rose-500 text-white ml-auto' 
+          : 'bg-white border border-gray-200 text-gray-800'
+      }`} 
+      style={{ maxWidth: 'min(300px, calc(100vw - 6rem))', boxSizing: 'border-box' }}
+      onContextMenu={onContextMenu}
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
+    >
       
       {/* Botón play/pause */}
       <button

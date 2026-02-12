@@ -10,10 +10,12 @@ import {
   serverTimestamp,
   where,
   getDocs,
+  getDoc,
   setDoc,
   limit,
   startAfter,
-  DocumentSnapshot
+  DocumentSnapshot,
+  deleteField
 } from "firebase/firestore";
 import { UserProfile, Message } from '../types';
 import { logger } from '../utils/logger';
@@ -250,4 +252,113 @@ export const listenToTypingStatus = (
   );
   
   return unsubscribe;
+};
+
+// Marcar mensajes como leídos
+export const markMessagesAsRead = async (
+  chatId: string,
+  userId: string,
+  messageIds: string[]
+): Promise<void> => {
+  try {
+    logger.chat.debug('Marcando mensajes como leídos', { 
+      chatId, 
+      userId, 
+      count: messageIds.length 
+    });
+
+    const updatePromises = messageIds.map(async (messageId) => {
+      const messageRef = doc(db, "chats", chatId, "messages", messageId);
+      await updateDoc(messageRef, {
+        isRead: true,
+        readBy: [userId], // Array con IDs de usuarios que leyeron
+        readAt: Date.now()
+      });
+    });
+
+    await Promise.all(updatePromises);
+    
+    logger.chat.success('Mensajes marcados como leídos', { count: messageIds.length });
+  } catch (error) {
+    logger.chat.error('Error marcando mensajes como leídos', error);
+  }
+};
+
+// Borrar mensaje para el usuario actual
+export const deleteMessageForMe = async (
+  chatId: string,
+  messageId: string,
+  userId: string
+): Promise<void> => {
+  try {
+    logger.chat.info('Borrando mensaje para usuario', { chatId, messageId, userId });
+
+    const messageRef = doc(db, "chats", chatId, "messages", messageId);
+    
+    // Obtener el documento actual
+    const messageDoc = await getDoc(messageRef);
+    
+    if (messageDoc.exists()) {
+      const currentData = messageDoc.data();
+      const deletedFor = currentData.deletedFor || [];
+      
+      // Agregar usuario a la lista de "borrado para"
+      await updateDoc(messageRef, {
+        deletedFor: [...deletedFor, userId]
+      });
+      
+      logger.chat.success('Mensaje borrado para usuario', { messageId });
+    } else {
+      logger.chat.warn('Mensaje no encontrado', { messageId });
+      throw new Error('Mensaje no encontrado');
+    }
+  } catch (error) {
+    logger.chat.error('Error borrando mensaje para usuario', error);
+    throw error;
+  }
+};
+
+// Borrar mensaje para todos
+export const deleteMessageForEveryone = async (
+  chatId: string,
+  messageId: string,
+  senderId: string
+): Promise<void> => {
+  try {
+    logger.chat.info('Borrando mensaje para todos', { chatId, messageId, senderId });
+
+    const messageRef = doc(db, "chats", chatId, "messages", messageId);
+    
+    // Obtener el documento actual
+    const messageDoc = await getDoc(messageRef);
+    
+    if (messageDoc.exists()) {
+      const messageData = messageDoc.data();
+      
+      // Verificar que el usuario sea el remitente
+      if (messageData.senderId !== senderId) {
+        logger.chat.warn('Usuario no autorizado para borrar mensaje', { 
+          messageSenderId: messageData.senderId, 
+          requestUserId: senderId 
+        });
+        throw new Error('Solo el remitente puede borrar el mensaje para todos');
+      }
+      
+      // Marcar como borrado para todos
+      await updateDoc(messageRef, {
+        deletedForEveryone: true,
+        text: 'Este mensaje fue eliminado',
+        content: deleteField(), // Usar deleteField() en lugar de undefined
+        type: 'text'
+      });
+      
+      logger.chat.success('Mensaje borrado para todos', { messageId });
+    } else {
+      logger.chat.warn('Mensaje no encontrado', { messageId });
+      throw new Error('Mensaje no encontrado');
+    }
+  } catch (error) {
+    logger.chat.error('Error borrando mensaje para todos', error);
+    throw error;
+  }
 };

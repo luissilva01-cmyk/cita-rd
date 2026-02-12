@@ -10,12 +10,20 @@ import {
   Image as ImageIcon,
   StopCircle,
   Brain,
-  Video as VideoIcon
+  Video as VideoIcon,
+  Check,
+  CheckCheck
 } from 'lucide-react';
 import { Match, Message } from '../../types';
 import { getIcebreakerSuggestions } from '../../services/geminiService';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { updateTypingStatus, listenToTypingStatus } from '../../services/chatService';
+import { 
+  updateTypingStatus, 
+  listenToTypingStatus, 
+  markMessagesAsRead,
+  deleteMessageForMe,
+  deleteMessageForEveryone
+} from '../../services/chatService';
 import { VoiceRecorder, uploadVoiceMessage, uploadPhotoMessage } from '../../services/voiceMessageService';
 import EmojiPicker from '../../components/EmojiPicker';
 import VoiceMessage from '../../components/VoiceMessage';
@@ -23,6 +31,7 @@ import VideoMessage from '../../components/VideoMessage';
 import PhotoMessage from '../../components/PhotoMessage';
 import PhotoPreviewModal from '../../components/PhotoPreviewModal';
 import EmotionalInsights from '../../components/EmotionalInsights';
+import MessageContextMenu from '../../components/MessageContextMenu';
 import { useEmotionalAI } from '../../hooks/useEmotionalAI';
 import TypingIndicator from '../../components/TypingIndicator';
 import { SmartSuggestion } from '../../services/emotionalAI';
@@ -80,6 +89,21 @@ const ChatView: React.FC<ChatViewProps> = ({
 
   // Estados para IA Emocional
   const [showEmotionalInsights, setShowEmotionalInsights] = useState(false);
+  
+  // Estados para menú contextual de mensajes
+  const [contextMenu, setContextMenu] = useState<{
+    isOpen: boolean;
+    position: { x: number; y: number };
+    messageId: string;
+    isOwnMessage: boolean;
+    messageText?: string;
+  }>({
+    isOpen: false,
+    position: { x: 0, y: 0 },
+    messageId: '',
+    isOwnMessage: false,
+    messageText: ''
+  });
   
   // Hook de IA Emocional
   const {
@@ -210,6 +234,22 @@ const ChatView: React.FC<ChatViewProps> = ({
       calculateMetrics(messages);
     }
   }, [messages, match.id, analyzeMessage, analyzeConversation, generateSuggestions, calculateMetrics]);
+
+  // Marcar mensajes como leídos cuando se abre el chat
+  useEffect(() => {
+    if (messages.length > 0 && chatId && currentUserId) {
+      // Filtrar mensajes no leídos que no son del usuario actual
+      const unreadMessages = messages.filter(
+        msg => !msg.isRead && msg.senderId !== currentUserId
+      );
+      
+      if (unreadMessages.length > 0) {
+        const messageIds = unreadMessages.map(msg => msg.id);
+        markMessagesAsRead(chatId, currentUserId, messageIds);
+        logger.chat.info('Mensajes marcados como leídos', { count: messageIds.length });
+      }
+    }
+  }, [messages, chatId, currentUserId]);
 
   const loadIcebreakers = async () => {
     setLoadingIce(true);
@@ -724,10 +764,58 @@ const ChatView: React.FC<ChatViewProps> = ({
     }
   };
 
+  // Funciones para menú contextual de mensajes
+  const handleMessageLongPress = (
+    e: React.MouseEvent | React.TouchEvent,
+    messageId: string,
+    isOwnMessage: boolean,
+    messageText?: string
+  ) => {
+    e.preventDefault();
+    
+    const x = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const y = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    
+    setContextMenu({
+      isOpen: true,
+      position: { x, y },
+      messageId,
+      isOwnMessage,
+      messageText
+    });
+  };
+
+  const handleCopyMessage = () => {
+    if (contextMenu.messageText) {
+      navigator.clipboard.writeText(contextMenu.messageText);
+      logger.chat.success('Mensaje copiado al portapapeles');
+    }
+  };
+
+  const handleDeleteForMe = async () => {
+    try {
+      await deleteMessageForMe(chatId, contextMenu.messageId, currentUserId);
+      logger.chat.success('Mensaje borrado para ti');
+    } catch (error) {
+      logger.chat.error('Error borrando mensaje', error);
+      alert('Error al borrar el mensaje');
+    }
+  };
+
+  const handleDeleteForEveryone = async () => {
+    try {
+      await deleteMessageForEveryone(chatId, contextMenu.messageId, currentUserId);
+      logger.chat.success('Mensaje borrado para todos');
+    } catch (error) {
+      logger.chat.error('Error borrando mensaje para todos', error);
+      alert('Error al borrar el mensaje para todos');
+    }
+  };
+
   return (
     <div className="flex flex-col h-full bg-white animate-in slide-in-from-right duration-300 chat-view-container">
       {/* Header - Responsive */}
-      <div className="bg-white/90 backdrop-blur-md border-b border-slate-100 px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between sticky top-0 z-20 safe-area-top" style={{ maxWidth: '100vw', width: '100%', boxSizing: 'border-box' }}>
+      <div className="bg-white/90 backdrop-blur-md border-b border-slate-100 px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between flex-shrink-0 z-20 safe-area-top" style={{ maxWidth: '100vw', width: '100%', boxSizing: 'border-box' }}>
         <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
           <button 
             onClick={onBack} 
@@ -789,34 +877,69 @@ const ChatView: React.FC<ChatViewProps> = ({
             <p className="text-slate-600 text-sm mb-4">{t('sendFirstMessage', { name: match.user.name })}</p>
           </div>
         ) : (
-          messages.map((msg) => (
-            <div 
-              key={msg.id} 
-              className={`flex ${msg.senderId === currentUserId ? 'justify-end' : 'justify-start'}`}
-              style={{ maxWidth: '100%', width: '100%', boxSizing: 'border-box' }}
-            >
-              {/* Mensaje de texto */}
-              {msg.type === 'text' && (
-                <div 
-                  className={`max-w-[85%] sm:max-w-[75%] px-3 sm:px-4 py-2 sm:py-2.5 rounded-2xl text-sm message-bubble ${
-                    msg.senderId === currentUserId 
-                      ? 'bg-rose-500 text-white rounded-tr-none shadow-md shadow-rose-100' 
-                      : 'bg-white text-slate-800 rounded-tl-none border border-slate-100 shadow-sm'
-                  }`}
-                  style={{ wordWrap: 'break-word', overflowWrap: 'break-word', boxSizing: 'border-box' }}
-                >
-                  {msg.text}
-                </div>
-              )}
+          messages.map((msg) => {
+            // Filtrar mensajes borrados para el usuario actual
+            if (msg.deletedFor?.includes(currentUserId)) {
+              return null;
+            }
 
-              {/* Mensaje de emoji */}
+            return (
+              <div 
+                key={msg.id} 
+                className={`flex ${msg.senderId === currentUserId ? 'justify-end' : 'justify-start'}`}
+                style={{ maxWidth: '100%', width: '100%', boxSizing: 'border-box' }}
+              >
+                {/* Mensaje de texto */}
+                {msg.type === 'text' && (
+                  <div className="flex flex-col gap-1 max-w-[85%] sm:max-w-[75%]">
+                    <div 
+                      className={`px-3 sm:px-4 py-2 sm:py-2.5 rounded-2xl text-sm message-bubble cursor-pointer inline-block ${
+                        msg.senderId === currentUserId 
+                          ? 'bg-rose-500 text-white rounded-tr-none shadow-md shadow-rose-100' 
+                          : 'bg-white text-slate-800 rounded-tl-none border border-slate-100 shadow-sm'
+                      } ${msg.deletedForEveryone ? 'italic opacity-60' : ''}`}
+                      style={{ 
+                        wordBreak: 'break-word', 
+                        overflowWrap: 'break-word'
+                      }}
+                      onContextMenu={(e) => handleMessageLongPress(e, msg.id, msg.senderId === currentUserId, msg.text)}
+                      onTouchStart={(e) => {
+                        const touchTimer = setTimeout(() => {
+                          handleMessageLongPress(e, msg.id, msg.senderId === currentUserId, msg.text);
+                        }, 500);
+                        (e.currentTarget as any).touchTimer = touchTimer;
+                      }}
+                      onTouchEnd={(e) => {
+                        const touchTimer = (e.currentTarget as any).touchTimer;
+                        if (touchTimer) {
+                          clearTimeout(touchTimer);
+                        }
+                      }}
+                    >
+                      {msg.text}
+                    </div>
+                    {/* Indicador de visto (solo para mensajes propios) */}
+                    {msg.senderId === currentUserId && (
+                      <div className="flex items-center justify-end gap-1 px-1">
+                        {msg.isRead || msg.readBy?.length ? (
+                          <CheckCheck size={14} className="text-blue-500" />
+                        ) : (
+                          <Check size={14} className="text-slate-400" />
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Mensaje de emoji */}
               {msg.type === 'emoji' && (
                 <div 
-                  className={`max-w-[85%] sm:max-w-[75%] px-3 sm:px-4 py-2 sm:py-2.5 rounded-2xl text-2xl sm:text-3xl ${
+                  className={`inline-block max-w-[85%] sm:max-w-[75%] px-3 sm:px-4 py-2 sm:py-2.5 rounded-2xl text-2xl sm:text-3xl ${
                     msg.senderId === currentUserId 
                       ? 'bg-rose-500 rounded-tr-none shadow-md shadow-rose-100' 
                       : 'bg-white rounded-tl-none border border-slate-100 shadow-sm'
                   }`}
+                  style={{ width: 'fit-content' }}
                 >
                   {msg.content}
                 </div>
@@ -829,6 +952,19 @@ const ChatView: React.FC<ChatViewProps> = ({
                   duration={msg.duration}
                   isOwn={msg.senderId === currentUserId}
                   timestamp={msg.timestamp}
+                  onContextMenu={(e) => handleMessageLongPress(e, msg.id, msg.senderId === currentUserId, 'Mensaje de voz')}
+                  onTouchStart={(e) => {
+                    const touchTimer = setTimeout(() => {
+                      handleMessageLongPress(e, msg.id, msg.senderId === currentUserId, 'Mensaje de voz');
+                    }, 500);
+                    (e.currentTarget as any).touchTimer = touchTimer;
+                  }}
+                  onTouchEnd={(e) => {
+                    const touchTimer = (e.currentTarget as any).touchTimer;
+                    if (touchTimer) {
+                      clearTimeout(touchTimer);
+                    }
+                  }}
                 />
               )}
 
@@ -839,6 +975,19 @@ const ChatView: React.FC<ChatViewProps> = ({
                   duration={msg.duration}
                   isOwn={msg.senderId === currentUserId}
                   timestamp={msg.timestamp}
+                  onContextMenu={(e) => handleMessageLongPress(e, msg.id, msg.senderId === currentUserId, 'Videomensaje')}
+                  onTouchStart={(e) => {
+                    const touchTimer = setTimeout(() => {
+                      handleMessageLongPress(e, msg.id, msg.senderId === currentUserId, 'Videomensaje');
+                    }, 500);
+                    (e.currentTarget as any).touchTimer = touchTimer;
+                  }}
+                  onTouchEnd={(e) => {
+                    const touchTimer = (e.currentTarget as any).touchTimer;
+                    if (touchTimer) {
+                      clearTimeout(touchTimer);
+                    }
+                  }}
                 />
               )}
 
@@ -849,6 +998,19 @@ const ChatView: React.FC<ChatViewProps> = ({
                   isOwn={msg.senderId === currentUserId}
                   timestamp={msg.timestamp}
                   caption={msg.text}
+                  onContextMenu={(e) => handleMessageLongPress(e, msg.id, msg.senderId === currentUserId, msg.text || 'Imagen')}
+                  onTouchStart={(e) => {
+                    const touchTimer = setTimeout(() => {
+                      handleMessageLongPress(e, msg.id, msg.senderId === currentUserId, msg.text || 'Imagen');
+                    }, 500);
+                    (e.currentTarget as any).touchTimer = touchTimer;
+                  }}
+                  onTouchEnd={(e) => {
+                    const touchTimer = (e.currentTarget as any).touchTimer;
+                    if (touchTimer) {
+                      clearTimeout(touchTimer);
+                    }
+                  }}
                 />
               )}
 
@@ -866,7 +1028,8 @@ const ChatView: React.FC<ChatViewProps> = ({
                 </div>
               )}
             </div>
-          ))
+            );
+          })
         )}
 
         {/* Typing Indicator - Real-time with Firebase */}
@@ -950,7 +1113,7 @@ const ChatView: React.FC<ChatViewProps> = ({
       </div>
 
       {/* Input - Responsive */}
-      <div className="p-3 sm:p-4 bg-white border-t border-slate-100 safe-area-bottom chat-input-area" style={{ maxWidth: '100vw', width: '100%', boxSizing: 'border-box' }}>
+      <div className="p-3 sm:p-4 bg-white border-t border-slate-100 safe-area-bottom chat-input-area flex-shrink-0" style={{ maxWidth: '100vw', width: '100%', boxSizing: 'border-box' }}>
         
         {/* Grabación de voz activa - Responsive */}
         {isRecording && (
@@ -1145,6 +1308,17 @@ const ChatView: React.FC<ChatViewProps> = ({
           setSelectedFiles([]);
         }}
         onSend={handleSendPhotos}
+      />
+
+      {/* Message Context Menu */}
+      <MessageContextMenu
+        isOpen={contextMenu.isOpen}
+        position={contextMenu.position}
+        isOwnMessage={contextMenu.isOwnMessage}
+        onDeleteForMe={handleDeleteForMe}
+        onDeleteForEveryone={handleDeleteForEveryone}
+        onCopy={handleCopyMessage}
+        onClose={() => setContextMenu({ ...contextMenu, isOpen: false })}
       />
     </div>
   );

@@ -91,10 +91,13 @@ service cloud.firestore {
         // Leer: Solo participantes del chat
         allow read: if isChatParticipant(chatId);
         
-        // Escribir: Simplificado - solo verificar que sea participante
-        allow write: if isChatParticipant(chatId);
+        // Crear: Solo participantes del chat
+        allow create: if isChatParticipant(chatId);
         
-        // Eliminar: No permitido
+        // Actualizar: Participantes del chat pueden actualizar
+        allow update: if isChatParticipant(chatId);
+        
+        // Eliminar: No permitido (usamos soft delete)
         allow delete: if false;
       }
       

@@ -85,10 +85,17 @@ export const validateProfilePhoto = async (imageUrl: string): Promise<PhotoValid
       analysis
     };
   } catch (error) {
-    console.error('❌ Error validando foto:', error);
+    console.error('❌ [VALIDATION] Error crítico validando foto:', error);
+    
+    // Si hay error en la validación, RECHAZAR la foto por seguridad
+    // Esto previene que fotos sin rostro pasen por errores de CORS u otros
     return {
       isValid: false,
-      errors: ['Error al analizar la foto. Intenta con otra imagen.'],
+      errors: [
+        '❌ No se pudo validar la foto correctamente',
+        'Por favor intenta con otra imagen',
+        'Asegúrate de que la foto muestre tu rostro claramente'
+      ],
       warnings: []
     };
   }

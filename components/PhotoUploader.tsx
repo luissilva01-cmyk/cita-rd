@@ -393,6 +393,22 @@ const PhotoUploader: React.FC<PhotoUploaderProps> = ({
         </div>
       </div>
 
+      {/* Validation warning */}
+      <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+        <div className="flex items-start gap-2 text-amber-700">
+          <AlertCircle size={16} className="mt-0.5 shrink-0" />
+          <div className="text-sm">
+            <p className="font-medium mb-1">⚠️ Validación automática de fotos:</p>
+            <ul className="text-xs space-y-1 text-amber-600">
+              <li>• Solo se aceptan fotos con rostros humanos reales</li>
+              <li>• No se permiten paisajes, avatares, dibujos o fondos oscuros</li>
+              <li>• Las fotos son analizadas automáticamente antes de guardar</li>
+              <li>• Esto garantiza perfiles auténticos y mayor seguridad</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
       {/* Hidden file input */}
       <input
         ref={fileInputRef}

@@ -110,7 +110,7 @@ export const detectFaceAdvanced = async (imageUrl: string): Promise<FaceDetectio
           reasons.push('✗ Proporciones no válidas para rostro');
         }
         
-        const hasFace = confidence >= 60; // Umbral: 60%
+        const hasFace = confidence >= 70; // Umbral: 70% (más estricto)
         
         console.log('🔍 [ADVANCED] Resultado:', {
           hasFace,
@@ -192,8 +192,8 @@ function analyzeSkinTone(pixels: Uint8ClampedArray): boolean {
   const skinPercentage = (skinPixels / totalPixels) * 100;
   console.log('🔍 [SKIN] Porcentaje de piel:', skinPercentage.toFixed(2) + '%');
   
-  // Al menos 15% de la imagen debe ser tono de piel
-  return skinPercentage >= 15;
+  // Al menos 20% de la imagen debe ser tono de piel (más estricto)
+  return skinPercentage >= 20;
 }
 
 /**

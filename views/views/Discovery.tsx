@@ -296,7 +296,7 @@ const Discovery: React.FC<DiscoveryProps> = ({
 
   const handleReportUser = (user: UserProfile) => {
     console.log('🚩 Botón de reportar clickeado', { userName: user.name });
-    logger.user.info('Abriendo modal de reporte', { userName: user.name });
+    logger.ui.info('Abriendo modal de reporte', { userName: user.name });
     setUserToReport(user);
     setShowReportModal(true);
     console.log('🚩 Estados actualizados', { showReportModal: true, userToReport: user.name });

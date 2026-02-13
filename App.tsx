@@ -15,9 +15,13 @@ const AICoach = lazy(() => import('./views/views/AICoach'));
 const ProfileView = lazy(() => import('./views/views/Profile'));
 const ChatView = lazy(() => import('./views/views/ChatView'));
 const LikesReceived = lazy(() => import('./views/views/LikesReceived'));
+const AdminPanel = lazy(() => import('./views/views/AdminPanel'));
 const StoriesViewer = lazy(() => import('./components/StoriesViewer'));
 const CreateStoryModal = lazy(() => import('./components/CreateStoryModal'));
-import { View, UserProfile, Message } from './types';
+import { UserProfile, Message } from './types';
+
+// Extender el tipo View para incluir 'admin'
+type View = 'home' | 'discovery' | 'messages' | 'matches' | 'ai-coach' | 'profile' | 'likes-received' | 'chat' | 'admin';
 import { getUserChats, sendMessage, listenToMessages, findOrCreateChat, Chat } from './services/chatService';
 import { getDiscoveryProfiles, createOrUpdateProfile, getUserProfile } from './services/profileService';
 import { privacyService } from './services/privacyService';
@@ -563,7 +567,11 @@ const App: React.FC = () => {
       case 'profile':
         return (
           <ErrorBoundary level="section">
-            <ProfileView user={user} onUpdate={setCurrentUser} />
+            <ProfileView 
+              user={user} 
+              onUpdate={setCurrentUser}
+              onNavigateToAdmin={() => setActiveView('admin')}
+            />
           </ErrorBoundary>
         );
       case 'likes-received':
@@ -620,6 +628,12 @@ const App: React.FC = () => {
               currentUserId={currentUser!.id}
               chatId={currentChat.id}
             />
+          </ErrorBoundary>
+        );
+      case 'admin':
+        return (
+          <ErrorBoundary level="section">
+            <AdminPanel />
           </ErrorBoundary>
         );
       default:

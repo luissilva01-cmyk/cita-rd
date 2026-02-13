@@ -9,6 +9,7 @@ import AccountSettings from '../../components/AccountSettings';
 import ReportProfileModal from '../../components/ReportProfileModal';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { logger } from '../../utils/logger';
+import { useAdmin } from '../../hooks/useAdmin';
 
 // 🇩🇴 Provincias de República Dominicana organizadas por región
 const DOMINICAN_PROVINCES = {
@@ -71,15 +72,18 @@ interface ProfileViewProps {
   onUpdate: (user: UserProfile) => void;
   currentUserId?: string; // ID del usuario que está viendo el perfil
   isOwnProfile?: boolean; // Si es el perfil propio o de otro usuario
+  onNavigateToAdmin?: () => void; // Función para navegar al panel de admin
 }
 
 const ProfileView: React.FC<ProfileViewProps> = ({ 
   user, 
   onUpdate,
   currentUserId,
-  isOwnProfile = true 
+  isOwnProfile = true,
+  onNavigateToAdmin
 }) => {
   const { t } = useLanguage();
+  const { isAdmin } = useAdmin(user.id);
   const [isEditing, setIsEditing] = useState(false);
   const [editedUser, setEditedUser] = useState(user);
   const [showPhotoUploader, setShowPhotoUploader] = useState(false);
@@ -262,6 +266,23 @@ const ProfileView: React.FC<ProfileViewProps> = ({
               </div>
             </div>
           </div>
+        )}
+
+        {/* Admin Panel Access Button */}
+        {isOwnProfile && isAdmin && onNavigateToAdmin && (
+          <button
+            onClick={onNavigateToAdmin}
+            className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl p-4 text-white shadow-lg hover:shadow-xl transition-all flex items-center justify-between group"
+          >
+            <div className="flex items-center gap-3">
+              <Shield className="text-white" size={24} />
+              <div className="text-left">
+                <p className="font-bold text-lg">Panel de Administración</p>
+                <p className="text-sm opacity-90">Gestionar reportes y usuarios</p>
+              </div>
+            </div>
+            <div className="text-2xl group-hover:translate-x-1 transition-transform">→</div>
+          </button>
         )}
 
         {/* Profile Score Section - Responsive */}

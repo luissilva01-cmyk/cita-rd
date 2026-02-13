@@ -29,33 +29,38 @@ const ReportProfileModal: React.FC<ReportProfileModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    console.log('🔴 REPORTE - handleSubmit llamado', { selectedCategory, reason });
+    
     if (!selectedCategory) {
+      console.log('🔴 REPORTE - Error: No hay categoría seleccionada');
       setError('Por favor selecciona una categoría');
       return;
     }
 
-    if (!reason.trim()) {
-      setError('Por favor describe el motivo del reporte');
-      return;
-    }
-
+    console.log('🔴 REPORTE - Iniciando envío...');
     setIsSubmitting(true);
     setError('');
 
     try {
-      logger.user.info('Enviando reporte', { 
-        reportedUserId, 
-        category: selectedCategory 
+      console.log('🔴 REPORTE - Llamando a reportUser...', {
+        currentUserId,
+        reportedUserId,
+        category: selectedCategory,
+        reason: reason.trim() || ''
       });
 
       const result = await reportUser(
         currentUserId,
         reportedUserId,
         selectedCategory as ReportCategory,
-        reason.trim()
+        reason.trim() || '' // Permitir envío sin detalles adicionales
       );
 
+      console.log('🔴 REPORTE - Resultado:', result);
+      console.log('🔴 REPORTE - Resultado:', result);
+
       if (result.success) {
+        console.log('🔴 REPORTE - Éxito! Mostrando mensaje...');
         setShowSuccess(true);
         setTimeout(() => {
           onClose();
@@ -65,12 +70,14 @@ const ReportProfileModal: React.FC<ReportProfileModalProps> = ({
           setShowSuccess(false);
         }, 2000);
       } else {
+        console.log('🔴 REPORTE - Error en resultado:', result.error);
         setError(result.error || 'Error al enviar el reporte');
       }
     } catch (err) {
-      logger.user.error('Error enviando reporte', err);
+      console.error('🔴 REPORTE - Excepción capturada:', err);
       setError('Error al enviar el reporte. Intenta de nuevo.');
     } finally {
+      console.log('🔴 REPORTE - Finalizando...');
       setIsSubmitting(false);
     }
   };
@@ -161,14 +168,14 @@ const ReportProfileModal: React.FC<ReportProfileModalProps> = ({
               {/* Reason Text Area */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Detalles adicionales
+                  Detalles adicionales <span className="text-slate-500 font-normal">(opcional)</span>
                 </label>
                 <textarea
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
                   rows={4}
                   className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none"
-                  placeholder="Describe el problema con más detalle..."
+                  placeholder="Describe el problema con más detalle... (opcional)"
                   maxLength={500}
                 />
                 <div className="text-xs text-slate-500 mt-1 text-right">
@@ -203,7 +210,7 @@ const ReportProfileModal: React.FC<ReportProfileModalProps> = ({
                 <button
                   type="submit"
                   className="flex-1 py-3 px-6 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  disabled={isSubmitting || !selectedCategory || !reason.trim()}
+                  disabled={isSubmitting || !selectedCategory}
                 >
                   {isSubmitting ? 'Enviando...' : 'Enviar Reporte'}
                 </button>

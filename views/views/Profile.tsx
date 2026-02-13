@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Edit3, MapPin, Briefcase, Heart, Settings, Camera, BarChart3, LogOut, X, Plus, Flag } from 'lucide-react';
+import { Edit3, MapPin, Briefcase, Heart, Settings, Camera, BarChart3, LogOut, X, Plus, Flag, Shield } from 'lucide-react';
 import { signOut } from 'firebase/auth';
 import { auth } from '../../services/firebase';
 import { UserProfile } from '../../types';
@@ -84,6 +84,14 @@ const ProfileView: React.FC<ProfileViewProps> = ({
 }) => {
   const { t } = useLanguage();
   const { isAdmin } = useAdmin(user.id);
+  
+  console.log('👤 ProfileView - Props:', { 
+    userId: user.id, 
+    isOwnProfile, 
+    hasNavigateFunction: !!onNavigateToAdmin 
+  });
+  console.log('🔐 ProfileView - Admin status:', isAdmin);
+  
   const [isEditing, setIsEditing] = useState(false);
   const [editedUser, setEditedUser] = useState(user);
   const [showPhotoUploader, setShowPhotoUploader] = useState(false);
@@ -269,6 +277,15 @@ const ProfileView: React.FC<ProfileViewProps> = ({
         )}
 
         {/* Admin Panel Access Button */}
+        {(() => {
+          console.log('🎨 Renderizando botón admin - Condiciones:', {
+            isOwnProfile,
+            isAdmin,
+            hasNavigateFunction: !!onNavigateToAdmin,
+            shouldShow: isOwnProfile && isAdmin && onNavigateToAdmin
+          });
+          return null;
+        })()}
         {isOwnProfile && isAdmin && onNavigateToAdmin && (
           <button
             onClick={onNavigateToAdmin}

@@ -24,6 +24,9 @@ const DesktopLayout: React.FC<DesktopLayoutProps> = ({
   chats,
   storiesRefreshKey = 0
 }) => {
+  // Detectar si la vista activa es un chat individual
+  const isChatView = typeof activeView === 'string' && activeView.startsWith('chat-');
+  
   return (
     <div className="grid grid-cols-[320px_1fr] min-h-screen" style={{background: 'linear-gradient(135deg, #FF6B6B 0%, #FFD93D 100%)'}}>
       {/* Sidebar */}
@@ -40,8 +43,14 @@ const DesktopLayout: React.FC<DesktopLayoutProps> = ({
       </aside>
 
       {/* Main Content */}
-      <main className="flex items-center justify-center p-8 min-w-0">
-        <div className="w-full h-full bg-white rounded-2xl shadow-2xl overflow-hidden" style={{ maxWidth: '1024px' }}>
+      <main className={`flex justify-center p-8 min-w-0 ${isChatView ? 'items-start pt-8' : 'items-center'}`}>
+        <div 
+          className="w-full bg-white rounded-2xl shadow-2xl overflow-hidden" 
+          style={{ 
+            maxWidth: '1024px',
+            height: isChatView ? '90vh' : '100%'
+          }}
+        >
           {children}
         </div>
       </main>

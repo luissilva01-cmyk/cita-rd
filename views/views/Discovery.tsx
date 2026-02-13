@@ -415,7 +415,7 @@ const Discovery: React.FC<DiscoveryProps> = ({
         )}
 
         {/* Main Card Container with aspect ratio 4:5 - Centered for optimal UX */}
-        <div className="relative group w-full max-w-lg">
+        <div className="relative group w-full max-w-lg mb-12">
           <div className="relative w-full aspect-[4/5] rounded-2xl overflow-hidden shadow-2xl">
           {/* Next Card (Background) */}
           {nextUser && (
@@ -457,8 +457,8 @@ const Discovery: React.FC<DiscoveryProps> = ({
             </button>
           )}
           
-          {/* Action Buttons - Glassmorphic Floating */}
-          <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-6 z-30">
+          {/* Action Buttons - Positioned on bottom border */}
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 flex items-center gap-6 z-30">
             <button
               onClick={() => handleAction('pass')}
               className="w-14 h-14 rounded-full bg-white/70 backdrop-blur-md shadow-xl flex items-center justify-center hover:scale-110 transition-transform border border-white/30 min-w-[48px] min-h-[48px]"

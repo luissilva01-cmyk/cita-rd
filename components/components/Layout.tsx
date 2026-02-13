@@ -53,7 +53,7 @@ const Layout: React.FC<LayoutProps> = ({
   
   // Layout móvil/tablet (existente)
   return (
-    <div className="flex flex-col h-screen w-full max-w-md lg:max-w-6xl mx-auto bg-white shadow-2xl relative overflow-hidden">
+    <div className="flex flex-col h-screen w-full max-w-md mx-auto bg-white shadow-2xl relative overflow-hidden">
       {/* Header */}
       <header className="px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center bg-white/80 backdrop-blur-md z-10 border-b border-slate-100 flex-shrink-0">
         <div className="flex items-center gap-2">
@@ -73,8 +73,8 @@ const Layout: React.FC<LayoutProps> = ({
         </button>
       </header>
 
-      {/* Main Content - CRITICAL: overflow-hidden para que el chat respete el espacio */}
-      <main className="flex-1 overflow-hidden" style={{ minHeight: 0 }}>
+      {/* Main Content - CRITICAL: overflow-auto para permitir scroll */}
+      <main className="flex-1 overflow-auto" style={{ minHeight: 0 }}>
         {children}
       </main>
 

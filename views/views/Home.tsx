@@ -44,25 +44,25 @@ const Home: React.FC<HomeProps> = ({
   const unreadMessages = recentMatches.length; // ✅ Calcular desde matches reales
 
   return (
-    <div className="w-full min-h-full overflow-y-auto bg-gradient-to-br from-slate-50 to-white pb-4">
+    <div className="w-full h-full bg-gradient-to-br from-slate-50 to-white pb-6">
       {/* Header */}
       <div className="flex items-center justify-between px-4 md:px-10 pt-4 pb-3">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 md:gap-3 flex-1 min-w-0">
           <div 
-            className="w-11 h-11 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-full border-2 p-0.5 shadow-sm bg-cover bg-center" 
+            className="w-11 h-11 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-full border-2 p-0.5 shadow-sm bg-cover bg-center shrink-0" 
             style={{
               borderColor: '#ff8052',
               backgroundImage: `url('${currentUser.images?.[0] || 'https://picsum.photos/seed/user/200/200'}')`
             }}
           />
-          <div>
-            <h2 className="text-xl md:text-2xl font-bold tracking-tight">¡Hola, {currentUser.name}! 👋</h2>
-            <p className="text-sm md:text-base font-medium opacity-70" style={{color: '#a15d45'}}>
+          <div className="flex-1 min-w-0">
+            <h2 className="text-lg md:text-2xl font-bold tracking-tight truncate">¡Hola, {currentUser.name}! 👋</h2>
+            <p className="text-xs md:text-base font-medium opacity-70 truncate" style={{color: '#a15d45'}}>
               {todayDate} • {location}
             </p>
           </div>
         </div>
-        <button className="w-9 h-9 flex items-center justify-center rounded-full bg-white shadow-sm border border-black/5">
+        <button className="w-9 h-9 flex items-center justify-center rounded-full bg-white shadow-sm border border-black/5 shrink-0">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5v-5z" />
           </svg>
@@ -72,11 +72,11 @@ const Home: React.FC<HomeProps> = ({
       {/* Banner Motivacional */}
       <div className="px-4 md:px-10 py-2">
         <div 
-          className="rounded-xl p-4 text-white relative overflow-hidden shadow-lg"
+          className="rounded-xl p-4 md:p-5 text-white relative overflow-hidden shadow-lg"
           style={{background: 'linear-gradient(135deg, #ff8052 0%, #ffc107 100%)'}}
         >
           <div className="relative z-10">
-            <p className="text-xl md:text-2xl font-bold leading-tight mb-1">
+            <p className="text-lg md:text-2xl font-bold leading-tight mb-2 break-words">
               ¿Listo para encontrar quien ta' pa' ti?
             </p>
             <div className="flex items-center gap-2 mb-3">
@@ -170,7 +170,7 @@ const Home: React.FC<HomeProps> = ({
       )}
 
       {/* Actividad Reciente */}
-      <div className="px-4 py-2">
+      <div className="px-4 md:px-10 py-2">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-sm font-bold tracking-tight">Actividad Reciente</h3>
           <button className="text-sm font-bold" style={{color: '#ff8052'}}>
@@ -183,7 +183,7 @@ const Home: React.FC<HomeProps> = ({
             {recentMatches.slice(0, 2).map((match) => (
               <div key={match.id} className="flex items-center gap-3 bg-white p-3 rounded-xl border border-black/5 shadow-sm">
                 <div 
-                  className="w-11 h-11 md:w-12 md:h-12 lg:w-14 lg:h-14 rounded-full shrink-0 bg-cover bg-center"
+                  className="w-12 h-12 rounded-full shrink-0 bg-cover bg-center"
                   style={{backgroundImage: `url('${match.images?.[0] || 'https://picsum.photos/seed/' + match.id + '/200/200'}')`}}
                 />
                 <div className="flex-1 min-w-0">
@@ -233,11 +233,11 @@ const Home: React.FC<HomeProps> = ({
       </div>
 
       {/* Progreso del Perfil */}
-      <div className="px-4 pb-4">
-        <div className="border rounded-xl p-4" style={{backgroundColor: '#ff805205', borderColor: '#ff805220'}}>
+      <div className="px-4 md:px-10 pb-4">
+        <div className="border rounded-xl p-4 md:p-5" style={{backgroundColor: '#ff805205', borderColor: '#ff805220'}}>
           <div className="flex items-center justify-between mb-3">
-            <h3 className="font-bold text-sm">Perfil Completado</h3>
-            <span className="font-bold text-sm" style={{color: '#ff8052'}}>85%</span>
+            <h3 className="font-bold text-sm md:text-base">Perfil Completado</h3>
+            <span className="font-bold text-sm md:text-base" style={{color: '#ff8052'}}>85%</span>
           </div>
           <div className="w-full h-2 bg-gray-200 rounded-full mb-3 overflow-hidden">
             <div 
@@ -245,12 +245,12 @@ const Home: React.FC<HomeProps> = ({
               style={{background: 'linear-gradient(90deg, #ff8052, #ffc107)', width: '85%'}}
             />
           </div>
-          <p className="text-sm text-gray-600 mb-3">
+          <p className="text-xs md:text-sm text-gray-600 mb-3">
             Agrega 2 fotos más para destacar y recibir más matches este fin de semana.
           </p>
           <button
             onClick={onNavigateToProfile}
-            className="w-full border-2 font-bold py-2 rounded-lg text-sm transition-colors hover:text-white"
+            className="w-full border-2 font-bold py-2 md:py-2.5 rounded-lg text-sm md:text-base transition-colors hover:text-white"
             style={{
               borderColor: '#ff8052', 
               color: '#ff8052'

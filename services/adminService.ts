@@ -25,6 +25,7 @@ export interface ReportWithDetails {
   reviewedBy?: string;
   reviewedAt?: Date;
   action?: string;
+  reportCount: number; // Total de reportes contra este usuario
 }
 
 /**
@@ -32,21 +33,78 @@ export interface ReportWithDetails {
  */
 export async function isUserAdmin(userId: string): Promise<boolean> {
   try {
+    console.log('🔍 isUserAdmin - Buscando en colección users para:', userId);
     const userDoc = await getDoc(doc(db, 'users', userId));
     
+    console.log('📄 isUserAdmin - Documento existe?:', userDoc.exists());
+    
     if (!userDoc.exists()) {
-      logger.firebase.warn('Usuario no encontrado', { userId });
+      logger.firebase.warn('Usuario no encontrado en users', { userId });
+      
+      // Intentar en perfiles
+      console.log('🔍 isUserAdmin - Intentando en colección perfiles...');
+      const perfilDoc = await getDoc(doc(db, 'perfiles', userId));
+      console.log('📄 isUserAdmin - Perfil existe?:', perfilDoc.exists());
+      
+      if (perfilDoc.exists()) {
+        const perfilData = perfilDoc.data();
+        console.log('📊 isUserAdmin - Datos COMPLETOS del perfil:', JSON.stringify(perfilData, null, 2));
+        console.log('📊 isUserAdmin - Campo isAdmin específico:', perfilData?.isAdmin);
+        console.log('📊 isUserAdmin - Tipo de isAdmin:', typeof perfilData?.isAdmin);
+        
+        // BUGFIX: Buscar tanto "isAdmin" como "isAdmin " (con espacio) por si hay error de tipeo en Firestore
+        const isAdmin = perfilData.isAdmin === true || perfilData['isAdmin '] === true;
+        
+        console.log('✅ isUserAdmin - isAdmin en perfiles:', isAdmin);
+        return isAdmin;
+      }
+      
+      console.log('❌ isUserAdmin - No se encontró en users ni en perfiles');
       return false;
     }
     
     const userData = userDoc.data();
-    const isAdmin = userData.isAdmin === true;
+    console.log('📊 isUserAdmin - Datos COMPLETOS del usuario:', JSON.stringify(userData, null, 2));
+    console.log('📊 isUserAdmin - Campo isAdmin específico:', userData?.isAdmin);
+    console.log('📊 isUserAdmin - Tipo de isAdmin:', typeof userData?.isAdmin);
+    console.log('📊 isUserAdmin - Todas las claves del documento:', Object.keys(userData || {}));
     
+    // BUGFIX: Buscar tanto "isAdmin" como "isAdmin " (con espacio) por si hay error de tipeo en Firestore
+    const isAdmin = userData.isAdmin === true || userData['isAdmin '] === true;
+    
+    console.log('✅ isUserAdmin - isAdmin:', isAdmin);
     logger.firebase.info('Verificación de admin', { userId, isAdmin });
     return isAdmin;
   } catch (error) {
+    console.error('❌ isUserAdmin - Error:', error);
     logger.firebase.error('Error verificando admin', error);
     return false;
+  }
+}
+
+/**
+ * Obtiene el nombre de un usuario desde users o perfiles
+ */
+async function getUserName(userId: string): Promise<string> {
+  try {
+    // Intentar primero en users
+    const userDoc = await getDoc(doc(db, 'users', userId));
+    if (userDoc.exists() && userDoc.data().name) {
+      return userDoc.data().name;
+    }
+    
+    // Si no existe, intentar en perfiles
+    const perfilDoc = await getDoc(doc(db, 'perfiles', userId));
+    if (perfilDoc.exists()) {
+      const perfilData = perfilDoc.data();
+      // Intentar diferentes campos de nombre
+      return perfilData.name || perfilData.nombre || 'Usuario desconocido';
+    }
+    
+    return 'Usuario desconocido';
+  } catch (error) {
+    logger.firebase.error('Error obteniendo nombre de usuario', { userId, error });
+    return 'Usuario desconocido';
   }
 }
 
@@ -68,25 +126,27 @@ export async function getPendingReports(): Promise<ReportWithDetails[]> {
     for (const docSnap of snapshot.docs) {
       const data = docSnap.data();
       
-      // Obtener nombres de usuarios
-      const [reporterDoc, reportedDoc] = await Promise.all([
-        getDoc(doc(db, 'users', data.reporterId)),
-        getDoc(doc(db, 'users', data.reportedUserId))
+      // Obtener nombres de usuarios y conteo de reportes
+      const [reporterName, reportedUserName, reportCount] = await Promise.all([
+        getUserName(data.reporterId),
+        getUserName(data.reportedUserId),
+        getReportCountByUser(data.reportedUserId)
       ]);
       
       reports.push({
         id: docSnap.id,
         reporterId: data.reporterId,
         reportedUserId: data.reportedUserId,
-        reportedUserName: reportedDoc.exists() ? reportedDoc.data().name : 'Usuario desconocido',
-        reporterName: reporterDoc.exists() ? reporterDoc.data().name : 'Usuario desconocido',
+        reportedUserName,
+        reporterName,
         category: data.category,
         description: data.description,
         timestamp: data.timestamp.toDate(),
         status: data.status,
         reviewedBy: data.reviewedBy,
         reviewedAt: data.reviewedAt?.toDate(),
-        action: data.action
+        action: data.action,
+        reportCount
       });
     }
     
@@ -115,25 +175,27 @@ export async function getAllReports(): Promise<ReportWithDetails[]> {
     for (const docSnap of snapshot.docs) {
       const data = docSnap.data();
       
-      // Obtener nombres de usuarios
-      const [reporterDoc, reportedDoc] = await Promise.all([
-        getDoc(doc(db, 'users', data.reporterId)),
-        getDoc(doc(db, 'users', data.reportedUserId))
+      // Obtener nombres de usuarios y conteo de reportes
+      const [reporterName, reportedUserName, reportCount] = await Promise.all([
+        getUserName(data.reporterId),
+        getUserName(data.reportedUserId),
+        getReportCountByUser(data.reportedUserId)
       ]);
       
       reports.push({
         id: docSnap.id,
         reporterId: data.reporterId,
         reportedUserId: data.reportedUserId,
-        reportedUserName: reportedDoc.exists() ? reportedDoc.data().name : 'Usuario desconocido',
-        reporterName: reporterDoc.exists() ? reporterDoc.data().name : 'Usuario desconocido',
+        reportedUserName,
+        reporterName,
         category: data.category,
         description: data.description,
         timestamp: data.timestamp.toDate(),
         status: data.status,
         reviewedBy: data.reviewedBy,
         reviewedAt: data.reviewedAt?.toDate(),
-        action: data.action
+        action: data.action,
+        reportCount
       });
     }
     

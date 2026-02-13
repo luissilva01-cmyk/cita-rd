@@ -59,36 +59,20 @@ export const reportUser = async (
       };
     }
 
-    // Verificar si ya reportó a este usuario
-    const existingReport = await hasReportedUser(reporterId, reportedUserId);
-    if (existingReport) {
-      return { 
-        success: false, 
-        error: 'Ya has reportado a este usuario' 
-      };
-    }
+    // NOTA: Verificación de duplicados removida por permisos de Firestore
+    // Los usuarios no pueden leer reportes, solo crearlos
 
     // Crear reporte
-    const report: Omit<Report, 'id'> = {
+    const reportData = {
       reporterId,
       reportedUserId,
       category,
-      reason,
-      timestamp: Date.now(),
+      description: reason, // Cambiado de 'reason' a 'description' para coincidir con las reglas
+      timestamp: serverTimestamp(),
       status: 'pending'
     };
 
-    await addDoc(collection(db, 'reports'), report);
-
-    // Incrementar contador de reportes del usuario
-    const userRef = doc(db, 'perfiles', reportedUserId);
-    await updateDoc(userRef, {
-      reportCount: increment(1),
-      lastReportedAt: serverTimestamp()
-    });
-
-    // Verificar si debe bloquearse automáticamente
-    await checkAutoBlock(reportedUserId);
+    await addDoc(collection(db, 'reports'), reportData);
 
     logger.firebase.success('Usuario reportado exitosamente');
     return { success: true };

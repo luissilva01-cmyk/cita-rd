@@ -307,8 +307,23 @@ const AdminPanel: React.FC = () => {
                     <div className="grid grid-cols-2 gap-4 mb-3">
                       <div>
                         <p className="text-xs text-slate-400">Usuario Reportado</p>
-                        <p className="font-semibold">{report.reportedUserName}</p>
-                        <p className="text-xs text-slate-500">{report.reportedUserId}</p>
+                        <div className="flex items-center gap-2">
+                          <div>
+                            <p className="font-semibold">{report.reportedUserName}</p>
+                            <p className="text-xs text-slate-500">{report.reportedUserId}</p>
+                          </div>
+                          {report.reportCount > 1 && (
+                            <span className={`px-2 py-1 rounded-full text-xs font-bold ${
+                              report.reportCount >= 5 
+                                ? 'bg-red-500 text-white animate-pulse' 
+                                : report.reportCount >= 3
+                                ? 'bg-orange-500 text-white'
+                                : 'bg-yellow-500 text-black'
+                            }`}>
+                              ⚠️ {report.reportCount} reportes
+                            </span>
+                          )}
+                        </div>
                       </div>
                       <div>
                         <p className="text-xs text-slate-400">Reportado por</p>

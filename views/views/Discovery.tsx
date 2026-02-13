@@ -1,12 +1,13 @@
 
 import React, { useState, useEffect } from 'react';
-import { Heart, X, Star, Brain, Zap } from 'lucide-react';
+import { Heart, X, Star, Brain, Zap, Flag } from 'lucide-react';
 import { UserProfile } from '../../types';
 import SwipeCard from '../../components/SwipeCard';
 import { calculateProfileScore } from '../../services/photoAnalysisService';
 import StoriesRing from '../../components/StoriesRing';
 import StoriesViewer from '../../components/StoriesViewer';
 import CreateStoryModal from '../../components/CreateStoryModal';
+import ReportProfileModal from '../../components/ReportProfileModal';
 import ErrorBoundary from '../../components/ErrorBoundary';
 import { StoryGroup } from '../../services/storiesService';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -75,6 +76,10 @@ const Discovery: React.FC<DiscoveryProps> = ({
   
   // Estados para Super Like
   const [showSuperLikeAnimation, setShowSuperLikeAnimation] = useState(false);
+  
+  // Estados para Reportar
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [userToReport, setUserToReport] = useState<UserProfile | null>(null);
 
   // Función para ordenar usuarios con IA
   const optimizeUsersWithAI = async (users: UserProfile[]): Promise<UserProfile[]> => {
@@ -289,6 +294,17 @@ const Discovery: React.FC<DiscoveryProps> = ({
     setSelectedStoryGroup(null);
   };
 
+  const handleReportUser = (user: UserProfile) => {
+    logger.user.info('Abriendo modal de reporte', { userName: user.name });
+    setUserToReport(user);
+    setShowReportModal(true);
+  };
+
+  const handleCloseReportModal = () => {
+    setShowReportModal(false);
+    setUserToReport(null);
+  };
+
   // Debug: mostrar información básica
   console.log('🔍 Estado actual:', {
     usersCount: displayUsers?.length,
@@ -448,6 +464,17 @@ const Discovery: React.FC<DiscoveryProps> = ({
               <Star className="text-white fill-current" size={24} />
             </button>
           </div>
+          
+          {/* Report Button - Top Right */}
+          {currentUser && (
+            <button
+              onClick={() => handleReportUser(currentUser)}
+              className="absolute top-4 right-4 z-30 p-2 bg-white/70 backdrop-blur-md rounded-full shadow-lg hover:bg-white/90 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+              title="Reportar perfil"
+            >
+              <Flag className="text-slate-600" size={18} />
+            </button>
+          )}
         </div>
       </div>
 
@@ -541,6 +568,17 @@ const Discovery: React.FC<DiscoveryProps> = ({
         onClose={() => setShowCreateStoryModal(false)}
         onStoryCreated={handleStoryCreated}
       />
+      
+      {/* Report Profile Modal */}
+      {userToReport && (
+        <ReportProfileModal
+          isOpen={showReportModal}
+          reportedUserId={userToReport.id}
+          reportedUserName={userToReport.name}
+          currentUserId={currentUserId}
+          onClose={handleCloseReportModal}
+        />
+      )}
     </div>
   );
 };

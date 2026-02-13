@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { Edit3, MapPin, Briefcase, Heart, Settings, Camera, BarChart3, LogOut, X, Plus } from 'lucide-react';
+import { Edit3, MapPin, Briefcase, Heart, Settings, Camera, BarChart3, LogOut, X, Plus, Flag } from 'lucide-react';
 import { signOut } from 'firebase/auth';
 import { auth } from '../../services/firebase';
 import { UserProfile } from '../../types';
 import PhotoUploader from '../../components/PhotoUploader';
 import ProfileScore from '../../components/ProfileScore';
 import AccountSettings from '../../components/AccountSettings';
+import ReportProfileModal from '../../components/ReportProfileModal';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { logger } from '../../utils/logger';
 
@@ -68,9 +69,16 @@ const SUGGESTED_INTERESTS = [
 interface ProfileViewProps {
   user: UserProfile;
   onUpdate: (user: UserProfile) => void;
+  currentUserId?: string; // ID del usuario que está viendo el perfil
+  isOwnProfile?: boolean; // Si es el perfil propio o de otro usuario
 }
 
-const ProfileView: React.FC<ProfileViewProps> = ({ user, onUpdate }) => {
+const ProfileView: React.FC<ProfileViewProps> = ({ 
+  user, 
+  onUpdate,
+  currentUserId,
+  isOwnProfile = true 
+}) => {
   const { t } = useLanguage();
   const [isEditing, setIsEditing] = useState(false);
   const [editedUser, setEditedUser] = useState(user);
@@ -80,6 +88,7 @@ const ProfileView: React.FC<ProfileViewProps> = ({ user, onUpdate }) => {
   const [newInterest, setNewInterest] = useState('');
   const [showInterestSuggestions, setShowInterestSuggestions] = useState(false);
   const [showAccountSettings, setShowAccountSettings] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
 
   // Detectar si el perfil está incompleto
   const isProfileIncomplete = !user.images || user.images.length === 0 || 
@@ -170,34 +179,50 @@ const ProfileView: React.FC<ProfileViewProps> = ({ user, onUpdate }) => {
     <div className="h-full overflow-y-auto bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Header - Responsive */}
       <div className="px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center border-b border-slate-100 safe-area-top">
-        <h2 className="text-xl sm:text-2xl font-bold text-slate-800">{t('myProfile')}</h2>
+        <h2 className="text-xl sm:text-2xl font-bold text-slate-800">{isOwnProfile ? t('myProfile') : user.name}</h2>
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => setShowAccountSettings(true)}
-            className="p-2 rounded-full hover:bg-slate-100 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
-            title="Configuración de cuenta"
-          >
-            <Settings className="text-slate-600" size={18} />
-          </button>
-          <button
-            onClick={() => setIsEditing(!isEditing)}
-            className="p-2 rounded-full hover:bg-slate-100 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
-            title={isEditing ? 'Cancelar edición' : 'Editar perfil'}
-          >
-            <Edit3 className="text-slate-600" size={18} />
-          </button>
-          <button
-            onClick={handleLogout}
-            disabled={isLoggingOut}
-            className="p-2 rounded-full hover:bg-red-50 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center group disabled:opacity-50"
-            title={t('logout') || 'Cerrar sesión'}
-          >
-            {isLoggingOut ? (
-              <div className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin"></div>
-            ) : (
-              <LogOut className="text-red-500 group-hover:text-red-600" size={18} />
-            )}
-          </button>
+          {/* Botón de reportar (solo si NO es perfil propio) */}
+          {!isOwnProfile && currentUserId && (
+            <button
+              onClick={() => setShowReportModal(true)}
+              className="p-2 rounded-full hover:bg-red-50 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center group"
+              title="Reportar perfil"
+            >
+              <Flag className="text-slate-600 group-hover:text-red-600" size={18} />
+            </button>
+          )}
+          
+          {/* Botones solo para perfil propio */}
+          {isOwnProfile && (
+            <>
+              <button
+                onClick={() => setShowAccountSettings(true)}
+                className="p-2 rounded-full hover:bg-slate-100 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+                title="Configuración de cuenta"
+              >
+                <Settings className="text-slate-600" size={18} />
+              </button>
+              <button
+                onClick={() => setIsEditing(!isEditing)}
+                className="p-2 rounded-full hover:bg-slate-100 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+                title={isEditing ? 'Cancelar edición' : 'Editar perfil'}
+              >
+                <Edit3 className="text-slate-600" size={18} />
+              </button>
+              <button
+                onClick={handleLogout}
+                disabled={isLoggingOut}
+                className="p-2 rounded-full hover:bg-red-50 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center group disabled:opacity-50"
+                title={t('logout') || 'Cerrar sesión'}
+              >
+                {isLoggingOut ? (
+                  <div className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin"></div>
+                ) : (
+                  <LogOut className="text-red-500 group-hover:text-red-600" size={18} />
+                )}
+              </button>
+            </>
+          )}
         </div>
       </div>
 
@@ -515,6 +540,17 @@ const ProfileView: React.FC<ProfileViewProps> = ({ user, onUpdate }) => {
           console.log('🗑️ Cuenta eliminada');
         }}
       />
+      
+      {/* Report Profile Modal */}
+      {!isOwnProfile && currentUserId && (
+        <ReportProfileModal
+          isOpen={showReportModal}
+          reportedUserId={user.id}
+          reportedUserName={user.name}
+          currentUserId={currentUserId}
+          onClose={() => setShowReportModal(false)}
+        />
+      )}
     </div>
   );
 };

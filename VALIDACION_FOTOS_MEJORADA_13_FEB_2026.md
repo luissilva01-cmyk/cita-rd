@@ -66,14 +66,14 @@ Agregado mensaje claro en PhotoUploader:
 
 ## 🎯 Cómo Funciona la Validación
 
-### Análisis Multi-Capa
+### Análisis Multi-Capa (5 Capas)
 
-1. **Detección de Tonos de Piel (35 puntos)**
+1. **Detección de Tonos de Piel (30 puntos)**
    - Analiza píxeles buscando rangos RGB de piel humana
    - Soporta diversos tonos de piel (clara, media, oscura)
    - Requiere ≥20% de la imagen con tonos de piel
 
-2. **Patrones Faciales (30 puntos)**
+2. **Patrones Faciales (25 puntos)**
    - Divide imagen en 3 regiones (superior, media, inferior)
    - Busca patrones de ojos, nariz, boca
    - Requiere al menos 2 de 3 regiones con características
@@ -88,6 +88,12 @@ Agregado mensaje claro en PhotoUploader:
    - Rostros humanos: 0.6 - 1.5
    - Rechaza proporciones extremas
 
+5. **Saturación Natural (10 puntos)** 🆕
+   - Detecta colores artificialmente saturados
+   - Rechaza dibujos animados (saturación >50%)
+   - Rechaza ilustraciones digitales (>30% píxeles muy saturados)
+   - Solo acepta saturación natural de fotos reales
+
 ### Umbral de Aprobación
 - **Total requerido: 70 puntos de 100**
 - Foto rechazada si < 70 puntos
@@ -99,6 +105,9 @@ Agregado mensaje claro en PhotoUploader:
 - Paisajes (sin tonos de piel)
 - Tránsito/carros (sin patrones faciales)
 - Avatares/dibujos (sin tonos de piel reales)
+- **Dibujos animados (saturación >50%)** 🆕
+- **Ilustraciones digitales (colores muy saturados)** 🆕
+- **Arte digital/pósters de artistas (saturación artificial)** 🆕
 - Fondos negros (contraste inválido)
 - Fotos muy borrosas (baja claridad)
 

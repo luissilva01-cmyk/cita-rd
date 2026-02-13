@@ -77,20 +77,21 @@ export const detectFaceAdvanced = async (imageUrl: string): Promise<FaceDetectio
         const contrastValid = analyzeContrast(pixels);
         const facialFeaturesDetected = analyzeFacialFeatures(imageData, width, height);
         const proportionsValid = analyzeProportions(width, height);
+        const saturationValid = analyzeSaturation(pixels); // Nueva capa anti-dibujos
         
         // Calcular confianza
         let confidence = 0;
         const reasons: string[] = [];
         
         if (skinToneDetected) {
-          confidence += 35;
+          confidence += 30; // Reducido de 35 para dar espacio a saturación
           reasons.push('✓ Tonos de piel detectados');
         } else {
           reasons.push('✗ No se detectaron tonos de piel humana');
         }
         
         if (facialFeaturesDetected) {
-          confidence += 30;
+          confidence += 25; // Reducido de 30
           reasons.push('✓ Patrones faciales detectados');
         } else {
           reasons.push('✗ No se detectaron patrones faciales');
@@ -110,6 +111,13 @@ export const detectFaceAdvanced = async (imageUrl: string): Promise<FaceDetectio
           reasons.push('✗ Proporciones no válidas para rostro');
         }
         
+        if (saturationValid) {
+          confidence += 10; // Nueva capa
+          reasons.push('✓ Saturación natural (no dibujo)');
+        } else {
+          reasons.push('✗ Saturación artificial detectada (posible dibujo/ilustración)');
+        }
+        
         const hasFace = confidence >= 70; // Umbral: 70% (más estricto)
         
         console.log('🔍 [ADVANCED] Resultado:', {
@@ -118,7 +126,8 @@ export const detectFaceAdvanced = async (imageUrl: string): Promise<FaceDetectio
           skinTone: skinToneDetected,
           features: facialFeaturesDetected,
           contrast: contrastValid,
-          proportions: proportionsValid
+          proportions: proportionsValid,
+          saturation: saturationValid
         });
         
         resolve({
@@ -323,6 +332,63 @@ function analyzeProportions(width: number, height: number): boolean {
   // Rostros humanos típicamente tienen ratio entre 0.6 y 1.2
   // (más ancho que alto en horizontal, más alto en vertical)
   return ratio >= 0.6 && ratio <= 1.5;
+}
+
+/**
+ * Analiza la saturación de colores para detectar dibujos animados e ilustraciones
+ * Dibujos animados y arte digital suelen tener colores muy saturados
+ * Fotos reales tienen saturación más moderada y natural
+ */
+function analyzeSaturation(pixels: Uint8ClampedArray): boolean {
+  let totalSaturation = 0;
+  let highSaturationPixels = 0;
+  let pixelCount = 0;
+  
+  // Muestrear cada 40 píxeles para velocidad
+  for (let i = 0; i < pixels.length; i += 40) {
+    const r = pixels[i];
+    const g = pixels[i + 1];
+    const b = pixels[i + 2];
+    
+    // Calcular saturación HSV
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    const delta = max - min;
+    
+    // Saturación = (max - min) / max (si max > 0)
+    const saturation = max > 0 ? (delta / max) * 100 : 0;
+    
+    totalSaturation += saturation;
+    pixelCount++;
+    
+    // Contar píxeles con saturación muy alta (típico de dibujos)
+    if (saturation > 70) {
+      highSaturationPixels++;
+    }
+  }
+  
+  const avgSaturation = totalSaturation / pixelCount;
+  const highSaturationPercentage = (highSaturationPixels / pixelCount) * 100;
+  
+  console.log('🔍 [SATURATION] Saturación promedio:', avgSaturation.toFixed(2) + '%');
+  console.log('🔍 [SATURATION] Píxeles muy saturados:', highSaturationPercentage.toFixed(2) + '%');
+  
+  // RECHAZAR si:
+  // 1. Saturación promedio muy alta (>50%) = dibujos animados
+  // 2. Muchos píxeles muy saturados (>30%) = ilustraciones digitales
+  
+  if (avgSaturation > 50) {
+    console.log('❌ [SATURATION] RECHAZADO: Saturación promedio muy alta (dibujo animado)');
+    return false;
+  }
+  
+  if (highSaturationPercentage > 30) {
+    console.log('❌ [SATURATION] RECHAZADO: Demasiados píxeles saturados (ilustración)');
+    return false;
+  }
+  
+  console.log('✅ [SATURATION] APROBADO: Saturación natural de foto real');
+  return true;
 }
 
 export default {

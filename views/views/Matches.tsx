@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Heart, MessageCircle, Clock, MapPin, Sparkles } from 'lucide-react';
 import { UserProfile, Match } from '../../types';
 import { useLanguage } from '../../contexts/LanguageContext';
+import LazyImage from '../../components/LazyImage';
+import { logger } from '../../utils/logger';
 
 interface MatchesProps {
   matches?: Match[];
@@ -112,13 +114,21 @@ const Matches: React.FC<MatchesProps> = ({
                 {/* Profile Image */}
                 <div className="relative">
                   <div className="w-16 h-16 rounded-full overflow-hidden">
-                    <img
+                    <LazyImage
                       src={match.user.images[0]}
                       alt={match.user.name}
                       className="w-full h-full object-cover"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.src = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=face';
+                      rootMargin="100px"
+                      onError={(error) => {
+                        logger.match.warn('Error cargando imagen de match', { 
+                          userName: match.user.name,
+                          error 
+                        });
+                        // Fallback a imagen por defecto
+                        const img = document.querySelector(`img[alt="${match.user.name}"]`) as HTMLImageElement;
+                        if (img) {
+                          img.src = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=face';
+                        }
                       }}
                     />
                   </div>

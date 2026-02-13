@@ -3,54 +3,129 @@ rules_version = '2';
 // Firebase Storage Security Rules para Ta' Pa' Ti
 service firebase.storage {
   match /b/{bucket}/o {
-    // Reglas para fotos de perfil - SIMPLIFICADAS
-    match /profile-photos/{allImages=**} {
-      // Permitir lectura pública de fotos de perfil
-      allow read: if true;
-      
-      // Permitir escritura a usuarios autenticados
-      allow write: if request.auth != null 
-                   && request.resource.size < 5 * 1024 * 1024 // Máximo 5MB
-                   && request.resource.contentType.matches('image/.*'); // Solo imágenes
-      
-      // Permitir eliminación a usuarios autenticados
-      allow delete: if request.auth != null;
+    
+    // ==============================
+    // FUNCIONES AUXILIARES
+    // ==============================
+    
+    // Verificar si el archivo es una imagen válida
+    function isValidImage() {
+      return request.resource.contentType.matches('image/.*') &&
+             request.resource.size < 5 * 1024 * 1024; // Máximo 5MB
     }
     
-    // Reglas para fotos de stories
-    match /stories/{allImages=**} {
-      allow read: if true;
-      allow write: if request.auth != null
-                   && request.resource.size < 5 * 1024 * 1024
-                   && request.resource.contentType.matches('image/.*');
-      allow delete: if request.auth != null;
+    // Verificar si el archivo es audio válido
+    function isValidAudio() {
+      return request.resource.contentType.matches('audio/.*') &&
+             request.resource.size < 10 * 1024 * 1024; // Máximo 10MB
     }
     
-    // Reglas para fotos de chat (futuro)
-    match /chat-photos/{allImages=**} {
+    // Verificar si el archivo es video válido
+    function isValidVideo() {
+      return request.resource.contentType.matches('video/.*') &&
+             request.resource.size < 50 * 1024 * 1024; // Máximo 50MB
+    }
+    
+    // ==============================
+    // FOTOS DE PERFIL
+    // ==============================
+    match /profile-photos/{userId}/{fileName} {
+      // Lectura: Pública (cualquiera puede ver fotos de perfil)
+      allow read: if true;
+      
+      // Escritura: Solo el dueño del perfil
+      allow write: if request.auth != null && 
+                      request.auth.uid == userId &&
+                      isValidImage();
+      
+      // Eliminación: Solo el dueño del perfil
+      allow delete: if request.auth != null && 
+                       request.auth.uid == userId;
+    }
+    
+    // ==============================
+    // FOTOS DE STORIES
+    // ==============================
+    match /stories/{userId}/{fileName} {
+      // Lectura: Usuarios autenticados
       allow read: if request.auth != null;
-      allow write: if request.auth != null
-                   && request.resource.size < 10 * 1024 * 1024 // Máximo 10MB para chat
-                   && request.resource.contentType.matches('image/.*');
+      
+      // Escritura: Solo el dueño de la story
+      allow write: if request.auth != null && 
+                      request.auth.uid == userId &&
+                      isValidImage();
+      
+      // Eliminación: Solo el dueño de la story
+      allow delete: if request.auth != null && 
+                       request.auth.uid == userId;
+    }
+    
+    // ==============================
+    // FOTOS DE CHAT
+    // ==============================
+    match /chat-photos/{chatId}/{fileName} {
+      // Lectura: Usuarios autenticados (validación de participante en app)
+      allow read: if request.auth != null;
+      
+      // Escritura: Usuarios autenticados
+      allow write: if request.auth != null &&
+                      isValidImage();
+      
+      // Eliminación: Usuarios autenticados
       allow delete: if request.auth != null;
     }
     
-    // Reglas para mensajes de voz y video
+    // ==============================
+    // MENSAJES DE VOZ
+    // ==============================
     match /voice_messages/{chatId}/{fileName} {
-      // Permitir lectura a usuarios autenticados
+      // Lectura: Usuarios autenticados
       allow read: if request.auth != null;
       
-      // Permitir escritura a usuarios autenticados
-      allow write: if request.auth != null
-                   && request.resource.size < 50 * 1024 * 1024 // Máximo 50MB
-                   && (request.resource.contentType.matches('audio/.*') 
-                       || request.resource.contentType.matches('video/.*')); // Audio o video
+      // Escritura: Usuarios autenticados con audio válido
+      allow write: if request.auth != null &&
+                      isValidAudio();
       
-      // Permitir eliminación a usuarios autenticados
+      // Eliminación: Usuarios autenticados
       allow delete: if request.auth != null;
     }
     
-    // Denegar acceso a cualquier otro archivo
+    // ==============================
+    // MENSAJES DE VIDEO
+    // ==============================
+    match /video_messages/{chatId}/{fileName} {
+      // Lectura: Usuarios autenticados
+      allow read: if request.auth != null;
+      
+      // Escritura: Usuarios autenticados con video válido
+      allow write: if request.auth != null &&
+                      isValidVideo();
+      
+      // Eliminación: Usuarios autenticados
+      allow delete: if request.auth != null;
+    }
+    
+    // ==============================
+    // FOTOS DE VERIFICACIÓN
+    // ==============================
+    match /verification-photos/{userId}/{fileName} {
+      // Lectura: Solo admins y el propio usuario
+      allow read: if request.auth != null && 
+                     request.auth.uid == userId;
+      
+      // Escritura: Solo el dueño
+      allow write: if request.auth != null && 
+                      request.auth.uid == userId &&
+                      isValidImage();
+      
+      // Eliminación: Solo el dueño
+      allow delete: if request.auth != null && 
+                       request.auth.uid == userId;
+    }
+    
+    // ==============================
+    // DENEGAR TODO LO DEMÁS
+    // ==============================
     match /{allPaths=**} {
       allow read, write: if false;
     }

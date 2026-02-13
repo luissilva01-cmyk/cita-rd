@@ -2,7 +2,7 @@ import React from 'react';
 import { Heart, MessageCircle, User, Search, Users, Flame, Home } from 'lucide-react';
 import { View } from '../types';
 import { useLanguage } from '../contexts/LanguageContext';
-import StoriesRingWorking from './StoriesRingWorking';
+import StoriesRing from './StoriesRing';
 import { StoryGroup } from '../services/storiesService';
 
 interface DesktopSidebarProps {
@@ -107,9 +107,9 @@ const DesktopSidebar: React.FC<DesktopSidebarProps> = ({
             <span className="text-xs text-gray-600 mt-1 block">Tu historia</span>
           </div>
           
-          {/* Stories from StoriesRingWorking */}
+          {/* Stories from StoriesRing */}
           <div className="flex-1">
-            <StoriesRingWorking
+            <StoriesRing
               key={storiesRefreshKey}
               currentUserId={currentUserId}
               onStoryClick={onStoryClick}

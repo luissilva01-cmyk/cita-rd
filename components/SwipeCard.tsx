@@ -4,10 +4,12 @@ import { UserProfile } from '../types';
 import { useSwipeGesture } from '../hooks/useSwipeGesture';
 import VerificationBadge from './VerificationBadge';
 import CompatibilityIndicator from './CompatibilityIndicator';
+import LazyImage from './LazyImage';
 import { verificationService } from '../services/verificationService';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useMatchingAI } from '../hooks/useMatchingAI';
 import { CompatibilityScore } from '../services/matchingAI';
+import { logger } from '../utils/logger';
 
 interface SwipeCardProps {
   user: UserProfile;
@@ -65,13 +67,13 @@ const SwipeCard: React.FC<SwipeCardProps> = ({
   }, [user.id, currentUser.id, calculateCompatibility]);
 
   const handleImageError = () => {
-    console.log('❌ Error cargando imagen para:', user.name);
+    logger.ui.warn('Error cargando imagen de perfil', { userName: user.name });
     setImageError(true);
     setImageLoading(false);
   };
 
   const handleImageLoad = () => {
-    console.log('✅ Imagen cargada para:', user.name);
+    logger.ui.debug('Imagen de perfil cargada', { userName: user.name });
     setImageLoading(false);
     setImageError(false);
   };
@@ -185,18 +187,20 @@ const SwipeCard: React.FC<SwipeCardProps> = ({
             </div>
           )}
           
-          {/* Main image or avatar fallback */}
-          <img 
+          {/* Main image with lazy loading */}
+          <LazyImage
             src={imageError ? getAvatarUrl() : user.images[0]} 
             alt={user.name}
             className="w-full h-full pointer-events-none"
-            draggable={false}
             onError={handleImageError}
             onLoad={handleImageLoad}
+            rootMargin="100px"
             style={{ 
               display: imageLoading ? 'none' : 'block',
               objectFit: 'cover',
-              objectPosition: 'center 20%'
+              objectPosition: 'center 20%',
+              pointerEvents: 'none',
+              userSelect: 'none'
             }}
           />
           
@@ -221,7 +225,6 @@ const SwipeCard: React.FC<SwipeCardProps> = ({
               <h2 className="text-3xl font-bold">{user.name}, {user.age}</h2>
               <VerificationBadge 
                 isVerified={user.isVerified || false} 
-                verificationLevel="basic"
                 size="md"
               />
               {/* Compatibility Badge */}

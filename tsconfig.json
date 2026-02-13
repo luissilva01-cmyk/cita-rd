@@ -36,7 +36,9 @@
     "components",
     "views",
     "services",
+    "config",
     "types.ts",
-    "App.tsx"
+    "App.tsx",
+    "vite-env.d.ts"
   ]
 }

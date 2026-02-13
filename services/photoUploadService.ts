@@ -3,6 +3,8 @@ import { doc, updateDoc, setDoc } from 'firebase/firestore';
 import { db } from './firebase';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { PhotoInfo, normalizePhotos, extractUrls } from '../types/PhotoInfo';
+import { logger } from '../utils/logger';
+import { PHOTO_CONFIG, FIREBASE_CONFIG } from '../config/constants';
 
 export interface PhotoUploadResult {
   success: boolean;
@@ -23,40 +25,54 @@ export const uploadPhoto = async (
   photoIndex: number = 0
 ): Promise<PhotoUploadResult> => {
   try {
-    console.log('📤 Iniciando subida de foto...');
-    console.log('📋 Archivo:', file.name);
-    console.log('📋 Tamaño:', (file.size / 1024).toFixed(2), 'KB');
-    console.log('📋 Tipo:', file.type);
+    logger.api.info('Iniciando subida de foto', { 
+      fileName: file.name,
+      fileSize: `${(file.size / 1024).toFixed(2)} KB`,
+      fileType: file.type,
+      userId,
+      photoIndex
+    });
     
     // Validar el archivo
-    if (!file.type.startsWith('image/')) {
-      return { success: false, error: 'El archivo debe ser una imagen' };
+    if (!PHOTO_CONFIG.ACCEPTED_FORMATS.includes(file.type as any)) {
+      logger.api.warn('Formato de archivo inválido', { fileType: file.type });
+      return { success: false, error: 'El archivo debe ser una imagen (JPG, PNG, WebP)' };
     }
 
-    // Validar tamaño (máximo 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      return { success: false, error: 'La imagen debe ser menor a 5MB' };
+    // Validar tamaño usando constante
+    if (file.size > PHOTO_CONFIG.MAX_SIZE_BYTES) {
+      logger.api.warn('Archivo demasiado grande', { 
+        fileSize: file.size,
+        maxSize: PHOTO_CONFIG.MAX_SIZE_BYTES 
+      });
+      return { success: false, error: `La imagen debe ser menor a ${PHOTO_CONFIG.MAX_SIZE_MB}MB` };
     }
 
     // Redimensionar imagen antes de subir
-    console.log('🔄 Redimensionando imagen...');
+    logger.api.debug('Redimensionando imagen...');
     const resizedFile = await resizeImage(file);
-    console.log('✅ Imagen redimensionada:', (resizedFile.size / 1024).toFixed(2), 'KB');
+    logger.api.debug('Imagen redimensionada', { 
+      newSize: `${(resizedFile.size / 1024).toFixed(2)} KB` 
+    });
 
     // Generar nombre único para el archivo
     const timestamp = Date.now();
     const fileName = `${userId}_${photoIndex}_${timestamp}.jpg`;
 
-    console.log('☁️ Subiendo a ImageKit...');
+    logger.api.debug('Subiendo a ImageKit...', { fileName });
     
     // Subir a ImageKit
     const result = await uploadToImageKit(resizedFile, fileName);
     
     if (!result.success) {
+      logger.api.error('Error en uploadToImageKit', result.error);
       return result;
     }
 
-    console.log('✅ Foto subida exitosamente a ImageKit');
+    logger.api.success('Foto subida exitosamente a ImageKit', { 
+      url: result.url,
+      fileId: result.fileId 
+    });
     
     // Retornar con fileId para poder eliminar después
     return {
@@ -66,7 +82,7 @@ export const uploadPhoto = async (
     };
     
   } catch (error) {
-    console.error('❌ Error subiendo foto:', error);
+    logger.api.error('Error subiendo foto', error);
     
     return { 
       success: false, 
@@ -84,12 +100,13 @@ export const updateUserPhotos = async (
   photos: PhotoInfo[]
 ): Promise<boolean> => {
   try {
-    console.log('💾 Actualizando fotos en Firestore...');
-    console.log('👤 User ID:', userId);
-    console.log('📸 Fotos a guardar:', photos.length);
-    console.log('📋 Datos:', JSON.stringify(photos, null, 2));
+    logger.firebase.info('Actualizando fotos en Firestore', { 
+      userId,
+      photoCount: photos.length 
+    });
+    logger.firebase.debug('Datos de fotos', { photos });
     
-    const userRef = doc(db, 'perfiles', userId);
+    const userRef = doc(db, FIREBASE_CONFIG.COLLECTIONS.PROFILES, userId);
     
     // Extraer URLs para compatibilidad con código antiguo
     const photoUrls = extractUrls(photos);
@@ -106,9 +123,10 @@ export const updateUserPhotos = async (
         analyzed: p.analyzed || false
       }));
     
-    console.log('📤 Enviando a Firestore:');
-    console.log('   - images:', photoUrls);
-    console.log('   - photosInfo:', JSON.stringify(photosData, null, 2));
+    logger.firebase.debug('Enviando a Firestore', { 
+      images: photoUrls,
+      photosInfo: photosData 
+    });
     
     // Usar setDoc con merge: true en lugar de updateDoc
     // Esto funciona tanto si el documento existe como si no
@@ -119,16 +137,17 @@ export const updateUserPhotos = async (
       updatedAt: Date.now()
     }, { merge: true });
     
-    console.log('✅ Fotos del perfil actualizadas en Firestore');
+    logger.firebase.success('Fotos del perfil actualizadas en Firestore');
     return true;
   } catch (error) {
-    console.error('❌ Error actualizando fotos del perfil:', error);
-    console.error('❌ Detalles del error:', error);
+    logger.firebase.error('Error actualizando fotos del perfil', error);
     
     // Log adicional para debugging
     if (error instanceof Error) {
-      console.error('❌ Error message:', error.message);
-      console.error('❌ Error stack:', error.stack);
+      logger.firebase.error('Detalles del error', { 
+        message: error.message,
+        stack: error.stack 
+      });
     }
     
     return false;
@@ -141,13 +160,11 @@ export const updateUserPhotos = async (
  */
 export const deletePhoto = async (photoUrl: string, fileId?: string): Promise<boolean> => {
   try {
-    console.log('🗑️ Eliminando foto de ImageKit...');
-    console.log('🔗 URL:', photoUrl);
-    console.log('📝 File ID:', fileId);
+    logger.api.info('Eliminando foto de ImageKit', { photoUrl, fileId });
     
     if (!fileId) {
-      console.warn('⚠️ No se proporcionó fileId, no se puede eliminar de ImageKit');
-      console.log('💡 La foto se eliminará solo de Firestore');
+      logger.api.warn('No se proporcionó fileId, no se puede eliminar de ImageKit');
+      logger.api.info('La foto se eliminará solo de Firestore');
       return true; // Continuar con la eliminación de Firestore
     }
     
@@ -155,19 +172,19 @@ export const deletePhoto = async (photoUrl: string, fileId?: string): Promise<bo
     const functions = getFunctions();
     const deleteImageKitPhoto = httpsCallable(functions, 'deleteImageKitPhoto');
     
-    console.log('☁️ Llamando a Cloud Function...');
+    logger.api.debug('Llamando a Cloud Function deleteImageKitPhoto...');
     const result = await deleteImageKitPhoto({ fileId, photoUrl });
     
-    console.log('✅ Respuesta de Cloud Function:', result.data);
+    logger.api.success('Respuesta de Cloud Function', result.data);
     return true;
     
   } catch (error) {
-    console.error('❌ Error eliminando foto:', error);
+    logger.api.error('Error eliminando foto', error);
     
     // Si falla la eliminación de ImageKit, aún así continuar
     // La foto se eliminará de Firestore y quedará huérfana en ImageKit
     // (se puede limpiar después con la función cleanOrphanedPhotos)
-    console.warn('⚠️ No se pudo eliminar de ImageKit, pero se eliminará de Firestore');
+    logger.api.warn('No se pudo eliminar de ImageKit, pero se eliminará de Firestore');
     return true;
   }
 };
@@ -178,9 +195,9 @@ export const deletePhoto = async (photoUrl: string, fileId?: string): Promise<bo
  */
 export const resizeImage = (
   file: File, 
-  maxWidth: number = 800, 
-  maxHeight: number = 1066, // 800 * 4/3 = 1066 para mantener ratio 3:4
-  quality: number = 0.85
+  maxWidth: number = PHOTO_CONFIG.MAX_WIDTH, 
+  maxHeight: number = PHOTO_CONFIG.MAX_HEIGHT,
+  quality: number = PHOTO_CONFIG.JPEG_QUALITY
 ): Promise<File> => {
   return new Promise((resolve) => {
     const canvas = document.createElement('canvas');

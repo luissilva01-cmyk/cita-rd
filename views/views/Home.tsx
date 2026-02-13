@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { UserProfile } from '../../types';
+import { countReceivedLikes } from '../../services/likesService';
 
 interface HomeProps {
   currentUser: UserProfile;
@@ -7,6 +8,7 @@ interface HomeProps {
   onNavigateToDiscovery: () => void;
   onNavigateToMessages: () => void;
   onNavigateToProfile: () => void;
+  onNavigateToLikesReceived?: () => void;
   availableProfilesCount?: number; // Nuevo prop para el conteo real
 }
 
@@ -16,8 +18,21 @@ const Home: React.FC<HomeProps> = ({
   onNavigateToDiscovery, 
   onNavigateToMessages,
   onNavigateToProfile,
+  onNavigateToLikesReceived,
   availableProfilesCount = 0 // Default a 0 si no se proporciona
 }) => {
+  const [likesCount, setLikesCount] = useState(0);
+
+  useEffect(() => {
+    // Cargar conteo de likes recibidos
+    const loadLikesCount = async () => {
+      const count = await countReceivedLikes(currentUser.id);
+      setLikesCount(count);
+    };
+
+    loadLikesCount();
+  }, [currentUser.id]);
+
   const todayDate = new Date().toLocaleDateString('es-DO', { 
     weekday: 'long', 
     day: 'numeric',
@@ -118,6 +133,42 @@ const Home: React.FC<HomeProps> = ({
           </button>
         </div>
       </div>
+
+      {/* Te Gustaron Section */}
+      {likesCount > 0 && onNavigateToLikesReceived && (
+        <div className="px-4 md:px-10 py-2">
+          <button
+            onClick={onNavigateToLikesReceived}
+            className="w-full p-4 rounded-xl text-white shadow-lg transition-transform active:scale-95 relative overflow-hidden"
+            style={{background: 'linear-gradient(135deg, #ec4899 0%, #f97316 100%)'}}
+          >
+            <div className="flex items-center justify-between relative z-10">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                  </svg>
+                </div>
+                <div className="text-left">
+                  <h3 className="font-bold text-lg">Te Gustaron</h3>
+                  <p className="text-sm opacity-90">
+                    {likesCount} {likesCount === 1 ? 'persona le gusta tu perfil' : 'personas les gusta tu perfil'}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="bg-white text-pink-600 font-bold text-lg px-3 py-1 rounded-full">
+                  {likesCount}
+                </div>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+            </div>
+            <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
+          </button>
+        </div>
+      )}
 
       {/* Actividad Reciente */}
       <div className="px-4 py-2">

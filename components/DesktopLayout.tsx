@@ -25,9 +25,9 @@ const DesktopLayout: React.FC<DesktopLayoutProps> = ({
   storiesRefreshKey = 0
 }) => {
   return (
-    <div className="flex min-h-screen" style={{background: 'linear-gradient(135deg, #FF6B6B 0%, #FFD93D 100%)'}}>
+    <div className="grid grid-cols-[320px_1fr] min-h-screen" style={{background: 'linear-gradient(135deg, #FF6B6B 0%, #FFD93D 100%)'}}>
       {/* Sidebar */}
-      <aside className="w-80">
+      <aside className="flex-shrink-0">
         <DesktopSidebar
           activeView={activeView}
           onViewChange={onViewChange}
@@ -40,8 +40,8 @@ const DesktopLayout: React.FC<DesktopLayoutProps> = ({
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex items-center justify-center p-8">
-        <div className="w-full h-full">
+      <main className="flex items-center justify-center p-8 min-w-0">
+        <div className="w-full h-full bg-white rounded-2xl shadow-2xl overflow-hidden" style={{ maxWidth: '1024px' }}>
           {children}
         </div>
       </main>

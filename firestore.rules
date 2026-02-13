@@ -115,28 +115,42 @@ service cloud.firestore {
     // COLECCIÓN: matches
     // ==============================
     match /matches/{matchId} {
-      // Leer: Usuarios autenticados (simplificado)
-      allow read: if isAuthenticated();
+      // Leer: Solo si el usuario es uno de los participantes del match
+      allow read: if isAuthenticated() && 
+                     request.auth.uid in resource.data.users;
       
-      // Escribir: Usuarios autenticados (simplificado)
-      allow write: if isAuthenticated();
+      // Crear: Solo Cloud Functions (matches se crean automáticamente)
+      allow create: if false;
       
-      // Eliminar: Usuarios autenticados
-      allow delete: if isAuthenticated();
+      // Actualizar: Solo participantes del match
+      allow update: if isAuthenticated() && 
+                       request.auth.uid in resource.data.users;
+      
+      // Eliminar: Solo participantes del match
+      allow delete: if isAuthenticated() && 
+                      request.auth.uid in resource.data.users;
     }
     
     // ==============================
     // COLECCIÓN: likes
     // ==============================
     match /likes/{likeId} {
-      // Leer: Usuarios autenticados (simplificado)
+      // Leer: Usuarios autenticados pueden ver likes
       allow read: if isAuthenticated();
       
-      // Escribir: Usuarios autenticados (simplificado)
-      allow write: if isAuthenticated();
+      // Crear: Solo el usuario puede crear sus propios likes
+      // Validar que fromUserId coincida con el usuario autenticado
+      allow create: if isAuthenticated() && 
+                       request.resource.data.fromUserId == request.auth.uid &&
+                       request.resource.data.toUserId is string &&
+                       request.resource.data.toUserId != request.auth.uid; // No puede gustarse a sí mismo
       
-      // Eliminar: Usuarios autenticados
-      allow delete: if isAuthenticated();
+      // Actualizar: No permitido (likes son inmutables)
+      allow update: if false;
+      
+      // Eliminar: Solo el usuario que creó el like
+      allow delete: if isAuthenticated() && 
+                      resource.data.fromUserId == request.auth.uid;
     }
     
     // ==============================
@@ -204,6 +218,104 @@ service cloud.firestore {
       
       // Escribir: Solo el propio usuario
       allow write: if isOwner(userId);
+    }
+    
+    // ==============================
+    // COLECCIÓN: reports (reportes de usuarios)
+    // ==============================
+    match /reports/{reportId} {
+      // Leer: Solo admins (false para usuarios normales)
+      allow read: if false;
+      
+      // Crear: Usuario autenticado puede reportar
+      allow create: if isAuthenticated() && 
+                       request.resource.data.reporterId == request.auth.uid &&
+                       request.resource.data.reportedUserId is string &&
+                       request.resource.data.reportedUserId != request.auth.uid && // No puede reportarse a sí mismo
+                       request.resource.data.reason is string &&
+                       request.resource.data.reason.size() > 0 &&
+                       request.resource.data.reason.size() <= 500;
+      
+      // Actualizar/Eliminar: Solo admins
+      allow update, delete: if false;
+    }
+    
+    // ==============================
+    // COLECCIÓN: blocks (usuarios bloqueados)
+    // ==============================
+    match /blocks/{blockId} {
+      // Leer: Solo el usuario que bloqueó
+      allow read: if isAuthenticated() && 
+                     resource.data.blockerId == request.auth.uid;
+      
+      // Crear: Usuario autenticado puede bloquear
+      allow create: if isAuthenticated() && 
+                       request.resource.data.blockerId == request.auth.uid &&
+                       request.resource.data.blockedUserId is string &&
+                       request.resource.data.blockedUserId != request.auth.uid; // No puede bloquearse a sí mismo
+      
+      // Actualizar: No permitido (blocks son inmutables)
+      allow update: if false;
+      
+      // Eliminar: Solo el usuario que bloqueó
+      allow delete: if isAuthenticated() && 
+                      resource.data.blockerId == request.auth.uid;
+    }
+    
+    // ==============================
+    // COLECCIÓN: notifications
+    // ==============================
+    match /notifications/{notificationId} {
+      // Leer: Solo el destinatario de la notificación
+      allow read: if isAuthenticated() && 
+                     resource.data.userId == request.auth.uid;
+      
+      // Crear: Sistema/Cloud Functions (usuarios no pueden crear notificaciones)
+      allow create: if false;
+      
+      // Actualizar: Solo el destinatario (para marcar como leída)
+      allow update: if isAuthenticated() && 
+                       resource.data.userId == request.auth.uid;
+      
+      // Eliminar: Solo el destinatario
+      allow delete: if isAuthenticated() && 
+                      resource.data.userId == request.auth.uid;
+    }
+    
+    // ==============================
+    // COLECCIÓN: analytics (eventos de analytics)
+    // ==============================
+    match /analytics/{eventId} {
+      // Leer: Solo admins
+      allow read: if false;
+      
+      // Crear: Usuario autenticado puede crear eventos
+      allow create: if isAuthenticated() && 
+                       request.resource.data.userId == request.auth.uid;
+      
+      // Actualizar/Eliminar: No permitido
+      allow update, delete: if false;
+    }
+    
+    // ==============================
+    // COLECCIÓN: superLikes
+    // ==============================
+    match /superLikes/{superLikeId} {
+      // Leer: Usuarios autenticados
+      allow read: if isAuthenticated();
+      
+      // Crear: Solo el usuario puede crear sus propios super likes
+      allow create: if isAuthenticated() && 
+                       request.resource.data.fromUserId == request.auth.uid &&
+                       request.resource.data.toUserId is string &&
+                       request.resource.data.toUserId != request.auth.uid;
+      
+      // Actualizar: No permitido (super likes son inmutables)
+      allow update: if false;
+      
+      // Eliminar: Solo el usuario que creó el super like
+      allow delete: if isAuthenticated() && 
+                      resource.data.fromUserId == request.auth.uid;
     }
     
     // ==============================

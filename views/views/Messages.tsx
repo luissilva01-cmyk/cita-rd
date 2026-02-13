@@ -3,6 +3,8 @@ import { MessageCircle, Clock } from 'lucide-react';
 import { Match } from '../../types';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { listenToTypingStatus } from '../../services/chatService';
+import LazyImage from '../../components/LazyImage';
+import { logger } from '../../utils/logger';
 
 interface MessagesProps {
   matches: Match[];
@@ -78,12 +80,19 @@ const Messages: React.FC<MessagesProps> = ({ matches, onSelectMatch, currentUser
             onClick={() => onSelectMatch(match)}
             className="w-full p-3 sm:p-4 flex items-center gap-3 sm:gap-4 hover:bg-slate-50 transition-colors border-b border-slate-50 min-h-[72px]"
           >
-            {/* Avatar - Responsive */}
+            {/* Avatar - Responsive with lazy loading */}
             <div className="relative flex-shrink-0">
-              <img
+              <LazyImage
                 src={match.user.images[0]}
                 alt={match.user.name}
                 className="w-12 h-12 sm:w-16 sm:h-16 rounded-full profile-image-smart"
+                rootMargin="150px"
+                onError={(error) => {
+                  logger.chat.warn('Error cargando avatar en lista de mensajes', {
+                    userName: match.user.name,
+                    error
+                  });
+                }}
               />
               {match.unreadCount && match.unreadCount > 0 && (
                 <div className="absolute -top-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 bg-rose-500 rounded-full flex items-center justify-center">

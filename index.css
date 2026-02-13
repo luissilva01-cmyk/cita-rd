@@ -890,6 +890,8 @@ body {
   .message-bubble-desktop {
     max-width: 60%;
   }
+  
+  /* Chat view container is controlled by DesktopLayout Grid - NO width constraints here */
 }
 
 /* Universal image/video constraints */
@@ -899,8 +901,13 @@ body {
   display: block;
 }
 
-/* Prevent content overflow */
-* {
+/* Prevent content overflow - ONLY for specific elements */
+img:not(.profile-image):not(.profile-image-smart), 
+video, 
+.message-bubble, 
+.voice-message-mobile, 
+.photo-message-mobile, 
+.video-message-mobile {
   max-width: 100%;
 }
 

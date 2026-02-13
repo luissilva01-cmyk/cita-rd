@@ -2,6 +2,7 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
+import { logger } from '../utils/logger';
 
 // Configuración de Firebase usando variables de entorno
 // Las credenciales están en .env.local (no se suben a Git)
@@ -16,18 +17,16 @@ const firebaseConfig = {
 
 // Validar que las variables de entorno estén configuradas
 if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
-  throw new Error(
-    '❌ Firebase no está configurado correctamente. ' +
-    'Verifica que .env.local exista y contenga todas las variables VITE_FIREBASE_*'
-  );
+  const errorMsg = 'Firebase no está configurado correctamente. Verifica que .env.local exista y contenga todas las variables VITE_FIREBASE_*';
+  logger.firebase.error(errorMsg);
+  throw new Error(errorMsg);
 }
 
-console.log('🔧 Inicializando Firebase...');
-console.log('📦 Proyecto:', firebaseConfig.projectId);
+logger.firebase.info('Inicializando Firebase', { projectId: firebaseConfig.projectId });
 
 // Initialize Firebase using the modular SDK (v9+).
 const app = initializeApp(firebaseConfig);
-console.log('✅ Firebase App inicializada');
+logger.firebase.success('Firebase App inicializada');
 
 export const auth = getAuth(app);
 export const db = getFirestore(app);
@@ -36,11 +35,11 @@ export const db = getFirestore(app);
 let storageInstance;
 try {
   storageInstance = getStorage(app);
-  console.log('✅ Firebase Storage inicializado correctamente');
+  logger.firebase.success('Firebase Storage inicializado correctamente');
 } catch (error) {
-  console.error('❌ Error inicializando Firebase Storage:', error);
-  console.warn('⚠️ Firebase Storage NO disponible. Verifica que esté habilitado en Firebase Console.');
-  console.warn('⚠️ URL: https://console.firebase.google.com/project/citard-fbc26/storage');
+  logger.firebase.error('Error inicializando Firebase Storage', error);
+  logger.firebase.warn('Firebase Storage NO disponible. Verifica que esté habilitado en Firebase Console.');
+  logger.firebase.warn('URL: https://console.firebase.google.com/project/citard-fbc26/storage');
   storageInstance = null;
 }
 

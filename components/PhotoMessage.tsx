@@ -1,6 +1,8 @@
 // cita-rd/components/PhotoMessage.tsx
 import React, { useState } from 'react';
 import { Download, X } from 'lucide-react';
+import LazyImage from './LazyImage';
+import { logger } from '../utils/logger';
 
 interface PhotoMessageProps {
   photoUrl: string;
@@ -90,14 +92,21 @@ const PhotoMessage: React.FC<PhotoMessageProps> = ({
               </div>
             )}
             
-            <img
+            <LazyImage
               src={photoUrl}
               alt="Foto enviada"
               className={`w-full h-auto object-cover transition-opacity duration-300 ${
                 imageLoaded ? 'opacity-100' : 'opacity-0'
               }`}
-              onLoad={() => setImageLoaded(true)}
-              onError={() => setImageError(true)}
+              onLoad={() => {
+                logger.chat.debug('Foto de mensaje cargada');
+                setImageLoaded(true);
+              }}
+              onError={() => {
+                logger.chat.error('Error cargando foto de mensaje');
+                setImageError(true);
+              }}
+              rootMargin="50px"
               style={{ maxHeight: '400px', maxWidth: '100%', display: 'block' }}
             />
             
@@ -171,7 +180,7 @@ const PhotoMessage: React.FC<PhotoMessageProps> = ({
             <span className="text-sm font-medium hidden sm:inline">Descargar</span>
           </button>
 
-          {/* Imagen en pantalla completa */}
+          {/* Imagen en pantalla completa - sin lazy loading aquí ya que está visible */}
           <img
             src={photoUrl}
             alt="Foto en pantalla completa"

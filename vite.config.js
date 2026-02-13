@@ -13,7 +13,59 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: false,
-    minify: 'esbuild'
+    minify: 'esbuild', // Usar esbuild (ya instalado) en lugar de terser
+    rollupOptions: {
+      output: {
+        // Manual chunks para optimizar carga
+        manualChunks: {
+          // Vendor chunks - librerías grandes separadas
+          'react-vendor': ['react', 'react-dom'],
+          'firebase-vendor': [
+            'firebase/app',
+            'firebase/auth',
+            'firebase/firestore',
+            'firebase/storage',
+            'firebase/analytics',
+          ],
+          'ui-vendor': ['framer-motion', 'lucide-react'],
+          
+          // Feature chunks - agrupar por funcionalidad
+          'chat-features': [
+            './services/chatService.ts',
+            './services/voiceMessageService.ts',
+            './services/callService.ts',
+          ],
+          'profile-features': [
+            './services/profileService.ts',
+            './services/photoUploadService.ts',
+            './services/photoAnalysisService.ts',
+          ],
+          'ai-features': [
+            './services/matchingAI.ts',
+            './services/emotionalAI.ts',
+          ],
+        },
+        // Nombres de chunks más descriptivos
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash].[ext]',
+      },
+    },
+    // Optimizaciones adicionales
+    chunkSizeWarningLimit: 1000, // Advertir si chunks > 1MB
+    cssCodeSplit: true, // Separar CSS por chunk
+    assetsInlineLimit: 4096, // Inline assets < 4KB
+  },
+  // Optimizaciones de dependencias
+  optimizeDeps: {
+    include: [
+      'react',
+      'react-dom',
+      'firebase/app',
+      'firebase/auth',
+      'firebase/firestore',
+    ],
+    exclude: ['@google/generative-ai'], // Excluir si causa problemas
   },
   css: {
     postcss: null

@@ -1,8 +1,8 @@
-# Sesión 11 Febrero 2026 - Chat Layout Fix & Analytics
+# Sesión 11 Febrero 2026 - Chat Layout Desktop Fix & Analytics
 
 ## Resumen de la Sesión
 
-Esta sesión continuó el trabajo de Analytics y corrigió un problema crítico con el layout del chat en la versión web.
+Esta sesión continuó el trabajo de Analytics y corrigió problemas críticos con el layout del chat en las versiones web y desktop.
 
 ---
 
@@ -32,6 +32,57 @@ Agregado `style={{ minHeight: 0 }}` al elemento `<main>` en `Layout.tsx`:
 - Deploy: ✅ Exitoso
 - URL: https://citard-fbc26.web.app
 - Commit: ae159a2
+
+---
+
+## TAREA 1B: Fix de Ancho del Chat en Desktop ✅
+
+### Problema
+El chat en la versión desktop se expandía hasta ocupar toda la pantalla, sin límite de ancho. El usuario quería un ancho máximo limitado (como WhatsApp Web) con espacio a los lados.
+
+### Causa Raíz
+El uso de Flexbox con `flex-1` en el `<main>` del `DesktopLayout.tsx` causaba que se expandiera para llenar todo el espacio disponible, ignorando el `max-width` del contenedor interno.
+
+### Solución
+Cambiar de Flexbox a CSS Grid:
+
+```tsx
+// ANTES (Flexbox - Problema)
+<div className="flex min-h-screen">
+  <aside className="w-80 flex-shrink-0">...</aside>
+  <main className="flex-1 flex items-center justify-center p-8">
+    <div className="w-full max-w-5xl h-full">{children}</div>
+  </main>
+</div>
+
+// DESPUÉS (CSS Grid - Solución)
+<div className="grid grid-cols-[320px_1fr] min-h-screen">
+  <aside className="flex-shrink-0">...</aside>
+  <main className="flex items-center justify-center p-8 min-w-0">
+    <div className="w-full h-full" style={{ maxWidth: '1024px' }}>
+      {children}
+    </div>
+  </main>
+</div>
+```
+
+### Por Qué Funciona
+1. **CSS Grid:** `grid-template-columns: 320px 1fr` define columnas explícitas
+2. **Sidebar fijo:** 320px siempre constante
+3. **Main con 1fr:** Toma el espacio restante pero permite que el contenido interno limite su ancho
+4. **min-width: 0:** Previene overflow en Grid
+5. **maxWidth inline:** Más explícito y no depende de Tailwind purge
+
+### Archivos Modificados
+- `cita-rd/components/DesktopLayout.tsx` - Cambio de Flexbox a Grid
+- `cita-rd/ISSUE_CHAT_DESKTOP_WIDTH_11_FEB_2026.md` - Issue tracker (resuelto)
+- `cita-rd/CHAT_DESKTOP_WIDTH_FIXED_11_FEB_2026.md` - Documentación completa
+- `cita-rd/test-desktop-chat-width-grid.html` - Archivo de prueba visual
+
+### Deploy
+- Build: ✅ Exitoso (#7 de la sesión)
+- Deploy: ✅ Exitoso
+- URL: https://citard-fbc26.web.app
 
 ---
 

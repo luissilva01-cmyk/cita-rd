@@ -17,32 +17,55 @@ import {
 } from "firebase/firestore";
 import { UserProfile } from '../types';
 import { logger } from '../utils/logger';
+import { retryWithBackoff } from '../utils/retry';
 
 // Crear o actualizar perfil de usuario
 export const createOrUpdateProfile = async (userId: string, profileData: Partial<UserProfile>) => {
-  const docRef = doc(db, "perfiles", userId);
-  
-  const data = {
-    ...profileData,
-    id: userId,
-    timestamp: Date.now(),
-    serverTimestamp: serverTimestamp()
-  };
-  
-  await setDoc(docRef, data, { merge: true });
+  return retryWithBackoff(
+    async () => {
+      const docRef = doc(db, "perfiles", userId);
+      
+      const data = {
+        ...profileData,
+        id: userId,
+        timestamp: Date.now(),
+        serverTimestamp: serverTimestamp()
+      };
+      
+      await setDoc(docRef, data, { merge: true });
+    },
+    {
+      maxRetries: 3,
+      baseDelay: 1000,
+      onRetry: (attempt) => {
+        logger.profile.warn(`Retrying createOrUpdateProfile, attempt ${attempt}`, { userId });
+      }
+    }
+  );
 };
 
 // Obtener perfil de usuario
 export const getUserProfile = async (userId: string): Promise<UserProfile | null> => {
   try {
-    const q = query(collection(db, "perfiles"), where("id", "==", userId));
-    const querySnapshot = await getDocs(q);
-    
-    if (!querySnapshot.empty) {
-      const doc = querySnapshot.docs[0];
-      return { id: doc.id, ...doc.data() } as UserProfile;
-    }
-    return null;
+    return await retryWithBackoff(
+      async () => {
+        const q = query(collection(db, "perfiles"), where("id", "==", userId));
+        const querySnapshot = await getDocs(q);
+        
+        if (!querySnapshot.empty) {
+          const doc = querySnapshot.docs[0];
+          return { id: doc.id, ...doc.data() } as UserProfile;
+        }
+        return null;
+      },
+      {
+        maxRetries: 3,
+        baseDelay: 1000,
+        onRetry: (attempt) => {
+          logger.profile.warn(`Retrying getUserProfile, attempt ${attempt}`, { userId });
+        }
+      }
+    );
   } catch (error) {
     logger.profile.error("Error obteniendo perfil de usuario", error);
     return null;
@@ -100,39 +123,50 @@ export const searchProfiles = async (searchCriteria: {
   interests?: string[];
 }): Promise<UserProfile[]> => {
   try {
-    let q = query(collection(db, "perfiles"));
-    
-    // Aquí puedes agregar filtros más específicos según tus necesidades
-    // Por ahora, obtenemos todos y filtramos en el cliente
-    const querySnapshot = await getDocs(q);
-    
-    const profiles: UserProfile[] = [];
-    querySnapshot.forEach((doc) => {
-      const profile = { id: doc.id, ...doc.data() } as UserProfile;
-      
-      // Filtrar por edad
-      if (searchCriteria.ageMin && profile.age < searchCriteria.ageMin) return;
-      if (searchCriteria.ageMax && profile.age > searchCriteria.ageMax) return;
-      
-      // Filtrar por ubicación (búsqueda parcial)
-      if (searchCriteria.location && 
-          !profile.location.toLowerCase().includes(searchCriteria.location.toLowerCase())) return;
-      
-      // Filtrar por intereses
-      if (searchCriteria.interests && searchCriteria.interests.length > 0) {
-        const hasCommonInterest = searchCriteria.interests.some(interest => 
-          profile.interests.some(userInterest => 
-            userInterest.toLowerCase().includes(interest.toLowerCase())
-          )
-        );
-        if (!hasCommonInterest) return;
+    return await retryWithBackoff(
+      async () => {
+        let q = query(collection(db, "perfiles"));
+        
+        // Aquí puedes agregar filtros más específicos según tus necesidades
+        // Por ahora, obtenemos todos y filtramos en el cliente
+        const querySnapshot = await getDocs(q);
+        
+        const profiles: UserProfile[] = [];
+        querySnapshot.forEach((doc) => {
+          const profile = { id: doc.id, ...doc.data() } as UserProfile;
+          
+          // Filtrar por edad
+          if (searchCriteria.ageMin && profile.age < searchCriteria.ageMin) return;
+          if (searchCriteria.ageMax && profile.age > searchCriteria.ageMax) return;
+          
+          // Filtrar por ubicación (búsqueda parcial)
+          if (searchCriteria.location && 
+              !profile.location.toLowerCase().includes(searchCriteria.location.toLowerCase())) return;
+          
+          // Filtrar por intereses
+          if (searchCriteria.interests && searchCriteria.interests.length > 0) {
+            const hasCommonInterest = searchCriteria.interests.some(interest => 
+              profile.interests.some(userInterest => 
+                userInterest.toLowerCase().includes(interest.toLowerCase())
+              )
+            );
+            if (!hasCommonInterest) return;
+          }
+          
+          profiles.push(profile);
+        });
+        
+        logger.profile.success('Búsqueda de perfiles completada', { found: profiles.length });
+        return profiles;
+      },
+      {
+        maxRetries: 3,
+        baseDelay: 1000,
+        onRetry: (attempt) => {
+          logger.profile.warn(`Retrying searchProfiles, attempt ${attempt}`);
+        }
       }
-      
-      profiles.push(profile);
-    });
-    
-    logger.profile.success('Búsqueda de perfiles completada', { found: profiles.length });
-    return profiles;
+    );
   } catch (error) {
     logger.profile.error("Error buscando perfiles", error);
     return [];

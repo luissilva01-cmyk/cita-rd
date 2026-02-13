@@ -4,7 +4,7 @@ import { Heart, X, Star, Brain, Zap } from 'lucide-react';
 import { UserProfile } from '../../types';
 import SwipeCard from '../../components/SwipeCard';
 import { calculateProfileScore } from '../../services/photoAnalysisService';
-import StoriesRingWorking from '../../components/StoriesRingWorking';
+import StoriesRing from '../../components/StoriesRing';
 import StoriesViewer from '../../components/StoriesViewer';
 import CreateStoryModal from '../../components/CreateStoryModal';
 import ErrorBoundary from '../../components/ErrorBoundary';
@@ -365,8 +365,8 @@ const Discovery: React.FC<DiscoveryProps> = ({
 
       {/* Stories Section - Responsive */}
       <div className="shrink-0 border-b border-gray-200 safe-area-top">
-        {/* Componente StoriesRingWorking - versión funcional */}
-        <StoriesRingWorking
+        {/* Componente StoriesRing - versión funcional */}
+        <StoriesRing
           currentUserId={currentUserId}
           onStoryClick={handleStoryClick}
           onCreateStory={handleCreateStory}

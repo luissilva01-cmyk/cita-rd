@@ -19,6 +19,7 @@ import {
 } from "firebase/firestore";
 import { UserProfile, Message } from '../types';
 import { logger } from '../utils/logger';
+import { retryWithBackoff } from '../utils/retry';
 
 export interface Chat {
   id: string;
@@ -32,15 +33,26 @@ export interface Chat {
 
 // Crear un nuevo chat entre dos usuarios
 export const createChat = async (currentUserId: string, otherUserId: string): Promise<string> => {
-  const chatData = {
-    participants: [currentUserId, otherUserId],
-    lastMessage: '',
-    timestamp: Date.now(),
-    serverTimestamp: serverTimestamp()
-  };
-  
-  const docRef = await addDoc(collection(db, "chats"), chatData);
-  return docRef.id;
+  return retryWithBackoff(
+    async () => {
+      const chatData = {
+        participants: [currentUserId, otherUserId],
+        lastMessage: '',
+        timestamp: Date.now(),
+        serverTimestamp: serverTimestamp()
+      };
+      
+      const docRef = await addDoc(collection(db, "chats"), chatData);
+      return docRef.id;
+    },
+    {
+      maxRetries: 3,
+      baseDelay: 1000,
+      onRetry: (attempt) => {
+        logger.chat.warn(`Retrying createChat, attempt ${attempt}`, { currentUserId, otherUserId });
+      }
+    }
+  );
 };
 
 // Obtener chats del usuario actual
@@ -76,45 +88,56 @@ export const sendMessage = async (
   content?: string,
   duration?: number
 ) => {
-  const messageData: any = {
-    senderId,
-    type,
-    timestamp: Date.now(),
-    serverTimestamp: serverTimestamp(),
-    isRead: false
-  };
+  return retryWithBackoff(
+    async () => {
+      const messageData: any = {
+        senderId,
+        type,
+        timestamp: Date.now(),
+        serverTimestamp: serverTimestamp(),
+        isRead: false
+      };
 
-  // Agregar contenido según el tipo
-  if (type === 'text' && text) {
-    messageData.text = text;
-  } else if (type === 'emoji' && content) {
-    messageData.content = content;
-  } else if (type === 'voice' && content && duration) {
-    messageData.content = content; // URL del archivo de audio
-    messageData.duration = duration;
-  } else if ((type === 'image' || type === 'video') && content) {
-    messageData.content = content; // URL del archivo
-  } else if (type === 'story_reaction' && text) {
-    // Para reacciones a historias, el emoji viene en el parámetro text
-    messageData.text = text;
-  }
+      // Agregar contenido según el tipo
+      if (type === 'text' && text) {
+        messageData.text = text;
+      } else if (type === 'emoji' && content) {
+        messageData.content = content;
+      } else if (type === 'voice' && content && duration) {
+        messageData.content = content; // URL del archivo de audio
+        messageData.duration = duration;
+      } else if ((type === 'image' || type === 'video') && content) {
+        messageData.content = content; // URL del archivo
+      } else if (type === 'story_reaction' && text) {
+        // Para reacciones a historias, el emoji viene en el parámetro text
+        messageData.text = text;
+      }
 
-  await addDoc(collection(db, "chats", chatId, "messages"), messageData);
-  
-  // Actualizar último mensaje del chat
-  const lastMessageText = type === 'text' ? text : 
-                         type === 'emoji' ? content :
-                         type === 'voice' ? '🎤 Mensaje de voz' :
-                         type === 'image' ? '📷 Imagen' :
-                         type === 'video' ? '🎥 Video' : 
-                         type === 'story_reaction' ? `${text} Reaccionó a tu historia` :
-                         'Mensaje';
-  
-  await updateDoc(doc(db, "chats", chatId), {
-    lastMessage: lastMessageText,
-    timestamp: Date.now(),
-    serverTimestamp: serverTimestamp()
-  });
+      await addDoc(collection(db, "chats", chatId, "messages"), messageData);
+      
+      // Actualizar último mensaje del chat
+      const lastMessageText = type === 'text' ? text : 
+                             type === 'emoji' ? content :
+                             type === 'voice' ? '🎤 Mensaje de voz' :
+                             type === 'image' ? '📷 Imagen' :
+                             type === 'video' ? '🎥 Video' : 
+                             type === 'story_reaction' ? `${text} Reaccionó a tu historia` :
+                             'Mensaje';
+      
+      await updateDoc(doc(db, "chats", chatId), {
+        lastMessage: lastMessageText,
+        timestamp: Date.now(),
+        serverTimestamp: serverTimestamp()
+      });
+    },
+    {
+      maxRetries: 3,
+      baseDelay: 1000,
+      onRetry: (attempt) => {
+        logger.chat.warn(`Retrying sendMessage, attempt ${attempt}`, { chatId, type });
+      }
+    }
+  );
 };
 
 // Escuchar mensajes de un chat en tiempo real
@@ -146,14 +169,25 @@ export const listenToMessages = (
 // Obtener información de un perfil
 export const getUserProfile = async (userId: string): Promise<UserProfile | null> => {
   try {
-    const q = query(collection(db, "perfiles"), where("id", "==", userId));
-    const querySnapshot = await getDocs(q);
-    
-    if (!querySnapshot.empty) {
-      const doc = querySnapshot.docs[0];
-      return { id: doc.id, ...doc.data() } as UserProfile;
-    }
-    return null;
+    return await retryWithBackoff(
+      async () => {
+        const q = query(collection(db, "perfiles"), where("id", "==", userId));
+        const querySnapshot = await getDocs(q);
+        
+        if (!querySnapshot.empty) {
+          const doc = querySnapshot.docs[0];
+          return { id: doc.id, ...doc.data() } as UserProfile;
+        }
+        return null;
+      },
+      {
+        maxRetries: 3,
+        baseDelay: 1000,
+        onRetry: (attempt) => {
+          logger.chat.warn(`Retrying getUserProfile, attempt ${attempt}`, { userId });
+        }
+      }
+    );
   } catch (error) {
     logger.chat.error("Error obteniendo perfil de usuario", error);
     return null;
@@ -162,25 +196,36 @@ export const getUserProfile = async (userId: string): Promise<UserProfile | null
 
 // Buscar o crear chat entre dos usuarios
 export const findOrCreateChat = async (currentUserId: string, otherUserId: string): Promise<string> => {
-  // Buscar chat existente
-  const q = query(
-    collection(db, "chats"),
-    where("participants", "array-contains", currentUserId)
-  );
-  
-  const querySnapshot = await getDocs(q);
-  
-  for (const doc of querySnapshot.docs) {
-    const chatData = doc.data();
-    
-    if (chatData.participants.includes(otherUserId)) {
-      return doc.id; // Chat ya existe
+  return retryWithBackoff(
+    async () => {
+      // Buscar chat existente
+      const q = query(
+        collection(db, "chats"),
+        where("participants", "array-contains", currentUserId)
+      );
+      
+      const querySnapshot = await getDocs(q);
+      
+      for (const doc of querySnapshot.docs) {
+        const chatData = doc.data();
+        
+        if (chatData.participants.includes(otherUserId)) {
+          return doc.id; // Chat ya existe
+        }
+      }
+      
+      // Si no existe, crear nuevo chat
+      const newChatId = await createChat(currentUserId, otherUserId);
+      return newChatId;
+    },
+    {
+      maxRetries: 3,
+      baseDelay: 1000,
+      onRetry: (attempt) => {
+        logger.chat.warn(`Retrying findOrCreateChat, attempt ${attempt}`, { currentUserId, otherUserId });
+      }
     }
-  }
-  
-  // Si no existe, crear nuevo chat
-  const newChatId = await createChat(currentUserId, otherUserId);
-  return newChatId;
+  );
 };
 
 // Actualizar estado de typing

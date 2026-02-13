@@ -295,12 +295,15 @@ const Discovery: React.FC<DiscoveryProps> = ({
   };
 
   const handleReportUser = (user: UserProfile) => {
+    console.log('🚩 Botón de reportar clickeado', { userName: user.name });
     logger.user.info('Abriendo modal de reporte', { userName: user.name });
     setUserToReport(user);
     setShowReportModal(true);
+    console.log('🚩 Estados actualizados', { showReportModal: true, userToReport: user.name });
   };
 
   const handleCloseReportModal = () => {
+    console.log('🚩 Cerrando modal de reporte');
     setShowReportModal(false);
     setUserToReport(null);
   };
@@ -438,6 +441,22 @@ const Discovery: React.FC<DiscoveryProps> = ({
           />
         </div>
           
+          {/* Report Button - Top Right (FUERA del SwipeCard para evitar conflictos) */}
+          {currentUser && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                console.log('🚩 Click en botón de reportar');
+                handleReportUser(currentUser);
+              }}
+              className="absolute top-4 right-4 z-50 p-2.5 bg-white/80 backdrop-blur-md rounded-full shadow-lg hover:bg-white transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center pointer-events-auto"
+              title="Reportar perfil"
+            >
+              <Flag className="text-slate-700 hover:text-red-600 transition-colors" size={20} />
+            </button>
+          )}
+          
           {/* Action Buttons - Glassmorphic Floating */}
           <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-6 z-30">
             <button
@@ -464,17 +483,6 @@ const Discovery: React.FC<DiscoveryProps> = ({
               <Star className="text-white fill-current" size={24} />
             </button>
           </div>
-          
-          {/* Report Button - Top Right */}
-          {currentUser && (
-            <button
-              onClick={() => handleReportUser(currentUser)}
-              className="absolute top-4 right-4 z-30 p-2 bg-white/70 backdrop-blur-md rounded-full shadow-lg hover:bg-white/90 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
-              title="Reportar perfil"
-            >
-              <Flag className="text-slate-600" size={18} />
-            </button>
-          )}
         </div>
       </div>
 

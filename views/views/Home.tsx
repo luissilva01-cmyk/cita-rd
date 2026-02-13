@@ -48,14 +48,13 @@ const Home: React.FC<HomeProps> = ({
       {/* Header */}
       <div className="flex items-center justify-between px-4 md:px-10 pt-4 pb-3">
         <div className="flex items-center gap-3">
-          <div className="w-11 h-11 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-full border-2 p-0.5 shadow-sm" style={{borderColor: '#ff8052'}}>
-            <div 
-              className="w-full h-full rounded-full bg-cover bg-center bg-image-smart md:bg-image-tablet lg:bg-image-desktop" 
-              style={{
-                backgroundImage: `url('${currentUser.images?.[0] || 'https://picsum.photos/seed/user/200/200'}')`
-              }}
-            />
-          </div>
+          <div 
+            className="w-11 h-11 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-full border-2 p-0.5 shadow-sm bg-cover bg-center" 
+            style={{
+              borderColor: '#ff8052',
+              backgroundImage: `url('${currentUser.images?.[0] || 'https://picsum.photos/seed/user/200/200'}')`
+            }}
+          />
           <div>
             <h2 className="text-xl md:text-2xl font-bold tracking-tight">¡Hola, {currentUser.name}! 👋</h2>
             <p className="text-sm md:text-base font-medium opacity-70" style={{color: '#a15d45'}}>
@@ -183,12 +182,10 @@ const Home: React.FC<HomeProps> = ({
           <div className="space-y-2">
             {recentMatches.slice(0, 2).map((match) => (
               <div key={match.id} className="flex items-center gap-3 bg-white p-3 rounded-xl border border-black/5 shadow-sm">
-                <div className="w-11 h-11 md:w-12 md:h-12 lg:w-14 lg:h-14 rounded-full shrink-0 profile-image-container">
-                  <div 
-                    className="w-full h-full rounded-full bg-image-smart md:bg-image-tablet lg:bg-image-desktop"
-                    style={{backgroundImage: `url('${match.images?.[0] || 'https://picsum.photos/seed/' + match.id + '/200/200'}')`}}
-                  />
-                </div>
+                <div 
+                  className="w-11 h-11 md:w-12 md:h-12 lg:w-14 lg:h-14 rounded-full shrink-0 bg-cover bg-center"
+                  style={{backgroundImage: `url('${match.images?.[0] || 'https://picsum.photos/seed/' + match.id + '/200/200'}')`}}
+                />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1">
                     <span className="font-bold text-sm truncate">{match.name}, {match.age}</span>

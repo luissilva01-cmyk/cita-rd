@@ -43,12 +43,13 @@ const DesktopLayout: React.FC<DesktopLayoutProps> = ({
       </aside>
 
       {/* Main Content */}
-      <main className={`flex justify-center p-8 min-w-0 ${isChatView ? 'items-start pt-8' : 'items-center'}`}>
+      <main className="flex justify-center items-center p-8 min-w-0">
         <div 
           className="w-full bg-white rounded-2xl shadow-2xl overflow-hidden" 
           style={{ 
             maxWidth: '1024px',
-            height: isChatView ? '90vh' : '100%'
+            height: isChatView ? 'min(90vh, 800px)' : '100%',
+            maxHeight: isChatView ? '90vh' : 'none'
           }}
         >
           {children}

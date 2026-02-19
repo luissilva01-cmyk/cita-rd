@@ -13,7 +13,7 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: false,
-    minify: 'esbuild', // Usar esbuild (ya instalado) en lugar de terser
+    minify: false, // ⚡ DESACTIVADO temporalmente para debugging
     rollupOptions: {
       output: {
         // Manual chunks para optimizar carga
@@ -45,10 +45,10 @@ export default defineConfig({
             './services/emotionalAI.ts',
           ],
         },
-        // Nombres de chunks más descriptivos
-        chunkFileNames: 'assets/[name]-[hash].js',
-        entryFileNames: 'assets/[name]-[hash].js',
-        assetFileNames: 'assets/[name]-[hash].[ext]',
+        // ⚡ FIX: Agregar timestamp para forzar nuevo hash en cada build
+        chunkFileNames: `assets/[name]-[hash]-${Date.now()}.js`,
+        entryFileNames: `assets/[name]-[hash]-${Date.now()}.js`,
+        assetFileNames: `assets/[name]-[hash]-${Date.now()}.[ext]`,
       },
     },
     // Optimizaciones adicionales

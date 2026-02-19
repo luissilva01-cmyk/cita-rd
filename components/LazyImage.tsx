@@ -91,6 +91,20 @@ export const LazyImage: React.FC<LazyImageProps> = ({
       }
     };
   }, [src, rootMargin, threshold]);
+  
+  // ⚡ TIMEOUT: Si la imagen no carga en 8 segundos, marcar como error
+  useEffect(() => {
+    if (!isInView) return; // Solo aplicar timeout si ya está en vista
+    
+    const timeout = setTimeout(() => {
+      if (!isLoaded && !hasError) {
+        logger.ui.warn('⏱️ Timeout cargando imagen LazyImage', { src });
+        handleError();
+      }
+    }, 8000); // 8 segundos
+    
+    return () => clearTimeout(timeout);
+  }, [isInView, isLoaded, hasError, src]);
 
   const handleLoad = () => {
     logger.ui.debug('Imagen cargada exitosamente', { src });

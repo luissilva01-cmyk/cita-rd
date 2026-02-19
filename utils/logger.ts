@@ -101,6 +101,9 @@ class Logger {
   private shouldLog(level: LogLevel, category: LogCategory): boolean {
     if (!this.config.enabled) return false;
     
+    // ⚡ FIX: SIEMPRE loggear en consola (incluso en producción) para debugging
+    return true;
+    
     // EXCEPCIÓN: Analytics SIEMPRE se loggea (incluso en producción)
     if (category === 'analytics') return true;
     

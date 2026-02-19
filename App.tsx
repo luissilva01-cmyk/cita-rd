@@ -29,6 +29,7 @@ import { LanguageProvider } from './contexts/LanguageContext';
 import { StoryGroup } from './services/storiesService';
 import { auth, db } from './services/firebase';
 import { doc, getDoc, setDoc, serverTimestamp, getFirestore } from 'firebase/firestore';
+import { onAuthStateChanged } from 'firebase/auth';
 import { setUserOnline, setUserOffline } from './services/presenceService';
 import { logger } from './utils/logger';
 import NotificationPermissionPrompt from './components/NotificationPermissionPrompt';
@@ -60,10 +61,20 @@ const getUserProfileFromFirestore = async (userId: string): Promise<Partial<User
   return null;
 };
 
+// Inicializar Analytics y Error Tracking FUERA del componente para evitar doble inicialización
+// Version: 17feb2026-v4 - Force new build hash
+const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID;
+if (GA_MEASUREMENT_ID && !analyticsService.isInitialized) {
+  analyticsService.initialize(GA_MEASUREMENT_ID);
+  errorTrackingService.initialize();
+  logger.analytics.info('Analytics and Error Tracking initialized');
+}
+
 const App: React.FC = () => {
   const [activeView, setActiveView] = useState<View>('home');
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [discoveryRefreshTrigger, setDiscoveryRefreshTrigger] = useState(0); // ⚡ NUEVO: Trigger para recargar Discovery
   
   // Offline detection
   const isOnline = useOfflineDetection();
@@ -85,38 +96,41 @@ const App: React.FC = () => {
   // Estado para mostrar prompt de notificaciones
   const [showNotificationPrompt, setShowNotificationPrompt] = useState(false);
 
-  // Inicializar Analytics y Error Tracking
-  useEffect(() => {
-    // Inicializar Google Analytics 4
-    const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID;
-    if (GA_MEASUREMENT_ID) {
-      analyticsService.initialize(GA_MEASUREMENT_ID);
-      logger.analytics.info('Analytics initialized');
-    } else {
-      logger.analytics.warn('GA_MEASUREMENT_ID not found in environment variables');
-    }
-
-    // Inicializar Error Tracking
-    errorTrackingService.initialize();
-    logger.analytics.info('Error tracking initialized');
-
-    // Track app open
-    analyticsService.trackEvent('app_open' as any);
-  }, []);
-
   // Cargar perfil del usuario autenticado
   useEffect(() => {
-    const loadUserProfile = async () => {
-      const user = auth.currentUser;
+    logger.auth.info('🚀 [INIT] Configurando onAuthStateChanged listener');
+    
+    // ⚡ FIX: Usar onAuthStateChanged para detectar cambios de autenticación
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+      logger.auth.info('🔔 [AUTH] onAuthStateChanged triggered', { 
+        hasUser: !!user, 
+        userId: user?.uid,
+        email: user?.email 
+      });
+      
       if (!user) {
+        logger.auth.warn('❌ [AUTH] No authenticated user, showing login');
         setLoading(false);
+        setCurrentUser(null);
         return;
       }
 
+      logger.auth.success('✅ [AUTH] User authenticated, loading profile', { userId: user.uid });
+
       try {
+        logger.profile.info('📡 [AUTH] Calling getUserProfile...', { userId: user.uid });
         const profile = await getUserProfile(user.uid);
+        logger.profile.info('📦 [AUTH] getUserProfile returned', { 
+          hasProfile: !!profile,
+          profileId: profile?.id,
+          profileName: profile?.name
+        });
         
         if (profile) {
+          logger.profile.success('✅ [AUTH] Setting currentUser state', { 
+            userId: profile.id,
+            name: profile.name
+          });
           setCurrentUser(profile);
           
           // Set user ID in analytics
@@ -128,15 +142,17 @@ const App: React.FC = () => {
                                !profile.location || profile.location.trim() === '';
           
           if (isIncomplete) {
-            logger.profile.info('Incomplete profile detected, redirecting to Profile', { userId: user.uid });
+            logger.profile.warn('⚠️ [AUTH] Incomplete profile detected, redirecting to Profile', { userId: user.uid });
             setActiveView('profile');
           } else {
+            logger.profile.success('✅ [AUTH] Profile complete, ready to use app');
             // Perfil completo - mostrar prompt de notificaciones después de 3 segundos
             setTimeout(() => {
               setShowNotificationPrompt(true);
             }, 3000);
           }
         } else {
+          logger.profile.warn('⚠️ [AUTH] No profile found, creating basic profile');
           // Crear perfil básico si no existe
           const basicProfile: UserProfile = {
             id: user.uid,
@@ -155,15 +171,20 @@ const App: React.FC = () => {
           setActiveView('profile');
         }
       } catch (error) {
-        logger.profile.error('Error cargando perfil', error);
+        logger.profile.error('❌ [AUTH] Error cargando perfil', error);
         // Mostrar mensaje al usuario
         alert('Error al cargar tu perfil. Por favor recarga la página.');
       } finally {
+        logger.auth.info('🏁 [AUTH] Setting loading to false');
         setLoading(false);
       }
-    };
+    });
 
-    loadUserProfile();
+    // Cleanup: cancelar listener al desmontar
+    return () => {
+      logger.auth.info('🧹 [AUTH] Cleaning up onAuthStateChanged listener');
+      unsubscribe();
+    };
   }, []);
 
   // Setup presence system when user is loaded
@@ -228,38 +249,107 @@ const App: React.FC = () => {
   }, [currentUser]);
 
   // Cargar perfiles para Discovery
+  // ⚡ FIX: Separar en dos useEffects para asegurar que se ejecute al montar
   useEffect(() => {
-    if (!currentUser) return;
+    if (!currentUser) {
+      logger.profile.warn('⚠️ currentUser es null, no se cargan perfiles');
+      return;
+    }
+
+    logger.profile.info('🚀 [MOUNT] Iniciando carga inicial de perfiles para Discovery', { 
+      userId: currentUser.id
+    });
 
     let unsubscribe: (() => void) | undefined;
 
     const setupDiscoveryListener = async () => {
       try {
+        logger.profile.info('📡 [MOUNT] Llamando a getDiscoveryProfiles...', { userId: currentUser.id });
+        
         unsubscribe = await getDiscoveryProfiles(currentUser.id, (profiles) => {
+          logger.profile.success('✅ [MOUNT] Callback de perfiles ejecutado', { 
+            profileCount: profiles.length,
+            profiles: profiles.map(p => ({ id: p.id, name: p.name }))
+          });
+          
           if (profiles.length > 0) {
             setPotentialMatches(profiles);
+            logger.profile.success('✅ [MOUNT] setPotentialMatches ejecutado', { count: profiles.length });
+          } else {
+            logger.profile.warn('⚠️ [MOUNT] No hay perfiles disponibles');
+            setPotentialMatches([]);
           }
-          // Si no hay perfiles en Firebase, usar los mock
         });
+        
+        logger.profile.info('✅ [MOUNT] getDiscoveryProfiles completado');
       } catch (error) {
-        logger.firebase.error('Error setting up discovery listener', error);
+        logger.firebase.error('❌ [MOUNT] Error setting up discovery listener', error);
       }
     };
 
     setupDiscoveryListener();
 
     return () => {
-      // Cancelar listener inmediatamente para evitar errores de permisos después del logout
       if (unsubscribe && typeof unsubscribe === 'function') {
         try {
           unsubscribe();
         } catch (error) {
-          // Ignorar errores al cancelar listeners después del logout
           logger.firebase.debug('Listener cleanup after logout (expected)');
         }
       }
     };
-  }, [currentUser]);
+  }, [currentUser?.id]); // ⚡ Solo depende del ID, se ejecuta cuando currentUser se carga
+
+  // ⚡ FIX: useEffect separado para recargas manuales (trigger)
+  useEffect(() => {
+    // Solo ejecutar si hay trigger Y currentUser ya está cargado
+    if (discoveryRefreshTrigger === 0 || !currentUser) {
+      return;
+    }
+
+    logger.profile.info('🔄 [TRIGGER] Recargando perfiles por navegación a Discovery', { 
+      userId: currentUser.id,
+      trigger: discoveryRefreshTrigger 
+    });
+
+    let unsubscribe: (() => void) | undefined;
+
+    const reloadProfiles = async () => {
+      try {
+        logger.profile.info('📡 [TRIGGER] Llamando a getDiscoveryProfiles...', { userId: currentUser.id });
+        
+        unsubscribe = await getDiscoveryProfiles(currentUser.id, (profiles) => {
+          logger.profile.success('✅ [TRIGGER] Callback de perfiles ejecutado', { 
+            profileCount: profiles.length
+          });
+          
+          if (profiles.length > 0) {
+            setPotentialMatches(profiles);
+            logger.profile.success('✅ [TRIGGER] setPotentialMatches ejecutado', { count: profiles.length });
+          } else {
+            logger.profile.warn('⚠️ [TRIGGER] No hay perfiles disponibles');
+            setPotentialMatches([]);
+          }
+        });
+        
+        logger.profile.info('✅ [TRIGGER] getDiscoveryProfiles completado');
+      } catch (error) {
+        logger.firebase.error('❌ [TRIGGER] Error reloading profiles', error);
+      }
+    };
+
+    reloadProfiles();
+
+    return () => {
+      if (unsubscribe && typeof unsubscribe === 'function') {
+        try {
+          unsubscribe();
+        } catch (error) {
+          logger.firebase.debug('Listener cleanup after logout (expected)');
+        }
+      }
+    };
+  }, [discoveryRefreshTrigger]); // ⚡ Solo depende del trigger, no de currentUser
 
   // Escuchar mensajes del chat seleccionado
   useEffect(() => {
@@ -641,13 +731,33 @@ const App: React.FC = () => {
     }
   };
 
-  // Mostrar loading mientras se carga el perfil
-  if (loading || !currentUser) {
+  // ⚡ FIX CRÍTICO: Mostrar loading mientras se carga el perfil
+  // NO renderizar la app hasta que currentUser esté completamente cargado
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-white text-lg">Cargando tu perfil...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // ⚡ FIX CRÍTICO: Si no hay usuario autenticado, mostrar pantalla de login
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+        <div className="text-center px-6">
+          <div className="text-6xl mb-6">💕</div>
+          <h1 className="text-4xl font-bold text-white mb-4">Ta' Pa' Ti</h1>
+          <p className="text-white/80 mb-8">Por favor inicia sesión para continuar</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-8 py-3 bg-white text-purple-900 rounded-full font-semibold hover:bg-white/90 transition-colors"
+          >
+            Recargar
+          </button>
         </div>
       </div>
     );
@@ -675,6 +785,12 @@ const App: React.FC = () => {
               if (isIncomplete && view !== 'profile') {
                 alert('⚠️ Por favor completa tu perfil antes de explorar la app.\n\n📸 Sube al menos una foto\n✍️ Escribe una bio\n📍 Selecciona tu provincia');
                 return;
+              }
+              
+              // ⚡ NUEVO: Si navega a Discovery, forzar recarga de perfiles
+              if (view === 'discovery') {
+                logger.profile.info('🔄 Navegando a Discovery, forzando recarga de perfiles');
+                setDiscoveryRefreshTrigger(prev => prev + 1);
               }
               
               setActiveView(view);

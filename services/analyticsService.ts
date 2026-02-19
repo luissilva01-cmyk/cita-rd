@@ -58,7 +58,7 @@ interface AnalyticsEventParams {
 }
 
 class AnalyticsService {
-  private isInitialized = false;
+  private _isInitialized = false;
   private userId: string | null = null;
   private sessionId: string;
   private sessionStartTime: number;
@@ -77,20 +77,42 @@ class AnalyticsService {
   }
 
   /**
+   * Getter para verificar si Analytics está inicializado
+   */
+  get isInitialized(): boolean {
+    return this._isInitialized;
+  }
+
+  /**
    * Inicializar Google Analytics 4
    */
   initialize(measurementId: string) {
-    if (this.isInitialized) {
+    if (this._isInitialized) {
       logger.analytics.warn('Analytics already initialized');
       return;
     }
 
+    if (!measurementId) {
+      logger.analytics.error('Measurement ID is required');
+      console.error('❌ [ANALYTICS] Measurement ID is missing!');
+      return;
+    }
+
     try {
+      console.log('🔧 [ANALYTICS] Starting initialization...', { measurementId });
+      
       // Cargar gtag.js
       const script = document.createElement('script');
       script.async = true;
       script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
+      script.onload = () => {
+        console.log('✅ [ANALYTICS] gtag.js script loaded successfully');
+      };
+      script.onerror = (error) => {
+        console.error('❌ [ANALYTICS] Failed to load gtag.js script', error);
+      };
       document.head.appendChild(script);
+      console.log('📝 [ANALYTICS] gtag.js script added to document head');
 
       // Inicializar gtag
       window.dataLayer = window.dataLayer || [];
@@ -98,21 +120,26 @@ class AnalyticsService {
         window.dataLayer.push(args);
       }
       window.gtag = gtag;
+      console.log('📊 [ANALYTICS] dataLayer initialized');
 
       gtag('js', new Date());
       gtag('config', measurementId, {
         send_page_view: true, // Enviar automáticamente
         anonymize_ip: true, // GDPR compliance
         cookie_flags: 'SameSite=None;Secure',
+        debug_mode: true, // Activar modo debug
       });
+      console.log('⚙️ [ANALYTICS] gtag configured with measurement ID:', measurementId);
 
-      this.isInitialized = true;
+      this._isInitialized = true;
       logger.analytics.info('Analytics initialized', { measurementId });
+      console.log('✅ [ANALYTICS] Initialization complete');
       
       // Enviar evento inicial de carga
       this.trackPageView(window.location.pathname, document.title);
     } catch (error) {
       logger.analytics.error('Failed to initialize analytics', error);
+      console.error('❌ [ANALYTICS] Initialization failed:', error);
     }
   }
 
@@ -122,7 +149,7 @@ class AnalyticsService {
   setUserId(userId: string) {
     this.userId = userId;
     
-    if (this.isInitialized && window.gtag) {
+    if (this._isInitialized && window.gtag) {
       window.gtag('set', { user_id: userId });
       logger.analytics.info('User ID set', { userId });
     }
@@ -134,7 +161,7 @@ class AnalyticsService {
   clearUserId() {
     this.userId = null;
     
-    if (this.isInitialized && window.gtag) {
+    if (this._isInitialized && window.gtag) {
       window.gtag('set', { user_id: null });
       logger.analytics.info('User ID cleared');
     }
@@ -155,7 +182,7 @@ class AnalyticsService {
     logger.analytics.info(`Event: ${event}`, eventData);
 
     // Enviar a Google Analytics
-    if (this.isInitialized && window.gtag) {
+    if (this._isInitialized && window.gtag) {
       window.gtag('event', event, eventData);
     }
 
@@ -172,7 +199,7 @@ class AnalyticsService {
       page_title: pageTitle || document.title,
     });
 
-    if (this.isInitialized && window.gtag) {
+    if (this._isInitialized && window.gtag) {
       window.gtag('event', 'page_view', {
         page_path: pagePath,
         page_title: pageTitle || document.title,
@@ -219,7 +246,7 @@ class AnalyticsService {
       value: value,
     });
 
-    if (this.isInitialized && window.gtag) {
+    if (this._isInitialized && window.gtag) {
       window.gtag('event', 'conversion', {
         send_to: conversionType,
         value: value,

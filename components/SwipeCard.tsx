@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { MapPin, ShieldCheck, Heart, X, Brain, Star, Info, Briefcase, GraduationCap, Music } from 'lucide-react';
+import { MapPin, ShieldCheck, Heart, X, Star, Info, Briefcase, GraduationCap, Music, Brain } from 'lucide-react';
 import { UserProfile } from '../types';
 import { useSwipeGesture } from '../hooks/useSwipeGesture';
 import VerificationBadge from './VerificationBadge';
@@ -51,7 +51,7 @@ const SwipeCard: React.FC<SwipeCardProps> = ({
     threshold: 80 // Reducir threshold para mayor sensibilidad
   });
 
-  // Calcular compatibilidad al cargar el componente
+  // 🤖 IA: Calcular compatibilidad al cargar perfil
   useEffect(() => {
     const loadCompatibility = async () => {
       try {
@@ -61,22 +61,57 @@ const SwipeCard: React.FC<SwipeCardProps> = ({
         console.error('Error calculando compatibilidad:', error);
       }
     };
-
     loadCompatibility();
-    setSwipeStartTime(Date.now()); // Resetear tiempo cuando se carga nueva card
+    setSwipeStartTime(Date.now());
   }, [user.id, currentUser.id, calculateCompatibility]);
+  
+  // ⚡ TIMEOUT: Si la imagen no carga en 10 segundos, mostrar fallback
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (imageLoading && !imageError) {
+        logger.ui.warn('⏱️ Timeout cargando imagen, usando fallback', {
+          userName: user.name,
+          imageUrl: user.images?.[0]
+        });
+        setImageError(true);
+        setImageLoading(false);
+      }
+    }, 10000); // 10 segundos
+    
+    return () => clearTimeout(timeout);
+  }, [imageLoading, imageError, user.name, user.images]);
 
   const handleImageError = () => {
-    logger.ui.warn('Error cargando imagen de perfil', { userName: user.name });
+    logger.ui.error('❌ Error cargando imagen de perfil', { 
+      userName: user.name,
+      imageUrl: user.images[0],
+      hasImages: user.images && user.images.length > 0
+    });
     setImageError(true);
     setImageLoading(false);
   };
 
   const handleImageLoad = () => {
-    logger.ui.debug('Imagen de perfil cargada', { userName: user.name });
+    logger.ui.success('✅ Imagen de perfil cargada exitosamente', { 
+      userName: user.name,
+      imageUrl: user.images[0]
+    });
     setImageLoading(false);
     setImageError(false);
   };
+  
+  // Log inicial para debugging
+  useEffect(() => {
+    const imageUrl = user.images?.[0] || 'NO IMAGE';
+    logger.ui.info(`🖼️ SwipeCard montado - ${user.name}`, {
+      userName: user.name,
+      hasImages: user.images && user.images.length > 0,
+      imageCount: user.images?.length || 0,
+      imageUrl: imageUrl
+    });
+    // Log adicional con URL en texto plano
+    console.log(`📸 URL de imagen para ${user.name}:`, imageUrl);
+  }, [user.id]);
 
   // Generar avatar de fallback
   const getAvatarUrl = () => {

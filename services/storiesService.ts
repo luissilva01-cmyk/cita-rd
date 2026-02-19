@@ -176,6 +176,28 @@ class StoriesService {
     
     console.log('📊 Usuarios con stories:', storiesByUser.size);
     
+    // 🚀 OPTIMIZACIÓN: Obtener todos los perfiles en una sola query batch
+    const userIds = Array.from(storiesByUser.keys());
+    const profilesMap = new Map<string, any>();
+    
+    try {
+      // Batch query para obtener todos los perfiles de una vez
+      const profilePromises = userIds.map(userId => 
+        getDoc(doc(this.perfilesCollection, userId))
+      );
+      const profileDocs = await Promise.all(profilePromises);
+      
+      profileDocs.forEach((doc, index) => {
+        if (doc.exists()) {
+          profilesMap.set(userIds[index], doc.data());
+        }
+      });
+      
+      console.log('✅ Perfiles cargados en batch:', profilesMap.size);
+    } catch (error) {
+      console.error('❌ Error cargando perfiles en batch:', error);
+    }
+    
     // Crear grupos con información de perfil
     const filteredGroups: StoryGroup[] = [];
     
@@ -183,7 +205,7 @@ class StoriesService {
       try {
         console.log('🔍 Procesando usuario:', userId, '- Stories:', userStories.length);
         
-        // Verificar privacidad
+        // Verificar privacidad (ahora con cache)
         const canView = await privacyService.canViewStories(currentUserId, userId);
         console.log('👁️ ¿Puede ver?', canView);
         
@@ -192,15 +214,13 @@ class StoriesService {
           continue;
         }
         
-        // Obtener información del perfil
-        const perfilDoc = await getDoc(doc(this.perfilesCollection, userId));
+        // Obtener perfil del map (ya cargado)
+        const perfilData = profilesMap.get(userId);
         
-        if (!perfilDoc.exists()) {
+        if (!perfilData) {
           console.log('⚠️ Perfil no encontrado para userId:', userId);
           continue;
         }
-        
-        const perfilData = perfilDoc.data();
         
         // Verificar si hay stories no vistas
         const hasUnviewed = userStories.some(story => 

@@ -73,46 +73,64 @@ export const getUserProfile = async (userId: string): Promise<UserProfile | null
 };
 
 // Obtener perfiles para Discovery (excluir el usuario actual y matches)
+// ⚡ OPTIMIZACIÓN: Carga única en lugar de listener en tiempo real para mejor performance
 export const getDiscoveryProfiles = async (
   currentUserId: string, 
   callback: (profiles: UserProfile[]) => void,
-  profileLimit: number = 20
+  profileLimit: number = 10 // ⚡ Reducido de 20 a 10 para carga más rápida
 ) => {
-  // Importar privacyService para obtener matches
-  const { privacyService } = await import('./privacyService');
+  logger.profile.info('🔍 getDiscoveryProfiles iniciado', { currentUserId, profileLimit });
   
-  // Obtener matches del usuario actual
-  const matchedUserIds = await privacyService.getUserMatches(currentUserId);
-  logger.profile.debug('Discovery - Excluyendo matches', { count: matchedUserIds.length });
-  
-  const q = query(
-    collection(db, "perfiles"),
-    orderBy("timestamp", "desc"),
-    limit(profileLimit)
-  );
-  
-  return onSnapshot(q, (querySnapshot) => {
+  try {
+    logger.profile.info('📊 Creando query de Firestore...');
+    
+    // ⚡ CAMBIO: Usar getDocs (carga única) en lugar de onSnapshot (tiempo real)
+    const q = query(
+      collection(db, "perfiles"),
+      orderBy("timestamp", "desc"),
+      limit(profileLimit)
+    );
+    
+    logger.profile.info('🔥 Ejecutando getDocs...');
+    const querySnapshot = await getDocs(q);
+    logger.profile.success('✅ getDocs completado', { docsCount: querySnapshot.size });
+    
     const profiles: UserProfile[] = [];
+    
     querySnapshot.forEach((doc) => {
       const profile = { id: doc.id, ...doc.data() } as UserProfile;
       
+      logger.profile.debug('📄 Procesando perfil', { id: profile.id, name: profile.name });
+      
       // Excluir el perfil del usuario actual
       if (profile.id === currentUserId) {
-        return;
-      }
-      
-      // Excluir perfiles con los que ya hizo match
-      if (matchedUserIds.includes(profile.id)) {
-        logger.profile.debug('Excluyendo match', { name: profile.name || profile.id });
+        logger.profile.debug('⏭️ Saltando perfil del usuario actual');
         return;
       }
       
       profiles.push(profile);
     });
     
-    logger.profile.success('Perfiles cargados para Discovery', { count: profiles.length, limit: profileLimit });
+    logger.profile.success('✅ Perfiles procesados', { 
+      totalDocs: querySnapshot.size,
+      profilesAfterFilter: profiles.length,
+      profiles: profiles.map(p => ({ id: p.id, name: p.name }))
+    });
+    
+    logger.profile.info('📞 Ejecutando callback con perfiles...');
     callback(profiles);
-  });
+    logger.profile.success('✅ Callback ejecutado exitosamente');
+    
+    // ⚡ Retornar función vacía ya que no hay listener que cancelar
+    return () => {
+      logger.profile.debug('🧹 Cleanup de getDiscoveryProfiles (no-op)');
+    };
+  } catch (error) {
+    logger.profile.error('❌ Error cargando perfiles para Discovery', error);
+    logger.profile.info('📞 Ejecutando callback con array vacío debido a error');
+    callback([]);
+    return () => {};
+  }
 };
 
 // Buscar perfiles por criterios

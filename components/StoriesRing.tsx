@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { Plus } from 'lucide-react';
 import VerificationBadge from './VerificationBadge';
 import LazyImage from './LazyImage';
@@ -38,12 +38,27 @@ const StoriesRingWorking: React.FC<StoriesRingWorkingProps> = ({
   const [isVerified, setIsVerified] = useState(false);
 
   useEffect(() => {
-    logger.stories.info('Configurando listener de stories', { userId: currentUserId });
-    setLoading(true);
+    if (!currentUserId) {
+      logger.stories.warn('⚠️ currentUserId es null, no configurar listener');
+      return;
+    }
+    
+    logger.stories.info('📡 [ÚNICO] Configurando listener de stories', { 
+      userId: currentUserId,
+      timestamp: Date.now()
+    });
+    
+    // ⚡ OPTIMIZACIÓN: No mostrar loading si ya hay datos
+    if (storyGroups.length === 0) {
+      setLoading(true);
+    }
     
     // ✅ Usar listener en tiempo real en lugar de carga única
     const unsubscribe = storiesService.listenToStoryGroups(currentUserId, (groups) => {
-      logger.stories.debug('Stories actualizadas en tiempo real', { groupCount: groups.length });
+      logger.stories.debug('✅ [CALLBACK] Stories actualizadas', { 
+        groupCount: groups.length,
+        timestamp: Date.now()
+      });
       setStoryGroups(groups);
       setLoading(false);
       
@@ -52,26 +67,22 @@ const StoriesRingWorking: React.FC<StoriesRingWorkingProps> = ({
       logger.stories.debug('Usuario tiene stories propias', { hasOwnStories });
     });
     
-    // Verificar estado de verificación
-    const checkVerification = async () => {
-      try {
-        const verification = await verificationService.getUserVerification(currentUserId);
-        setIsVerified(verification.isVerified);
-      } catch (error) {
-        logger.verification.error('Error verificando estado', error);
-      }
-    };
-    
-    checkVerification();
+    // Verificar estado de verificación (solo una vez)
+    verificationService.getUserVerification(currentUserId)
+      .then(verification => setIsVerified(verification.isVerified))
+      .catch(error => logger.verification.error('Error verificando estado', error));
     
     // Cleanup: cancelar listener al desmontar
     return () => {
-      logger.stories.debug('Desconectando listener de stories');
+      logger.stories.info('🧹 [CLEANUP] Limpiando listener de stories', { 
+        userId: currentUserId,
+        timestamp: Date.now()
+      });
       if (unsubscribe) {
         unsubscribe();
       }
     };
-  }, [currentUserId]); // ✅ Solo depende de currentUserId, NO de storiesKey
+  }, [currentUserId]); // ✅ Solo depende de currentUserId (string)
 
   const handleStoryClick = (storyGroup: StoryGroup) => {
     if (onStoryClick) {
@@ -196,4 +207,11 @@ const StoriesRingWorking: React.FC<StoriesRingWorkingProps> = ({
   );
 };
 
-export default StoriesRingWorking;
+// ⚡ OPTIMIZACIÓN: Usar React.memo para evitar re-renders innecesarios
+export default memo(StoriesRingWorking, (prevProps, nextProps) => {
+  // Solo re-renderizar si cambia el currentUserId o compact
+  return (
+    prevProps.currentUserId === nextProps.currentUserId &&
+    prevProps.compact === nextProps.compact
+  );
+});

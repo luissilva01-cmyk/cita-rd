@@ -1,9 +1,8 @@
 
-import React, { useState, useEffect } from 'react';
-import { Heart, X, Star, Brain, Zap, Flag } from 'lucide-react';
+import React, { useState, useEffect, memo } from 'react';
+import { Heart, X, Star, Flag } from 'lucide-react';
 import { UserProfile } from '../../types';
 import SwipeCard from '../../components/SwipeCard';
-import { calculateProfileScore } from '../../services/photoAnalysisService';
 import StoriesRing from '../../components/StoriesRing';
 import StoriesViewer from '../../components/StoriesViewer';
 import CreateStoryModal from '../../components/CreateStoryModal';
@@ -11,10 +10,12 @@ import ReportProfileModal from '../../components/ReportProfileModal';
 import ErrorBoundary from '../../components/ErrorBoundary';
 import { StoryGroup } from '../../services/storiesService';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { useMatchingAI } from '../../hooks/useMatchingAI';
-import { MatchPrediction } from '../../services/matchingAI';
 import { useToast } from '../../components/Toast';
 import { logger } from '../../utils/logger';
+
+// ⚡ PERFORMANCE MODE: Sistema de IA completamente removido
+// El sistema de matching IA causaba lentitud de 10-60 segundos
+// Removidos: useMatchingAI, Brain icon, Zap icon, MatchPrediction, calculateProfileScore
 
 interface DiscoveryProps {
   users?: UserProfile[];
@@ -47,15 +48,17 @@ const Discovery: React.FC<DiscoveryProps> = ({
   onSendMessage,
   currentUserId = 'demo-user'
 }) => {
+  // ⚡ LOG CRÍTICO: Verificar que currentUserId llega correctamente
+  logger.profile.info('🎯 [DISCOVERY] Component mounted/updated', { 
+    currentUserId,
+    hasUsers: !!users,
+    usersCount: users?.length || 0
+  });
+  
   const { t } = useLanguage();
   const { showToast, ToastContainer } = useToast();
-  const { 
-    predictions, 
-    generatePredictions, 
-    recordSwipe, 
-    isAnalyzing,
-    error: aiError 
-  } = useMatchingAI();
+  
+  // ⚡ PERFORMANCE MODE: Sistema de IA completamente removido para velocidad óptima
   
   // Usar solo los usuarios pasados como prop (usuarios reales de Firebase)
   const availableUsers = users || [];
@@ -63,16 +66,12 @@ const Discovery: React.FC<DiscoveryProps> = ({
   const [showMatch, setShowMatch] = useState(false);
   const [matchedUser, setMatchedUser] = useState<UserProfile | null>(null);
   const [sortedUsers, setSortedUsers] = useState<UserProfile[]>([]);
-  const [isLoadingScores, setIsLoadingScores] = useState(true);
-  const [aiOptimizedUsers, setAiOptimizedUsers] = useState<UserProfile[]>([]);
-  const [showAIInsights, setShowAIInsights] = useState(false);
   const [swipeStartTime, setSwipeStartTime] = useState<number>(Date.now());
 
   // Estados para Stories
   const [showStoriesViewer, setShowStoriesViewer] = useState(false);
   const [selectedStoryGroup, setSelectedStoryGroup] = useState<StoryGroup | null>(null);
   const [showCreateStoryModal, setShowCreateStoryModal] = useState(false);
-  const [storiesKey, setStoriesKey] = useState(0); // Para forzar re-render de stories
   
   // Estados para Super Like
   const [showSuperLikeAnimation, setShowSuperLikeAnimation] = useState(false);
@@ -81,115 +80,24 @@ const Discovery: React.FC<DiscoveryProps> = ({
   const [showReportModal, setShowReportModal] = useState(false);
   const [userToReport, setUserToReport] = useState<UserProfile | null>(null);
 
-  // Función para ordenar usuarios con IA
-  const optimizeUsersWithAI = async (users: UserProfile[]): Promise<UserProfile[]> => {
-    logger.match.debug('Optimizando usuarios con IA', { count: users.length });
-    
-    try {
-      // Generar predicciones de matching
-      await generatePredictions(currentUserId, [CURRENT_USER_MOCK, ...users]);
-      
-      // Calcular scores de visibilidad tradicionales
-      const usersWithScores = await Promise.all(
-        users.map(async (user) => {
-          try {
-            const profileScore = await calculateProfileScore(user.images || []);
-            return {
-              ...user,
-              visibilityBoost: profileScore.visibilityBoost,
-              profileScore: profileScore.totalScore
-            };
-          } catch (error) {
-            logger.match.error('Error calculando score para usuario', { userName: user.name, error });
-            return {
-              ...user,
-              visibilityBoost: 1.0,
-              profileScore: 50
-            };
-          }
-        })
-      );
-
-      // Combinar con predicciones de IA si están disponibles
-      const optimizedUsers = usersWithScores.map(user => {
-        const prediction = predictions.find(p => p.targetUserId === user.id);
-        if (prediction) {
-          return {
-            ...user,
-            aiCompatibility: prediction.compatibilityScore.overall,
-            aiPriority: prediction.priority,
-            aiRecommendation: prediction.recommendationReason,
-            matchLikelihood: prediction.likelihoodOfMatch
-          };
-        }
-        return user;
-      });
-
-      // Ordenar por IA primero, luego por visibility boost
-      const sorted = optimizedUsers.sort((a, b) => {
-        // Priorizar usuarios con predicciones de IA
-        if (a.aiCompatibility && b.aiCompatibility) {
-          const aScore = a.aiCompatibility * (a.matchLikelihood || 0.5);
-          const bScore = b.aiCompatibility * (b.matchLikelihood || 0.5);
-          if (Math.abs(aScore - bScore) > 0.1) {
-            return bScore - aScore;
-          }
-        }
-        
-        // Fallback a visibility boost
-        if (b.visibilityBoost !== a.visibilityBoost) {
-          return b.visibilityBoost - a.visibilityBoost;
-        }
-        return (b.profileScore || 0) - (a.profileScore || 0);
-      });
-
-      logger.match.success('Usuarios optimizados con IA', { 
-        topUsers: sorted.slice(0, 3).map(u => ({ 
-          name: u.name, 
-          aiScore: u.aiCompatibility ? Math.round(u.aiCompatibility * 100) : 'N/A',
-          priority: u.aiPriority || 'N/A',
-          boost: u.visibilityBoost 
-        }))
-      });
-
-      return sorted;
-    } catch (error) {
-      logger.match.error('Error optimizando con IA', error);
-      return users;
-    }
-  };
-
-  // Efecto para optimizar usuarios con IA cuando cambian
+  // ⚡ ULTRA FAST MODE: Usuarios se muestran instantáneamente sin procesamiento
+  // ⚡ OPTIMIZACIÓN: Usar useMemo para evitar recalcular en cada render
   useEffect(() => {
-    const loadAndOptimizeUsers = async () => {
-      setIsLoadingScores(true);
-      try {
-        const optimized = await optimizeUsersWithAI(availableUsers);
-        setSortedUsers(optimized);
-        setAiOptimizedUsers(optimized);
-      } catch (error) {
-        logger.match.error('Error optimizando usuarios', error);
-        setSortedUsers(availableUsers);
-        // Mostrar mensaje al usuario solo si es un error crítico
-        if (availableUsers.length === 0) {
-          alert('Error al cargar perfiles. Por favor recarga la página.');
-        }
-      } finally {
-        setIsLoadingScores(false);
-      }
-    };
+    if (availableUsers.length > 0) {
+      logger.match.debug('Usuarios cargados instantáneamente', { count: availableUsers.length });
+      setSortedUsers(availableUsers);
+    }
+  }, [availableUsers.length]); // Solo depende del length, no del array completo
 
-    loadAndOptimizeUsers();
-  }, [availableUsers, currentUserId]);
-
-  // Usar usuarios ordenados en lugar de availableUsers
-  const displayUsers = sortedUsers.length > 0 ? sortedUsers : availableUsers;
+  // ⚡ OPTIMIZACIÓN: Usar useMemo para displayUsers
+  const displayUsers = React.useMemo(() => {
+    return sortedUsers.length > 0 ? sortedUsers : availableUsers;
+  }, [sortedUsers.length, availableUsers.length]); // Solo depende de lengths
 
   console.log('🔍 Discovery render:', { 
     usersLength: displayUsers?.length, 
     currentIndex, 
-    currentUserName: displayUsers?.[currentIndex]?.name,
-    isLoadingScores
+    currentUserName: displayUsers?.[currentIndex]?.name
   });
 
   // Asegurar que siempre tengamos un usuario válido
@@ -202,32 +110,24 @@ const Discovery: React.FC<DiscoveryProps> = ({
     const timeSpent = Date.now() - swipeStartTime;
     logger.match.debug('Acción de swipe', { action, userName: currentUser.name, timeSpent });
     
-    try {
-      // Si es super like, mostrar animación PRIMERO
-      if (action === 'superlike') {
-        logger.match.info('Super Like enviado', { userName: currentUser.name });
-        
-        // Mostrar animación especial
-        setShowSuperLikeAnimation(true);
-        
-        // Mostrar toast de notificación
-        showToast({
-          type: 'info',
-          title: '⭐ Super Like enviado!',
-          message: `Le has enviado un Super Like a ${currentUser.name}. Serás priorizado en su lista.`,
-          duration: 4000
-        });
-        
-        // Esperar a que la animación termine antes de continuar
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        setShowSuperLikeAnimation(false);
-      }
+    // Si es super like, mostrar animación PRIMERO
+    if (action === 'superlike') {
+      logger.match.info('Super Like enviado', { userName: currentUser.name });
       
-      // Registrar swipe en el sistema de IA
-      await recordSwipe(currentUserId, currentUser.id, action === 'superlike' ? 'like' : action, currentUser, timeSpent);
-      logger.match.success('Swipe registrado en IA');
-    } catch (error) {
-      console.error('Error registrando swipe en IA:', error);
+      // Mostrar animación especial
+      setShowSuperLikeAnimation(true);
+      
+      // Mostrar toast de notificación
+      showToast({
+        type: 'info',
+        title: '⭐ Super Like enviado!',
+        message: `Le has enviado un Super Like a ${currentUser.name}. Serás priorizado en su lista.`,
+        duration: 4000
+      });
+      
+      // Esperar a que la animación termine antes de continuar
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      setShowSuperLikeAnimation(false);
     }
     
     if ((action === 'like' || action === 'superlike') && onLike) {
@@ -285,8 +185,7 @@ const Discovery: React.FC<DiscoveryProps> = ({
 
   const handleStoryCreated = () => {
     console.log('✅ Story creada, actualizando lista');
-    // Forzar re-render del componente StoriesRing
-    setStoriesKey(prev => prev + 1);
+    // Stories se actualizan automáticamente via listener en tiempo real
   };
 
   const handleCloseStoriesViewer = () => {
@@ -312,32 +211,11 @@ const Discovery: React.FC<DiscoveryProps> = ({
   console.log('🔍 Estado actual:', {
     usersCount: displayUsers?.length,
     currentIndex,
-    hasCurrentUser: !!currentUser,
-    isLoadingScores
+    hasCurrentUser: !!currentUser
   });
 
-  // Mostrar loading mientras se calculan los scores y la IA
-  if (isLoadingScores || isAnalyzing) {
-    return (
-      <div className="flex flex-col items-center justify-center h-full text-center px-6">
-        <div className="relative mb-6">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-rose-500"></div>
-          <Brain className="absolute inset-0 m-auto text-purple-600" size={20} />
-        </div>
-        <h2 className="text-xl font-semibold text-slate-800 mb-2">
-          {isAnalyzing ? 'Analizando con IA...' : t('optimizingProfiles')}
-        </h2>
-        <p className="text-slate-600">
-          {isAnalyzing ? 'Calculando compatibilidad inteligente' : t('calculatingCompatibility')}
-        </p>
-        {aiError && (
-          <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-red-600 text-sm">Error de IA: {aiError}</p>
-          </div>
-        )}
-      </div>
-    );
-  }
+  // NO bloquear la UI mientras se calculan scores - mostrar perfiles inmediatamente
+  // El indicador de carga se muestra como overlay sutil
 
   // Solo mostrar mensaje de "no hay más" si realmente no hay usuarios
   if (!displayUsers || displayUsers.length === 0) {
@@ -394,25 +272,6 @@ const Discovery: React.FC<DiscoveryProps> = ({
 
       {/* Profile Cards Stack - Full width desktop layout */}
       <div className="flex-1 px-4 py-6 w-full space-y-6 flex flex-col items-center">
-        {/* AI Insights Toggle - Responsive */}
-        {predictions.length > 0 && (
-          <div className="flex justify-between items-center w-full max-w-lg">
-            <button
-              onClick={() => setShowAIInsights(!showAIInsights)}
-              className="flex items-center gap-2 px-3 py-2 bg-purple-100 text-purple-700 rounded-full text-xs sm:text-sm font-medium hover:bg-purple-200 transition-colors min-h-[44px]"
-            >
-              <Brain size={14} className="sm:w-4 sm:h-4" />
-              IA Insights
-              <Zap size={12} className="sm:w-3.5 sm:h-3.5" />
-            </button>
-            
-            {showAIInsights && currentUser && (
-              <div className="text-[10px] sm:text-xs text-gray-600 max-w-[60%] text-right">
-                {predictions.find(p => p.targetUserId === currentUser.id)?.recommendationReason || 'Analizando...'}
-              </div>
-            )}
-          </div>
-        )}
 
         {/* Main Card Container with aspect ratio 4:5 - Centered for optimal UX */}
         <div className="relative group w-full max-w-lg mb-12">
@@ -591,4 +450,11 @@ const Discovery: React.FC<DiscoveryProps> = ({
   );
 };
 
-export default Discovery;
+// ⚡ OPTIMIZACIÓN: Usar React.memo para evitar re-renders innecesarios
+export default memo(Discovery, (prevProps, nextProps) => {
+  // Solo re-renderizar si cambian los usuarios o el currentUserId
+  return (
+    prevProps.users?.length === nextProps.users?.length &&
+    prevProps.currentUserId === nextProps.currentUserId
+  );
+});

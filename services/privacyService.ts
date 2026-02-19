@@ -73,7 +73,25 @@ class PrivacyService {
   }
 
   // Verificar si dos usuarios tienen match
+  // Cache de matches para evitar queries repetidas
+  private matchesCache = new Map<string, { isMatched: boolean; timestamp: number }>();
+  private readonly MATCHES_CACHE_TTL = 60000; // 1 minuto
+  
+  // ⚡ NUEVO: Cache para canViewStories
+  private storiesViewCache = new Map<string, { canView: boolean; timestamp: number }>();
+  private readonly STORIES_VIEW_CACHE_TTL = 30000; // 30 segundos
+
   async areUsersMatched(userId1: string, userId2: string): Promise<boolean> {
+    // Crear clave de cache (ordenada para que A-B y B-A sean la misma)
+    const cacheKey = [userId1, userId2].sort().join('_');
+    
+    // Verificar cache
+    const cached = this.matchesCache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < this.MATCHES_CACHE_TTL) {
+      console.log('✅ Match obtenido de cache:', cached.isMatched);
+      return cached.isMatched;
+    }
+    
     console.log('🔍 Verificando match real en Firestore entre', userId1, 'y', userId2);
     
     try {
@@ -94,6 +112,9 @@ class PrivacyService {
           isMatched = true;
         }
       });
+      
+      // Guardar en cache
+      this.matchesCache.set(cacheKey, { isMatched, timestamp: Date.now() });
       
       console.log('✅ Match real encontrado:', isMatched);
       return isMatched;
@@ -124,30 +145,48 @@ class PrivacyService {
       return true;
     }
 
+    // ⚡ OPTIMIZACIÓN: Verificar cache primero
+    const cacheKey = `${viewerId}_${storyOwnerId}`;
+    const cached = this.storiesViewCache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < this.STORIES_VIEW_CACHE_TTL) {
+      console.log('✅ Permiso obtenido de cache:', cached.canView);
+      return cached.canView;
+    }
+
     // Obtener configuración de privacidad del dueño de la story
     const ownerSettings = await this.getPrivacySettings(storyOwnerId);
+    
+    let canView = false;
     
     switch (ownerSettings.storiesVisibility) {
       case 'everyone':
         console.log('✅ Stories públicas - todos pueden ver');
-        return true;
+        canView = true;
+        break;
         
       case 'matches_only':
         const areMatched = await this.areUsersMatched(viewerId, storyOwnerId);
         console.log('🔒 Stories solo para matches:', areMatched);
-        return areMatched;
+        canView = areMatched;
+        break;
         
       case 'close_friends':
         // Por ahora, close_friends funciona igual que matches_only
         // En el futuro se puede implementar una lista de amigos cercanos
         const areCloseFriends = await this.areUsersMatched(viewerId, storyOwnerId);
         console.log('👥 Stories para amigos cercanos:', areCloseFriends);
-        return areCloseFriends;
+        canView = areCloseFriends;
+        break;
         
       default:
         console.log('❌ Configuración de privacidad desconocida');
-        return false;
+        canView = false;
     }
+    
+    // ⚡ Guardar en cache
+    this.storiesViewCache.set(cacheKey, { canView, timestamp: Date.now() });
+    
+    return canView;
   }
 
   // Verificar si un usuario puede responder a stories

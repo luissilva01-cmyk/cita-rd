@@ -358,64 +358,6 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted }) => {
         </div>
       </div>
 
-      {/* Testimonials - Horizontal Scroll */}
-      <div className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
-              Historias de Éxito
-            </h2>
-            <div className="w-24 h-1.5 rounded-full mx-auto mb-4" style={{background: 'linear-gradient(90deg, #ff8052 0%, #ffc107 100%)'}}></div>
-            <p className="text-xl text-gray-600">
-              Miles de personas han encontrado su match perfecto
-            </p>
-          </div>
-
-          <div className="flex overflow-x-auto gap-6 pb-8 snap-x snap-mandatory hide-scrollbar">
-            {[
-              {
-                name: 'María & Carlos',
-                location: 'Santo Domingo',
-                text: 'Nos conocimos en Ta\' Pa\' Ti hace 6 meses. La compatibilidad que mostró la app era del 92% y tenían razón!',
-                rating: 5
-              },
-              {
-                name: 'Ana',
-                location: 'Santiago',
-                text: 'Después de probar otras apps, Ta\' Pa\' Ti fue diferente. Perfiles reales, personas genuinas. Encontré a mi persona especial.',
-                rating: 5
-              },
-              {
-                name: 'Roberto',
-                location: 'La Vega',
-                text: 'El sistema de IA realmente funciona. Los matches que recibo son mucho más compatibles que en otras apps.',
-                rating: 5
-              }
-            ].map((testimonial, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="flex-shrink-0 w-80 bg-white rounded-3xl p-6 border border-gray-200 snap-center shadow-sm hover:shadow-lg transition-shadow"
-              >
-                <div className="flex gap-1 mb-4">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 text-yellow-400" fill="currentColor" />
-                  ))}
-                </div>
-                <p className="text-gray-700 mb-4 italic leading-relaxed">"{testimonial.text}"</p>
-                <div className="border-t border-gray-200 pt-4">
-                  <p className="text-gray-900 font-semibold">{testimonial.name}</p>
-                  <p className="text-gray-500 text-sm">{testimonial.location}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </div>
-
       {/* Final CTA */}
       <div className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-4xl mx-auto text-center">

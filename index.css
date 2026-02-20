@@ -182,6 +182,16 @@ body {
   scrollbar-width: none;
 }
 
+/* Hide scrollbar for horizontal scroll containers */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 /* Mobile touch improvements */
 @media (max-width: 640px) {
   /* Larger touch targets - Industry standard 44x44px minimum */

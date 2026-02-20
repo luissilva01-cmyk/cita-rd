@@ -1,6 +1,7 @@
 import React from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from '../../src/pages/Auth/Login';
+import Register from '../../src/pages/Auth/Register';
 
 interface AuthWrapperProps {
   onBack: () => void;
@@ -9,7 +10,11 @@ interface AuthWrapperProps {
 const AuthWrapper: React.FC<AuthWrapperProps> = ({ onBack }) => {
   return (
     <Router>
-      <Login />
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
     </Router>
   );
 };

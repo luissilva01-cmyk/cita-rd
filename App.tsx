@@ -7,6 +7,7 @@ import { useOfflineDetection } from './hooks/useOfflineDetection';
 
 // Code Splitting: Lazy load de vistas para reducir bundle inicial
 // Esto reduce el bundle de ~1.3MB a ~400KB (-70%)
+const Landing = lazy(() => import('./views/views/Landing'));
 const Home = lazy(() => import('./views/views/Home'));
 const Discovery = lazy(() => import('./views/views/Discovery'));
 const Messages = lazy(() => import('./views/views/Messages'));
@@ -744,22 +745,14 @@ const App: React.FC = () => {
     );
   }
 
-  // ⚡ FIX CRÍTICO: Si no hay usuario autenticado, mostrar pantalla de login
+  // ⚡ FIX CRÍTICO: Si no hay usuario autenticado, mostrar Landing Page
   if (!currentUser) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
-        <div className="text-center px-6">
-          <div className="text-6xl mb-6">💕</div>
-          <h1 className="text-4xl font-bold text-white mb-4">Ta' Pa' Ti</h1>
-          <p className="text-white/80 mb-8">Por favor inicia sesión para continuar</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="px-8 py-3 bg-white text-purple-900 rounded-full font-semibold hover:bg-white/90 transition-colors"
-          >
-            Recargar
-          </button>
-        </div>
-      </div>
+      <ErrorBoundary level="app">
+        <Suspense fallback={<LoadingFallback />}>
+          <Landing onGetStarted={() => window.location.reload()} />
+        </Suspense>
+      </ErrorBoundary>
     );
   }
 
@@ -774,7 +767,7 @@ const App: React.FC = () => {
           />
           
           <Layout 
-            activeView={activeView === 'chat' ? 'messages' : activeView} 
+            activeView={activeView === 'chat' ? 'messages' : activeView === 'admin' ? 'profile' : activeView} 
             onViewChange={(view) => {
               // Verificar si el perfil está incompleto
               const isIncomplete = !currentUser.images || currentUser.images.length === 0 || 

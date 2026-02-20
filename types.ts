@@ -64,4 +64,4 @@ export interface Call {
   duration?: number;
 }
 
-export type View = 'home' | 'discovery' | 'messages' | 'matches' | 'ai-coach' | 'profile' | 'chat' | 'likes-received';
+export type View = 'home' | 'discovery' | 'messages' | 'matches' | 'ai-coach' | 'profile' | 'chat' | 'likes-received' | 'admin';

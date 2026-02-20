@@ -8,7 +8,7 @@ import { useOfflineDetection } from './hooks/useOfflineDetection';
 // Code Splitting: Lazy load de vistas para reducir bundle inicial
 // Esto reduce el bundle de ~1.3MB a ~400KB (-70%)
 const Landing = lazy(() => import('./views/views/Landing'));
-const Login = lazy(() => import('./views/views/Login'));
+const AuthWrapper = lazy(() => import('./views/views/AuthWrapper'));
 const Home = lazy(() => import('./views/views/Home'));
 const Discovery = lazy(() => import('./views/views/Discovery'));
 const Messages = lazy(() => import('./views/views/Messages'));
@@ -753,7 +753,7 @@ const App: React.FC = () => {
       <ErrorBoundary level="app">
         <Suspense fallback={<LoadingFallback />}>
           {showLogin ? (
-            <Login onBack={() => setShowLogin(false)} />
+            <AuthWrapper onBack={() => setShowLogin(false)} />
           ) : (
             <Landing 
               onGetStarted={() => setShowLogin(true)} 

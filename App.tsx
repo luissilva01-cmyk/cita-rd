@@ -8,6 +8,7 @@ import { useOfflineDetection } from './hooks/useOfflineDetection';
 // Code Splitting: Lazy load de vistas para reducir bundle inicial
 // Esto reduce el bundle de ~1.3MB a ~400KB (-70%)
 const Landing = lazy(() => import('./views/views/Landing'));
+const Login = lazy(() => import('./views/views/Login'));
 const Home = lazy(() => import('./views/views/Home'));
 const Discovery = lazy(() => import('./views/views/Discovery'));
 const Messages = lazy(() => import('./views/views/Messages'));
@@ -75,6 +76,7 @@ const App: React.FC = () => {
   const [activeView, setActiveView] = useState<View>('home');
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showLogin, setShowLogin] = useState(false); // Estado para mostrar login
   const [discoveryRefreshTrigger, setDiscoveryRefreshTrigger] = useState(0); // ⚡ NUEVO: Trigger para recargar Discovery
   
   // Offline detection
@@ -745,12 +747,19 @@ const App: React.FC = () => {
     );
   }
 
-  // ⚡ FIX CRÍTICO: Si no hay usuario autenticado, mostrar Landing Page
+  // ⚡ FIX CRÍTICO: Si no hay usuario autenticado, mostrar Landing Page o Login
   if (!currentUser) {
     return (
       <ErrorBoundary level="app">
         <Suspense fallback={<LoadingFallback />}>
-          <Landing onGetStarted={() => window.location.reload()} />
+          {showLogin ? (
+            <Login onBack={() => setShowLogin(false)} />
+          ) : (
+            <Landing 
+              onGetStarted={() => setShowLogin(true)} 
+              onShowLogin={() => setShowLogin(true)}
+            />
+          )}
         </Suspense>
       </ErrorBoundary>
     );

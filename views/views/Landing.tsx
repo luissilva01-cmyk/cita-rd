@@ -4,9 +4,10 @@ import { motion } from 'framer-motion';
 
 interface LandingProps {
   onGetStarted: () => void;
+  onShowLogin: () => void;
 }
 
-const Landing: React.FC<LandingProps> = ({ onGetStarted }) => {
+const Landing: React.FC<LandingProps> = ({ onGetStarted, onShowLogin }) => {
   const features = [
     {
       icon: Sparkles,
@@ -114,10 +115,10 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted }) => {
               </button>
               
               <button
-                onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
+                onClick={onShowLogin}
                 className="px-8 py-4 bg-white text-gray-900 rounded-full font-semibold text-lg border-2 border-gray-200 hover:bg-gray-50 transition-all duration-300 shadow-sm"
               >
-                Ver Características
+                Iniciar Sesión
               </button>
             </div>
           </motion.div>

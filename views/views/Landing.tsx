@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heart, Sparkles, Shield, MessageCircle, Users, Zap, ChevronRight, Star } from 'lucide-react';
+import { Heart, Sparkles, Shield, MessageCircle, Users, Zap, ChevronRight, Star, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface LandingProps {
@@ -154,6 +154,134 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted }) => {
             <div className="w-1 h-3 bg-gray-400 rounded-full mt-2 animate-bounce"></div>
           </div>
         </motion.div>
+      </div>
+
+      {/* App Preview Section */}
+      <div className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="relative"
+          >
+            {/* Decorative elements */}
+            <div className="absolute -top-10 -left-10 w-40 h-40 rounded-full blur-3xl opacity-20" style={{backgroundColor: '#ff8052'}}></div>
+            <div className="absolute -bottom-10 -right-10 w-40 h-40 rounded-full blur-3xl opacity-20" style={{backgroundColor: '#ffc107'}}></div>
+            
+            {/* Image container with gradient border */}
+            <div className="relative rounded-3xl p-1" style={{background: 'linear-gradient(135deg, #ff8052 0%, #ffc107 100%)'}}>
+              <div className="bg-white rounded-3xl p-8 sm:p-12">
+                <div className="grid md:grid-cols-2 gap-12 items-center">
+                  {/* Text content */}
+                  <div className="order-2 md:order-1">
+                    <h3 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+                      Diseñada para conectar
+                    </h3>
+                    <p className="text-lg text-gray-600 mb-6">
+                      Una experiencia intuitiva y moderna que hace que encontrar tu match perfecto sea natural y divertido.
+                    </p>
+                    <ul className="space-y-4">
+                      {[
+                        'Interfaz limpia y fácil de usar',
+                        'Swipe inteligente con IA',
+                        'Chat en tiempo real',
+                        'Stories para compartir momentos'
+                      ].map((feature, index) => (
+                        <li key={index} className="flex items-center gap-3">
+                          <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0" style={{background: 'linear-gradient(135deg, #ff8052 0%, #ffc107 100%)'}}>
+                            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                          </div>
+                          <span className="text-gray-700">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  
+                  {/* Image mockup */}
+                  <div className="order-1 md:order-2 relative">
+                    <div className="relative mx-auto max-w-sm">
+                      {/* Phone frame */}
+                      <div className="relative rounded-[3rem] overflow-hidden shadow-2xl border-8 border-gray-900 bg-gray-900">
+                        {/* Notch */}
+                        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-40 h-7 bg-gray-900 rounded-b-3xl z-10"></div>
+                        
+                        {/* Screen content - Placeholder gradient */}
+                        <div className="aspect-[9/19.5] bg-gradient-to-br from-slate-50 to-white relative overflow-hidden">
+                          {/* Simulated app interface */}
+                          <div className="absolute inset-0 flex flex-col">
+                            {/* Header */}
+                            <div className="p-4 flex items-center justify-between">
+                              <div className="w-10 h-10 rounded-full" style={{background: 'linear-gradient(135deg, #ff8052 0%, #ffc107 100%)'}}></div>
+                              <div className="text-xl font-bold text-gray-900">Ta' Pa' Ti</div>
+                              <div className="w-10 h-10"></div>
+                            </div>
+                            
+                            {/* Card stack simulation */}
+                            <div className="flex-1 flex items-center justify-center p-6">
+                              <div className="relative w-full max-w-xs aspect-[3/4]">
+                                {/* Background cards */}
+                                <div className="absolute inset-0 rounded-3xl bg-gray-200 transform rotate-6 scale-95 opacity-30"></div>
+                                <div className="absolute inset-0 rounded-3xl bg-gray-300 transform rotate-3 scale-97 opacity-50"></div>
+                                
+                                {/* Main card */}
+                                <div className="relative w-full h-full rounded-3xl overflow-hidden shadow-xl" style={{background: 'linear-gradient(135deg, #ff8052 0%, #ffc107 100%)'}}>
+                                  <div className="absolute inset-0 flex items-center justify-center">
+                                    <Heart className="w-20 h-20 text-white opacity-20" />
+                                  </div>
+                                  <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/60 to-transparent">
+                                    <div className="text-white">
+                                      <div className="text-2xl font-bold mb-1">Tu Match</div>
+                                      <div className="text-sm opacity-90">Encuentra conexiones reales</div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            {/* Bottom actions */}
+                            <div className="p-6 flex justify-center gap-4">
+                              <div className="w-14 h-14 rounded-full bg-white shadow-lg flex items-center justify-center">
+                                <X className="w-6 h-6 text-red-500" />
+                              </div>
+                              <div className="w-16 h-16 rounded-full shadow-lg flex items-center justify-center" style={{background: 'linear-gradient(135deg, #ff8052 0%, #ffc107 100%)'}}>
+                                <Heart className="w-7 h-7 text-white" fill="currentColor" />
+                              </div>
+                              <div className="w-14 h-14 rounded-full bg-white shadow-lg flex items-center justify-center">
+                                <Star className="w-6 h-6 text-blue-500" />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Floating elements */}
+                      <motion.div
+                        animate={{ y: [0, -10, 0] }}
+                        transition={{ duration: 3, repeat: Infinity }}
+                        className="absolute -top-4 -right-4 w-16 h-16 rounded-2xl shadow-xl flex items-center justify-center"
+                        style={{background: 'linear-gradient(135deg, #ff8052 0%, #ffc107 100%)'}}
+                      >
+                        <Sparkles className="w-8 h-8 text-white" />
+                      </motion.div>
+                      
+                      <motion.div
+                        animate={{ y: [0, 10, 0] }}
+                        transition={{ duration: 2.5, repeat: Infinity }}
+                        className="absolute -bottom-4 -left-4 w-16 h-16 rounded-2xl bg-white shadow-xl flex items-center justify-center"
+                      >
+                        <MessageCircle className="w-8 h-8" style={{color: '#ff8052'}} />
+                      </motion.div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
       </div>
 
       {/* Features Section Mejorado */}

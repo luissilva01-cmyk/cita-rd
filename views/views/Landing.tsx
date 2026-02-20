@@ -35,10 +35,10 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted }) => {
   ];
 
   const stats = [
-    { value: '10K+', label: 'Usuarios Activos' },
-    { value: '50K+', label: 'Matches Creados' },
-    { value: '95%', label: 'Satisfacción' },
-    { value: '24/7', label: 'Soporte' }
+    { icon: Users, label: 'Conexiones Auténticas', description: 'Personas reales buscando relaciones genuinas' },
+    { icon: Shield, label: 'Perfiles Verificados', description: 'Sistema de verificación para tu seguridad' },
+    { icon: Heart, label: 'Comunidad Segura', description: 'Ambiente respetuoso y protegido' },
+    { icon: MessageCircle, label: 'Soporte Dedicado', description: 'Estamos aquí para ayudarte' }
   ];
 
   const howItWorks = [
@@ -127,12 +127,17 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted }) => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="grid grid-cols-2 sm:grid-cols-4 gap-8 max-w-4xl mx-auto"
+            className="grid grid-cols-2 sm:grid-cols-4 gap-6 max-w-5xl mx-auto"
           >
             {stats.map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">{stat.value}</div>
-                <div className="text-sm sm:text-base text-gray-600">{stat.label}</div>
+              <div key={index} className="text-center bg-white/60 backdrop-blur-sm rounded-2xl p-4 border border-gray-200">
+                <div className="flex justify-center mb-3">
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{background: 'linear-gradient(135deg, #ff8052 0%, #ffc107 100%)'}}>
+                    <stat.icon className="w-6 h-6 text-white" />
+                  </div>
+                </div>
+                <div className="text-base sm:text-lg font-bold text-gray-900 mb-1">{stat.label}</div>
+                <div className="text-xs sm:text-sm text-gray-600">{stat.description}</div>
               </div>
             ))}
           </motion.div>

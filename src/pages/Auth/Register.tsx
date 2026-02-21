@@ -417,21 +417,25 @@ export default function Register() {
               style={{ color: '#9a5f4c' }}
             >
               Al crear una cuenta, confirmo que soy mayor de 18 años y acepto los{" "}
-              <Link 
+              <a 
                 className="hover:underline"
                 style={{ color: '#ec4913' }}
-                to="/terms-of-service"
+                href="/terms-of-service.html"
+                target="_blank"
+                rel="noopener noreferrer"
               >
                 Términos de Servicio
-              </Link>{" "}
+              </a>{" "}
               y la{" "}
-              <Link 
+              <a 
                 className="hover:underline"
                 style={{ color: '#ec4913' }}
-                to="/privacy-policy"
+                href="/privacy-policy.html"
+                target="_blank"
+                rel="noopener noreferrer"
               >
                 Política de Privacidad
-              </Link>{" "}
+              </a>{" "}
               de Ta' Pa' Ti.
             </div>
 

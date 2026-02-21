@@ -5,9 +5,10 @@ import { motion } from 'framer-motion';
 interface LandingProps {
   onGetStarted: () => void;
   onShowLogin: () => void;
+  onShowRegister: () => void;
 }
 
-const Landing: React.FC<LandingProps> = ({ onGetStarted, onShowLogin }) => {
+const Landing: React.FC<LandingProps> = ({ onGetStarted, onShowLogin, onShowRegister }) => {
   const features = [
     {
       icon: Sparkles,
@@ -106,7 +107,7 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted, onShowLogin }) => {
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <button
-                onClick={onGetStarted}
+                onClick={onShowRegister}
                 className="group px-8 py-4 text-white rounded-full font-semibold text-lg shadow-2xl transition-all duration-300 hover:scale-105 flex items-center gap-2"
                 style={{background: 'linear-gradient(135deg, #ff8052 0%, #ffc107 100%)', boxShadow: '0 20px 60px rgba(255, 128, 82, 0.3)'}}
               >

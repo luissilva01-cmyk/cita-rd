@@ -76,7 +76,7 @@ const App: React.FC = () => {
   const [activeView, setActiveView] = useState<View>('home');
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [showLogin, setShowLogin] = useState(false); // Estado para mostrar login
+  const [showAuth, setShowAuth] = useState<'login' | 'register' | null>(null); // Estado para mostrar login o register
   const [discoveryRefreshTrigger, setDiscoveryRefreshTrigger] = useState(0); // ⚡ NUEVO: Trigger para recargar Discovery
   
   // Offline detection
@@ -747,17 +747,21 @@ const App: React.FC = () => {
     );
   }
 
-  // ⚡ FIX CRÍTICO: Si no hay usuario autenticado, mostrar Landing Page o Login
+  // ⚡ FIX CRÍTICO: Si no hay usuario autenticado, mostrar Landing Page o Login/Register
   if (!currentUser) {
     return (
       <ErrorBoundary level="app">
         <Suspense fallback={<LoadingFallback />}>
-          {showLogin ? (
-            <AuthWrapper onBack={() => setShowLogin(false)} />
+          {showAuth ? (
+            <AuthWrapper 
+              onBack={() => setShowAuth(null)} 
+              initialRoute={showAuth === 'register' ? '/register' : '/login'}
+            />
           ) : (
             <Landing 
-              onGetStarted={() => setShowLogin(true)} 
-              onShowLogin={() => setShowLogin(true)}
+              onGetStarted={() => setShowAuth('register')} 
+              onShowLogin={() => setShowAuth('login')}
+              onShowRegister={() => setShowAuth('register')}
             />
           )}
         </Suspense>

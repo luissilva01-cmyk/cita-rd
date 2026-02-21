@@ -392,14 +392,17 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted, onShowLogin, onShowRegi
       {/* Footer */}
       <footer className="py-12 px-4 sm:px-6 lg:px-8 border-t border-gray-200 bg-gray-50">
         <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
+          <div className="grid md:grid-cols-3 gap-8 mb-8">
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <Heart className="w-6 h-6" style={{color: '#ff8052'}} fill="currentColor" />
                 <span className="text-gray-900 font-bold text-xl">Ta' Pa' Ti</span>
               </div>
-              <p className="text-gray-600 text-sm">
+              <p className="text-gray-600 text-sm mb-4">
                 Cuando alguien sí te elige
+              </p>
+              <p className="text-gray-600 text-sm">
+                Santo Domingo, República Dominicana
               </p>
             </div>
             
@@ -407,17 +410,14 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted, onShowLogin, onShowRegi
               <h4 className="text-gray-900 font-semibold mb-4">Producto</h4>
               <ul className="space-y-2 text-gray-600 text-sm">
                 <li><a href="#features" className="hover:text-gray-900 transition-colors">Características</a></li>
-                <li><a href="#" className="hover:text-gray-900 transition-colors">Precios</a></li>
-                <li><a href="#" className="hover:text-gray-900 transition-colors">FAQ</a></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="text-gray-900 font-semibold mb-4">Compañía</h4>
-              <ul className="space-y-2 text-gray-600 text-sm">
-                <li><a href="#" className="hover:text-gray-900 transition-colors">Sobre Nosotros</a></li>
-                <li><a href="#" className="hover:text-gray-900 transition-colors">Blog</a></li>
-                <li><a href="#" className="hover:text-gray-900 transition-colors">Contacto</a></li>
+                <li>
+                  <a 
+                    href="mailto:tapapatisoporte@gmail.com" 
+                    className="hover:text-gray-900 transition-colors"
+                  >
+                    Contacto
+                  </a>
+                </li>
               </ul>
             </div>
             
@@ -426,7 +426,6 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted, onShowLogin, onShowRegi
               <ul className="space-y-2 text-gray-600 text-sm">
                 <li><a href="/terms-of-service.html" target="_blank" rel="noopener noreferrer" className="hover:text-gray-900 transition-colors">Términos de Servicio</a></li>
                 <li><a href="/privacy-policy.html" target="_blank" rel="noopener noreferrer" className="hover:text-gray-900 transition-colors">Política de Privacidad</a></li>
-                <li><a href="#" className="hover:text-gray-900 transition-colors">Cookies</a></li>
               </ul>
             </div>
           </div>

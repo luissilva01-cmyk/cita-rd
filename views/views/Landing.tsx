@@ -424,8 +424,8 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted, onShowLogin, onShowRegi
             <div>
               <h4 className="text-gray-900 font-semibold mb-4">Legal</h4>
               <ul className="space-y-2 text-gray-600 text-sm">
-                <li><a href="/terms-of-service.html" className="hover:text-gray-900 transition-colors">Términos de Servicio</a></li>
-                <li><a href="/privacy-policy.html" className="hover:text-gray-900 transition-colors">Política de Privacidad</a></li>
+                <li><a href="/terms-of-service.html" target="_blank" rel="noopener noreferrer" className="hover:text-gray-900 transition-colors">Términos de Servicio</a></li>
+                <li><a href="/privacy-policy.html" target="_blank" rel="noopener noreferrer" className="hover:text-gray-900 transition-colors">Política de Privacidad</a></li>
                 <li><a href="#" className="hover:text-gray-900 transition-colors">Cookies</a></li>
               </ul>
             </div>

@@ -413,14 +413,13 @@ export default function Login() {
                 >
                   ¿No tienes una cuenta?
                 </p>
-                <button
-                  onClick={() => navigate('/register')}
+                <Link
+                  to="/register"
                   className="text-sm font-bold transition-colors hover:opacity-80 bg-transparent border-none cursor-pointer p-0"
                   style={{ color: '#ec4913' }}
-                  type="button"
                 >
                   Regístrate aquí
-                </button>
+                </Link>
               </div>
             </>
           ) : (

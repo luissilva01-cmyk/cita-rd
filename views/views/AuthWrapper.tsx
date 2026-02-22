@@ -1,5 +1,4 @@
-import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
 import Login from '../../src/pages/Auth/Login';
 import Register from '../../src/pages/Auth/Register';
 
@@ -8,29 +7,26 @@ interface AuthWrapperProps {
   initialRoute?: string;
 }
 
-// Componente interno para manejar la navegación inicial
-const AuthRoutes: React.FC<{ initialRoute: string }> = ({ initialRoute }) => {
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    // Navegar a la ruta inicial cuando el componente se monta
-    navigate(initialRoute, { replace: true });
-  }, [initialRoute, navigate]);
-
-  return (
-    <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="*" element={<Navigate to="/login" replace />} />
-    </Routes>
-  );
-};
-
 const AuthWrapper: React.FC<AuthWrapperProps> = ({ onBack, initialRoute = '/login' }) => {
+  const [currentView, setCurrentView] = useState<'login' | 'register'>(
+    initialRoute === '/register' ? 'register' : 'login'
+  );
+
+  // Crear versiones modificadas de Login y Register que usan setCurrentView
+  const LoginWithNavigation = () => {
+    // Clonar Login pero interceptar navigate
+    return <Login onNavigateToRegister={() => setCurrentView('register')} />;
+  };
+
+  const RegisterWithNavigation = () => {
+    // Clonar Register pero interceptar navigate
+    return <Register onNavigateToLogin={() => setCurrentView('login')} />;
+  };
+
   return (
-    <Router>
-      <AuthRoutes initialRoute={initialRoute} />
-    </Router>
+    <>
+      {currentView === 'login' ? <LoginWithNavigation /> : <RegisterWithNavigation />}
+    </>
   );
 };
 

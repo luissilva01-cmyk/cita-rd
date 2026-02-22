@@ -7,7 +7,7 @@ import { checkStorageAvailability, showStorageWarning } from "../../utils/storag
 import { motion } from "framer-motion";
 import { Eye, EyeOff, ArrowLeft, Heart, Mail, AlertTriangle, CheckCircle } from "lucide-react";
 
-export default function Login() {
+export default function Login({ onNavigateToRegister }: { onNavigateToRegister?: () => void }) {
   const [formData, setFormData] = useState({
     email: "",
     password: ""
@@ -414,7 +414,13 @@ export default function Login() {
                   ¿No tienes una cuenta?
                 </p>
                 <button
-                  onClick={() => navigate('/register')}
+                  onClick={() => {
+                    if (onNavigateToRegister) {
+                      onNavigateToRegister();
+                    } else {
+                      navigate('/register');
+                    }
+                  }}
                   className="text-sm font-bold transition-colors hover:opacity-80 bg-transparent border-none cursor-pointer p-0"
                   style={{ color: '#ec4913' }}
                   type="button"

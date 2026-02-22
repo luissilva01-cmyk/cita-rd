@@ -10,7 +10,7 @@ import { consentService, ConsentData } from "../../services/consentService";
 import { createOrUpdateProfile } from "../../../services/profileService";
 import { UserProfile } from "../../../types";
 
-export default function Register() {
+export default function Register({ onNavigateToLogin }: { onNavigateToLogin?: () => void }) {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -465,7 +465,13 @@ export default function Register() {
             >
               ¿Ya tienes una cuenta?{" "}
               <button
-                onClick={() => navigate('/login')}
+                onClick={() => {
+                  if (onNavigateToLogin) {
+                    onNavigateToLogin();
+                  } else {
+                    navigate('/login');
+                  }
+                }}
                 className="font-bold hover:underline ml-1 bg-transparent border-none cursor-pointer p-0"
                 style={{ color: '#ec4913' }}
                 type="button"

@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect, lazy, Suspense } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/components/Layout';
 import ErrorBoundary from './components/ErrorBoundary';
 import OfflineBanner from './components/OfflineBanner';
@@ -8,7 +9,8 @@ import { useOfflineDetection } from './hooks/useOfflineDetection';
 // Code Splitting: Lazy load de vistas para reducir bundle inicial
 // Esto reduce el bundle de ~1.3MB a ~400KB (-70%)
 const Landing = lazy(() => import('./views/views/Landing'));
-const AuthWrapper = lazy(() => import('./views/views/AuthWrapper'));
+const Login = lazy(() => import('./src/pages/Auth/Login'));
+const Register = lazy(() => import('./src/pages/Auth/Register'));
 const Home = lazy(() => import('./views/views/Home'));
 const Discovery = lazy(() => import('./views/views/Discovery'));
 const Messages = lazy(() => import('./views/views/Messages'));
@@ -76,7 +78,6 @@ const App: React.FC = () => {
   const [activeView, setActiveView] = useState<View>('home');
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [showAuth, setShowAuth] = useState<'login' | 'register' | null>(null); // Estado para mostrar login o register
   const [discoveryRefreshTrigger, setDiscoveryRefreshTrigger] = useState(0); // ⚡ NUEVO: Trigger para recargar Discovery
   
   // Offline detection
@@ -751,20 +752,16 @@ const App: React.FC = () => {
   if (!currentUser) {
     return (
       <ErrorBoundary level="app">
-        <Suspense fallback={<LoadingFallback />}>
-          {showAuth ? (
-            <AuthWrapper 
-              onBack={() => setShowAuth(null)} 
-              initialRoute={showAuth === 'register' ? '/register' : '/login'}
-            />
-          ) : (
-            <Landing 
-              onGetStarted={() => setShowAuth('register')} 
-              onShowLogin={() => setShowAuth('login')}
-              onShowRegister={() => setShowAuth('register')}
-            />
-          )}
-        </Suspense>
+        <BrowserRouter>
+          <Suspense fallback={<LoadingFallback />}>
+            <Routes>
+              <Route path="/" element={<Landing />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Suspense>
+        </BrowserRouter>
       </ErrorBoundary>
     );
   }

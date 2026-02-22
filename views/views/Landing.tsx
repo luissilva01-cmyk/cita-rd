@@ -1,14 +1,10 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Heart, Sparkles, Shield, MessageCircle, Users, Zap, ChevronRight, Star, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-interface LandingProps {
-  onGetStarted: () => void;
-  onShowLogin: () => void;
-  onShowRegister: () => void;
-}
-
-const Landing: React.FC<LandingProps> = ({ onGetStarted, onShowLogin, onShowRegister }) => {
+const Landing: React.FC = () => {
+  const navigate = useNavigate();
   const features = [
     {
       icon: Sparkles,
@@ -107,7 +103,7 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted, onShowLogin, onShowRegi
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <button
-                onClick={onShowRegister}
+                onClick={() => navigate('/register')}
                 className="group px-8 py-4 text-white rounded-full font-semibold text-lg shadow-2xl transition-all duration-300 hover:scale-105 flex items-center gap-2"
                 style={{background: 'linear-gradient(135deg, #ff8052 0%, #ffc107 100%)', boxShadow: '0 20px 60px rgba(255, 128, 82, 0.3)'}}
               >
@@ -116,7 +112,7 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted, onShowLogin, onShowRegi
               </button>
               
               <button
-                onClick={onShowLogin}
+                onClick={() => navigate('/login')}
                 className="px-8 py-4 bg-white text-gray-900 rounded-full font-semibold text-lg border-2 border-gray-200 hover:bg-gray-50 transition-all duration-300 shadow-sm"
               >
                 Iniciar Sesión
@@ -378,7 +374,7 @@ const Landing: React.FC<LandingProps> = ({ onGetStarted, onShowLogin, onShowRegi
               Únete a miles de personas que ya encontraron conexiones reales
             </p>
             <button
-              onClick={onGetStarted}
+              onClick={() => navigate('/register')}
               className="px-10 py-5 bg-white rounded-full font-bold text-lg shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 inline-flex items-center gap-2"
               style={{color: '#ff8052'}}
             >

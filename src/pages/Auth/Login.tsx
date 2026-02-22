@@ -7,7 +7,8 @@ import { checkStorageAvailability, showStorageWarning } from "../../utils/storag
 import { motion } from "framer-motion";
 import { Eye, EyeOff, ArrowLeft, Heart, Mail, AlertTriangle, CheckCircle } from "lucide-react";
 
-export default function Login({ onNavigateToRegister }: { onNavigateToRegister?: () => void }) {
+export default function Login() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
     password: ""
@@ -23,8 +24,6 @@ export default function Login({ onNavigateToRegister }: { onNavigateToRegister?:
   const [forgotLoading, setForgotLoading] = useState(false);
   const [forgotError, setForgotError] = useState("");
   const [forgotSuccess, setForgotSuccess] = useState(false);
-  
-  const navigate = useNavigate();
 
   useEffect(() => {
     // Verificar si el storage está disponible al cargar el componente
@@ -418,17 +417,7 @@ export default function Login({ onNavigateToRegister }: { onNavigateToRegister?:
                   ¿No tienes una cuenta?
                 </p>
                 <button
-                  onClick={() => {
-                    console.log('🔘 Login - Click en Regístrate aquí');
-                    console.log('🔘 Login - onNavigateToRegister existe?', !!onNavigateToRegister);
-                    if (onNavigateToRegister) {
-                      console.log('✅ Login - Llamando a onNavigateToRegister');
-                      onNavigateToRegister();
-                    } else {
-                      console.log('⚠️ Login - Usando navigate fallback');
-                      navigate('/register');
-                    }
-                  }}
+                  onClick={() => navigate('/register')}
                   className="text-sm font-bold transition-colors hover:opacity-80 bg-transparent border-none cursor-pointer p-0"
                   style={{ color: '#ec4913' }}
                   type="button"

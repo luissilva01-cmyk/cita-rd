@@ -10,7 +10,8 @@ import { consentService, ConsentData } from "../../services/consentService";
 import { createOrUpdateProfile } from "../../../services/profileService";
 import { UserProfile } from "../../../types";
 
-export default function Register({ onNavigateToLogin }: { onNavigateToLogin?: () => void }) {
+export default function Register() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -24,7 +25,6 @@ export default function Register({ onNavigateToLogin }: { onNavigateToLogin?: ()
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showConsentModal, setShowConsentModal] = useState(false);
-  const navigate = useNavigate();
 
   // Función para calcular edad desde fecha de nacimiento
   const calculateAge = (birthDate: string): number => {
@@ -475,17 +475,7 @@ export default function Register({ onNavigateToLogin }: { onNavigateToLogin?: ()
             >
               ¿Ya tienes una cuenta?{" "}
               <button
-                onClick={() => {
-                  console.log('🔘 Register - Click en Inicia sesión');
-                  console.log('🔘 Register - onNavigateToLogin existe?', !!onNavigateToLogin);
-                  if (onNavigateToLogin) {
-                    console.log('✅ Register - Llamando a onNavigateToLogin');
-                    onNavigateToLogin();
-                  } else {
-                    console.log('⚠️ Register - Usando navigate fallback');
-                    navigate('/login');
-                  }
-                }}
+                onClick={() => navigate('/login')}
                 className="font-bold hover:underline ml-1 bg-transparent border-none cursor-pointer p-0"
                 style={{ color: '#ec4913' }}
                 type="button"

@@ -1,6 +1,6 @@
 // cita-rd/src/pages/Auth/Register.tsx - DISEÑO MODERNO UNIFICADO CON CONSENT MODAL
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../../services/firebase";
 import { motion } from "framer-motion";
@@ -464,13 +464,14 @@ export default function Register() {
               style={{ color: '#9a5f4c' }}
             >
               ¿Ya tienes una cuenta?{" "}
-              <Link 
-                className="font-bold hover:underline ml-1"
+              <button
+                onClick={() => navigate('/login')}
+                className="font-bold hover:underline ml-1 bg-transparent border-none cursor-pointer p-0"
                 style={{ color: '#ec4913' }}
-                to="/login"
+                type="button"
               >
                 Inicia sesión
-              </Link>
+              </button>
             </p>
           </div>
           <div className="h-10"></div>

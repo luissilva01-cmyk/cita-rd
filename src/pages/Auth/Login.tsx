@@ -1,6 +1,6 @@
 // cita-rd/src/pages/Auth/Login.tsx - DISEÑO MODERNO UNIFICADO CON FORGOT PASSWORD INTEGRADO
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../../services/firebase";
 import { checkStorageAvailability, showStorageWarning } from "../../utils/storageHelper";
@@ -413,13 +413,14 @@ export default function Login() {
                 >
                   ¿No tienes una cuenta?
                 </p>
-                <Link
-                  to="/register"
+                <button
+                  onClick={() => navigate('/register')}
                   className="text-sm font-bold transition-colors hover:opacity-80 bg-transparent border-none cursor-pointer p-0"
                   style={{ color: '#ec4913' }}
+                  type="button"
                 >
                   Regístrate aquí
-                </Link>
+                </button>
               </div>
             </>
           ) : (

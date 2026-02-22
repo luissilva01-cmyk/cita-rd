@@ -280,6 +280,8 @@ export default function Register({ onNavigateToLogin }: { onNavigateToLogin?: ()
                 Nombre completo
               </label>
               <input
+                id="register-name"
+                name="name"
                 className="form-input flex w-full rounded-xl border h-12 px-4 text-base focus:outline-none focus:ring-2 transition-all focus:ring-orange-200 focus:border-orange-500"
                 style={{
                   borderColor: '#e7d5cf',
@@ -303,6 +305,8 @@ export default function Register({ onNavigateToLogin }: { onNavigateToLogin?: ()
                 Correo electrónico
               </label>
               <input
+                id="register-email"
+                name="email"
                 className="form-input flex w-full rounded-xl border h-12 px-4 text-base focus:outline-none focus:ring-2 transition-all focus:ring-orange-200 focus:border-orange-500"
                 style={{
                   borderColor: '#e7d5cf',
@@ -326,6 +330,8 @@ export default function Register({ onNavigateToLogin }: { onNavigateToLogin?: ()
                 Fecha de nacimiento
               </label>
               <input
+                id="register-birthdate"
+                name="birthdate"
                 className="form-input flex w-full rounded-xl border h-12 px-4 text-base focus:outline-none focus:ring-2 transition-all focus:ring-orange-200 focus:border-orange-500"
                 style={{
                   borderColor: '#e7d5cf',
@@ -355,6 +361,8 @@ export default function Register({ onNavigateToLogin }: { onNavigateToLogin?: ()
               </label>
               <div className="relative">
                 <input
+                  id="register-password"
+                  name="password"
                   className="form-input flex w-full rounded-xl border h-12 px-4 pr-12 text-base focus:outline-none focus:ring-2 transition-all focus:ring-orange-200 focus:border-orange-500"
                   style={{
                     borderColor: '#e7d5cf',
@@ -388,6 +396,8 @@ export default function Register({ onNavigateToLogin }: { onNavigateToLogin?: ()
               </label>
               <div className="relative">
                 <input
+                  id="register-confirm-password"
+                  name="confirm-password"
                   className="form-input flex w-full rounded-xl border h-12 px-4 pr-12 text-base focus:outline-none focus:ring-2 transition-all focus:ring-orange-200 focus:border-orange-500"
                   style={{
                     borderColor: '#e7d5cf',

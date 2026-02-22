@@ -316,6 +316,8 @@ export default function Login({ onNavigateToRegister }: { onNavigateToRegister?:
                   </label>
                   <div className="relative flex items-center">
                     <input
+                      id="login-email"
+                      name="email"
                       className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl focus:outline-0 focus:ring-2 border h-14 p-[15px] text-base font-normal leading-normal shadow-sm transition-all focus:ring-orange-200 focus:border-orange-500"
                       style={{
                         color: '#1b110d',
@@ -347,6 +349,8 @@ export default function Login({ onNavigateToRegister }: { onNavigateToRegister?:
                   </label>
                   <div className="relative flex items-center">
                     <input
+                      id="login-password"
+                      name="password"
                       className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl focus:outline-0 focus:ring-2 border h-14 p-[15px] pr-12 text-base font-normal leading-normal shadow-sm transition-all focus:ring-orange-200 focus:border-orange-500"
                       style={{
                         color: '#1b110d',
@@ -479,6 +483,8 @@ export default function Login({ onNavigateToRegister }: { onNavigateToRegister?:
                       </label>
                       <div className="relative flex items-center">
                         <input
+                          id="forgot-password-email"
+                          name="email"
                           className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl focus:outline-0 focus:ring-2 border h-14 p-[15px] text-base font-normal leading-normal shadow-sm transition-all focus:ring-orange-200 focus:border-orange-500"
                           style={{
                             color: '#1b110d',

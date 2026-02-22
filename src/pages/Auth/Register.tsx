@@ -274,6 +274,7 @@ export default function Register() {
             {/* Name Field */}
             <div className="flex flex-col gap-2">
               <label 
+                htmlFor="register-name"
                 className="text-sm font-semibold leading-normal"
                 style={{ color: '#1b110d' }}
               >
@@ -299,6 +300,7 @@ export default function Register() {
             {/* Email Field */}
             <div className="flex flex-col gap-2">
               <label 
+                htmlFor="register-email"
                 className="text-sm font-semibold leading-normal"
                 style={{ color: '#1b110d' }}
               >
@@ -324,6 +326,7 @@ export default function Register() {
             {/* Birth Date Field */}
             <div className="flex flex-col gap-2">
               <label 
+                htmlFor="register-birthdate"
                 className="text-sm font-semibold leading-normal"
                 style={{ color: '#1b110d' }}
               >
@@ -354,6 +357,7 @@ export default function Register() {
             {/* Password Field */}
             <div className="flex flex-col gap-2">
               <label 
+                htmlFor="register-password"
                 className="text-sm font-semibold leading-normal"
                 style={{ color: '#1b110d' }}
               >
@@ -389,6 +393,7 @@ export default function Register() {
             {/* Confirm Password Field */}
             <div className="flex flex-col gap-2">
               <label 
+                htmlFor="register-confirm-password"
                 className="text-sm font-semibold leading-normal"
                 style={{ color: '#1b110d' }}
               >

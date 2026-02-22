@@ -308,6 +308,7 @@ export default function Login() {
                 {/* Email Field */}
                 <div className="flex flex-col gap-2">
                   <label 
+                    htmlFor="login-email"
                     className="text-sm font-semibold leading-normal ml-1"
                     style={{ color: '#1b110d' }}
                   >
@@ -341,6 +342,7 @@ export default function Login() {
                 {/* Password Field */}
                 <div className="flex flex-col gap-2">
                   <label 
+                    htmlFor="login-password"
                     className="text-sm font-semibold leading-normal ml-1"
                     style={{ color: '#1b110d' }}
                   >
@@ -469,6 +471,7 @@ export default function Login() {
                     {/* Email Field */}
                     <div className="flex flex-col gap-2">
                       <label 
+                        htmlFor="forgot-password-email"
                         className="text-sm font-semibold leading-normal ml-1"
                         style={{ color: '#1b110d' }}
                       >

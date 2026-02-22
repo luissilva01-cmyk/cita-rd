@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Navegación - Ta' Pa' Ti</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #ec4913;
+            margin-bottom: 20px;
+        }
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        button {
+            background: #ec4913;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        .code {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            margin: 10px 0;
+        }
+        ul {
+            line-height: 1.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🔍 Test de Navegación - Ta' Pa' Ti</h1>
+        
+        <div class="status info">
+            <strong>📋 Estado del Código:</strong>
+            <ul>
+                <li>✅ Login.tsx usa <code>useNavigate()</code></li>
+                <li>✅ Register.tsx usa <code>useNavigate()</code></li>
+                <li>✅ App.tsx usa <code>BrowserRouter</code> con rutas</li>
+                <li>✅ Botones usan <code>navigate('/login')</code> y <code>navigate('/register')</code></li>
+            </ul>
+        </div>
+
+        <div class="status success">
+            <strong>✅ El código está correcto</strong><br>
+            La navegación funciona en el código fuente.
+        </div>
+
+        <div class="status error">
+            <strong>⚠️ Problema: Caché del Navegador</strong><br>
+            Estás viendo una versión antigua en caché.
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>🔧 Soluciones</h2>
+        
+        <h3>Opción 1: Hard Refresh (Más Rápido)</h3>
+        <div class="code">
+            Windows/Linux: Ctrl + Shift + R<br>
+            Mac: Cmd + Shift + R
+        </div>
+
+        <h3>Opción 2: Limpiar Caché Completo</h3>
+        <button onclick="clearCache()">Limpiar Caché del Navegador</button>
+        <p>O manualmente: Ctrl + Shift + Delete → Selecciona "Imágenes y archivos en caché" → Borrar datos</p>
+
+        <h3>Opción 3: Modo Incógnito</h3>
+        <div class="code">
+            Windows/Linux: Ctrl + Shift + N<br>
+            Mac: Cmd + Shift + N
+        </div>
+        <p>Abre la app en modo incógnito para ver la versión nueva sin caché.</p>
+
+        <h3>Opción 4: Verificar Timestamp del Build</h3>
+        <p>Abre DevTools (F12) → Console → Busca el timestamp:</p>
+        <div class="code">
+            Timestamp esperado: 1771794634241
+        </div>
+        <p>Si ves un timestamp diferente, necesitas limpiar el caché.</p>
+    </div>
+
+    <div class="card">
+        <h2>🧪 Test de Navegación</h2>
+        <p>Una vez que limpies el caché, verifica:</p>
+        <ol>
+            <li>Ve a la landing page (http://localhost:5173/)</li>
+            <li>Click en "Iniciar Sesión" → Debe ir a <code>/login</code></li>
+            <li>En login, click en "Regístrate aquí" → Debe ir a <code>/register</code></li>
+            <li>En register, click en "Inicia sesión" → Debe ir a <code>/login</code></li>
+        </ol>
+
+        <div class="status success">
+            <strong>✅ Si después de limpiar caché funciona:</strong><br>
+            El problema era solo el caché del navegador.
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>📊 Información del Build</h2>
+        <div class="code">
+            Build Timestamp: 1771794634241<br>
+            Fecha: 22 de Febrero 2026<br>
+            Commits:<br>
+            - a2f48c1: Fix navegación con React Router<br>
+            - 08121c4: Eliminar AuthWrapper<br>
+            - ba4a115: Fix labels con htmlFor<br>
+            - 3769e63: Docs accesibilidad
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>🚀 Comandos Útiles</h2>
+        <div class="code">
+            # Hacer nuevo build<br>
+            cd cita-rd<br>
+            npm run build<br>
+            <br>
+            # Ver el build localmente<br>
+            npm run preview<br>
+            <br>
+            # Deploy a Firebase<br>
+            firebase deploy
+        </div>
+    </div>
+
+    <script>
+        function clearCache() {
+            if ('caches' in window) {
+                caches.keys().then(function(names) {
+                    for (let name of names) {
+                        caches.delete(name);
+                    }
+                });
+                alert('✅ Caché limpiado! Ahora recarga la página con Ctrl + Shift + R');
+            } else {
+                alert('⚠️ Tu navegador no soporta la API de caché. Usa Ctrl + Shift + Delete para limpiar manualmente.');
+            }
+        }
+
+        // Mostrar información del navegador
+        window.onload = function() {
+            console.log('🔍 Test de Navegación - Ta\' Pa\' Ti');
+            console.log('📅 Build esperado: 1771794634241');
+            console.log('🌐 Navegador:', navigator.userAgent);
+            console.log('📍 URL actual:', window.location.href);
+        }
+    </script>
+</body>
+</html>

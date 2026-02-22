@@ -419,9 +419,13 @@ export default function Login({ onNavigateToRegister }: { onNavigateToRegister?:
                 </p>
                 <button
                   onClick={() => {
+                    console.log('🔘 Login - Click en Regístrate aquí');
+                    console.log('🔘 Login - onNavigateToRegister existe?', !!onNavigateToRegister);
                     if (onNavigateToRegister) {
+                      console.log('✅ Login - Llamando a onNavigateToRegister');
                       onNavigateToRegister();
                     } else {
+                      console.log('⚠️ Login - Usando navigate fallback');
                       navigate('/register');
                     }
                   }}

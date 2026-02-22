@@ -476,9 +476,13 @@ export default function Register({ onNavigateToLogin }: { onNavigateToLogin?: ()
               ¿Ya tienes una cuenta?{" "}
               <button
                 onClick={() => {
+                  console.log('🔘 Register - Click en Inicia sesión');
+                  console.log('🔘 Register - onNavigateToLogin existe?', !!onNavigateToLogin);
                   if (onNavigateToLogin) {
+                    console.log('✅ Register - Llamando a onNavigateToLogin');
                     onNavigateToLogin();
                   } else {
+                    console.log('⚠️ Register - Usando navigate fallback');
                     navigate('/login');
                   }
                 }}

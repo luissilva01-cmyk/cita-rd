@@ -12,20 +12,25 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ onBack, initialRoute = '/logi
     initialRoute === '/register' ? 'register' : 'login'
   );
 
-  // Crear versiones modificadas de Login y Register que usan setCurrentView
-  const LoginWithNavigation = () => {
-    // Clonar Login pero interceptar navigate
-    return <Login onNavigateToRegister={() => setCurrentView('register')} />;
+  console.log('🔄 AuthWrapper - currentView:', currentView);
+
+  const handleNavigateToRegister = () => {
+    console.log('📝 AuthWrapper - Navegando a Register');
+    setCurrentView('register');
   };
 
-  const RegisterWithNavigation = () => {
-    // Clonar Register pero interceptar navigate
-    return <Register onNavigateToLogin={() => setCurrentView('login')} />;
+  const handleNavigateToLogin = () => {
+    console.log('🔐 AuthWrapper - Navegando a Login');
+    setCurrentView('login');
   };
 
   return (
     <>
-      {currentView === 'login' ? <LoginWithNavigation /> : <RegisterWithNavigation />}
+      {currentView === 'login' ? (
+        <Login onNavigateToRegister={handleNavigateToRegister} />
+      ) : (
+        <Register onNavigateToLogin={handleNavigateToLogin} />
+      )}
     </>
   );
 };

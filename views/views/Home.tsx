@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { UserProfile } from '../../types';
-import { countReceivedLikes } from '../../services/likesService';
+import { countReceivedLikes, listenToReceivedLikes } from '../../services/likesService';
 
 interface HomeProps {
   currentUser: UserProfile;
@@ -24,13 +24,22 @@ const Home: React.FC<HomeProps> = ({
   const [likesCount, setLikesCount] = useState(0);
 
   useEffect(() => {
-    // Cargar conteo de likes recibidos
+    // Cargar conteo de likes recibidos y escuchar cambios en tiempo real
     const loadLikesCount = async () => {
       const count = await countReceivedLikes(currentUser.id);
       setLikesCount(count);
     };
 
     loadLikesCount();
+
+    // Listener en tiempo real para actualizar el contador
+    const unsubscribe = listenToReceivedLikes(currentUser.id, (likes) => {
+      setLikesCount(likes.length);
+    });
+
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
   }, [currentUser.id]);
 
   const todayDate = new Date().toLocaleDateString('es-DO', { 
@@ -45,28 +54,22 @@ const Home: React.FC<HomeProps> = ({
 
   return (
     <div className="w-full h-full bg-gradient-to-br from-slate-50 to-white pb-6">
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 md:px-10 pt-4 pb-3">
-        <div className="flex items-center gap-2 md:gap-3 flex-1 min-w-0">
-          <div 
-            className="w-11 h-11 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-full border-2 p-0.5 shadow-sm bg-cover bg-center shrink-0" 
-            style={{
-              borderColor: '#ff8052',
-              backgroundImage: `url('${currentUser.images?.[0] || 'https://picsum.photos/seed/user/200/200'}')`
-            }}
-          />
-          <div className="flex-1 min-w-0">
-            <h2 className="text-lg md:text-2xl font-bold tracking-tight truncate">¡Hola, {currentUser.name}! 👋</h2>
-            <p className="text-xs md:text-base font-medium opacity-70 truncate" style={{color: '#a15d45'}}>
-              {todayDate} • {location}
-            </p>
-          </div>
+      {/* User Info Section - Header con saludo personalizado y foto */}
+      <div className="px-4 md:px-10 pt-4 pb-3 flex items-center gap-3">
+        <img 
+          src={currentUser.images?.[0] || 'https://via.placeholder.com/80'} 
+          alt={currentUser.name}
+          className="w-14 h-14 md:w-16 md:h-16 rounded-full object-cover border-3 shadow-lg"
+          style={{borderColor: '#ff6b35', borderWidth: '3px', borderStyle: 'solid'}}
+        />
+        <div className="flex-1 min-w-0">
+          <p className="text-base md:text-lg font-bold truncate" style={{color: '#1e293b'}}>
+            ¡Hola, {currentUser.name}! 👋
+          </p>
+          <p className="text-xs md:text-sm font-medium truncate" style={{color: '#ff6b35'}}>
+            {todayDate} • {location}
+          </p>
         </div>
-        <button className="w-9 h-9 flex items-center justify-center rounded-full bg-white shadow-sm border border-black/5 shrink-0">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5v-5z" />
-          </svg>
-        </button>
       </div>
 
       {/* Banner Motivacional */}

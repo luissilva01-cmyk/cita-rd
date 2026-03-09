@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Heart, Sparkles, Shield, MessageCircle, Users, Zap, ChevronRight, Star, X } from 'lucide-react';
 import { motion } from 'framer-motion';
+import Logo from '../../components/Logo';
 
 const Landing: React.FC = () => {
   const navigate = useNavigate();
@@ -78,10 +79,19 @@ const Landing: React.FC = () => {
             transition={{ duration: 0.6 }}
             className="mb-8"
           >
-            <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl mb-6 shadow-2xl" style={{background: 'linear-gradient(135deg, #ff8052 0%, #ffc107 100%)'}}>
-              <Heart className="w-10 h-10 text-white" fill="currentColor" />
+            <div className="inline-flex items-center justify-center mb-6">
+              <Logo size={80} variant="color" />
             </div>
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 mb-4">
+            <h1 
+              className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-4"
+              style={{
+                background: 'linear-gradient(90deg, #ff6b35 0%, #f7931e 50%, #fdc830 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                display: 'inline-block'
+              }}
+            >
               Ta' Pa' Ti
             </h1>
             <p className="text-xl sm:text-2xl text-gray-600 font-light">
@@ -214,7 +224,17 @@ const Landing: React.FC = () => {
                             {/* Header */}
                             <div className="p-4 flex items-center justify-between">
                               <div className="w-10 h-10 rounded-full" style={{background: 'linear-gradient(135deg, #ff8052 0%, #ffc107 100%)'}}></div>
-                              <div className="text-xl font-bold text-gray-900">Ta' Pa' Ti</div>
+                              <div 
+                                className="text-xl font-bold"
+                                style={{
+                                  background: 'linear-gradient(to right, #f97316, #eab308)',
+                                  WebkitBackgroundClip: 'text',
+                                  WebkitTextFillColor: 'transparent',
+                                  backgroundClip: 'text'
+                                }}
+                              >
+                                Ta' Pa' Ti
+                              </div>
                               <div className="w-10 h-10"></div>
                             </div>
                             
@@ -391,8 +411,19 @@ const Landing: React.FC = () => {
           <div className="grid md:grid-cols-3 gap-8 mb-8">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <Heart className="w-6 h-6" style={{color: '#ff8052'}} fill="currentColor" />
-                <span className="text-gray-900 font-bold text-xl">Ta' Pa' Ti</span>
+                <Logo size={24} useImage={true} />
+                <span 
+                  className="font-bold text-xl"
+                  style={{
+                    background: 'linear-gradient(90deg, #ff6b35 0%, #f7931e 50%, #fdc830 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text',
+                    display: 'inline-block'
+                  }}
+                >
+                  Ta' Pa' Ti
+                </span>
               </div>
               <p className="text-gray-600 text-sm mb-4">
                 Cuando alguien sí te elige

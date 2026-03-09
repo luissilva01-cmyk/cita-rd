@@ -5,18 +5,32 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { listenToTypingStatus } from '../../services/chatService';
 import LazyImage from '../../components/LazyImage';
 import { logger } from '../../utils/logger';
+import { useUnreadMessages } from '../../hooks/useUnreadMessages';
+import StoriesRing from '../../components/StoriesRing';
+import StoriesViewer from '../../components/StoriesViewer';
+import CreateStoryModal from '../../components/CreateStoryModal';
+import { StoryGroup } from '../../services/storiesService';
 
 interface MessagesProps {
   matches: Match[];
   onSelectMatch: (match: Match) => void;
-  currentUserId: string; // NEW: Needed to listen to typing status
+  onSendMessage?: (userId: string, message: string, type?: 'text' | 'story_reaction') => Promise<void>;
+  currentUserId: string;
 }
 
-const Messages: React.FC<MessagesProps> = ({ matches, onSelectMatch, currentUserId }) => {
+const Messages: React.FC<MessagesProps> = ({ matches, onSelectMatch, onSendMessage, currentUserId }) => {
   const { t } = useLanguage();
   
   // Track typing status for each chat
   const [typingStatus, setTypingStatus] = useState<Record<string, boolean>>({});
+  
+  // Get unread counts for each chat
+  const { unreadCounts } = useUnreadMessages(currentUserId);
+  
+  // Estados para Stories
+  const [showStoriesViewer, setShowStoriesViewer] = useState(false);
+  const [selectedStoryGroup, setSelectedStoryGroup] = useState<StoryGroup | null>(null);
+  const [showCreateStoryModal, setShowCreateStoryModal] = useState(false);
   
   // Listen to typing status for all chats
   useEffect(() => {
@@ -39,6 +53,25 @@ const Messages: React.FC<MessagesProps> = ({ matches, onSelectMatch, currentUser
       unsubscribers.forEach(unsub => unsub());
     };
   }, [matches]);
+  
+  // Funciones para Stories
+  const handleStoryClick = (storyGroup: StoryGroup) => {
+    setSelectedStoryGroup(storyGroup);
+    setShowStoriesViewer(true);
+  };
+
+  const handleCreateStory = () => {
+    setShowCreateStoryModal(true);
+  };
+
+  const handleStoryCreated = () => {
+    // Stories se actualizan automáticamente via listener en tiempo real
+  };
+
+  const handleCloseStoriesViewer = () => {
+    setShowStoriesViewer(false);
+    setSelectedStoryGroup(null);
+  };
   
   const formatTime = (timestamp: number) => {
     const date = new Date(timestamp);
@@ -65,10 +98,19 @@ const Messages: React.FC<MessagesProps> = ({ matches, onSelectMatch, currentUser
   }
 
   return (
-    <div className="h-full bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="h-full flex flex-col bg-gradient-to-br from-gray-50 to-gray-100">
+      {/* Stories Section */}
+      <div className="shrink-0 border-b border-gray-200 safe-area-top">
+        <StoriesRing
+          currentUserId={currentUserId}
+          onStoryClick={handleStoryClick}
+          onCreateStory={handleCreateStory}
+        />
+      </div>
+      
       {/* Header - Responsive */}
-      <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-100 safe-area-top">
-        <h2 className="text-xl sm:text-2xl font-bold text-slate-800">{t('messages')}</h2>
+      <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-100">
+        <h3 className="text-lg sm:text-xl font-bold text-slate-800 mb-1">Mensajes</h3>
         <p className="text-slate-600 text-xs sm:text-sm">{t('matchesCount', { count: matches.length.toString() })}</p>
       </div>
 
@@ -94,9 +136,12 @@ const Messages: React.FC<MessagesProps> = ({ matches, onSelectMatch, currentUser
                   });
                 }}
               />
-              {match.unreadCount && match.unreadCount > 0 && (
-                <div className="absolute -top-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 bg-rose-500 rounded-full flex items-center justify-center">
-                  <span className="text-white text-[10px] sm:text-xs font-bold">{match.unreadCount}</span>
+              {/* Badge de mensajes no leídos - estilo WhatsApp/Telegram */}
+              {unreadCounts[match.id] && unreadCounts[match.id] > 0 && (
+                <div className="absolute -top-1 -right-1 w-5 h-5 sm:w-6 sm:h-6 bg-emerald-500 rounded-full flex items-center justify-center shadow-lg">
+                  <span className="text-white text-[10px] sm:text-xs font-bold">
+                    {unreadCounts[match.id] > 99 ? '99+' : unreadCounts[match.id]}
+                  </span>
                 </div>
               )}
             </div>
@@ -130,6 +175,23 @@ const Messages: React.FC<MessagesProps> = ({ matches, onSelectMatch, currentUser
           </button>
         ))}
       </div>
+      
+      {/* Stories Viewer */}
+      <StoriesViewer
+        isOpen={showStoriesViewer}
+        storyGroup={selectedStoryGroup}
+        currentUserId={currentUserId}
+        onClose={handleCloseStoriesViewer}
+        onSendMessage={onSendMessage}
+      />
+      
+      {/* Create Story Modal */}
+      <CreateStoryModal
+        isOpen={showCreateStoryModal}
+        currentUserId={currentUserId}
+        onClose={() => setShowCreateStoryModal(false)}
+        onStoryCreated={handleStoryCreated}
+      />
     </div>
   );
 };

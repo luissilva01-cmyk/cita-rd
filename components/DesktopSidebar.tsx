@@ -4,6 +4,7 @@ import { View } from '../types';
 import { useLanguage } from '../contexts/LanguageContext';
 import StoriesRing from './StoriesRing';
 import { StoryGroup } from '../services/storiesService';
+import Logo from './Logo';
 
 interface DesktopSidebarProps {
   activeView: View;
@@ -13,6 +14,7 @@ interface DesktopSidebarProps {
   onCreateStory?: () => void;
   chats?: any[];
   storiesRefreshKey?: number;
+  totalUnreadMessages?: number;
 }
 
 const DesktopSidebar: React.FC<DesktopSidebarProps> = ({
@@ -22,13 +24,15 @@ const DesktopSidebar: React.FC<DesktopSidebarProps> = ({
   onStoryClick,
   onCreateStory,
   chats = [],
-  storiesRefreshKey = 0
+  storiesRefreshKey = 0,
+  totalUnreadMessages = 0
 }) => {
   const { t } = useLanguage();
 
   // Contar matches y mensajes reales (no hardcodeados)
   const matchesCount = chats.length;
-  const messagesCount = chats.length;
+  // Solo mostrar badge si hay mensajes no leídos
+  const messagesCount = totalUnreadMessages;
 
   return (
     <div className="w-80 bg-white h-full flex flex-col shadow-2xl">
@@ -36,11 +40,19 @@ const DesktopSidebar: React.FC<DesktopSidebarProps> = ({
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center space-x-3">
           {/* Ta' Pa' Ti Logo */}
-          <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-yellow-500 rounded-full flex items-center justify-center">
-            <Flame className="w-6 h-6 text-white" />
+          <div className="w-10 h-10 rounded-full flex items-center justify-center">
+            <Logo size={40} useImage={true} />
           </div>
           <div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-yellow-500 bg-clip-text text-transparent">
+            <h1 
+              className="text-2xl font-bold"
+              style={{
+                background: 'linear-gradient(to right, #f97316, #eab308)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text'
+              }}
+            >
               Ta' Pa' Ti
             </h1>
             <p className="text-xs text-gray-500">cuando alguien sí te elige</p>

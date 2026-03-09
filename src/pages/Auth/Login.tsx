@@ -6,6 +6,7 @@ import { auth } from "../../../services/firebase";
 import { checkStorageAvailability, showStorageWarning } from "../../utils/storageHelper";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, ArrowLeft, Heart, Mail, AlertTriangle, CheckCircle } from "lucide-react";
+import Logo from "../../../components/Logo";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -224,7 +225,7 @@ export default function Login() {
       >
         {/* Top Bar */}
         <div 
-          className="flex items-center p-4 justify-between sticky top-0 z-10 backdrop-blur-sm"
+          className="flex items-center px-4 py-4 justify-between sticky top-0 z-10 backdrop-blur-sm"
           style={{ backgroundColor: 'rgba(248, 246, 246, 0.95)' }}
         >
           <button 
@@ -235,12 +236,17 @@ export default function Login() {
             <ArrowLeft size={24} />
           </button>
           <h2 
-            className="text-lg font-bold leading-tight tracking-[-0.015em] text-center absolute left-1/2 -translate-x-1/2"
-            style={{ color: '#1b110d' }}
+            className="text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pr-10"
+            style={{
+              background: 'linear-gradient(90deg, #ff6b35 0%, #f7931e 50%, #fdc830 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              color: 'transparent'
+            }}
           >
             {showForgotPassword ? 'Recuperar Contraseña' : "Ta' Pa' Ti"}
           </h2>
-          <div className="size-10"></div>
         </div>
 
         {/* Main Content Scrollable Area */}
@@ -253,9 +259,9 @@ export default function Login() {
               <div className="flex flex-col items-center justify-center pt-6 pb-8">
                 <div 
                   className="size-20 rounded-2xl flex items-center justify-center mb-6"
-                  style={{ backgroundColor: 'rgba(255, 107, 107, 0.1)', color: '#FF6B6B' }}
+                  style={{ backgroundColor: 'rgba(255, 107, 107, 0.1)' }}
                 >
-                  <Heart size={40} />
+                  <Logo size={40} useImage={true} />
                 </div>
                 <h1 
                   className="tracking-tight text-[32px] font-extrabold leading-tight text-center mb-2"

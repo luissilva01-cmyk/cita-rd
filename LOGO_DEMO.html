@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ta' Pa' Ti - Demostración de Logos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #1a1a1a;
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 1.1rem;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+        
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #1a1a1a;
+        }
+        
+        .card-description {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 200px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            padding: 20px;
+        }
+        
+        .logo-container.dark {
+            background: #1a1a1a;
+        }
+        
+        .logo-container.gradient {
+            background: linear-gradient(135deg, #EC4913 0%, #FF6B9D 100%);
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .badge.recommended {
+            background: linear-gradient(135deg, #EC4913 0%, #FF6B9D 100%);
+            color: white;
+        }
+        
+        .badge.info {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+        
+        .section-title {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 60px 0 30px;
+            text-align: center;
+            color: #1a1a1a;
+        }
+        
+        .comparison {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 40px;
+        }
+        
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .size-demo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .size-label {
+            font-weight: 600;
+            color: #666;
+            min-width: 80px;
+        }
+        
+        .usage-example {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .usage-title {
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 10px;
+        }
+        
+        code {
+            background: #1a1a1a;
+            color: #4ade80;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+        
+        .code-block {
+            background: #1a1a1a;
+            color: #e0e0e0;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            margin-top: 10px;
+        }
+        
+        .code-block code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+        
+        .pros-cons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .pros, .cons {
+            padding: 15px;
+            border-radius: 10px;
+        }
+        
+        .pros {
+            background: #e8f5e9;
+        }
+        
+        .cons {
+            background: #ffebee;
+        }
+        
+        .pros h4, .cons h4 {
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+        
+        .pros h4 {
+            color: #2e7d32;
+        }
+        
+        .cons h4 {
+            color: #c62828;
+        }
+        
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        ul li {
+            padding: 5px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .pros ul li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #2e7d32;
+            font-weight: bold;
+        }
+        
+        .cons ul li:before {
+            content: "✗";
+            position: absolute;
+            left: 0;
+            color: #c62828;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .pros-cons {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Ta' Pa' Ti - Logos</h1>
+        <p class="subtitle">Elige el diseño perfecto para tu app de citas</p>
+        
+        <!-- Versiones principales -->
+        <div class="grid">
+            <!-- Versión 2 - RECOMENDADA -->
+            <div class="card">
+                <div class="card-title">
+                    <span class="badge recommended">⭐ RECOMENDADA</span>
+                    Versión 2 - Compacta
+                </div>
+                <p class="card-description">
+                    Logo limpio y moderno. Perfecto para iconos de app, favicon y uso general. 
+                    Basado en la segunda imagen que compartiste.
+                </p>
+                <div class="logo-container">
+                    <img src="logo-tapati-v2.svg" alt="Logo V2" style="max-width: 180px; height: auto;">
+                </div>
+                <div class="pros-cons">
+                    <div class="pros">
+                        <h4>Ventajas</h4>
+                        <ul>
+                            <li>Más compacto</li>
+                            <li>Mejor en tamaños pequeños</li>
+                            <li>Moderno y limpio</li>
+                            <li>Versátil</li>
+                        </ul>
+                    </div>
+                    <div class="cons">
+                        <h4>Consideraciones</h4>
+                        <ul>
+                            <li>Menos impacto visual</li>
+                            <li>Requiere buen contraste</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="usage-example">
+                    <div class="usage-title">Uso en React:</div>
+                    <div class="code-block">
+                        <code>&lt;Logo size={60} variant="color" version="v2" /&gt;</code>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Versión 1 -->
+            <div class="card">
+                <div class="card-title">
+                    <span class="badge info">ALTERNATIVA</span>
+                    Versión 1 - Grande
+                </div>
+                <p class="card-description">
+                    Logo más grande con mayor presencia visual. Ideal para landing page y marketing.
+                    Basado en la primera imagen que compartiste.
+                </p>
+                <div class="logo-container">
+                    <img src="logo-tapati-v1.svg" alt="Logo V1" style="max-width: 250px; height: auto;">
+                </div>
+                <div class="pros-cons">
+                    <div class="pros">
+                        <h4>Ventajas</h4>
+                        <ul>
+                            <li>Mayor impacto visual</li>
+                            <li>Perfecto para hero sections</li>
+                            <li>Más detallado</li>
+                        </ul>
+                    </div>
+                    <div class="cons">
+                        <h4>Consideraciones</h4>
+                        <ul>
+                            <li>Ocupa más espacio</li>
+                            <li>No ideal para favicon</li>
+                            <li>Menos versátil</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="usage-example">
+                    <div class="usage-title">Uso en React:</div>
+                    <div class="code-block">
+                        <code>&lt;Logo size={80} variant="color" version="v1" /&gt;</code>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Versión Simple -->
+            <div class="card">
+                <div class="card-title">
+                    <span class="badge info">MINIMALISTA</span>
+                    Versión Simple
+                </div>
+                <p class="card-description">
+                    Diseño ultra minimalista con formas geométricas básicas. Máxima simplicidad.
+                </p>
+                <div class="logo-container">
+                    <img src="logo-simple.svg" alt="Logo Simple" style="max-width: 160px; height: auto;">
+                </div>
+                <div class="pros-cons">
+                    <div class="pros">
+                        <h4>Ventajas</h4>
+                        <ul>
+                            <li>Extremadamente simple</li>
+                            <li>Carga rápida</li>
+                            <li>Escalable</li>
+                        </ul>
+                    </div>
+                    <div class="cons">
+                        <h4>Consideraciones</h4>
+                        <ul>
+                            <li>Menos personalidad</li>
+                            <li>Puede parecer genérico</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="usage-example">
+                    <div class="usage-title">Uso en React:</div>
+                    <div class="code-block">
+                        <code>&lt;Logo size={50} variant="color" version="simple" /&gt;</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Variantes de color -->
+        <h2 class="section-title">🎨 Variantes de Color</h2>
+        <div class="comparison">
+            <div class="comparison-grid">
+                <div>
+                    <h3 style="margin-bottom: 15px; color: #1a1a1a;">Color (Gradiente)</h3>
+                    <div class="logo-container">
+                        <img src="logo-tapati-v2.svg" alt="Logo Color" style="max-width: 150px; height: auto;">
+                    </div>
+                    <p style="color: #666; font-size: 0.9rem; text-align: center;">
+                        Para fondos claros y uso general
+                    </p>
+                </div>
+                
+                <div>
+                    <h3 style="margin-bottom: 15px; color: #1a1a1a;">Blanco</h3>
+                    <div class="logo-container dark">
+                        <img src="logo-white.svg" alt="Logo Blanco" style="max-width: 150px; height: auto;">
+                    </div>
+                    <p style="color: #666; font-size: 0.9rem; text-align: center;">
+                        Para fondos oscuros
+                    </p>
+                </div>
+                
+                <div>
+                    <h3 style="margin-bottom: 15px; color: #1a1a1a;">Negro</h3>
+                    <div class="logo-container">
+                        <img src="logo-black.svg" alt="Logo Negro" style="max-width: 150px; height: auto;">
+                    </div>
+                    <p style="color: #666; font-size: 0.9rem; text-align: center;">
+                        Para impresión y documentos
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Diferentes tamaños -->
+        <h2 class="section-title">📏 Escalabilidad</h2>
+        <div class="comparison">
+            <h3 style="margin-bottom: 20px; color: #1a1a1a;">Versión 2 en diferentes tamaños</h3>
+            <div class="size-demo">
+                <span class="size-label">16px (favicon)</span>
+                <img src="logo-tapati-v2.svg" alt="Logo 16px" style="width: 16px; height: 16px;">
+            </div>
+            <div class="size-demo">
+                <span class="size-label">32px (pequeño)</span>
+                <img src="logo-tapati-v2.svg" alt="Logo 32px" style="width: 32px; height: 32px;">
+            </div>
+            <div class="size-demo">
+                <span class="size-label">64px (mediano)</span>
+                <img src="logo-tapati-v2.svg" alt="Logo 64px" style="width: 64px; height: 64px;">
+            </div>
+            <div class="size-demo">
+                <span class="size-label">128px (grande)</span>
+                <img src="logo-tapati-v2.svg" alt="Logo 128px" style="width: 128px; height: 128px;">
+            </div>
+            <div class="size-demo">
+                <span class="size-label">256px (muy grande)</span>
+                <img src="logo-tapati-v2.svg" alt="Logo 256px" style="width: 256px; height: 256px;">
+            </div>
+        </div>
+        
+        <!-- Guía de uso -->
+        <h2 class="section-title">📖 Guía de Uso</h2>
+        <div class="comparison">
+            <h3 style="margin-bottom: 20px; color: #1a1a1a;">Cómo usar en tu código</h3>
+            
+            <div style="margin-bottom: 30px;">
+                <h4 style="color: #1a1a1a; margin-bottom: 10px;">1. Importar el componente</h4>
+                <div class="code-block">
+                    <code>import Logo from './components/Logo';</code>
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 30px;">
+                <h4 style="color: #1a1a1a; margin-bottom: 10px;">2. Usar en tu JSX</h4>
+                <div class="code-block">
+<code>// Logo por defecto (v2, color, 40px)
+&lt;Logo /&gt;
+
+// Logo grande para landing
+&lt;Logo size={80} variant="color" version="v2" /&gt;
+
+// Logo blanco para navbar oscuro
+&lt;Logo size={50} variant="white" version="v2" /&gt;
+
+// Logo con texto debajo
+&lt;Logo size={100} variant="color" version="v2" showText={true} /&gt;
+
+// Logo versión 1 para hero section
+&lt;Logo size={120} variant="color" version="v1" /&gt;</code>
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 30px;">
+                <h4 style="color: #1a1a1a; margin-bottom: 10px;">3. Props disponibles</h4>
+                <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+                    <thead>
+                        <tr style="background: #f8f9fa;">
+                            <th style="padding: 12px; text-align: left; border-bottom: 2px solid #dee2e6;">Prop</th>
+                            <th style="padding: 12px; text-align: left; border-bottom: 2px solid #dee2e6;">Tipo</th>
+                            <th style="padding: 12px; text-align: left; border-bottom: 2px solid #dee2e6;">Default</th>
+                            <th style="padding: 12px; text-align: left; border-bottom: 2px solid #dee2e6;">Descripción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="padding: 12px; border-bottom: 1px solid #dee2e6;"><code>size</code></td>
+                            <td style="padding: 12px; border-bottom: 1px solid #dee2e6;">number</td>
+                            <td style="padding: 12px; border-bottom: 1px solid #dee2e6;">40</td>
+                            <td style="padding: 12px; border-bottom: 1px solid #dee2e6;">Tamaño en píxeles</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 12px; border-bottom: 1px solid #dee2e6;"><code>variant</code></td>
+                            <td style="padding: 12px; border-bottom: 1px solid #dee2e6;">'color' | 'white' | 'black'</td>
+                            <td style="padding: 12px; border-bottom: 1px solid #dee2e6;">'color'</td>
+                            <td style="padding: 12px; border-bottom: 1px solid #dee2e6;">Variante de color</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 12px; border-bottom: 1px solid #dee2e6;"><code>version</code></td>
+                            <td style="padding: 12px; border-bottom: 1px solid #dee2e6;">'v1' | 'v2' | 'simple'</td>
+                            <td style="padding: 12px; border-bottom: 1px solid #dee2e6;">'v2'</td>
+                            <td style="padding: 12px; border-bottom: 1px solid #dee2e6;">Versión del diseño</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 12px; border-bottom: 1px solid #dee2e6;"><code>showText</code></td>
+                            <td style="padding: 12px; border-bottom: 1px solid #dee2e6;">boolean</td>
+                            <td style="padding: 12px; border-bottom: 1px solid #dee2e6;">false</td>
+                            <td style="padding: 12px; border-bottom: 1px solid #dee2e6;">Mostrar "Ta' Pa' Ti" debajo</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 12px;"><code>className</code></td>
+                            <td style="padding: 12px;">string</td>
+                            <td style="padding: 12px;">''</td>
+                            <td style="padding: 12px;">Clases CSS adicionales</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Recomendación final -->
+        <div class="comparison" style="background: linear-gradient(135deg, #EC4913 0%, #FF6B9D 100%); color: white;">
+            <h2 style="color: white; margin-bottom: 20px; text-align: center;">💡 Recomendación</h2>
+            <p style="font-size: 1.1rem; line-height: 1.8; text-align: center; max-width: 800px; margin: 0 auto;">
+                Te recomiendo usar la <strong>Versión 2 (Compacta)</strong> como logo principal. 
+                Es más versátil, funciona mejor en tamaños pequeños (favicon, iconos de app), 
+                y tiene un diseño más moderno y limpio. Puedes usar la Versión 1 para la landing page 
+                si quieres más impacto visual en el hero section.
+            </p>
+            <div style="text-align: center; margin-top: 30px;">
+                <div style="background: white; display: inline-block; padding: 30px; border-radius: 20px;">
+                    <img src="logo-tapati-v2.svg" alt="Logo Recomendado" style="max-width: 200px; height: auto;">
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

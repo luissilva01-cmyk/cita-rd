@@ -71,6 +71,25 @@ const ChatView: React.FC<ChatViewProps> = ({
   const scrollRef = useRef<HTMLDivElement>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
+  // Detectar si estamos en desktop (>=1024px)
+  const [isDesktop, setIsDesktop] = useState(false);
+  
+  useEffect(() => {
+    const checkDesktop = () => {
+      setIsDesktop(window.innerWidth >= 1024);
+    };
+    
+    // Check inicial
+    checkDesktop();
+    
+    // Listener para cambios de tamaño
+    window.addEventListener('resize', checkDesktop);
+    
+    return () => {
+      window.removeEventListener('resize', checkDesktop);
+    };
+  }, []);
+  
   // Estados para nuevas funcionalidades
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
@@ -813,9 +832,26 @@ const ChatView: React.FC<ChatViewProps> = ({
   };
 
   return (
-    <div className="flex flex-col bg-white animate-in slide-in-from-right duration-300 chat-view-container h-full" style={{ minWidth: 0 }}>
+    <div 
+      className="flex flex-col bg-white chat-view-container" 
+      style={{ 
+        minWidth: 0,
+        ...(isDesktop ? {
+          height: 'calc(100vh - 8rem)',
+          maxHeight: 'calc(100vh - 8rem)',
+          overflow: 'hidden',
+          borderRadius: '16px',
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+        } : {})
+      }}
+    >
       {/* Header - Responsive */}
-      <div className="bg-white/90 backdrop-blur-md border-b border-slate-100 px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between flex-shrink-0 z-20 safe-area-top">
+      <div className="bg-white backdrop-blur-md border-b border-slate-200 px-3 sm:px-4 lg:px-6 py-3 sm:py-3 lg:py-4 flex items-center justify-between flex-shrink-0 z-20 safe-area-top" style={{
+        ...(isDesktop ? {
+          borderTopLeftRadius: '16px',
+          borderTopRightRadius: '16px'
+        } : {})
+      }}>
         <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
           <button 
             onClick={onBack} 
@@ -826,15 +862,15 @@ const ChatView: React.FC<ChatViewProps> = ({
           <img 
             src={match.user.images[0]} 
             alt={match.user.name}
-            className="w-8 h-8 sm:w-10 sm:h-10 rounded-full profile-image-smart shadow-sm flex-shrink-0" 
+            className="w-10 h-10 sm:w-11 sm:h-11 lg:w-12 lg:h-12 rounded-full profile-image-smart shadow-md flex-shrink-0 ring-2 ring-white" 
           />
           <div className="min-w-0 flex-1">
-            <h3 className="font-bold text-sm sm:text-base truncate">{match.user.name}</h3>
-            <p className={`text-[9px] sm:text-[10px] font-bold uppercase flex items-center gap-1 ${
+            <h3 className="font-bold text-sm sm:text-base lg:text-lg truncate text-slate-800">{match.user.name}</h3>
+            <p className={`text-[9px] sm:text-[10px] lg:text-xs font-semibold uppercase flex items-center gap-1.5 ${
               otherUserPresence.online ? 'text-emerald-500' : 'text-slate-400'
             }`}>
-              <span className={`w-1.5 h-1.5 rounded-full ${
-                otherUserPresence.online ? 'bg-emerald-500' : 'bg-slate-400'
+              <span className={`w-1.5 h-1.5 lg:w-2 lg:h-2 rounded-full ${
+                otherUserPresence.online ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'
               }`}></span>
               {formatPresenceStatus(otherUserPresence, t)}
             </p>
@@ -865,7 +901,17 @@ const ChatView: React.FC<ChatViewProps> = ({
       {/* Messages - Responsive */}
       <div 
         ref={scrollRef} 
-        className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4 bg-slate-50/50 no-scrollbar chat-messages-area"
+        className="flex-1 overflow-y-auto p-3 sm:p-4 lg:p-6 space-y-3 sm:space-y-4 chat-messages-area"
+        style={{
+          background: 'linear-gradient(to bottom, #f8fafc 0%, #f1f5f9 100%)',
+          ...(isDesktop ? {
+            flex: '1 1 auto',
+            minHeight: 0,
+            maxHeight: '100%',
+            overflowY: 'auto',
+            overflowX: 'hidden'
+          } : {})
+        }}
       >
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center py-6 sm:py-8 px-4">
@@ -889,12 +935,12 @@ const ChatView: React.FC<ChatViewProps> = ({
               >
                 {/* Mensaje de texto */}
                 {msg.type === 'text' && (
-                  <div className="flex flex-col gap-1 max-w-[85%] sm:max-w-[75%]">
+                  <div className="flex flex-col gap-1 max-w-[85%] sm:max-w-[75%] lg:max-w-[65%]">
                     <div 
-                      className={`px-3 sm:px-4 py-2 sm:py-2.5 rounded-2xl text-sm message-bubble cursor-pointer inline-block ${
+                      className={`px-4 sm:px-4 lg:px-5 py-2.5 sm:py-2.5 lg:py-3 rounded-2xl text-sm lg:text-base message-bubble cursor-pointer inline-block transition-all hover:scale-[1.02] ${
                         msg.senderId === currentUserId 
-                          ? 'bg-rose-500 text-white rounded-tr-none shadow-md shadow-rose-100' 
-                          : 'bg-white text-slate-800 rounded-tl-none border border-slate-100 shadow-sm'
+                          ? 'bg-gradient-to-br from-rose-500 to-rose-600 text-white rounded-tr-none shadow-lg shadow-rose-200' 
+                          : 'bg-white text-slate-800 rounded-tl-none border border-slate-200 shadow-md hover:shadow-lg'
                       } ${msg.deletedForEveryone ? 'italic opacity-60' : ''}`}
                       style={{ 
                         wordBreak: 'break-word', 
@@ -1111,7 +1157,18 @@ const ChatView: React.FC<ChatViewProps> = ({
       </div>
 
       {/* Input - Responsive */}
-      <div className="p-3 sm:p-4 bg-white border-t border-slate-100 safe-area-bottom chat-input-area flex-shrink-0">
+      <div 
+        className="p-3 sm:p-4 lg:p-5 bg-white border-t border-slate-200 safe-area-bottom chat-input-area flex-shrink-0"
+        style={{
+          ...(isDesktop ? {
+            flexShrink: 0,
+            flexGrow: 0,
+            borderBottomLeftRadius: '16px',
+            borderBottomRightRadius: '16px',
+            boxShadow: '0 -2px 10px rgba(0, 0, 0, 0.05)'
+          } : {})
+        }}
+      >
         
         {/* Grabación de voz activa - Responsive */}
         {isRecording && (
@@ -1194,7 +1251,7 @@ const ChatView: React.FC<ChatViewProps> = ({
           </div>
         )}
 
-        <div className="flex items-center gap-1 bg-slate-100 rounded-full px-2 sm:px-3 py-1 focus-within:bg-white focus-within:ring-2 focus-within:ring-rose-500 focus-within:border-rose-500 transition-all w-full">
+        <div className="flex items-center gap-1 sm:gap-1.5 lg:gap-2 bg-slate-50 rounded-full px-2 sm:px-3 lg:px-4 py-1 focus-within:bg-white focus-within:ring-2 focus-within:ring-rose-500 focus-within:border-rose-500 transition-all w-full border border-slate-200">
           
           {/* Input file oculto para fotos */}
           <input
@@ -1209,48 +1266,48 @@ const ChatView: React.FC<ChatViewProps> = ({
           {/* Botón de emoji - Touch optimized */}
           <button
             onClick={() => setShowEmojiPicker(true)}
-            className="text-slate-400 hover:text-slate-600 transition-colors p-1.5 sm:p-2 min-w-[40px] min-h-[40px] sm:min-w-[44px] sm:min-h-[44px] flex items-center justify-center flex-shrink-0"
+            className="text-slate-400 hover:text-rose-500 transition-colors p-1.5 sm:p-2 min-w-[40px] min-h-[40px] sm:min-w-[44px] sm:min-h-[44px] flex items-center justify-center flex-shrink-0 rounded-full hover:bg-slate-100"
             disabled={isRecording || isRecordingVideo}
           >
-            <Smile size={16} className="sm:w-5 sm:h-5" />
+            <Smile size={18} className="sm:w-5 sm:h-5" />
           </button>
 
           {/* Botón de foto - Touch optimized */}
           <button
             onClick={handlePhotoButtonClick}
-            className="text-slate-400 hover:text-slate-600 transition-colors p-1.5 sm:p-2 min-w-[40px] min-h-[40px] sm:min-w-[44px] sm:min-h-[44px] flex items-center justify-center flex-shrink-0"
+            className="text-slate-400 hover:text-rose-500 transition-colors p-1.5 sm:p-2 min-w-[40px] min-h-[40px] sm:min-w-[44px] sm:min-h-[44px] flex items-center justify-center flex-shrink-0 rounded-full hover:bg-slate-100"
             title="Enviar foto"
             disabled={isRecording || isRecordingVideo}
           >
-            <ImageIcon size={16} className="sm:w-5 sm:h-5" />
+            <ImageIcon size={18} className="sm:w-5 sm:h-5" />
           </button>
 
           {/* Botón de videomensaje - Touch optimized */}
           <button
             onClick={isRecordingVideo ? handleStopVideoRecording : handleStartVideoRecording}
-            className={`transition-colors p-1.5 sm:p-2 min-w-[40px] min-h-[40px] sm:min-w-[44px] sm:min-h-[44px] flex items-center justify-center flex-shrink-0 ${
+            className={`transition-colors p-1.5 sm:p-2 min-w-[40px] min-h-[40px] sm:min-w-[44px] sm:min-h-[44px] flex items-center justify-center flex-shrink-0 rounded-full hover:bg-slate-100 ${
               isRecordingVideo 
                 ? 'text-purple-500 hover:text-purple-600' 
-                : 'text-slate-400 hover:text-slate-600'
+                : 'text-slate-400 hover:text-rose-500'
             }`}
             title={isRecordingVideo ? 'Detener grabación de video' : 'Grabar videomensaje'}
             disabled={isRecording}
           >
-            <VideoIcon size={16} className="sm:w-5 sm:h-5" />
+            <VideoIcon size={18} className="sm:w-5 sm:h-5" />
           </button>
 
           {/* Botón de micrófono - Touch optimized */}
           <button
             onClick={isRecording ? handleStopVoiceRecording : handleStartVoiceRecording}
-            className={`transition-colors p-1.5 sm:p-2 min-w-[40px] min-h-[40px] sm:min-w-[44px] sm:min-h-[44px] flex items-center justify-center flex-shrink-0 ${
+            className={`transition-colors p-1.5 sm:p-2 min-w-[40px] min-h-[40px] sm:min-w-[44px] sm:min-h-[44px] flex items-center justify-center flex-shrink-0 rounded-full hover:bg-slate-100 ${
               isRecording 
                 ? 'text-red-500 hover:text-red-600' 
-                : 'text-slate-400 hover:text-slate-600'
+                : 'text-slate-400 hover:text-rose-500'
             }`}
             title={isRecording ? 'Detener grabación' : 'Grabar mensaje de voz'}
             disabled={isRecordingVideo}
           >
-            {isRecording ? <MicOff size={16} className="sm:w-5 sm:h-5" /> : <Mic size={16} className="sm:w-5 sm:h-5" />}
+            {isRecording ? <MicOff size={18} className="sm:w-5 sm:h-5" /> : <Mic size={18} className="sm:w-5 sm:h-5" />}
           </button>
 
           <textarea 
@@ -1260,20 +1317,20 @@ const ChatView: React.FC<ChatViewProps> = ({
             onKeyDown={handleKeyDown}
             placeholder={t('typeSomethingCool')}
             rows={1}
-            className="flex-1 bg-transparent border-none focus:ring-0 py-2 sm:py-3 text-sm outline-none placeholder-slate-400 min-h-[40px] sm:min-h-[44px] max-h-[120px] min-w-0 resize-none overflow-y-auto"
+            className="flex-1 bg-transparent border-none focus:ring-0 py-2 sm:py-3 text-sm lg:text-base outline-none placeholder-slate-400 min-h-[40px] sm:min-h-[44px] max-h-[120px] min-w-0 resize-none overflow-y-auto"
             disabled={isRecording || isRecordingVideo}
           />
           
           <button 
             onClick={handleSendMessage}
             disabled={!inputValue.trim() || isRecording || isRecordingVideo}
-            className={`p-1.5 sm:p-2 rounded-full transition-all min-w-[40px] min-h-[40px] sm:min-w-[44px] sm:min-h-[44px] flex items-center justify-center flex-shrink-0 ${
+            className={`p-2 sm:p-2.5 rounded-full transition-all min-w-[40px] min-h-[40px] sm:min-w-[44px] sm:min-h-[44px] flex items-center justify-center flex-shrink-0 ${
               inputValue.trim() && !isRecording && !isRecordingVideo
-                ? 'text-white bg-rose-500 hover:bg-rose-600 shadow-md' 
-                : 'text-slate-300'
+                ? 'text-white bg-gradient-to-br from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 shadow-lg shadow-rose-200 hover:shadow-xl hover:scale-105' 
+                : 'text-slate-300 bg-slate-100'
             }`}
           >
-            <Send size={16} className="sm:w-4.5 sm:h-4.5" />
+            <Send size={18} className="sm:w-5 sm:h-5" />
           </button>
         </div>
       </div>

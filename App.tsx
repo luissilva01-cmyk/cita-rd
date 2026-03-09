@@ -32,7 +32,7 @@ import { privacyService } from './services/privacyService';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { StoryGroup } from './services/storiesService';
 import { auth, db } from './services/firebase';
-import { doc, getDoc, setDoc, serverTimestamp, getFirestore } from 'firebase/firestore';
+import { doc, getDoc, setDoc, deleteDoc, serverTimestamp, getFirestore } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { setUserOnline, setUserOffline } from './services/presenceService';
 import { logger } from './utils/logger';
@@ -40,6 +40,7 @@ import NotificationPermissionPrompt from './components/NotificationPermissionPro
 import { analyticsService } from './services/analyticsService';
 import { errorTrackingService } from './services/errorTrackingService';
 import { AnalyticsDashboard } from './components/AnalyticsDashboard';
+import { useUnreadMessages } from './hooks/useUnreadMessages';
 
 const INITIAL_POTENTIAL_MATCHES: UserProfile[] = [];
 
@@ -99,6 +100,11 @@ const App: React.FC = () => {
   
   // Estado para mostrar prompt de notificaciones
   const [showNotificationPrompt, setShowNotificationPrompt] = useState(false);
+  
+  // Hook para contador de mensajes no leídos
+  console.log('🔔 [APP] Llamando useUnreadMessages con userId:', currentUser?.id);
+  const { unreadCounts, totalUnread } = useUnreadMessages(currentUser?.id);
+  console.log('🔔 [APP] useUnreadMessages retornó:', { totalUnread, unreadCounts });
 
   // Cargar perfil del usuario autenticado
   useEffect(() => {
@@ -422,6 +428,14 @@ const App: React.FC = () => {
         
         logger.match.success('Match creado en Firestore', { matchId: chatId });
         
+        // Eliminar el like recibido (reverseLikeRef) ya que se convirtió en match
+        try {
+          await deleteDoc(reverseLikeRef);
+          logger.match.info('Like recibido eliminado después del match', { likeId: reverseLikeRef.id });
+        } catch (deleteError) {
+          logger.match.warn('No se pudo eliminar el like recibido, pero el match se creó correctamente', deleteError);
+        }
+        
         return true; // Hay match
       } else {
         // No hay match todavía, solo se guardó el like
@@ -674,8 +688,17 @@ const App: React.FC = () => {
             <LikesReceived
               currentUserId={user.id}
               onLike={handleLike}
-              onPass={(userId) => {
+              onPass={async (userId) => {
                 logger.match.info('Usuario pasado desde likes recibidos', { userId });
+                // Eliminar el like de la base de datos
+                try {
+                  const db = getFirestore();
+                  const likeRef = doc(db, 'likes', `${userId}_${user.id}`);
+                  await deleteDoc(likeRef);
+                  logger.match.info('Like eliminado después de pass', { fromUserId: userId, toUserId: user.id });
+                } catch (error) {
+                  logger.match.error('Error eliminando like después de pass', error);
+                }
               }}
               onBack={() => setActiveView('home')}
             />
@@ -803,6 +826,7 @@ const App: React.FC = () => {
             onStoryClick={handleStoryClick}
             onCreateStory={handleCreateStory}
             storiesRefreshKey={storiesRefreshKey}
+            totalUnreadMessages={totalUnread}
           >
             {renderView()}
           </Layout>

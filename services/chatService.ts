@@ -124,11 +124,22 @@ export const sendMessage = async (
                              type === 'story_reaction' ? `${text} Reaccionó a tu historia` :
                              'Mensaje';
       
-      await updateDoc(doc(db, "chats", chatId), {
-        lastMessage: lastMessageText,
-        timestamp: Date.now(),
-        serverTimestamp: serverTimestamp()
-      });
+      // Obtener el chat para saber quién es el receptor
+      const chatDoc = await getDoc(doc(db, "chats", chatId));
+      if (chatDoc.exists()) {
+        const chatData = chatDoc.data();
+        const receiverId = chatData.participants.find((id: string) => id !== senderId);
+        
+        if (receiverId) {
+          // Incrementar contador de no leídos para el receptor
+          await updateDoc(doc(db, "chats", chatId), {
+            lastMessage: lastMessageText,
+            timestamp: Date.now(),
+            serverTimestamp: serverTimestamp(),
+            [`unreadCount_${receiverId}`]: (chatData[`unreadCount_${receiverId}`] || 0) + 1
+          });
+        }
+      }
     },
     {
       maxRetries: 3,
@@ -323,7 +334,12 @@ export const markMessagesAsRead = async (
 
     await Promise.all(updatePromises);
     
-    logger.chat.success('Mensajes marcados como leídos', { count: messageIds.length });
+    // Resetear contador de no leídos para este usuario
+    await updateDoc(doc(db, "chats", chatId), {
+      [`unreadCount_${userId}`]: 0
+    });
+    
+    logger.chat.success('Mensajes marcados como leídos y contador reseteado', { count: messageIds.length });
   } catch (error) {
     logger.chat.error('Error marcando mensajes como leídos', error);
   }

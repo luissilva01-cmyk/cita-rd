@@ -1,14 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { Heart, MessageCircle, Clock, MapPin, Sparkles } from 'lucide-react';
+import { Heart, MessageCircle, Clock, MapPin, Sparkles, CheckCircle2 } from 'lucide-react';
 import { UserProfile, Match } from '../../types';
 import { useLanguage } from '../../contexts/LanguageContext';
 import LazyImage from '../../components/LazyImage';
 import { logger } from '../../utils/logger';
+import StoriesRing from '../../components/StoriesRing';
+import StoriesViewer from '../../components/StoriesViewer';
+import CreateStoryModal from '../../components/CreateStoryModal';
+import { StoryGroup } from '../../services/storiesService';
 
 interface MatchesProps {
   matches?: Match[];
   onSelectMatch?: (match: Match) => void;
   onStartChat?: (userId: string) => void;
+  onSendMessage?: (userId: string, message: string, type?: 'text' | 'story_reaction') => Promise<void>;
   currentUserId?: string;
 }
 
@@ -16,11 +21,17 @@ const Matches: React.FC<MatchesProps> = ({
   matches,
   onSelectMatch,
   onStartChat,
+  onSendMessage,
   currentUserId = 'demo-user'
 }) => {
   const { t } = useLanguage();
   const [displayMatches, setDisplayMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // Estados para Stories
+  const [showStoriesViewer, setShowStoriesViewer] = useState(false);
+  const [selectedStoryGroup, setSelectedStoryGroup] = useState<StoryGroup | null>(null);
+  const [showCreateStoryModal, setShowCreateStoryModal] = useState(false);
 
   useEffect(() => {
     // Simular carga de matches
@@ -54,6 +65,25 @@ const Matches: React.FC<MatchesProps> = ({
       onStartChat(match.user.id);
     }
   };
+  
+  // Funciones para Stories
+  const handleStoryClick = (storyGroup: StoryGroup) => {
+    setSelectedStoryGroup(storyGroup);
+    setShowStoriesViewer(true);
+  };
+
+  const handleCreateStory = () => {
+    setShowCreateStoryModal(true);
+  };
+
+  const handleStoryCreated = () => {
+    // Stories se actualizan automáticamente via listener en tiempo real
+  };
+
+  const handleCloseStoriesViewer = () => {
+    setShowStoriesViewer(false);
+    setSelectedStoryGroup(null);
+  };
 
   if (loading) {
     return (
@@ -84,136 +114,132 @@ const Matches: React.FC<MatchesProps> = ({
   }
 
   return (
-    <div className="h-full flex flex-col bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="h-full flex flex-col bg-slate-50">
+      {/* Stories Section */}
+      <div className="shrink-0 border-b border-gray-200 safe-area-top">
+        <StoriesRing
+          currentUserId={currentUserId}
+          onStoryClick={handleStoryClick}
+          onCreateStory={handleCreateStory}
+        />
+      </div>
+      
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-4 py-4 safe-area-top">
+      <div className="bg-white border-b border-gray-200 px-4 pt-6 pb-4 flex-shrink-0">
         <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-slate-800">Matches</h1>
-            <p className="text-sm text-slate-600">{displayMatches.length} conexiones</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Sparkles className="text-orange-500" size={20} />
-            <span className="text-sm font-medium text-orange-600">
-              {displayMatches.filter(m => m.unreadCount && m.unreadCount > 0).length} nuevos
+          <h1 className="text-2xl font-bold text-slate-800">Matches</h1>
+          <div className="flex items-center gap-2 bg-orange-50 px-3 py-1.5 rounded-full">
+            <Sparkles className="text-orange-500" size={16} />
+            <span className="text-sm font-semibold text-orange-600">
+              {displayMatches.length}
             </span>
           </div>
         </div>
       </div>
 
-      {/* Matches List */}
-      <div className="flex-1 overflow-y-auto">
-        <div className="p-4 space-y-4">
+      {/* Matches Grid */}
+      <div className="flex-1 overflow-y-auto px-4 pt-4 pb-20">
+        <div className="grid grid-cols-3 gap-3">
           {displayMatches.map((match) => (
             <div
               key={match.id}
               onClick={() => handleMatchClick(match)}
-              className="bg-white rounded-2xl p-4 shadow-sm hover:shadow-md transition-all cursor-pointer border border-gray-100"
+              className="group relative flex flex-col gap-2 cursor-pointer active:scale-95 transition-transform duration-200"
             >
-              <div className="flex items-center space-x-4">
-                {/* Profile Image */}
-                <div className="relative">
-                  <div className="w-16 h-16 rounded-full overflow-hidden">
-                    <LazyImage
-                      src={match.user.images[0]}
-                      alt={match.user.name}
-                      className="w-full h-full object-cover"
-                      rootMargin="100px"
-                      onError={(error) => {
-                        logger.match.warn('Error cargando imagen de match', { 
-                          userName: match.user.name,
-                          error 
-                        });
-                        // Fallback a imagen por defecto
-                        const img = document.querySelector(`img[alt="${match.user.name}"]`) as HTMLImageElement;
-                        if (img) {
-                          img.src = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=face';
-                        }
-                      }}
-                    />
+              {/* Card Image */}
+              <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-gray-200 shadow-md">
+                <LazyImage
+                  src={match.user.images[0]}
+                  alt={match.user.name}
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  rootMargin="100px"
+                  onError={(error) => {
+                    logger.match.warn('Error cargando imagen de match', { 
+                      userName: match.user.name,
+                      error 
+                    });
+                  }}
+                />
+                
+                {/* Online Status */}
+                <div className="absolute top-2 right-2 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full shadow-sm"></div>
+                
+                {/* Unread Badge */}
+                {match.unreadCount && match.unreadCount > 0 && (
+                  <div className="absolute top-2 left-2 bg-rose-500 text-white text-[10px] font-bold rounded-full min-w-[20px] h-5 px-1.5 flex items-center justify-center shadow-lg">
+                    {match.unreadCount}
                   </div>
-                  
-                  {/* Online indicator */}
-                  <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 border-2 border-white rounded-full"></div>
-                  
-                  {/* Unread badge */}
-                  {match.unreadCount && match.unreadCount > 0 && (
-                    <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
-                      {match.unreadCount}
-                    </div>
+                )}
+                
+                {/* Gradient Overlay */}
+                <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                
+                {/* Quick Action Button */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleMatchClick(match);
+                  }}
+                  className="absolute bottom-2 right-2 p-2 bg-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all hover:scale-110 active:scale-95"
+                >
+                  <MessageCircle className="text-rose-500" size={14} />
+                </button>
+              </div>
+              
+              {/* Card Info */}
+              <div className="px-0.5">
+                <div className="flex items-center gap-1 mb-0.5">
+                  <h3 className="text-slate-800 text-sm font-bold leading-none truncate">
+                    {match.user.name}, {match.user.age}
+                  </h3>
+                  {match.user.isVerified && (
+                    <CheckCircle2 className="text-blue-500 flex-shrink-0" size={12} />
                   )}
                 </div>
-
-                {/* Match Info */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-semibold text-slate-800 truncate">
-                      {match.user.name}, {match.user.age}
-                    </h3>
-                    {match.user.isVerified && (
-                      <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
-                        <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="flex items-center gap-1 text-sm text-slate-500 mb-2">
-                    <MapPin size={12} />
-                    <span>{match.user.location}</span>
-                    {match.user.distance && (
-                      <>
-                        <span>•</span>
-                        <span>{match.user.distance}</span>
-                      </>
-                    )}
-                  </div>
-                  
-                  <p className="text-sm text-slate-600 truncate">
-                    {match.lastMessage}
-                  </p>
+                
+                <div className="flex items-center gap-0.5 text-slate-500 text-xs font-medium mb-1.5">
+                  <MapPin size={10} className="flex-shrink-0" />
+                  <span className="truncate">{match.user.location}</span>
                 </div>
-
-                {/* Time and Action */}
-                <div className="flex flex-col items-end space-y-2">
-                  <div className="flex items-center gap-1 text-xs text-slate-400">
-                    <Clock size={12} />
-                    <span>{formatTimeAgo(match.timestamp)}</span>
-                  </div>
-                  
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleMatchClick(match);
-                    }}
-                    className="p-2 bg-gradient-to-r from-rose-500 to-pink-600 text-white rounded-full hover:shadow-lg transition-all"
-                  >
-                    <MessageCircle size={16} />
-                  </button>
+                
+                {/* Interests */}
+                <div className="flex gap-1 flex-wrap">
+                  {Array.isArray(match.user.interests) && match.user.interests.slice(0, 1).map((interest, index) => (
+                    <span
+                      key={index}
+                      className="px-1.5 py-0.5 rounded-md bg-slate-200 text-[9px] font-semibold text-slate-600 truncate max-w-full"
+                    >
+                      {interest}
+                    </span>
+                  ))}
+                  {Array.isArray(match.user.interests) && match.user.interests.length > 1 && (
+                    <span className="px-1.5 py-0.5 rounded-md bg-slate-200 text-[9px] font-semibold text-slate-600">
+                      +{match.user.interests.length - 1}
+                    </span>
+                  )}
                 </div>
-              </div>
-
-              {/* Interests Preview */}
-              <div className="mt-3 flex flex-wrap gap-1">
-                {Array.isArray(match.user.interests) && match.user.interests.slice(0, 3).map((interest, index) => (
-                  <span
-                    key={index}
-                    className="px-2 py-1 bg-orange-50 text-orange-700 rounded-full text-xs font-medium"
-                  >
-                    {interest}
-                  </span>
-                ))}
-                {Array.isArray(match.user.interests) && match.user.interests.length > 3 && (
-                  <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-medium">
-                    +{match.user.interests.length - 3}
-                  </span>
-                )}
               </div>
             </div>
           ))}
         </div>
       </div>
+      
+      {/* Stories Viewer */}
+      <StoriesViewer
+        isOpen={showStoriesViewer}
+        storyGroup={selectedStoryGroup}
+        currentUserId={currentUserId}
+        onClose={handleCloseStoriesViewer}
+        onSendMessage={onSendMessage}
+      />
+      
+      {/* Create Story Modal */}
+      <CreateStoryModal
+        isOpen={showCreateStoryModal}
+        currentUserId={currentUserId}
+        onClose={() => setShowCreateStoryModal(false)}
+        onStoryCreated={handleStoryCreated}
+      />
     </div>
   );
 };

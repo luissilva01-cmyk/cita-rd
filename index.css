@@ -902,6 +902,46 @@ body {
   }
   
   /* Chat view container is controlled by DesktopLayout Grid - NO width constraints here */
+  
+  /* DESKTOP CHAT SCROLL FIX - 06 Mar 2026 V3 - DEFINITIVO */
+  /* Dar altura fija al chat para separar su scroll del scroll de la página */
+  
+  /* Contenedor principal del chat */
+  div.chat-view-container {
+    height: calc(100vh - 8rem) !important; /* Altura fija: viewport menos padding */
+    max-height: calc(100vh - 8rem) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important; /* Prevenir scroll en el contenedor principal */
+  }
+  
+  /* Header del chat: fijo arriba */
+  div.chat-view-container > div:first-child {
+    flex-shrink: 0 !important; /* No se encoge */
+  }
+  
+  /* Área de mensajes: scroll interno */
+  div.chat-messages-area {
+    flex: 1 1 auto !important; /* Toma todo el espacio disponible */
+    overflow-y: auto !important; /* Scroll interno solo aquí */
+    overflow-x: hidden !important;
+    min-height: 0 !important; /* Importante para que flex funcione correctamente */
+    max-height: 100% !important;
+  }
+  
+  /* Input del chat: fijo abajo */
+  div.chat-input-area {
+    flex-shrink: 0 !important; /* No se encoge */
+    flex-grow: 0 !important;
+  }
+}
+
+/* Desktop XL (padding más grande) */
+@media (min-width: 1280px) {
+  div.chat-view-container {
+    height: calc(100vh - 12rem) !important; /* Menos altura para compensar padding xl:p-12 */
+    max-height: calc(100vh - 12rem) !important;
+  }
 }
 
 /* Universal image/video constraints */

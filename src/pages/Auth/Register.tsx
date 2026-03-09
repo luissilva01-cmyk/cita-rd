@@ -232,7 +232,13 @@ export default function Register() {
           </button>
           <h2 
             className="text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pr-10"
-            style={{ color: '#1b110d' }}
+            style={{
+              background: 'linear-gradient(90deg, #ff6b35 0%, #f7931e 50%, #fdc830 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              display: 'inline-block'
+            }}
           >
             Ta' Pa' Ti
           </h2>

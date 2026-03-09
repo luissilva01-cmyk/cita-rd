@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Heart, MessageCircle, Sparkles, User, Flame, Home } from 'lucide-react';
+import { Heart, MessageCircle, Sparkles, User, Home } from 'lucide-react';
 import { View } from '../../types';
 import { useLanguage } from '../../contexts/LanguageContext';
 import NotificationBadge from '../NotificationBadge';
@@ -8,6 +8,7 @@ import { useNotifications } from '../../hooks/useNotifications';
 import { useScreenSize } from '../../hooks/useScreenSize';
 import DesktopLayout from '../DesktopLayout';
 import { StoryGroup } from '../../services/storiesService';
+import Logo from '../Logo';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -18,6 +19,7 @@ interface LayoutProps {
   onStoryClick?: (storyGroup: StoryGroup) => void;
   onCreateStory?: () => void;
   storiesRefreshKey?: number;
+  totalUnreadMessages?: number;
 }
 
 const Layout: React.FC<LayoutProps> = ({ 
@@ -28,7 +30,8 @@ const Layout: React.FC<LayoutProps> = ({
   currentUserId = '',
   onStoryClick,
   onCreateStory,
-  storiesRefreshKey = 0
+  storiesRefreshKey = 0,
+  totalUnreadMessages = 0
 }) => {
   const { t } = useLanguage();
   const { notifications, clearNotifications } = useNotifications(chats, currentUserId);
@@ -45,6 +48,7 @@ const Layout: React.FC<LayoutProps> = ({
         onCreateStory={onCreateStory}
         chats={chats}
         storiesRefreshKey={storiesRefreshKey}
+        totalUnreadMessages={totalUnreadMessages}
       >
         {children}
       </DesktopLayout>
@@ -57,12 +61,22 @@ const Layout: React.FC<LayoutProps> = ({
       {/* Header */}
       <header className="px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center bg-white/80 backdrop-blur-md z-10 border-b border-slate-100 flex-shrink-0">
         <div className="flex items-center gap-2">
-          <div className="bg-gradient-to-tr p-1.5 rounded-lg" style={{background: 'linear-gradient(to top right, #FF6B6B, #FFD93D)'}}>
-            <Flame className="text-white" size={18} />
+          <Logo size={24} useImage={true} />
+          <div className="flex flex-col">
+            <h1 
+              className="text-xl sm:text-2xl lg:text-3xl font-bold leading-tight"
+              style={{
+                background: 'linear-gradient(90deg, #ff6b35 0%, #f7931e 50%, #fdc830 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                color: 'transparent'
+              }}
+            >
+              Ta' Pa' Ti
+            </h1>
+            <p className="text-[10px] sm:text-xs text-gray-500 -mt-0.5">cuando alguien sí te elige</p>
           </div>
-          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold bg-clip-text text-transparent" style={{background: 'linear-gradient(to right, #FF6B6B, #FFD93D)', WebkitBackgroundClip: 'text'}}>
-            Ta' Pa' Ti
-          </h1>
         </div>
         <button 
           onClick={() => onViewChange('ai-coach')}
@@ -101,7 +115,7 @@ const Layout: React.FC<LayoutProps> = ({
             onViewChange('messages');
           }} 
           label={t('messages') || 'Mensajes'}
-          notificationCount={notifications.totalMessages}
+          notificationCount={totalUnreadMessages}
         />
         <NavItem 
           icon={<User size={22} />} 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Heart, Sparkles, X, Check } from 'lucide-react';
+import { Heart, Sparkles, X } from 'lucide-react';
 import { ReceivedLike, getReceivedLikes, listenToReceivedLikes } from '../../services/likesService';
 import { logger } from '../../utils/logger';
 import { UserProfile } from '../../types';
@@ -56,13 +56,19 @@ const LikesReceived: React.FC<LikesReceivedProps> = ({
       });
     }
 
-    // Avanzar al siguiente
-    if (selectedIndex < likes.length - 1) {
-      setSelectedIndex(selectedIndex + 1);
-    } else {
-      // No hay más likes, volver
+    // Remover el like actual del array
+    const updatedLikes = likes.filter((_, index) => index !== selectedIndex);
+    setLikes(updatedLikes);
+
+    // Si no hay más likes, volver
+    if (updatedLikes.length === 0) {
       onBack();
     }
+    // Si estábamos en el último, mantener el índice en el nuevo último
+    else if (selectedIndex >= updatedLikes.length) {
+      setSelectedIndex(updatedLikes.length - 1);
+    }
+    // Si no, el índice se mantiene y muestra el siguiente usuario
   };
 
   const handlePass = () => {
@@ -71,13 +77,19 @@ const LikesReceived: React.FC<LikesReceivedProps> = ({
 
     onPass(currentLike.fromUserId);
 
-    // Avanzar al siguiente
-    if (selectedIndex < likes.length - 1) {
-      setSelectedIndex(selectedIndex + 1);
-    } else {
-      // No hay más likes, volver
+    // Remover el like actual del array
+    const updatedLikes = likes.filter((_, index) => index !== selectedIndex);
+    setLikes(updatedLikes);
+
+    // Si no hay más likes, volver
+    if (updatedLikes.length === 0) {
       onBack();
     }
+    // Si estábamos en el último, mantener el índice en el nuevo último
+    else if (selectedIndex >= updatedLikes.length) {
+      setSelectedIndex(updatedLikes.length - 1);
+    }
+    // Si no, el índice se mantiene y muestra el siguiente usuario
   };
 
   if (loading) {

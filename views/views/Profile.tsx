@@ -191,7 +191,10 @@ const ProfileView: React.FC<ProfileViewProps> = ({
     <div className="h-full overflow-y-auto bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Header - Responsive */}
       <div className="px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center border-b border-slate-100 safe-area-top">
-        <h2 className="text-xl sm:text-2xl font-bold text-slate-800">{isOwnProfile ? t('myProfile') : user.name}</h2>
+        <div>
+          <h3 className="text-lg sm:text-xl font-bold text-slate-800 mb-1">Mi Perfil</h3>
+          <p className="text-slate-600 text-xs sm:text-sm">Gestiona tu información personal</p>
+        </div>
         <div className="flex items-center gap-2">
           {/* Botón de reportar (solo si NO es perfil propio) */}
           {!isOwnProfile && currentUserId && (

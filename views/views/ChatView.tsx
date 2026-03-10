@@ -842,7 +842,12 @@ const ChatView: React.FC<ChatViewProps> = ({
           overflow: 'hidden',
           borderRadius: '16px',
           boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
-        } : {})
+        } : {
+          // Mobile: Fixed height layout
+          height: '100dvh',
+          maxHeight: '100dvh',
+          overflow: 'hidden'
+        })
       }}
     >
       {/* Header - Responsive */}
@@ -904,13 +909,11 @@ const ChatView: React.FC<ChatViewProps> = ({
         className="flex-1 overflow-y-auto p-3 sm:p-4 lg:p-6 space-y-3 sm:space-y-4 chat-messages-area"
         style={{
           background: 'linear-gradient(to bottom, #f8fafc 0%, #f1f5f9 100%)',
-          ...(isDesktop ? {
-            flex: '1 1 auto',
-            minHeight: 0,
-            maxHeight: '100%',
-            overflowY: 'auto',
-            overflowX: 'hidden'
-          } : {})
+          flex: '1 1 auto',
+          minHeight: 0,
+          maxHeight: '100%',
+          overflowY: 'auto',
+          overflowX: 'hidden'
         }}
       >
         {messages.length === 0 ? (
@@ -1160,13 +1163,15 @@ const ChatView: React.FC<ChatViewProps> = ({
       <div 
         className="p-3 sm:p-4 lg:p-5 bg-white border-t border-slate-200 safe-area-bottom chat-input-area flex-shrink-0"
         style={{
+          flexShrink: 0,
+          flexGrow: 0,
           ...(isDesktop ? {
-            flexShrink: 0,
-            flexGrow: 0,
             borderBottomLeftRadius: '16px',
             borderBottomRightRadius: '16px',
             boxShadow: '0 -2px 10px rgba(0, 0, 0, 0.05)'
-          } : {})
+          } : {
+            boxShadow: '0 -2px 10px rgba(0, 0, 0, 0.05)'
+          })
         }}
       >
         

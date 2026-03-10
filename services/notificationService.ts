@@ -165,7 +165,19 @@ class NotificationService {
     onMessage(this.messaging, (payload) => {
       logger.notification.info('Foreground message received', payload);
 
-      // Mostrar notificación personalizada
+      // Mostrar notificación usando Service Worker
+      this.showNotificationViaServiceWorker(payload);
+    });
+  }
+
+  /**
+   * Mostrar notificación a través del Service Worker
+   */
+  private async showNotificationViaServiceWorker(payload: any): Promise<void> {
+    try {
+      // Verificar que el Service Worker esté registrado
+      const registration = await navigator.serviceWorker.ready;
+
       const notificationTitle = payload.notification?.title || 'Ta\' Pa\' Ti';
       const notificationOptions: NotificationOptions = {
         body: payload.notification?.body || 'Tienes una nueva notificación',
@@ -177,11 +189,12 @@ class NotificationService {
         vibrate: [200, 100, 200],
       };
 
-      // Mostrar notificación si el permiso está concedido
-      if (Notification.permission === 'granted') {
-        new Notification(notificationTitle, notificationOptions);
-      }
-    });
+      // Mostrar notificación a través del Service Worker
+      await registration.showNotification(notificationTitle, notificationOptions);
+      logger.notification.success('Notification shown via Service Worker');
+    } catch (error) {
+      logger.notification.error('Error showing notification via Service Worker', error);
+    }
   }
 
   /**
@@ -219,17 +232,26 @@ class NotificationService {
       return;
     }
 
-    const notification = new Notification('🎉 Ta\' Pa\' Ti', {
-      body: 'Las notificaciones están funcionando correctamente!',
-      icon: '/logo192.png',
-      badge: '/logo192.png',
-      vibrate: [200, 100, 200],
-    });
+    try {
+      // Usar Service Worker para mostrar la notificación
+      const registration = await navigator.serviceWorker.ready;
+      
+      await registration.showNotification('🎉 Ta\' Pa\' Ti', {
+        body: 'Las notificaciones están funcionando correctamente!',
+        icon: '/logo192.png',
+        badge: '/logo192.png',
+        vibrate: [200, 100, 200],
+        tag: 'test-notification',
+        requireInteraction: false,
+        data: {
+          url: window.location.origin
+        }
+      });
 
-    notification.onclick = () => {
-      window.focus();
-      notification.close();
-    };
+      logger.notification.success('Test notification shown via Service Worker');
+    } catch (error) {
+      logger.notification.error('Error showing test notification', error);
+    }
   }
 }
 

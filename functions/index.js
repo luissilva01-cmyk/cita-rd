@@ -106,17 +106,27 @@ exports.sendMessageNotification = functions.firestore
       const payload = {
         notification: {
           title: senderName,
-          body: messageBody,
-          icon: '/logo192.png',
-          badge: '/logo192.png',
-          tag: 'message',
-          clickAction: `https://tapapati.app/chat/${chatId}`
+          body: messageBody
         },
         data: {
           type: 'message',
           chatId: chatId,
           senderId: message.senderId,
-          senderName: senderName
+          senderName: senderName,
+          icon: '/logo192.png',
+          clickAction: `https://tapati.app/chat/${chatId}`
+        },
+        webpush: {
+          notification: {
+            icon: '/logo192.png',
+            badge: '/logo192.png',
+            tag: 'message',
+            requireInteraction: false,
+            vibrate: [200, 100, 200]
+          },
+          fcmOptions: {
+            link: `https://tapati.app/chat/${chatId}`
+          }
         },
         token: fcmToken
       };
@@ -179,17 +189,27 @@ exports.sendMatchNotification = functions.firestore
         const payload = {
           notification: {
             title: '🎉 ¡Nuevo Match!',
-            body: `¡Hiciste match con ${otherUserName}!`,
-            icon: '/logo192.png',
-            badge: '/logo192.png',
-            tag: 'match',
-            clickAction: 'https://tapapati.app/matches'
+            body: `¡Hiciste match con ${otherUserName}!`
           },
           data: {
             type: 'match',
             chatId: context.params.chatId,
             matchUserId: otherUserId,
-            matchUserName: otherUserName
+            matchUserName: otherUserName,
+            icon: '/logo192.png',
+            clickAction: 'https://tapati.app/matches'
+          },
+          webpush: {
+            notification: {
+              icon: '/logo192.png',
+              badge: '/logo192.png',
+              tag: 'match',
+              requireInteraction: true,
+              vibrate: [200, 100, 200, 100, 200]
+            },
+            fcmOptions: {
+              link: 'https://tapati.app/matches'
+            }
           },
           token: fcmToken
         };
@@ -284,17 +304,27 @@ exports.sendStoryNotification = functions.firestore
         const payload = {
           notification: {
             title: `${creatorName} publicó una historia`,
-            body: '¡Mírala antes de que desaparezca!',
-            icon: '/logo192.png',
-            badge: '/logo192.png',
-            tag: 'story',
-            clickAction: 'https://tapapati.app/'
+            body: '¡Mírala antes de que desaparezca!'
           },
           data: {
             type: 'story',
             storyId: context.params.storyId,
             creatorId: story.userId,
-            creatorName: creatorName
+            creatorName: creatorName,
+            icon: '/logo192.png',
+            clickAction: 'https://tapati.app/'
+          },
+          webpush: {
+            notification: {
+              icon: '/logo192.png',
+              badge: '/logo192.png',
+              tag: 'story',
+              requireInteraction: false,
+              vibrate: [200, 100, 200]
+            },
+            fcmOptions: {
+              link: 'https://tapati.app/'
+            }
           },
           token: fcmToken
         };

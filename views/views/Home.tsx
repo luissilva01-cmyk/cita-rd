@@ -46,7 +46,7 @@ const Home: React.FC<HomeProps> = ({
     weekday: 'long', 
     day: 'numeric',
     month: 'long'
-  });
+  }).replace(/^./, (c) => c.toUpperCase());
 
   const location = currentUser.location || 'Santo Domingo';
   const newProfilesCount = availableProfilesCount; // ✅ Usar el conteo real
@@ -121,7 +121,7 @@ const Home: React.FC<HomeProps> = ({
           <button
             onClick={onNavigateToDiscovery}
             className="p-4 rounded-xl text-white flex flex-col justify-between h-22 shadow-lg transition-transform active:scale-95"
-            style={{background: 'linear-gradient(135deg, #0ea5e9 0%, #22d3ee 100%)', height: '88px'}}
+            style={{background: 'linear-gradient(135deg, #f43f5e 0%, #fb7185 100%)', height: '88px'}}
           >
             <div className="w-7 h-7 bg-white/20 rounded-lg flex items-center justify-center relative">
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">

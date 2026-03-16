@@ -507,10 +507,36 @@ const App: React.FC = () => {
 
   // Loading fallback para Suspense
   const LoadingFallback = () => (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
-      <div className="text-center">
-        <div className="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-        <p className="text-white text-lg">Cargando...</p>
+    <div className="min-h-screen flex items-center justify-center" style={{background: 'linear-gradient(135deg, #ff8052 0%, #ffc107 100%)'}}>
+      <style>{`
+        @keyframes heartbeat {
+          0% { transform: scale(1); }
+          14% { transform: scale(1.15); }
+          28% { transform: scale(1); }
+          42% { transform: scale(1.1); }
+          56% { transform: scale(1); }
+          100% { transform: scale(1); }
+        }
+        @keyframes pulse-ring-loader {
+          0% { transform: scale(0.8); opacity: 0.6; }
+          50% { transform: scale(1.3); opacity: 0; }
+          100% { transform: scale(0.8); opacity: 0; }
+        }
+      `}</style>
+      <div className="text-center flex flex-col items-center">
+        <div className="relative mb-6">
+          <div className="absolute inset-0 rounded-full" style={{
+            width: 140, height: 140, margin: 'auto', left: 0, right: 0, top: 0, bottom: 0,
+            background: 'rgba(255,255,255,0.2)',
+            animation: 'pulse-ring-loader 1.5s ease-in-out infinite'
+          }}></div>
+          <img src="/logo-tpt.png" alt="Ta' Pa' Ti" style={{
+            width: 120, height: 120, objectFit: 'contain',
+            filter: 'drop-shadow(0 4px 20px rgba(0,0,0,0.15))',
+            animation: 'heartbeat 1.4s ease-in-out infinite'
+          }} />
+        </div>
+        <p className="text-white text-lg font-semibold" style={{textShadow: '0 2px 8px rgba(0,0,0,0.15)'}}>Cargando...</p>
       </div>
     </div>
   );
@@ -762,10 +788,36 @@ const App: React.FC = () => {
   // NO renderizar la app hasta que currentUser esté completamente cargado
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-white text-lg">Cargando tu perfil...</p>
+      <div className="min-h-screen flex items-center justify-center" style={{background: 'linear-gradient(135deg, #ff8052 0%, #ffc107 100%)'}}>
+        <style>{`
+          @keyframes heartbeat {
+            0% { transform: scale(1); }
+            14% { transform: scale(1.15); }
+            28% { transform: scale(1); }
+            42% { transform: scale(1.1); }
+            56% { transform: scale(1); }
+            100% { transform: scale(1); }
+          }
+          @keyframes pulse-ring-loader {
+            0% { transform: scale(0.8); opacity: 0.6; }
+            50% { transform: scale(1.3); opacity: 0; }
+            100% { transform: scale(0.8); opacity: 0; }
+          }
+        `}</style>
+        <div className="text-center flex flex-col items-center">
+          <div className="relative mb-6">
+            <div className="absolute inset-0 rounded-full" style={{
+              width: 140, height: 140, margin: 'auto', left: 0, right: 0, top: 0, bottom: 0,
+              background: 'rgba(255,255,255,0.2)',
+              animation: 'pulse-ring-loader 1.5s ease-in-out infinite'
+            }}></div>
+            <img src="/logo-tpt.png" alt="Ta' Pa' Ti" style={{
+              width: 120, height: 120, objectFit: 'contain',
+              filter: 'drop-shadow(0 4px 20px rgba(0,0,0,0.15))',
+              animation: 'heartbeat 1.4s ease-in-out infinite'
+            }} />
+          </div>
+          <p className="text-white text-lg font-semibold" style={{textShadow: '0 2px 8px rgba(0,0,0,0.15)'}}>Cargando...</p>
         </div>
       </div>
     );

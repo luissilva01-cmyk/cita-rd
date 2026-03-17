@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, memo } from 'react';
+import React, { useState, useEffect, useRef, memo } from 'react';
 import { Heart, X, Star, Flag } from 'lucide-react';
 import { UserProfile } from '../../types';
 import SwipeCard from '../../components/SwipeCard';
@@ -12,10 +12,10 @@ import { StoryGroup } from '../../services/storiesService';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useToast } from '../../components/Toast';
 import { logger } from '../../utils/logger';
+import { useMatchingAI } from '../../hooks/useMatchingAI';
 
-// ⚡ PERFORMANCE MODE: Sistema de IA completamente removido
-// El sistema de matching IA causaba lentitud de 10-60 segundos
-// Removidos: useMatchingAI, Brain icon, Zap icon, MatchPrediction, calculateProfileScore
+// ⚡ PERFORMANCE MODE v2: IA reactivada en background
+// Los perfiles se muestran INMEDIATAMENTE, la IA reordena en background sin bloquear
 
 interface DiscoveryProps {
   users?: UserProfile[];
@@ -58,7 +58,8 @@ const Discovery: React.FC<DiscoveryProps> = ({
   const { t } = useLanguage();
   const { showToast, ToastContainer } = useToast();
   
-  // ⚡ PERFORMANCE MODE: Sistema de IA completamente removido para velocidad óptima
+  // ⚡ IA reactivada: corre en background sin bloquear la UI
+  const { predictions, generatePredictions, recordSwipe } = useMatchingAI();
   
   // Usar solo los usuarios pasados como prop (usuarios reales de Firebase)
   const availableUsers = users || [];
@@ -80,14 +81,40 @@ const Discovery: React.FC<DiscoveryProps> = ({
   const [showReportModal, setShowReportModal] = useState(false);
   const [userToReport, setUserToReport] = useState<UserProfile | null>(null);
 
-  // ⚡ ULTRA FAST MODE: Usuarios se muestran instantáneamente sin procesamiento
-  // ⚡ OPTIMIZACIÓN: Usar useMemo para evitar recalcular en cada render
+  // ⚡ ULTRA FAST: Mostrar perfiles inmediatamente, IA reordena en background
+  const aiSortedRef = useRef(false);
+  
   useEffect(() => {
     if (availableUsers.length > 0) {
-      logger.match.debug('Usuarios cargados instantáneamente', { count: availableUsers.length });
+      // Mostrar inmediatamente sin esperar IA
       setSortedUsers(availableUsers);
+      
+      // Lanzar IA en background para reordenar (no bloquea)
+      if (!aiSortedRef.current && currentUserId && currentUserId !== 'demo-user') {
+        aiSortedRef.current = true;
+        // setTimeout para no bloquear el primer render
+        setTimeout(() => {
+          generatePredictions(currentUserId, availableUsers).catch(() => {});
+        }, 500);
+      }
     }
-  }, [availableUsers.length]); // Solo depende del length, no del array completo
+  }, [availableUsers.length]);
+  
+  // Cuando las predicciones de IA llegan, reordenar los perfiles que aún no se han visto
+  useEffect(() => {
+    if (predictions.length > 0 && availableUsers.length > 0 && currentIndex < 2) {
+      // Solo reordenar si el usuario aún está en los primeros perfiles
+      const sorted = [...availableUsers].sort((a, b) => {
+        const predA = predictions.find(p => p.targetUserId === a.id);
+        const predB = predictions.find(p => p.targetUserId === b.id);
+        const scoreA = predA ? predA.compatibilityScore.overall * predA.likelihoodOfMatch : 0.5;
+        const scoreB = predB ? predB.compatibilityScore.overall * predB.likelihoodOfMatch : 0.5;
+        return scoreB - scoreA;
+      });
+      setSortedUsers(sorted);
+      logger.match.info('Perfiles reordenados por IA', { count: sorted.length });
+    }
+  }, [predictions.length]);
 
   // ⚡ OPTIMIZACIÓN: Usar useMemo para displayUsers
   const displayUsers = React.useMemo(() => {
@@ -109,6 +136,11 @@ const Discovery: React.FC<DiscoveryProps> = ({
     
     const timeSpent = Date.now() - swipeStartTime;
     logger.match.debug('Acción de swipe', { action, userName: currentUser.name, timeSpent });
+    
+    // Registrar swipe en el sistema de IA (background, no bloquea)
+    if (currentUserId && currentUserId !== 'demo-user') {
+      recordSwipe(currentUserId, currentUser.id, action, currentUser, timeSpent).catch(() => {});
+    }
     
     // Si es super like, mostrar animación PRIMERO
     if (action === 'superlike') {

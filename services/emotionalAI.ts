@@ -308,15 +308,12 @@ class EmotionalAIService {
 
   // Calcular compatibilidad emocional
   private calculateEmotionalCompatibility(analyses: EmotionAnalysis[], participants: string[]): number {
-    if (participants.length < 2) return 0.5;
+    if (participants.length < 2 || analyses.length < 2) return 0.5;
 
-    const [user1, user2] = participants;
-    const user1Messages = analyses.filter(a => {
-      // Necesitamos una forma de identificar el sender del mensaje
-      // Por ahora usaremos un enfoque simplificado
-      return Math.random() > 0.5; // Placeholder
-    });
-    const user2Messages = analyses.filter(a => !user1Messages.includes(a));
+    // Dividir análisis alternadamente (par = user1, impar = user2)
+    // Esto es una aproximación razonable ya que los mensajes en chat alternan entre usuarios
+    const user1Messages = analyses.filter((_, i) => i % 2 === 0);
+    const user2Messages = analyses.filter((_, i) => i % 2 !== 0);
 
     if (user1Messages.length === 0 || user2Messages.length === 0) return 0.5;
 

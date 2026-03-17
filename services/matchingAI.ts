@@ -190,6 +190,20 @@ class MatchingAIService {
     }
   }
 
+  // Eliminar valores undefined recursivamente (Firestore no los acepta)
+  private stripUndefined(obj: any): any {
+    if (obj === null || obj === undefined) return null;
+    if (typeof obj !== 'object') return obj;
+    if (Array.isArray(obj)) return obj.map(item => this.stripUndefined(item));
+    const cleaned: Record<string, any> = {};
+    for (const [key, value] of Object.entries(obj)) {
+      if (value !== undefined) {
+        cleaned[key] = this.stripUndefined(value);
+      }
+    }
+    return cleaned;
+  }
+
   // Guardar comportamiento en Firestore (debounced, solo últimos 200 swipes)
   private async saveBehaviorToFirestore(userId: string, behavior: UserBehavior): Promise<void> {
     try {
@@ -208,7 +222,9 @@ class MatchingAIService {
         lastActive: Date.now(),
         updatedAt: Date.now()
       };
-      await setDoc(docRef, trimmedBehavior, { merge: true });
+      // Limpiar undefined antes de enviar a Firestore
+      const cleanData = this.stripUndefined(trimmedBehavior);
+      await setDoc(docRef, cleanData, { merge: true });
     } catch (error) {
       logger.match.warn('⚠️ Error guardando comportamiento en Firestore', { userId, error });
     }

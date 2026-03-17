@@ -335,6 +335,13 @@ service cloud.firestore {
     }
     
     // ==============================
+    // COLECCIÓN: userBehaviors (datos de IA matching)
+    // ==============================
+    match /userBehaviors/{userId} {
+      allow read, write: if isOwner(userId);
+    }
+    
+    // ==============================
     // DENEGAR TODO LO DEMÁS
     // ==============================
     match /{document=**} {

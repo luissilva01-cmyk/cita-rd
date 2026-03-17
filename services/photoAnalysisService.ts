@@ -66,12 +66,15 @@ const simulatePhotoAnalysis = async (imageUrl: string): Promise<PhotoAnalysis> =
     });
     
     // Calcular calidad de la foto basada en los detalles de detección
-    let photoQuality = 50; // Base
+    let photoQuality = 40; // Base
     
-    if (faceDetection.details.skinToneDetected) photoQuality += 15;
-    if (faceDetection.details.facialFeaturesDetected) photoQuality += 15;
+    if (faceDetection.details.skinToneDetected) photoQuality += 12;
+    if (faceDetection.details.facialFeaturesDetected) photoQuality += 12;
     if (faceDetection.details.contrastValid) photoQuality += 10;
-    if (faceDetection.details.proportionsValid) photoQuality += 10;
+    if (faceDetection.details.proportionsValid) photoQuality += 8;
+    if (faceDetection.details.saturationNatural) photoQuality += 6;
+    if (faceDetection.details.notSolidColor) photoQuality += 6;
+    if (faceDetection.details.notScreenshot) photoQuality += 6;
     
     // Usar la confianza como claridad del rostro
     const faceClarity = faceDetection.confidence;
@@ -133,7 +136,7 @@ const generateAdvancedSuggestions = (detection: FaceDetectionResult, quality: nu
     // Foto rechazada - dar razones específicas
     suggestions.push('❌ No se detectó un rostro humano en esta foto');
     
-    // Agregar razones específicas del análisis
+    // Razones específicas del análisis
     if (!detection.details.skinToneDetected) {
       suggestions.push('No se detectaron tonos de piel humana');
     }

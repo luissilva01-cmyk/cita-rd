@@ -30,14 +30,32 @@ export const validateProfilePhoto = async (imageUrl: string): Promise<PhotoValid
     const errors: string[] = [];
     const warnings: string[] = [];
     
-    // VALIDACIÓN CRÍTICA: Debe tener rostro
+    // VALIDACIÓN CRÍTICA: Debe tener rostro humano real
     if (!analysis.hasFace) {
-      errors.push('❌ No se detectó un rostro en la foto');
-      errors.push('Por favor usa una foto donde se vea tu cara claramente');
-      errors.push('No se permiten paisajes, avatares, dibujos o fondos oscuros');
+      errors.push('❌ No se detectó un rostro humano en la foto');
+      
+      // Dar razones específicas basadas en el análisis avanzado
+      const det = analysis.advancedDetection?.details;
+      if (det) {
+        if (!det.notSolidColor) {
+          errors.push('La imagen parece ser un color sólido o está vacía');
+        } else if (!det.notScreenshot) {
+          errors.push('La imagen parece ser un screenshot o captura de pantalla');
+        } else if (!det.saturationNatural) {
+          errors.push('La imagen parece ser un dibujo animado o ilustración digital');
+        } else if (!det.skinToneDetected) {
+          errors.push('No se detectaron tonos de piel humana (¿es una mascota, flor o paisaje?)');
+        } else if (!det.skinClusterValid) {
+          errors.push('No se detectó un rostro centrado en la imagen');
+        } else {
+          errors.push('No se detectaron características faciales suficientes');
+        }
+      }
+      
+      errors.push('Solo se permiten fotos reales de personas. No se aceptan mascotas, dibujos, paisajes ni objetos.');
     }
     
-    // VALIDACIÓN CRÍTICA: Claridad mínima del rostro (más estricto)
+    // VALIDACIÓN CRÍTICA: Claridad mínima del rostro
     if (analysis.hasFace && analysis.faceClarity < 50) {
       errors.push('❌ El rostro no se ve con suficiente claridad');
       errors.push('Usa una foto con mejor iluminación y enfoque');
@@ -142,15 +160,15 @@ export const validateProfilePhotos = async (photos: string[]): Promise<PhotoVali
     };
   }
   
-  // Validar fotos adicionales (menos estricto)
-  const additionalPhotosErrors: string[] = [];
+  // Validar fotos adicionales (también deben ser fotos reales de personas)
   const additionalPhotosWarnings: string[] = [];
   
   for (let i = 1; i < photos.length; i++) {
     const validation = await validateProfilePhoto(photos[i]);
     
     if (!validation.isValid) {
-      additionalPhotosWarnings.push(`Foto ${i + 1}: ${validation.errors[0]}`);
+      // Las fotos adicionales también deben ser de personas reales
+      additionalPhotosWarnings.push(`Foto ${i + 1}: No cumple con los requisitos de seguridad`);
     }
   }
   

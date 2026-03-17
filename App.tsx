@@ -589,6 +589,7 @@ const App: React.FC = () => {
             <Discovery 
               users={potentialMatches} 
               currentUserId={currentUser!.id}
+              currentUserProfile={currentUser!}
               onLike={handleLike} 
               onSendMessage={handleSendStoryMessage}
               onAction={(id) => {

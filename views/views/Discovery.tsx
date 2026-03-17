@@ -24,21 +24,8 @@ interface DiscoveryProps {
   onOpenChat?: (userId: string) => void;
   onSendMessage?: (userId: string, message: string, type?: 'text' | 'story_reaction') => Promise<void>;
   currentUserId?: string;
+  currentUserProfile?: UserProfile;
 }
-
-// Mock user para el usuario actual (solo para sistema de matching IA)
-const CURRENT_USER_MOCK: UserProfile = {
-  id: 'current-user',
-  name: 'Usuario Actual',
-  age: 25,
-  bio: 'Usuario de prueba para el sistema de matching IA',
-  location: 'Santo Domingo',
-  distance: '0km',
-  images: ['https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=95&w=1200&h=1600'],
-  interests: ['Tecnología', 'Música', 'Deportes'],
-  job: 'Desarrollador',
-  isVerified: true
-};
 
 const Discovery: React.FC<DiscoveryProps> = ({ 
   users, 
@@ -46,7 +33,8 @@ const Discovery: React.FC<DiscoveryProps> = ({
   onAction,
   onOpenChat,
   onSendMessage,
-  currentUserId = 'demo-user'
+  currentUserId = 'demo-user',
+  currentUserProfile
 }) => {
   // ⚡ LOG CRÍTICO: Verificar que currentUserId llega correctamente
   logger.profile.info('🎯 [DISCOVERY] Component mounted/updated', { 
@@ -313,7 +301,7 @@ const Discovery: React.FC<DiscoveryProps> = ({
             <div className="absolute inset-0 z-10 opacity-50 scale-95 pointer-events-none">
               <SwipeCard
                 user={nextUser}
-                currentUser={CURRENT_USER_MOCK}
+                currentUser={currentUserProfile || { id: currentUserId, name: '', age: 25, bio: '', location: '', distance: '', images: [], interests: [], isVerified: false }}
                 onSwipeLeft={() => {}}
                 onSwipeRight={() => {}}
                 isTop={false}
@@ -324,7 +312,7 @@ const Discovery: React.FC<DiscoveryProps> = ({
           {/* Current Card (Interactive) */}
           <SwipeCard
             user={currentUser}
-            currentUser={CURRENT_USER_MOCK}
+            currentUser={currentUserProfile || { id: currentUserId, name: '', age: 25, bio: '', location: '', distance: '', images: [], interests: [], isVerified: false }}
             onSwipeLeft={handleSwipeLeft}
             onSwipeRight={handleSwipeRight}
             isTop={true}
@@ -487,6 +475,7 @@ export default memo(Discovery, (prevProps, nextProps) => {
   // Solo re-renderizar si cambian los usuarios o el currentUserId
   return (
     prevProps.users?.length === nextProps.users?.length &&
-    prevProps.currentUserId === nextProps.currentUserId
+    prevProps.currentUserId === nextProps.currentUserId &&
+    prevProps.currentUserProfile?.id === nextProps.currentUserProfile?.id
   );
 });

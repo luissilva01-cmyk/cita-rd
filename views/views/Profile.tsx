@@ -398,6 +398,58 @@ const ProfileView: React.FC<ProfileViewProps> = ({
           </div>
 
           <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">Soy</label>
+            {isEditing ? (
+              <div className="flex gap-3">
+                {(['hombre', 'mujer'] as const).map((g) => (
+                  <button
+                    key={g}
+                    type="button"
+                    onClick={() => setEditedUser({ ...editedUser, gender: g })}
+                    className={`flex-1 py-3 rounded-lg border text-sm font-medium transition-all ${
+                      editedUser.gender === g
+                        ? 'border-rose-500 bg-rose-50 text-rose-600'
+                        : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+                    }`}
+                  >
+                    {g === 'hombre' ? '👨 Hombre' : '👩 Mujer'}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <p className="text-base sm:text-lg text-slate-800">
+                {user.gender === 'hombre' ? '👨 Hombre' : user.gender === 'mujer' ? '👩 Mujer' : 'No especificado'}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">Me interesan</label>
+            {isEditing ? (
+              <div className="flex gap-3">
+                {(['hombres', 'mujeres', 'ambos'] as const).map((pref) => (
+                  <button
+                    key={pref}
+                    type="button"
+                    onClick={() => setEditedUser({ ...editedUser, interestedIn: pref })}
+                    className={`flex-1 py-3 rounded-lg border text-sm font-medium transition-all ${
+                      editedUser.interestedIn === pref
+                        ? 'border-rose-500 bg-rose-50 text-rose-600'
+                        : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+                    }`}
+                  >
+                    {pref.charAt(0).toUpperCase() + pref.slice(1)}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <p className="text-base sm:text-lg text-slate-800">
+                {user.interestedIn ? user.interestedIn.charAt(0).toUpperCase() + user.interestedIn.slice(1) : 'No especificado'}
+              </p>
+            )}
+          </div>
+
+          <div>
             <label className="block text-sm font-medium text-slate-700 mb-2">
               <MapPin className="inline w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1" />
               {t('location')} (Provincia)

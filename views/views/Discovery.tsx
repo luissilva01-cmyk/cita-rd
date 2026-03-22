@@ -72,27 +72,40 @@ const Discovery: React.FC<DiscoveryProps> = ({
   // ⚡ ULTRA FAST: Mostrar perfiles inmediatamente, IA reordena en background
   const aiSortedRef = useRef(false);
   
+  // Filtrar perfiles por preferencia de género
+  const genderFilteredUsers = React.useMemo(() => {
+    if (!currentUserProfile?.interestedIn) return availableUsers;
+    
+    return availableUsers.filter(u => {
+      // Si el usuario no tiene género definido, mostrarlo (perfil antiguo)
+      if (!u.gender) return true;
+      
+      if (currentUserProfile.interestedIn === 'ambos') return true;
+      if (currentUserProfile.interestedIn === 'hombres' && u.gender === 'hombre') return true;
+      if (currentUserProfile.interestedIn === 'mujeres' && u.gender === 'mujer') return true;
+      return false;
+    });
+  }, [availableUsers, currentUserProfile?.interestedIn]);
+  
   useEffect(() => {
-    if (availableUsers.length > 0) {
+    if (genderFilteredUsers.length > 0) {
       // Mostrar inmediatamente sin esperar IA
-      setSortedUsers(availableUsers);
+      setSortedUsers(genderFilteredUsers);
       
       // Lanzar IA en background para reordenar (no bloquea)
       if (!aiSortedRef.current && currentUserId && currentUserId !== 'demo-user') {
         aiSortedRef.current = true;
-        // setTimeout para no bloquear el primer render
         setTimeout(() => {
-          generatePredictions(currentUserId, availableUsers).catch(() => {});
+          generatePredictions(currentUserId, genderFilteredUsers).catch(() => {});
         }, 500);
       }
     }
-  }, [availableUsers.length]);
+  }, [genderFilteredUsers.length]);
   
   // Cuando las predicciones de IA llegan, reordenar los perfiles que aún no se han visto
   useEffect(() => {
-    if (predictions.length > 0 && availableUsers.length > 0 && currentIndex < 2) {
-      // Solo reordenar si el usuario aún está en los primeros perfiles
-      const sorted = [...availableUsers].sort((a, b) => {
+    if (predictions.length > 0 && genderFilteredUsers.length > 0 && currentIndex < 2) {
+      const sorted = [...genderFilteredUsers].sort((a, b) => {
         const predA = predictions.find(p => p.targetUserId === a.id);
         const predB = predictions.find(p => p.targetUserId === b.id);
         const scoreA = predA ? predA.compatibilityScore.overall * predA.likelihoodOfMatch : 0.5;
@@ -106,8 +119,8 @@ const Discovery: React.FC<DiscoveryProps> = ({
 
   // ⚡ OPTIMIZACIÓN: Usar useMemo para displayUsers
   const displayUsers = React.useMemo(() => {
-    return sortedUsers.length > 0 ? sortedUsers : availableUsers;
-  }, [sortedUsers.length, availableUsers.length]); // Solo depende de lengths
+    return sortedUsers.length > 0 ? sortedUsers : genderFilteredUsers;
+  }, [sortedUsers.length, genderFilteredUsers.length]);
 
   console.log('🔍 Discovery render:', { 
     usersLength: displayUsers?.length, 

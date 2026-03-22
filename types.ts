@@ -11,6 +11,10 @@ export interface UserProfile {
   distance?: string;
   isVerified?: boolean;
   
+  // Género y preferencia
+  gender?: 'hombre' | 'mujer';
+  interestedIn?: 'hombres' | 'mujeres' | 'ambos';
+  
   // Información adicional del perfil
   education?: string;
   height?: string;

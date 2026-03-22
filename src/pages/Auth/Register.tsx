@@ -18,7 +18,8 @@ export default function Register() {
     password: "",
     confirmPassword: "",
     birthDate: "",
-    gender: ""
+    gender: "",
+    interestedIn: ""
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -41,10 +42,20 @@ export default function Register() {
   };
 
   const validateForm = () => {
-    const { name, email, password, confirmPassword, birthDate } = formData;
+    const { name, email, password, confirmPassword, birthDate, gender, interestedIn } = formData;
     
     if (!name || !email || !password || !confirmPassword || !birthDate) {
       setError("Por favor completa todos los campos obligatorios.");
+      return false;
+    }
+    
+    if (!gender) {
+      setError("Por favor selecciona tu género.");
+      return false;
+    }
+    
+    if (!interestedIn) {
+      setError("Por favor selecciona en quién estás interesado/a.");
       return false;
     }
     
@@ -118,13 +129,15 @@ export default function Register() {
       // Crear perfil del usuario con datos del formulario
       const userProfile: UserProfile = {
         id: user.uid,
-        name: formData.name, // ✅ Usar nombre del formulario
-        age: calculateAge(formData.birthDate), // ✅ Calcular edad real
+        name: formData.name,
+        age: calculateAge(formData.birthDate),
         bio: '',
         location: '',
         images: [],
         interests: [],
-        isVerified: false
+        isVerified: false,
+        gender: formData.gender as 'hombre' | 'mujer',
+        interestedIn: formData.interestedIn as 'hombres' | 'mujeres' | 'ambos'
       };
 
       console.log("📝 Creando perfil:", userProfile);
@@ -358,6 +371,90 @@ export default function Register() {
               >
                 Debes ser mayor de 18 años
               </p>
+            </div>
+
+            {/* Gender Field */}
+            <div className="flex flex-col gap-2">
+              <label 
+                className="text-sm font-semibold leading-normal"
+                style={{ color: '#1b110d' }}
+              >
+                Soy
+              </label>
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => handleInputChange('gender', 'hombre')}
+                  className="flex-1 h-12 rounded-xl border text-base font-medium transition-all"
+                  style={{
+                    borderColor: formData.gender === 'hombre' ? '#ec4913' : '#e7d5cf',
+                    backgroundColor: formData.gender === 'hombre' ? '#fff3ef' : '#ffffff',
+                    color: formData.gender === 'hombre' ? '#ec4913' : '#1b110d'
+                  }}
+                >
+                  👨 Hombre
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleInputChange('gender', 'mujer')}
+                  className="flex-1 h-12 rounded-xl border text-base font-medium transition-all"
+                  style={{
+                    borderColor: formData.gender === 'mujer' ? '#ec4913' : '#e7d5cf',
+                    backgroundColor: formData.gender === 'mujer' ? '#fff3ef' : '#ffffff',
+                    color: formData.gender === 'mujer' ? '#ec4913' : '#1b110d'
+                  }}
+                >
+                  👩 Mujer
+                </button>
+              </div>
+            </div>
+
+            {/* Interested In Field */}
+            <div className="flex flex-col gap-2">
+              <label 
+                className="text-sm font-semibold leading-normal"
+                style={{ color: '#1b110d' }}
+              >
+                Me interesan
+              </label>
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => handleInputChange('interestedIn', 'hombres')}
+                  className="flex-1 h-12 rounded-xl border text-sm font-medium transition-all"
+                  style={{
+                    borderColor: formData.interestedIn === 'hombres' ? '#ec4913' : '#e7d5cf',
+                    backgroundColor: formData.interestedIn === 'hombres' ? '#fff3ef' : '#ffffff',
+                    color: formData.interestedIn === 'hombres' ? '#ec4913' : '#1b110d'
+                  }}
+                >
+                  Hombres
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleInputChange('interestedIn', 'mujeres')}
+                  className="flex-1 h-12 rounded-xl border text-sm font-medium transition-all"
+                  style={{
+                    borderColor: formData.interestedIn === 'mujeres' ? '#ec4913' : '#e7d5cf',
+                    backgroundColor: formData.interestedIn === 'mujeres' ? '#fff3ef' : '#ffffff',
+                    color: formData.interestedIn === 'mujeres' ? '#ec4913' : '#1b110d'
+                  }}
+                >
+                  Mujeres
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleInputChange('interestedIn', 'ambos')}
+                  className="flex-1 h-12 rounded-xl border text-sm font-medium transition-all"
+                  style={{
+                    borderColor: formData.interestedIn === 'ambos' ? '#ec4913' : '#e7d5cf',
+                    backgroundColor: formData.interestedIn === 'ambos' ? '#fff3ef' : '#ffffff',
+                    color: formData.interestedIn === 'ambos' ? '#ec4913' : '#1b110d'
+                  }}
+                >
+                  Ambos
+                </button>
+              </div>
             </div>
 
             {/* Password Field */}

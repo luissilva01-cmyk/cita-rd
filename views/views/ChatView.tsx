@@ -1209,16 +1209,17 @@ const ChatView: React.FC<ChatViewProps> = ({
         {isRecordingVideo && (
           <div className="mb-3 sm:mb-4 bg-purple-50 border border-purple-200 rounded-2xl p-3 sm:p-4">
             {/* Vista previa de video */}
-            <div className="relative mb-3 rounded-xl overflow-hidden bg-black mx-auto" style={{ maxWidth: 'min(360px, calc(100vw - 4rem))' }}>
+            <div className="relative mb-2 rounded-xl overflow-hidden bg-black mx-auto" style={{ maxWidth: 'min(280px, calc(100vw - 4rem))' }}>
               <video
                 ref={videoPreviewRef}
                 autoPlay
                 playsInline
                 muted
-                className="w-full h-auto object-cover"
+                className="w-full object-cover"
                 style={{ 
-                  transform: 'scaleX(-1)', // Efecto espejo
-                  aspectRatio: '9/16' // Mantener proporción vertical
+                  transform: 'scaleX(-1)',
+                  aspectRatio: '4/5',
+                  maxHeight: '35vh'
                 }}
               />
               {/* Overlay con información */}

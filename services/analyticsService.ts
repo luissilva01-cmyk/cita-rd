@@ -101,34 +101,34 @@ class AnalyticsService {
     try {
       console.log('🔧 [ANALYTICS] Starting initialization...', { measurementId });
       
-      // Cargar gtag.js
-      const script = document.createElement('script');
-      script.async = true;
-      script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
-      script.onload = () => {
-        console.log('✅ [ANALYTICS] gtag.js script loaded successfully');
-      };
-      script.onerror = (error) => {
-        console.error('❌ [ANALYTICS] Failed to load gtag.js script', error);
-      };
-      document.head.appendChild(script);
-      console.log('📝 [ANALYTICS] gtag.js script added to document head');
+      // Si gtag ya fue cargado desde index.html, solo configurar
+      if (window.gtag) {
+        console.log('✅ [ANALYTICS] gtag already loaded from index.html, configuring...');
+        window.gtag('config', measurementId, {
+          send_page_view: true,
+          anonymize_ip: true,
+          cookie_flags: 'SameSite=None;Secure',
+        });
+      } else {
+        // Cargar gtag.js dinámicamente como fallback
+        const script = document.createElement('script');
+        script.async = true;
+        script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
+        document.head.appendChild(script);
 
-      // Inicializar gtag
-      window.dataLayer = window.dataLayer || [];
-      function gtag(...args: any[]) {
-        window.dataLayer.push(args);
+        window.dataLayer = window.dataLayer || [];
+        function gtag(...args: any[]) {
+          window.dataLayer.push(args);
+        }
+        window.gtag = gtag;
+
+        gtag('js', new Date());
+        gtag('config', measurementId, {
+          send_page_view: true,
+          anonymize_ip: true,
+          cookie_flags: 'SameSite=None;Secure',
+        });
       }
-      window.gtag = gtag;
-      console.log('📊 [ANALYTICS] dataLayer initialized');
-
-      gtag('js', new Date());
-      gtag('config', measurementId, {
-        send_page_view: true, // Enviar automáticamente
-        anonymize_ip: true, // GDPR compliance
-        cookie_flags: 'SameSite=None;Secure',
-        debug_mode: true, // Activar modo debug
-      });
       console.log('⚙️ [ANALYTICS] gtag configured with measurement ID:', measurementId);
 
       this._isInitialized = true;

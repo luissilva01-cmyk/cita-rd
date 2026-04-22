@@ -24,6 +24,11 @@ export interface UserProfile {
   visibilityBoost?: number;
   profileScore?: number;
   
+  // Geolocalización
+  latitude?: number;
+  longitude?: number;
+  locationUpdatedAt?: number;
+  
   // Propiedades de IA de matching
   aiCompatibility?: number;
   aiPriority?: 'high' | 'medium' | 'low';

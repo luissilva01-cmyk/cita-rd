@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef, memo } from 'react';
 import { Heart, X, Star, Flag } from 'lucide-react';
 import { UserProfile } from '../../types';
 import SwipeCard from '../../components/SwipeCard';
+import { calculateDistanceKm } from '../../services/geolocationService';
 import StoriesRing from '../../components/StoriesRing';
 import StoriesViewer from '../../components/StoriesViewer';
 import CreateStoryModal from '../../components/CreateStoryModal';
@@ -57,6 +58,24 @@ const Discovery: React.FC<DiscoveryProps> = ({
   const [sortedUsers, setSortedUsers] = useState<UserProfile[]>([]);
   const [swipeStartTime, setSwipeStartTime] = useState<number>(Date.now());
 
+  // Daily swipe limit for free users
+  const DAILY_SWIPE_LIMIT = 25;
+  const [dailySwipes, setDailySwipes] = useState(0);
+  const [showSwipeLimitModal, setShowSwipeLimitModal] = useState(false);
+
+  useEffect(() => {
+    const today = new Date().toISOString().split('T')[0];
+    const stored = localStorage.getItem(`swipes_${currentUserId}_${today}`);
+    setDailySwipes(stored ? parseInt(stored, 10) : 0);
+  }, [currentUserId]);
+
+  const incrementSwipeCount = () => {
+    const today = new Date().toISOString().split('T')[0];
+    const newCount = dailySwipes + 1;
+    setDailySwipes(newCount);
+    localStorage.setItem(`swipes_${currentUserId}_${today}`, String(newCount));
+  };
+
   // Estados para Stories
   const [showStoriesViewer, setShowStoriesViewer] = useState(false);
   const [selectedStoryGroup, setSelectedStoryGroup] = useState<StoryGroup | null>(null);
@@ -68,6 +87,28 @@ const Discovery: React.FC<DiscoveryProps> = ({
   // Estados para Reportar
   const [showReportModal, setShowReportModal] = useState(false);
   const [userToReport, setUserToReport] = useState<UserProfile | null>(null);
+
+  // Filter chips state
+  type FilterChip = 'todos' | 'mujeres' | 'hombres' | 'cerca' | 'jovenes' | 'verificados';
+  const [activeFilters, setActiveFilters] = useState<Set<FilterChip>>(new Set(['todos']));
+
+  const toggleFilter = (filter: FilterChip) => {
+    setActiveFilters(prev => {
+      const next = new Set(prev);
+      if (filter === 'todos') {
+        return new Set(['todos']);
+      }
+      next.delete('todos');
+      if (next.has(filter)) {
+        next.delete(filter);
+        if (next.size === 0) next.add('todos');
+      } else {
+        next.add(filter);
+      }
+      return next;
+    });
+    setCurrentIndex(0); // Reset to first card when filter changes
+  };
 
   // ⚡ ULTRA FAST: Mostrar perfiles inmediatamente, IA reordena en background
   const aiSortedRef = useRef(false);
@@ -117,10 +158,38 @@ const Discovery: React.FC<DiscoveryProps> = ({
     }
   }, [predictions.length]);
 
-  // ⚡ OPTIMIZACIÓN: Usar useMemo para displayUsers
+  // ⚡ OPTIMIZACIÓN: Usar useMemo para displayUsers with real distance calculation
   const displayUsers = React.useMemo(() => {
-    return sortedUsers.length > 0 ? sortedUsers : genderFilteredUsers;
-  }, [sortedUsers.length, genderFilteredUsers.length]);
+    const base = sortedUsers.length > 0 ? sortedUsers : genderFilteredUsers;
+    
+    // Calculate real distance if current user has coords
+    const myLat = currentUserProfile?.latitude;
+    const myLng = currentUserProfile?.longitude;
+    const withDistance = base.map(u => {
+      if (myLat && myLng && u.latitude && u.longitude) {
+        const km = calculateDistanceKm(
+          { latitude: myLat, longitude: myLng },
+          { latitude: u.latitude, longitude: u.longitude }
+        );
+        return { ...u, distance: `${km.toFixed(1)} km` };
+      }
+      return u;
+    });
+    
+    if (activeFilters.has('todos')) return withDistance;
+    
+    return withDistance.filter(u => {
+      if (activeFilters.has('mujeres') && u.gender !== 'mujer') return false;
+      if (activeFilters.has('hombres') && u.gender !== 'hombre') return false;
+      if (activeFilters.has('jovenes') && (u.age < 18 || u.age > 30)) return false;
+      if (activeFilters.has('verificados') && !u.isVerified) return false;
+      if (activeFilters.has('cerca')) {
+        const dist = parseFloat(u.distance || '999');
+        if (dist > 10) return false;
+      }
+      return true;
+    });
+  }, [sortedUsers.length, genderFilteredUsers.length, activeFilters, currentUserProfile?.latitude, currentUserProfile?.longitude]);
 
   console.log('🔍 Discovery render:', { 
     usersLength: displayUsers?.length, 
@@ -134,6 +203,15 @@ const Discovery: React.FC<DiscoveryProps> = ({
 
   const handleAction = async (action: 'like' | 'pass' | 'superlike') => {
     if (!currentUser) return;
+
+    // Check daily swipe limit for free users
+    if (dailySwipes >= DAILY_SWIPE_LIMIT) {
+      setShowSwipeLimitModal(true);
+      return;
+    }
+    
+    // Increment swipe counter
+    incrementSwipeCount();
     
     const timeSpent = Date.now() - swipeStartTime;
     logger.match.debug('Acción de swipe', { action, userName: currentUser.name, timeSpent });
@@ -301,6 +379,36 @@ const Discovery: React.FC<DiscoveryProps> = ({
           onStoryClick={handleStoryClick}
           onCreateStory={handleCreateStory}
         />
+      </div>
+
+      {/* Filter Chips */}
+      <div className="shrink-0 px-3 py-2 flex gap-2 overflow-x-auto no-scrollbar bg-white/80 backdrop-blur-sm border-b border-gray-100">
+        {([
+          { id: 'todos' as FilterChip, label: 'Todos', emoji: '🔥' },
+          { id: 'mujeres' as FilterChip, label: 'Mujeres', emoji: '👩' },
+          { id: 'hombres' as FilterChip, label: 'Hombres', emoji: '👨' },
+          { id: 'cerca' as FilterChip, label: '<10km', emoji: '📍' },
+          { id: 'jovenes' as FilterChip, label: '18-30', emoji: '🎯' },
+          { id: 'verificados' as FilterChip, label: 'Verificados', emoji: '✓' },
+        ]).map(chip => {
+          const isActive = activeFilters.has(chip.id);
+          return (
+            <button
+              key={chip.id}
+              onClick={() => toggleFilter(chip.id)}
+              className="shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold transition-all active:scale-95"
+              style={{
+                background: isActive ? 'linear-gradient(135deg, #ff8052, #ffc107)' : 'white',
+                color: isActive ? 'white' : '#64748b',
+                border: isActive ? 'none' : '1px solid #e2e8f0',
+                boxShadow: isActive ? '0 2px 8px rgba(255,128,82,0.3)' : 'none'
+              }}
+            >
+              <span className="text-[11px]">{chip.emoji}</span>
+              {chip.label}
+            </button>
+          );
+        })}
       </div>
 
       {/* Profile Cards Stack - Full width desktop layout */}
@@ -478,6 +586,40 @@ const Discovery: React.FC<DiscoveryProps> = ({
           currentUserId={currentUserId}
           onClose={handleCloseReportModal}
         />
+      )}
+
+      {/* Swipe Limit Modal */}
+      {showSwipeLimitModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl text-center">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #ff8052, #ffc107)' }}>
+              <Heart className="text-white" size={28} />
+            </div>
+            <h3 className="text-xl font-bold text-slate-800 mb-2">¡Se acabaron los swipes!</h3>
+            <p className="text-sm text-gray-500 mb-1">
+              Usaste tus {DAILY_SWIPE_LIMIT} swipes gratis de hoy.
+            </p>
+            <p className="text-xs text-gray-400 mb-5">
+              Vuelve mañana o hazte Premium para swipes ilimitados.
+            </p>
+            <button
+              onClick={() => setShowSwipeLimitModal(false)}
+              className="w-full py-3 rounded-xl font-bold text-white text-sm shadow-lg transition-transform active:scale-95"
+              style={{ background: 'linear-gradient(135deg, #ff8052, #ffc107)' }}
+            >
+              Entendido
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Remaining swipes indicator */}
+      {dailySwipes > 0 && dailySwipes < DAILY_SWIPE_LIMIT && (
+        <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-30">
+          <div className="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full shadow-md border border-black/5 text-[10px] font-semibold text-slate-500">
+            {DAILY_SWIPE_LIMIT - dailySwipes} swipes restantes
+          </div>
+        </div>
       )}
     </div>
   );

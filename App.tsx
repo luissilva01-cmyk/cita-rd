@@ -40,6 +40,7 @@ import NotificationPermissionPrompt from './components/NotificationPermissionPro
 import { analyticsService } from './services/analyticsService';
 import { errorTrackingService } from './services/errorTrackingService';
 import { AnalyticsDashboard } from './components/AnalyticsDashboard';
+import { getCurrentPosition, saveUserLocation } from './services/geolocationService';
 import { useUnreadMessages } from './hooks/useUnreadMessages';
 
 const INITIAL_POTENTIAL_MATCHES: UserProfile[] = [];
@@ -142,6 +143,14 @@ const App: React.FC = () => {
             name: profile.name
           });
           setCurrentUser(profile);
+          
+          // Request geolocation in background and save to Firestore
+          getCurrentPosition().then(coords => {
+            if (coords) {
+              saveUserLocation(user.uid, coords);
+              setCurrentUser(prev => prev ? { ...prev, latitude: coords.latitude, longitude: coords.longitude } : prev);
+            }
+          });
           
           // Set user ID in analytics
           analyticsService.setUserId(user.uid);
@@ -579,7 +588,10 @@ const App: React.FC = () => {
               onNavigateToMessages={() => setActiveView('messages')}
               onNavigateToProfile={() => setActiveView('profile')}
               onNavigateToLikesReceived={() => setActiveView('likes-received')}
+              onNavigateToMatches={() => setActiveView('matches')}
               availableProfilesCount={potentialMatches.length}
+              matchesCount={chats.length}
+              unreadMessagesCount={totalUnread}
             />
           </ErrorBoundary>
         );

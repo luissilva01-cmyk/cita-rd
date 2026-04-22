@@ -874,7 +874,37 @@ const ChatView: React.FC<ChatViewProps> = ({
             className="w-10 h-10 sm:w-11 sm:h-11 lg:w-12 lg:h-12 rounded-full profile-image-smart shadow-md flex-shrink-0 ring-2 ring-white" 
           />
           <div className="min-w-0 flex-1">
-            <h3 className="font-bold text-sm sm:text-base lg:text-lg truncate text-slate-800">{match.user.name}</h3>
+            <div className="flex items-center gap-1.5">
+              <h3 className="font-bold text-sm sm:text-base lg:text-lg truncate text-slate-800">{match.user.name}</h3>
+              {/* Compatibility Badge */}
+              {match.user.aiCompatibility != null && match.user.aiCompatibility > 0 && (
+                <span 
+                  className="shrink-0 px-1.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold text-white"
+                  style={{ 
+                    background: match.user.aiCompatibility >= 0.7 
+                      ? 'linear-gradient(135deg, #22c55e, #4ade80)' 
+                      : match.user.aiCompatibility >= 0.4 
+                        ? 'linear-gradient(135deg, #f59e0b, #fbbf24)' 
+                        : 'linear-gradient(135deg, #94a3b8, #cbd5e1)'
+                  }}
+                  title="Compatibilidad IA"
+                >
+                  {Math.round(match.user.aiCompatibility * 100)}%
+                </span>
+              )}
+              {/* Fallback: interest-based compatibility if no AI score */}
+              {(match.user.aiCompatibility == null || match.user.aiCompatibility === 0) && (match.user.interests?.length ?? 0) > 0 && (
+                <span 
+                  className="shrink-0 px-1.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold"
+                  style={{ 
+                    background: 'linear-gradient(135deg, #ff805215, #ffc10715)',
+                    color: '#ff8052'
+                  }}
+                >
+                  {match.user.interests.length} intereses
+                </span>
+              )}
+            </div>
             <p className={`text-[9px] sm:text-[10px] lg:text-xs font-semibold uppercase flex items-center gap-1.5 ${
               otherUserPresence.online ? 'text-emerald-500' : 'text-slate-400'
             }`}>
@@ -1091,6 +1121,72 @@ const ChatView: React.FC<ChatViewProps> = ({
 
         {/* AI Icebreakers Section - Responsive */}
         <div className="pt-3 sm:pt-4 flex flex-col items-center px-2 sm:px-0">
+
+          {/* AI Coach Contextual Tip */}
+          {(() => {
+            // Only show after some messages exist
+            if (messages.length < 2) return null;
+            
+            const myMessages = messages.filter(m => m.senderId === currentUserId && !m.deletedForEveryone);
+            const theirMessages = messages.filter(m => m.senderId !== currentUserId && !m.deletedForEveryone);
+            const lastMsg = messages[messages.length - 1];
+            const isLastMine = lastMsg?.senderId === currentUserId;
+            
+            // Time since last message in minutes
+            const timeSinceLastMsg = lastMsg ? (Date.now() - lastMsg.timestamp) / 60000 : 0;
+            
+            // Determine contextual tip
+            let tip = '';
+            let emoji = '';
+            let color = '';
+            
+            if (theirMessages.length === 0 && myMessages.length >= 2) {
+              tip = 'Dale tiempo para responder, no envíes muchos mensajes seguidos';
+              emoji = '⏳';
+              color = '#f59e0b';
+            } else if (isLastMine && timeSinceLastMsg > 60 * 4) {
+              tip = 'La conversación se enfrió. Intenta con un tema nuevo o una pregunta divertida';
+              emoji = '🧊';
+              color = '#6366f1';
+            } else if (!isLastMine && timeSinceLastMsg < 2) {
+              tip = 'Acaba de escribir — buen momento para mantener el ritmo';
+              emoji = '🔥';
+              color = '#f43f5e';
+            } else if (messages.length >= 10 && (conversationMetrics?.conversationMomentum ?? 0) > 0.6) {
+              tip = 'La conversación fluye bien. ¿Buen momento para proponer verse?';
+              emoji = '☕';
+              color = '#22c55e';
+            } else if (conversationInsights?.conversationHealth === 'declining') {
+              tip = 'Haz una pregunta abierta para reavivar la conversación';
+              emoji = '💡';
+              color = '#8b5cf6';
+            } else if (myMessages.length > 0 && theirMessages.length > 0 && messages.length >= 6 && messages.length <= 12) {
+              tip = 'Van bien — comparte algo personal para crear más conexión';
+              emoji = '✨';
+              color = '#ff8052';
+            } else {
+              return null;
+            }
+            
+            return (
+              <div 
+                className="w-full mb-2 px-1"
+                style={{ animation: 'fadeIn 0.3s ease-out' }}
+              >
+                <div 
+                  className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs"
+                  style={{ 
+                    backgroundColor: `${color}10`,
+                    border: `1px solid ${color}25`
+                  }}
+                >
+                  <span className="text-sm shrink-0">{emoji}</span>
+                  <span className="font-medium" style={{ color }}>{tip}</span>
+                </div>
+              </div>
+            );
+          })()}
+
           {!icebreakers.length && !loadingIce && (
             <button 
               onClick={loadIcebreakers}

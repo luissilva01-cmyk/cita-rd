@@ -246,14 +246,23 @@ const Landing: React.FC = () => {
                                 <div className="absolute inset-0 rounded-3xl bg-gray-300 transform rotate-3 scale-97 opacity-50"></div>
                                 
                                 {/* Main card */}
-                                <div className="relative w-full h-full rounded-3xl overflow-hidden shadow-xl" style={{background: 'linear-gradient(135deg, #ff8052 0%, #ffc107 100%)'}}>
-                                  <div className="absolute inset-0 flex items-center justify-center">
-                                    <Heart className="w-20 h-20 text-white opacity-20" />
-                                  </div>
-                                  <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/60 to-transparent">
+                                <div className="relative w-full h-full rounded-3xl overflow-hidden shadow-xl">
+                                  <img 
+                                    src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=600&fit=crop&crop=face" 
+                                    alt="Perfil de ejemplo"
+                                    className="absolute inset-0 w-full h-full object-cover"
+                                  />
+                                  <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/70 via-black/30 to-transparent">
                                     <div className="text-white">
-                                      <div className="text-2xl font-bold mb-1">Tu Match</div>
-                                      <div className="text-sm opacity-90">Encuentra conexiones reales</div>
+                                      <div className="text-2xl font-bold mb-0.5">María, 24</div>
+                                      <div className="text-sm opacity-90 flex items-center gap-1">
+                                        <span>📍</span> Santo Domingo • 2.5 km
+                                      </div>
+                                      <div className="flex gap-1.5 mt-2">
+                                        <span className="px-2 py-0.5 bg-white/20 backdrop-blur-sm rounded-full text-[10px]">Música</span>
+                                        <span className="px-2 py-0.5 bg-white/20 backdrop-blur-sm rounded-full text-[10px]">Viajes</span>
+                                        <span className="px-2 py-0.5 bg-white/20 backdrop-blur-sm rounded-full text-[10px]">❤️ Seria</span>
+                                      </div>
                                     </div>
                                   </div>
                                 </div>

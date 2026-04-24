@@ -41,6 +41,7 @@ import { analyticsService } from './services/analyticsService';
 import { errorTrackingService } from './services/errorTrackingService';
 import { AnalyticsDashboard } from './components/AnalyticsDashboard';
 import { getCurrentPosition, saveUserLocation } from './services/geolocationService';
+import Onboarding from './components/Onboarding';
 import { useUnreadMessages } from './hooks/useUnreadMessages';
 
 const INITIAL_POTENTIAL_MATCHES: UserProfile[] = [];
@@ -101,6 +102,7 @@ const App: React.FC = () => {
   
   // Estado para mostrar prompt de notificaciones
   const [showNotificationPrompt, setShowNotificationPrompt] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   
   // Hook para contador de mensajes no leídos
   console.log('🔔 [APP] Llamando useUnreadMessages con userId:', currentUser?.id);
@@ -151,6 +153,11 @@ const App: React.FC = () => {
               setCurrentUser(prev => prev ? { ...prev, latitude: coords.latitude, longitude: coords.longitude } : prev);
             }
           });
+
+          // Show onboarding for first-time users
+          if (!localStorage.getItem('tapati_onboarding_done')) {
+            setShowOnboarding(true);
+          }
           
           // Set user ID in analytics
           analyticsService.setUserId(user.uid);
@@ -858,6 +865,9 @@ const App: React.FC = () => {
     <ErrorBoundary level="app">
       <LanguageProvider>
         <Suspense fallback={<LoadingFallback />}>
+          {/* Onboarding for new users */}
+          {showOnboarding && <Onboarding onComplete={() => setShowOnboarding(false)} />}
+          
           {/* Offline Banner */}
           <OfflineBanner 
             isOnline={isOnline} 

@@ -401,17 +401,26 @@ const SwipeCard: React.FC<SwipeCardProps> = ({
                 </div>
                 
                 {/* Additional Info (if available) */}
-                {(user as any).height && (
-                  <div className="flex items-center gap-2 text-sm">
-                    <span className="text-white/70">Altura:</span>
-                    <span className="text-white/90">{(user as any).height}</span>
+                {(user.height || user.zodiacSign || user.kids || user.smoking || user.drinking || user.pets) && (
+                  <div>
+                    <h4 className="text-sm font-semibold text-white/70 mb-2">✨ Más sobre mí</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {user.height && <span className="px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-full text-xs font-medium">📏 {user.height}</span>}
+                      {user.zodiacSign && <span className="px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-full text-xs font-medium">♈ {user.zodiacSign}</span>}
+                      {user.kids && <span className="px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-full text-xs font-medium">👶 {user.kids === 'no_tengo' ? 'Sin hijos' : user.kids === 'tengo' ? 'Tiene hijos' : user.kids === 'quiero' ? 'Quiere hijos' : 'No quiere'}</span>}
+                      {user.smoking && <span className="px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-full text-xs font-medium">🚬 {user.smoking === 'no' ? 'No fuma' : user.smoking === 'social' ? 'Social' : 'Fuma'}</span>}
+                      {user.drinking && <span className="px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-full text-xs font-medium">🍺 {user.drinking === 'no' ? 'No toma' : user.drinking === 'social' ? 'Social' : 'Toma'}</span>}
+                      {user.pets && <span className="px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-full text-xs font-medium">{user.pets === 'perro' ? '🐶 Perro' : user.pets === 'gato' ? '🐱 Gato' : user.pets === 'ambos' ? '🐾 Ambos' : user.pets === 'quiero' ? '🐾 Quiere' : '🚫 No'}</span>}
+                    </div>
                   </div>
                 )}
                 
-                {(user as any).relationshipGoal && (
+                {user.relationshipGoal && (
                   <div className="flex items-center gap-2 text-sm">
                     <span className="text-white/70">Buscando:</span>
-                    <span className="text-white/90">{(user as any).relationshipGoal}</span>
+                    <span className="text-white/90">
+                      {user.relationshipGoal === 'relacion_seria' ? '❤️ Relación seria' : user.relationshipGoal === 'algo_casual' ? '🔥 Algo casual' : user.relationshipGoal === 'amistad' ? '🤝 Amistad' : '🤷 Explorando'}
+                    </span>
                   </div>
                 )}
               </div>

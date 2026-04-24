@@ -642,6 +642,114 @@ const ProfileView: React.FC<ProfileViewProps> = ({
           </div>
         </div>
 
+        {/* Más sobre mí - Optional badges */}
+        <div className="mt-4">
+          <h3 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
+            ✨ Más sobre mí
+            <span className="text-[10px] font-normal text-slate-400">(opcional)</span>
+          </h3>
+          
+          {isEditing ? (
+            <div className="space-y-3">
+              {/* Altura */}
+              <div>
+                <label className="text-xs font-medium text-slate-500 mb-1 block">📏 Altura</label>
+                <select
+                  value={editedUser.height || ''}
+                  onChange={(e) => setEditedUser({ ...editedUser, height: e.target.value || undefined })}
+                  className="w-full p-2.5 border border-slate-200 rounded-lg text-sm"
+                >
+                  <option value="">No especificar</option>
+                  {Array.from({ length: 41 }, (_, i) => 150 + i).map(cm => (
+                    <option key={cm} value={`${cm} cm`}>{cm} cm ({Math.floor(cm / 30.48)}'{Math.round((cm % 30.48) / 2.54)}")</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Signo zodiacal */}
+              <div>
+                <label className="text-xs font-medium text-slate-500 mb-1 block">♈ Signo zodiacal</label>
+                <div className="grid grid-cols-4 gap-1.5">
+                  {[
+                    { v: 'aries', l: '♈ Aries' }, { v: 'tauro', l: '♉ Tauro' }, { v: 'geminis', l: '♊ Géminis' }, { v: 'cancer', l: '♋ Cáncer' },
+                    { v: 'leo', l: '♌ Leo' }, { v: 'virgo', l: '♍ Virgo' }, { v: 'libra', l: '♎ Libra' }, { v: 'escorpio', l: '♏ Escorpio' },
+                    { v: 'sagitario', l: '♐ Sagitario' }, { v: 'capricornio', l: '♑ Capricornio' }, { v: 'acuario', l: '♒ Acuario' }, { v: 'piscis', l: '♓ Piscis' },
+                  ].map(s => (
+                    <button key={s.v} type="button" onClick={() => setEditedUser({ ...editedUser, zodiacSign: editedUser.zodiacSign === s.v ? undefined : s.v })}
+                      className="px-1.5 py-1.5 rounded-lg text-[10px] font-medium transition-all active:scale-95"
+                      style={{ background: editedUser.zodiacSign === s.v ? 'linear-gradient(135deg, #ff8052, #ffc107)' : '#f1f5f9', color: editedUser.zodiacSign === s.v ? 'white' : '#475569' }}
+                    >{s.l}</button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Hijos */}
+              <div>
+                <label className="text-xs font-medium text-slate-500 mb-1 block">👶 Hijos</label>
+                <div className="flex gap-2 flex-wrap">
+                  {[{ v: 'no_tengo', l: 'No tengo' }, { v: 'tengo', l: 'Tengo' }, { v: 'quiero', l: 'Quiero tener' }, { v: 'no_quiero', l: 'No quiero' }].map(o => (
+                    <button key={o.v} type="button" onClick={() => setEditedUser({ ...editedUser, kids: editedUser.kids === o.v ? undefined : o.v })}
+                      className="px-3 py-1.5 rounded-full text-xs font-medium transition-all active:scale-95"
+                      style={{ background: editedUser.kids === o.v ? 'linear-gradient(135deg, #ff8052, #ffc107)' : '#f1f5f9', color: editedUser.kids === o.v ? 'white' : '#475569' }}
+                    >{o.l}</button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Fuma / Toma */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-medium text-slate-500 mb-1 block">🚬 Fuma</label>
+                  <div className="flex gap-1.5 flex-wrap">
+                    {[{ v: 'no', l: 'No' }, { v: 'social', l: 'Social' }, { v: 'si', l: 'Sí' }].map(o => (
+                      <button key={o.v} type="button" onClick={() => setEditedUser({ ...editedUser, smoking: editedUser.smoking === o.v ? undefined : o.v })}
+                        className="px-2.5 py-1.5 rounded-full text-[11px] font-medium transition-all active:scale-95"
+                        style={{ background: editedUser.smoking === o.v ? 'linear-gradient(135deg, #ff8052, #ffc107)' : '#f1f5f9', color: editedUser.smoking === o.v ? 'white' : '#475569' }}
+                      >{o.l}</button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-slate-500 mb-1 block">🍺 Toma</label>
+                  <div className="flex gap-1.5 flex-wrap">
+                    {[{ v: 'no', l: 'No' }, { v: 'social', l: 'Social' }, { v: 'si', l: 'Sí' }].map(o => (
+                      <button key={o.v} type="button" onClick={() => setEditedUser({ ...editedUser, drinking: editedUser.drinking === o.v ? undefined : o.v })}
+                        className="px-2.5 py-1.5 rounded-full text-[11px] font-medium transition-all active:scale-95"
+                        style={{ background: editedUser.drinking === o.v ? 'linear-gradient(135deg, #ff8052, #ffc107)' : '#f1f5f9', color: editedUser.drinking === o.v ? 'white' : '#475569' }}
+                      >{o.l}</button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Mascotas */}
+              <div>
+                <label className="text-xs font-medium text-slate-500 mb-1 block">🐶 Mascotas</label>
+                <div className="flex gap-2 flex-wrap">
+                  {[{ v: 'perro', l: '🐶 Perro' }, { v: 'gato', l: '🐱 Gato' }, { v: 'ambos', l: '🐾 Ambos' }, { v: 'no', l: 'No tengo' }, { v: 'quiero', l: 'Quiero' }].map(o => (
+                    <button key={o.v} type="button" onClick={() => setEditedUser({ ...editedUser, pets: editedUser.pets === o.v ? undefined : o.v })}
+                      className="px-3 py-1.5 rounded-full text-xs font-medium transition-all active:scale-95"
+                      style={{ background: editedUser.pets === o.v ? 'linear-gradient(135deg, #ff8052, #ffc107)' : '#f1f5f9', color: editedUser.pets === o.v ? 'white' : '#475569' }}
+                    >{o.l}</button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              {user.height && <span className="px-3 py-1.5 bg-slate-100 rounded-full text-xs font-medium text-slate-600">📏 {user.height}</span>}
+              {user.zodiacSign && <span className="px-3 py-1.5 bg-slate-100 rounded-full text-xs font-medium text-slate-600">♈ {user.zodiacSign}</span>}
+              {user.kids && <span className="px-3 py-1.5 bg-slate-100 rounded-full text-xs font-medium text-slate-600">👶 {user.kids === 'no_tengo' ? 'Sin hijos' : user.kids === 'tengo' ? 'Tiene hijos' : user.kids === 'quiero' ? 'Quiere hijos' : 'No quiere hijos'}</span>}
+              {user.smoking && <span className="px-3 py-1.5 bg-slate-100 rounded-full text-xs font-medium text-slate-600">🚬 {user.smoking === 'no' ? 'No fuma' : user.smoking === 'social' ? 'Social' : 'Fuma'}</span>}
+              {user.drinking && <span className="px-3 py-1.5 bg-slate-100 rounded-full text-xs font-medium text-slate-600">🍺 {user.drinking === 'no' ? 'No toma' : user.drinking === 'social' ? 'Social' : 'Toma'}</span>}
+              {user.pets && <span className="px-3 py-1.5 bg-slate-100 rounded-full text-xs font-medium text-slate-600">{user.pets === 'perro' ? '🐶 Perro' : user.pets === 'gato' ? '🐱 Gato' : user.pets === 'ambos' ? '🐾 Perro y gato' : user.pets === 'quiero' ? '🐾 Quiere mascota' : '🚫 Sin mascotas'}</span>}
+              {!user.height && !user.zodiacSign && !user.kids && !user.smoking && !user.drinking && !user.pets && (
+                <p className="text-slate-400 text-xs">Edita tu perfil para agregar más detalles</p>
+              )}
+            </div>
+          )}
+        </div>
+
         {/* Action Buttons - Responsive */}
         {isEditing && (
           <div className="flex flex-col sm:flex-row gap-3 pt-4">

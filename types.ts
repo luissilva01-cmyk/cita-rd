@@ -20,6 +20,13 @@ export interface UserProfile {
   height?: string;
   relationshipGoal?: string;
   
+  // Más sobre mí (opcionales)
+  zodiacSign?: string;
+  kids?: string;
+  smoking?: string;
+  drinking?: string;
+  pets?: string;
+  
   // Propiedades de análisis de perfil
   visibilityBoost?: number;
   profileScore?: number;

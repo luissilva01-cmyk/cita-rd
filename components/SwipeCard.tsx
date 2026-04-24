@@ -302,7 +302,23 @@ const SwipeCard: React.FC<SwipeCardProps> = ({
                   {interest}
                 </span>
               ))}
+              {/* Relationship Goal Badge */}
+              {user.relationshipGoal && (
+                <span className="px-3 py-1 bg-white/25 backdrop-blur-sm rounded-full text-xs font-medium">
+                  {user.relationshipGoal === 'relacion_seria' && '❤️ Relación seria'}
+                  {user.relationshipGoal === 'algo_casual' && '🔥 Casual'}
+                  {user.relationshipGoal === 'amistad' && '🤝 Amistad'}
+                  {user.relationshipGoal === 'no_se_aun' && '🤷 Explorando'}
+                </span>
+              )}
             </div>
+            {/* Match de intención */}
+            {user.relationshipGoal && currentUser.relationshipGoal && user.relationshipGoal === currentUser.relationshipGoal && user.relationshipGoal !== 'no_se_aun' && (
+              <div className="mb-3 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5" style={{ background: 'rgba(34,197,94,0.2)', color: '#bbf7d0' }}>
+                <span>✨</span>
+                También busca {user.relationshipGoal === 'relacion_seria' ? 'relación seria' : user.relationshipGoal === 'algo_casual' ? 'algo casual' : 'amistad'}
+              </div>
+            )}
             
             {/* About Me Button */}
             <button

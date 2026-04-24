@@ -506,6 +506,48 @@ const ProfileView: React.FC<ProfileViewProps> = ({
             )}
           </div>
 
+          {/* Qué Busca - Relationship Goal */}
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              💘 ¿Qué buscas?
+            </label>
+            {isEditing ? (
+              <div className="grid grid-cols-2 gap-2">
+                {([
+                  { value: 'relacion_seria', label: 'Relación seria', emoji: '❤️' },
+                  { value: 'algo_casual', label: 'Algo casual', emoji: '🔥' },
+                  { value: 'amistad', label: 'Amistad', emoji: '🤝' },
+                  { value: 'no_se_aun', label: 'No sé aún', emoji: '🤷' },
+                ] as const).map((opt) => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => setEditedUser({ ...editedUser, relationshipGoal: opt.value })}
+                    className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-medium transition-all active:scale-95"
+                    style={{
+                      background: editedUser.relationshipGoal === opt.value
+                        ? 'linear-gradient(135deg, #ff8052, #ffc107)'
+                        : 'white',
+                      color: editedUser.relationshipGoal === opt.value ? 'white' : '#475569',
+                      border: editedUser.relationshipGoal === opt.value ? 'none' : '1px solid #e2e8f0'
+                    }}
+                  >
+                    <span>{opt.emoji}</span>
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <p className="text-slate-600 text-sm sm:text-base">
+                {user.relationshipGoal === 'relacion_seria' && '❤️ Relación seria'}
+                {user.relationshipGoal === 'algo_casual' && '🔥 Algo casual'}
+                {user.relationshipGoal === 'amistad' && '🤝 Amistad'}
+                {user.relationshipGoal === 'no_se_aun' && '🤷 No sé aún'}
+                {!user.relationshipGoal && '—'}
+              </p>
+            )}
+          </div>
+
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-2">
               <Heart className="inline w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1" />

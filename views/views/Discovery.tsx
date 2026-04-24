@@ -89,7 +89,7 @@ const Discovery: React.FC<DiscoveryProps> = ({
   const [userToReport, setUserToReport] = useState<UserProfile | null>(null);
 
   // Filter chips state
-  type FilterChip = 'todos' | 'mujeres' | 'hombres' | 'cerca' | 'jovenes' | 'verificados';
+  type FilterChip = 'todos' | 'mujeres' | 'hombres' | 'cerca' | 'jovenes' | 'verificados' | 'serios';
   const [activeFilters, setActiveFilters] = useState<Set<FilterChip>>(new Set(['todos']));
 
   const toggleFilter = (filter: FilterChip) => {
@@ -183,6 +183,7 @@ const Discovery: React.FC<DiscoveryProps> = ({
       if (activeFilters.has('hombres') && u.gender !== 'hombre') return false;
       if (activeFilters.has('jovenes') && (u.age < 18 || u.age > 30)) return false;
       if (activeFilters.has('verificados') && !u.isVerified) return false;
+      if (activeFilters.has('serios') && u.relationshipGoal !== 'relacion_seria') return false;
       if (activeFilters.has('cerca')) {
         const dist = parseFloat(u.distance || '999');
         if (dist > 10) return false;
@@ -390,6 +391,7 @@ const Discovery: React.FC<DiscoveryProps> = ({
           { id: 'cerca' as FilterChip, label: '<10km', emoji: '📍' },
           { id: 'jovenes' as FilterChip, label: '18-30', emoji: '🎯' },
           { id: 'verificados' as FilterChip, label: 'Verificados', emoji: '✓' },
+          { id: 'serios' as FilterChip, label: 'Serios', emoji: '❤️' },
         ]).map(chip => {
           const isActive = activeFilters.has(chip.id);
           return (

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Heart, Shield, MessageCircle, ChevronRight, MapPin, Check, Star, Users, Sparkles } from 'lucide-react';
+import { Heart, Shield, MessageCircle, ChevronRight, MapPin, Check, Star } from 'lucide-react';
 import Logo from '../../components/Logo';
 
 const Landing: React.FC = () => {
@@ -34,50 +34,111 @@ const Landing: React.FC = () => {
           </button>
         </nav>
 
-        {/* Hero content — pushed to bottom */}
-        <div className="relative z-10 mt-auto px-5 pb-8 sm:px-8 sm:pb-12">
-          {/* Honest tagline pill */}
-          <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/15 rounded-full px-4 py-2 mb-5">
-            <span className="text-lg">🇩🇴</span>
-            <span className="text-white/90 text-sm font-medium">
-              La nueva app de citas dominicana
-            </span>
+        {/* Hero content — 2 columns on desktop */}
+        <div className="relative z-10 mt-auto lg:mt-0 lg:flex-1 flex items-end lg:items-center px-5 pb-8 sm:px-8 sm:pb-12 lg:pb-0 lg:max-w-7xl lg:mx-auto lg:w-full lg:gap-12">
+          {/* Left: Text */}
+          <div className="lg:flex-1 lg:py-20">
+            {/* Honest tagline pill */}
+            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/15 rounded-full px-4 py-2 mb-5">
+              <span className="text-lg">🇩🇴</span>
+              <span className="text-white/90 text-sm font-medium">
+                La nueva app de citas dominicana
+              </span>
+            </div>
+
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-[1.1] mb-4">
+              Encuentra quien<br />
+              <span style={{
+                background: 'linear-gradient(90deg, #ff8052, #ffc107)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+              }}>ta' pa' ti</span>
+            </h1>
+
+            <p className="text-white/80 text-lg sm:text-xl max-w-lg mb-8 leading-relaxed">
+              La app de citas hecha para República Dominicana. Personas reales, cerca de ti, buscando lo mismo que tú.
+            </p>
+
+            {/* CTA buttons */}
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={() => navigate('/register')}
+                className="group flex items-center justify-center gap-2 px-8 py-4 text-white rounded-2xl font-bold text-lg transition-all duration-300 hover:scale-[1.02] active:scale-95"
+                style={{
+                  background: 'linear-gradient(135deg, #ff8052 0%, #ffc107 100%)',
+                  boxShadow: '0 12px 40px rgba(255, 128, 82, 0.4)'
+                }}
+              >
+                Crear mi perfil gratis
+                <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </button>
+              <button
+                onClick={() => navigate('/login')}
+                className="flex items-center justify-center px-8 py-4 bg-white/10 backdrop-blur-md text-white rounded-2xl font-semibold text-lg border border-white/20 hover:bg-white/20 transition-all"
+              >
+                Ya tengo cuenta
+              </button>
+            </div>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-[1.1] mb-4">
-            Encuentra quien<br />
-            <span style={{
-              background: 'linear-gradient(90deg, #ff8052, #ffc107)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-            }}>ta' pa' ti</span>
-          </h1>
-
-          <p className="text-white/80 text-lg sm:text-xl max-w-lg mb-8 leading-relaxed">
-            La app de citas hecha para República Dominicana. Personas reales, cerca de ti, buscando lo mismo que tú.
-          </p>
-
-          {/* CTA buttons */}
-          <div className="flex flex-col sm:flex-row gap-3">
-            <button
-              onClick={() => navigate('/register')}
-              className="group flex items-center justify-center gap-2 px-8 py-4 text-white rounded-2xl font-bold text-lg transition-all duration-300 hover:scale-[1.02] active:scale-95"
-              style={{
-                background: 'linear-gradient(135deg, #ff8052 0%, #ffc107 100%)',
-                boxShadow: '0 12px 40px rgba(255, 128, 82, 0.4)'
-              }}
-            >
-              Crear mi perfil gratis
-              <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </button>
-            <button
-              onClick={() => navigate('/login')}
-              className="flex items-center justify-center px-8 py-4 bg-white/10 backdrop-blur-md text-white rounded-2xl font-semibold text-lg border border-white/20 hover:bg-white/20 transition-all"
-            >
-              Ya tengo cuenta
-            </button>
+          {/* Right: Phone mockup — hidden on mobile, visible on lg+ */}
+          <div className="hidden lg:block lg:flex-shrink-0">
+            <div className="relative">
+              <div className="rounded-[2.5rem] overflow-hidden border-[6px] border-gray-800 bg-gray-900 shadow-2xl" style={{ width: 280 }}>
+                <div className="aspect-[9/19] bg-gradient-to-br from-slate-50 to-white relative overflow-hidden">
+                  <div className="absolute inset-0 flex flex-col">
+                    {/* Mini header */}
+                    <div className="p-3 flex items-center justify-center">
+                      <span className="text-sm font-bold" style={{
+                        background: 'linear-gradient(to right, #f97316, #eab308)',
+                        WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+                      }}>Ta' Pa' Ti</span>
+                    </div>
+                    {/* Card */}
+                    <div className="flex-1 flex items-center justify-center px-4 pb-2">
+                      <div className="relative w-full aspect-[3/4] rounded-2xl overflow-hidden shadow-lg">
+                        <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=600&fit=crop&crop=face" alt="" className="absolute inset-0 w-full h-full object-cover" />
+                        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent">
+                          <p className="text-white font-bold text-lg">María, 24</p>
+                          <p className="text-white/80 text-xs flex items-center gap-1"><MapPin className="w-3 h-3" /> Santo Domingo • 2 km</p>
+                        </div>
+                      </div>
+                    </div>
+                    {/* Action buttons */}
+                    <div className="pb-4 flex justify-center gap-3">
+                      <div className="w-12 h-12 rounded-full bg-white shadow-md flex items-center justify-center">
+                        <span className="text-red-400 text-lg">✕</span>
+                      </div>
+                      <div className="w-14 h-14 rounded-full shadow-md flex items-center justify-center" style={{background: 'linear-gradient(135deg, #ff8052, #ffc107)'}}>
+                        <Heart className="w-6 h-6 text-white" fill="white" />
+                      </div>
+                      <div className="w-12 h-12 rounded-full bg-white shadow-md flex items-center justify-center">
+                        <Star className="w-5 h-5 text-blue-500" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {/* Floating match notification */}
+              <div className="absolute -left-6 top-1/3 bg-white rounded-2xl shadow-xl p-3 flex items-center gap-2 border border-gray-100" style={{ animation: 'float 3s ease-in-out infinite' }}>
+                <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{background: 'linear-gradient(135deg, #ff8052, #ffc107)'}}>
+                  <Heart className="w-4 h-4 text-white" fill="white" />
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-gray-900">¡Nuevo match!</p>
+                  <p className="text-[10px] text-gray-500">Ahora mismo</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
+
+        <style>{`
+          @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+          }
+        `}</style>
       </div>
 
       {/* ═══ TRUST STRIP ═══ */}
@@ -147,98 +208,50 @@ const Landing: React.FC = () => {
         </div>
       </div>
 
-      {/* ═══ APP PREVIEW — Phone mockup with real screenshot feel ═══ */}
+      {/* ═══ FEATURES — Text with checks ═══ */}
       <div className="py-16 sm:py-20 px-5 sm:px-8 bg-gradient-to-b from-white to-gray-50">
-        <div className="max-w-5xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            {/* Phone */}
-            <div className="relative mx-auto max-w-[280px]">
-              <div className="rounded-[2.5rem] overflow-hidden border-[6px] border-gray-900 bg-gray-900 shadow-2xl">
-                <div className="aspect-[9/19] bg-gradient-to-br from-slate-50 to-white relative overflow-hidden">
-                  <div className="absolute inset-0 flex flex-col">
-                    {/* Mini header */}
-                    <div className="p-3 flex items-center justify-center">
-                      <span className="text-sm font-bold" style={{
-                        background: 'linear-gradient(to right, #f97316, #eab308)',
-                        WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-                      }}>Ta' Pa' Ti</span>
-                    </div>
-                    {/* Card */}
-                    <div className="flex-1 flex items-center justify-center px-4 pb-2">
-                      <div className="relative w-full aspect-[3/4] rounded-2xl overflow-hidden shadow-lg">
-                        <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=600&fit=crop&crop=face" alt="" className="absolute inset-0 w-full h-full object-cover" />
-                        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent">
-                          <p className="text-white font-bold text-lg">María, 24</p>
-                          <p className="text-white/80 text-xs flex items-center gap-1"><MapPin className="w-3 h-3" /> Santo Domingo • 2 km</p>
-                        </div>
-                      </div>
-                    </div>
-                    {/* Action buttons */}
-                    <div className="pb-4 flex justify-center gap-3">
-                      <div className="w-12 h-12 rounded-full bg-white shadow-md flex items-center justify-center">
-                        <span className="text-red-400 text-lg">✕</span>
-                      </div>
-                      <div className="w-14 h-14 rounded-full shadow-md flex items-center justify-center" style={{background: 'linear-gradient(135deg, #ff8052, #ffc107)'}}>
-                        <Heart className="w-6 h-6 text-white" fill="white" />
-                      </div>
-                      <div className="w-12 h-12 rounded-full bg-white shadow-md flex items-center justify-center">
-                        <Star className="w-5 h-5 text-blue-500" />
-                      </div>
-                    </div>
-                  </div>
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-3">
+              Hecha para dominicanos que buscan algo real
+            </h2>
+            <p className="text-gray-500 text-lg max-w-2xl mx-auto">
+              No es otra app gringa traducida. Ta' Pa' Ti entiende cómo conectamos aquí — con sabor, con flow, con respeto.
+            </p>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
+            {[
+              'IA que entiende tu tipo',
+              'Personas verificadas, sin catfish',
+              'Filtros por provincia, edad, intención',
+              'Chat con fotos, voz y video',
+              'Stories para compartir momentos',
+              'Gratis para empezar'
+            ].map((item, i) => (
+              <div key={i} className="flex items-center gap-3 bg-white rounded-xl p-4 border border-gray-100">
+                <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0" style={{background: 'linear-gradient(135deg, #ff8052, #ffc107)'}}>
+                  <Check className="w-4 h-4 text-white" strokeWidth={3} />
                 </div>
+                <span className="text-gray-700 font-medium text-sm">{item}</span>
               </div>
-              {/* Floating notification */}
-              <div className="absolute -right-4 top-1/4 bg-white rounded-2xl shadow-xl p-3 flex items-center gap-2 border border-gray-100 animate-bounce" style={{ animationDuration: '3s' }}>
-                <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{background: 'linear-gradient(135deg, #ff8052, #ffc107)'}}>
-                  <Heart className="w-4 h-4 text-white" fill="white" />
-                </div>
-                <div>
-                  <p className="text-xs font-bold text-gray-900">¡Nuevo match!</p>
-                  <p className="text-[10px] text-gray-500">Ahora mismo</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Text */}
-            <div>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-4 leading-tight">
-                Hecha para<br />dominicanos que<br />buscan algo real
-              </h2>
-              <p className="text-gray-500 text-lg mb-8 leading-relaxed">
-                No es otra app gringa traducida. Ta' Pa' Ti entiende cómo conectamos aquí — con sabor, con flow, con respeto.
-              </p>
-              <div className="space-y-4">
-                {[
-                  'IA que entiende tu tipo',
-                  'Personas verificadas, sin catfish',
-                  'Filtros por provincia, edad, intención',
-                  'Chat con fotos, voz y video',
-                  'Gratis para empezar'
-                ].map((item, i) => (
-                  <div key={i} className="flex items-center gap-3">
-                    <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0" style={{background: 'linear-gradient(135deg, #ff8052, #ffc107)'}}>
-                      <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />
-                    </div>
-                    <span className="text-gray-700 font-medium">{item}</span>
-                  </div>
-                ))}
-              </div>
-              <button
-                onClick={() => navigate('/register')}
-                className="mt-8 px-8 py-4 text-white rounded-2xl font-bold text-lg transition-all hover:scale-[1.02] active:scale-95"
-                style={{
-                  background: 'linear-gradient(135deg, #ff8052, #ffc107)',
-                  boxShadow: '0 8px 30px rgba(255,128,82,0.3)'
-                }}
-              >
-                Únete ahora — es gratis
-              </button>
-            </div>
+            ))}
+          </div>
+          <div className="text-center mt-10">
+            <button
+              onClick={() => navigate('/register')}
+              className="px-8 py-4 text-white rounded-2xl font-bold text-lg transition-all hover:scale-[1.02] active:scale-95"
+              style={{
+                background: 'linear-gradient(135deg, #ff8052, #ffc107)',
+                boxShadow: '0 8px 30px rgba(255,128,82,0.3)'
+              }}
+            >
+              Únete ahora — es gratis
+            </button>
           </div>
         </div>
       </div>
 
+      {/* ═══ WHY TA PA TI ═══ */}
       {/* ═══ WHY TA PA TI ═══ */}
       <div className="py-16 sm:py-20 px-5 sm:px-8 bg-white">
         <div className="max-w-4xl mx-auto">

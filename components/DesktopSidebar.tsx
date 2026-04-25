@@ -35,9 +35,9 @@ const DesktopSidebar: React.FC<DesktopSidebarProps> = ({
   const messagesCount = totalUnreadMessages;
 
   return (
-    <div className="w-80 bg-white dark:bg-[#1a1a1a] h-full flex flex-col shadow-2xl">
+    <div className="w-80 bg-white dark:bg-[#141312] h-full flex flex-col shadow-2xl">
       {/* Header */}
-      <div className="p-6 border-b border-gray-200 dark:border-gray-800">
+      <div className="p-6 border-b border-gray-200 dark:border-white/10">
         <div className="flex items-center space-x-3">
           {/* Ta' Pa' Ti Logo */}
           <div className="w-10 h-10 rounded-full flex items-center justify-center">

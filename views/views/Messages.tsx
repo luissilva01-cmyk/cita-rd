@@ -98,7 +98,7 @@ const Messages: React.FC<MessagesProps> = ({ matches, onSelectMatch, onSendMessa
   }
 
   return (
-    <div className="h-full flex flex-col bg-gradient-to-br from-gray-50 to-gray-100 dark:from-[#121212] dark:to-[#1a1a1a] transition-colors">
+    <div className="h-full flex flex-col bg-gradient-to-br from-gray-50 to-gray-100 dark:from-[#0f0e0e] dark:to-[#141312] transition-colors">
       {/* Stories Section */}
       <div className="shrink-0 border-b border-gray-200 safe-area-top">
         <StoriesRing

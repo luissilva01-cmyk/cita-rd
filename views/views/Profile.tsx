@@ -190,7 +190,7 @@ const ProfileView: React.FC<ProfileViewProps> = ({
   );
 
   return (
-    <div className="h-full overflow-y-auto bg-gradient-to-br from-gray-50 to-gray-100 dark:from-[#121212] dark:to-[#1a1a1a] transition-colors">
+    <div className="h-full overflow-y-auto bg-gradient-to-br from-gray-50 to-gray-100 dark:from-[#0f0e0e] dark:to-[#141312] transition-colors">
       {/* Header - Responsive */}
       <div className="px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center border-b border-slate-100 dark:border-slate-800 safe-area-top">
         <div>
@@ -541,9 +541,9 @@ const ProfileView: React.FC<ProfileViewProps> = ({
                     style={{
                       background: editedUser.relationshipGoal === opt.value
                         ? 'linear-gradient(135deg, #ff8052, #ffc107)'
-                        : isDark ? '#252525' : 'white',
-                      color: editedUser.relationshipGoal === opt.value ? 'white' : isDark ? '#a1a1aa' : '#475569',
-                      border: editedUser.relationshipGoal === opt.value ? 'none' : `1px solid ${isDark ? '#3a3a3a' : '#e2e8f0'}`
+                        : isDark ? '#1c1a19' : 'white',
+                      color: editedUser.relationshipGoal === opt.value ? 'white' : isDark ? '#a8a5a0' : '#475569',
+                      border: editedUser.relationshipGoal === opt.value ? 'none' : `1px solid ${isDark ? 'rgba(255,255,255,0.12)' : '#e2e8f0'}`
                     }}
                   >
                     <span>{opt.emoji}</span>
@@ -774,7 +774,7 @@ const ProfileView: React.FC<ProfileViewProps> = ({
                   ].map(s => (
                     <button key={s.v} type="button" onClick={() => setEditedUser({ ...editedUser, zodiacSign: editedUser.zodiacSign === s.v ? undefined : s.v })}
                       className="px-1.5 py-1.5 rounded-lg text-[10px] font-medium transition-all active:scale-95"
-                      style={{ background: editedUser.zodiacSign === s.v ? 'linear-gradient(135deg, #ff8052, #ffc107)' : isDark ? '#252525' : '#f1f5f9', color: editedUser.zodiacSign === s.v ? 'white' : isDark ? '#a1a1aa' : '#475569' }}
+                      style={{ background: editedUser.zodiacSign === s.v ? 'linear-gradient(135deg, #ff8052, #ffc107)' : isDark ? '#1c1a19' : '#f1f5f9', color: editedUser.zodiacSign === s.v ? 'white' : isDark ? '#a8a5a0' : '#475569' }}
                     >{s.l}</button>
                   ))}
                 </div>
@@ -787,7 +787,7 @@ const ProfileView: React.FC<ProfileViewProps> = ({
                   {[{ v: 'no_tengo', l: 'No tengo' }, { v: 'tengo', l: 'Tengo' }, { v: 'quiero', l: 'Quiero tener' }, { v: 'no_quiero', l: 'No quiero' }].map(o => (
                     <button key={o.v} type="button" onClick={() => setEditedUser({ ...editedUser, kids: editedUser.kids === o.v ? undefined : o.v })}
                       className="px-3 py-1.5 rounded-full text-xs font-medium transition-all active:scale-95"
-                      style={{ background: editedUser.kids === o.v ? 'linear-gradient(135deg, #ff8052, #ffc107)' : isDark ? '#252525' : '#f1f5f9', color: editedUser.kids === o.v ? 'white' : isDark ? '#a1a1aa' : '#475569' }}
+                      style={{ background: editedUser.kids === o.v ? 'linear-gradient(135deg, #ff8052, #ffc107)' : isDark ? '#1c1a19' : '#f1f5f9', color: editedUser.kids === o.v ? 'white' : isDark ? '#a8a5a0' : '#475569' }}
                     >{o.l}</button>
                   ))}
                 </div>
@@ -801,7 +801,7 @@ const ProfileView: React.FC<ProfileViewProps> = ({
                     {[{ v: 'no', l: 'No' }, { v: 'social', l: 'Social' }, { v: 'si', l: 'Sí' }].map(o => (
                       <button key={o.v} type="button" onClick={() => setEditedUser({ ...editedUser, smoking: editedUser.smoking === o.v ? undefined : o.v })}
                         className="px-2.5 py-1.5 rounded-full text-[11px] font-medium transition-all active:scale-95"
-                        style={{ background: editedUser.smoking === o.v ? 'linear-gradient(135deg, #ff8052, #ffc107)' : isDark ? '#252525' : '#f1f5f9', color: editedUser.smoking === o.v ? 'white' : isDark ? '#a1a1aa' : '#475569' }}
+                        style={{ background: editedUser.smoking === o.v ? 'linear-gradient(135deg, #ff8052, #ffc107)' : isDark ? '#1c1a19' : '#f1f5f9', color: editedUser.smoking === o.v ? 'white' : isDark ? '#a8a5a0' : '#475569' }}
                       >{o.l}</button>
                     ))}
                   </div>
@@ -812,7 +812,7 @@ const ProfileView: React.FC<ProfileViewProps> = ({
                     {[{ v: 'no', l: 'No' }, { v: 'social', l: 'Social' }, { v: 'si', l: 'Sí' }].map(o => (
                       <button key={o.v} type="button" onClick={() => setEditedUser({ ...editedUser, drinking: editedUser.drinking === o.v ? undefined : o.v })}
                         className="px-2.5 py-1.5 rounded-full text-[11px] font-medium transition-all active:scale-95"
-                        style={{ background: editedUser.drinking === o.v ? 'linear-gradient(135deg, #ff8052, #ffc107)' : isDark ? '#252525' : '#f1f5f9', color: editedUser.drinking === o.v ? 'white' : isDark ? '#a1a1aa' : '#475569' }}
+                        style={{ background: editedUser.drinking === o.v ? 'linear-gradient(135deg, #ff8052, #ffc107)' : isDark ? '#1c1a19' : '#f1f5f9', color: editedUser.drinking === o.v ? 'white' : isDark ? '#a8a5a0' : '#475569' }}
                       >{o.l}</button>
                     ))}
                   </div>
@@ -826,7 +826,7 @@ const ProfileView: React.FC<ProfileViewProps> = ({
                   {[{ v: 'perro', l: '🐶 Perro' }, { v: 'gato', l: '🐱 Gato' }, { v: 'ambos', l: '🐾 Ambos' }, { v: 'no', l: 'No tengo' }, { v: 'quiero', l: 'Quiero' }].map(o => (
                     <button key={o.v} type="button" onClick={() => setEditedUser({ ...editedUser, pets: editedUser.pets === o.v ? undefined : o.v })}
                       className="px-3 py-1.5 rounded-full text-xs font-medium transition-all active:scale-95"
-                      style={{ background: editedUser.pets === o.v ? 'linear-gradient(135deg, #ff8052, #ffc107)' : isDark ? '#252525' : '#f1f5f9', color: editedUser.pets === o.v ? 'white' : isDark ? '#a1a1aa' : '#475569' }}
+                      style={{ background: editedUser.pets === o.v ? 'linear-gradient(135deg, #ff8052, #ffc107)' : isDark ? '#1c1a19' : '#f1f5f9', color: editedUser.pets === o.v ? 'white' : isDark ? '#a8a5a0' : '#475569' }}
                     >{o.l}</button>
                   ))}
                 </div>

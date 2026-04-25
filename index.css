@@ -969,61 +969,61 @@ html, body, #root, .full-width-allowed {
 
 
 /* ═══════════════════════════════════════════════════
-   DARK MODE - Comprehensive Overrides
-   Cubre TODOS los colores de texto, fondo, bordes
-   que usan clases Tailwind sin variante dark:
+   DARK MODE - Paleta cálida suave
+   Base: #0f0e0e  Surfaces: #141312 / #1c1a19
+   Borders: rgba(255,255,255,0.10)
    ═══════════════════════════════════════════════════ */
 
 /* Body dark mode */
 html.dark body {
-  background-color: #121212;
-  color: #e4e4e7;
+  background-color: #0f0e0e;
+  color: #e8e6e3;
 }
 
 /* ── TEXT COLORS ── */
 html.dark .text-slate-900,
 html.dark .text-gray-900 {
-  color: #f1f1f1 !important;
+  color: #f5f3f0 !important;
 }
 
 html.dark .text-slate-800,
 html.dark .text-gray-800 {
-  color: #e4e4e7 !important;
+  color: #e8e6e3 !important;
 }
 
 html.dark .text-slate-700,
 html.dark .text-gray-700 {
-  color: #d1d5db !important;
+  color: #ccc9c5 !important;
 }
 
 html.dark .text-slate-600,
 html.dark .text-gray-600 {
-  color: #a1a1aa !important;
+  color: #a8a5a0 !important;
 }
 
 html.dark .text-slate-500,
 html.dark .text-gray-500 {
-  color: #8b8b96 !important;
+  color: #8a8680 !important;
 }
 
 html.dark .text-slate-400,
 html.dark .text-gray-400 {
-  color: #71717a !important;
+  color: #6e6b66 !important;
 }
 
 /* ── BACKGROUND COLORS ── */
 html.dark .bg-white {
-  background-color: #1e1e1e !important;
+  background-color: #141312 !important;
 }
 
 html.dark .bg-gray-50,
 html.dark .bg-slate-50 {
-  background-color: #1a1a1a !important;
+  background-color: #141312 !important;
 }
 
 html.dark .bg-gray-100,
 html.dark .bg-slate-100 {
-  background-color: #252525 !important;
+  background-color: #1c1a19 !important;
 }
 
 html.dark .bg-gray-200,
@@ -1031,159 +1031,130 @@ html.dark .bg-slate-200 {
   background-color: #2a2a2a !important;
 }
 
+html.dark .bg-gray-300 {
+  background-color: #333 !important;
+}
+
 /* ── BORDER COLORS ── */
 html.dark .border-slate-100,
-html.dark .border-gray-100 {
-  border-color: #2a2a2a !important;
+html.dark .border-gray-100,
+html.dark .border-slate-50,
+html.dark .border-gray-50 {
+  border-color: rgba(255, 255, 255, 0.10) !important;
 }
 
 html.dark .border-slate-200,
 html.dark .border-gray-200 {
-  border-color: #333 !important;
+  border-color: rgba(255, 255, 255, 0.10) !important;
 }
 
-html.dark .border-slate-50,
-html.dark .border-gray-50 {
-  border-color: #252525 !important;
+html.dark .border-black\/5 {
+  border-color: rgba(255, 255, 255, 0.08) !important;
 }
 
 /* ── FORM INPUTS ── */
 html.dark input,
 html.dark textarea,
 html.dark select {
-  background-color: #252525 !important;
-  color: #e4e4e7 !important;
-  border-color: #3a3a3a !important;
+  background-color: #1c1a19 !important;
+  color: #e8e6e3 !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
 }
 
 html.dark input::placeholder,
 html.dark textarea::placeholder {
-  color: #71717a !important;
+  color: #6e6b66 !important;
 }
 
 html.dark select option {
-  background-color: #1e1e1e;
-  color: #e4e4e7;
+  background-color: #141312;
+  color: #e8e6e3;
 }
 
 html.dark select optgroup {
-  background-color: #1a1a1a;
-  color: #a1a1aa;
+  background-color: #0f0e0e;
+  color: #a8a5a0;
 }
 
-/* ── SPECIFIC COMPONENT OVERRIDES ── */
+/* ── COMPONENT OVERRIDES ── */
 
 /* Glass card dark */
 html.dark .glass-card {
-  background: rgba(30, 30, 30, 0.7);
+  background: rgba(20, 19, 18, 0.8);
+  border-color: rgba(255, 255, 255, 0.08);
 }
 
 /* Chat input area dark */
 html.dark .chat-input-area {
-  background: #1e1e1e !important;
-  border-top-color: #2a2a2a !important;
+  background: #141312 !important;
+  border-top-color: rgba(255, 255, 255, 0.10) !important;
 }
 
 /* Hover states */
 html.dark .hover\:bg-slate-50:hover,
 html.dark .hover\:bg-gray-50:hover {
-  background-color: #252525 !important;
+  background-color: #1c1a19 !important;
 }
 
 html.dark .hover\:bg-slate-100:hover {
-  background-color: #2a2a2a !important;
+  background-color: #252321 !important;
 }
 
 /* Rose/pink chips in dark mode */
 html.dark .bg-rose-100 {
-  background-color: rgba(244, 63, 94, 0.15) !important;
+  background-color: rgba(244, 63, 94, 0.12) !important;
 }
 
 html.dark .bg-rose-50,
 html.dark .hover\:bg-rose-50:hover {
-  background-color: rgba(244, 63, 94, 0.1) !important;
+  background-color: rgba(244, 63, 94, 0.08) !important;
 }
 
 html.dark .bg-orange-50,
 html.dark .hover\:bg-orange-100:hover {
-  background-color: rgba(255, 128, 82, 0.1) !important;
+  background-color: rgba(255, 128, 82, 0.08) !important;
 }
 
-/* Inline style overrides for elements using style={{ color: '#475569' }} etc */
-html.dark [style*="color: #475569"],
-html.dark [style*="color:#475569"] {
-  color: #a1a1aa !important;
-}
-
-html.dark [style*="background: white"],
-html.dark [style*="background:white"],
-html.dark [style*="background: #f1f5f9"],
-html.dark [style*="background:#f1f5f9"] {
-  background: #252525 !important;
-}
-
-/* Profile section: "Foto principal" text, section headers */
+/* Profile section headers */
 html.dark .text-rose-700 {
   color: #fb7185 !important;
 }
 
-/* Suggestions dropdown */
-html.dark .border-b.border-slate-100 {
-  border-color: #2a2a2a !important;
-}
-
 /* Prompt cards */
 html.dark .bg-gradient-to-br.from-orange-50 {
-  background: rgba(255, 128, 82, 0.08) !important;
-}
-
-/* "Más sobre mí" badge chips */
-html.dark [style*="background: #f1f5f9"] {
-  background: #252525 !important;
-  color: #a1a1aa !important;
-}
-
-/* Border on unselected buttons */
-html.dark [style*="border: 1px solid #e2e8f0"] {
-  border-color: #3a3a3a !important;
+  background: rgba(255, 128, 82, 0.06) !important;
 }
 
 /* Desktop sidebar dark */
 html.dark .desktop-sidebar {
-  background: #1a1a1a;
+  background: #141312;
 }
 
 /* Desktop main content dark */
 html.dark .desktop-main-content {
-  background: linear-gradient(135deg, #1a0a05 0%, #1a1200 100%);
+  background: linear-gradient(135deg, #1a0f0a 0%, #1a1500 100%);
 }
 
 /* Scrollbar dark */
 html.dark ::-webkit-scrollbar-track {
-  background: #1e1e1e;
+  background: #0f0e0e;
 }
 html.dark ::-webkit-scrollbar-thumb {
-  background: #3a3a3a;
+  background: #2a2a2a;
+  border-radius: 4px;
 }
 
-/* Home gradient background override */
-html.dark [style*="background: linear-gradient(180deg, #fff8f5"] {
-  background: #121212 !important;
-}
-
-/* Stories border */
-html.dark .border-b.border-gray-200 {
-  border-color: #2a2a2a !important;
-}
-
-/* Shadow adjustments for dark mode */
+/* Shadow adjustments for dark mode - más sutiles */
 html.dark .shadow-sm,
-html.dark .shadow-md,
+html.dark .shadow-md {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
 html.dark .shadow-lg {
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
 }
 
 html.dark .shadow-xl,
 html.dark .shadow-2xl {
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5) !important;
 }

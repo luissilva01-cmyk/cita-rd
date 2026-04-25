@@ -61,7 +61,7 @@ const Home: React.FC<HomeProps> = ({
   const location = currentUser.location || 'Santo Domingo';
 
   return (
-    <div className="w-full h-full overflow-y-auto pb-24 transition-colors" style={{ background: isDark ? '#121212' : 'linear-gradient(180deg, #fff8f5 0%, #ffffff 40%)' }}>
+    <div className="w-full h-full overflow-y-auto pb-24 transition-colors" style={{ background: isDark ? '#0f0e0e' : 'linear-gradient(180deg, #fff8f5 0%, #ffffff 40%)' }}>
 
       {/* Header con saludo */}
       <div className="px-4 md:px-10 pt-5 pb-2 flex items-center gap-3">
@@ -72,7 +72,7 @@ const Home: React.FC<HomeProps> = ({
             className="w-14 h-14 md:w-16 md:h-16 rounded-full object-cover shadow-lg"
             style={{ border: '3px solid #ff8052' }}
           />
-          <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-400 border-2 border-white dark:border-[#121212] rounded-full"></span>
+          <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-400 border-2 border-white dark:border-[#0f0e0e] rounded-full"></span>
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-lg md:text-xl font-bold truncate text-slate-800 dark:text-white">
@@ -245,7 +245,7 @@ const Home: React.FC<HomeProps> = ({
         {recentMatches.length > 0 ? (
           <div className="space-y-2">
             {recentMatches.slice(0, 3).map((match) => (
-              <div key={match.id} className="flex items-center gap-3 bg-white dark:bg-[#1e1e1e] p-3 rounded-xl border border-black/5 dark:border-white/10 shadow-sm hover:shadow-md transition-shadow">
+              <div key={match.id} className="flex items-center gap-3 bg-white dark:bg-[#1c1a19] p-3 rounded-xl border border-black/5 dark:border-white/10 shadow-sm hover:shadow-md transition-shadow">
                 <div 
                   className="w-11 h-11 rounded-full shrink-0 bg-cover bg-center border-2 border-orange-100 dark:border-orange-900"
                   style={{ backgroundImage: `url('${match.images?.[0] || 'https://picsum.photos/seed/' + match.id + '/200/200'}')` }}
@@ -275,7 +275,7 @@ const Home: React.FC<HomeProps> = ({
             ))}
           </div>
         ) : (
-          <div className="text-center py-6 bg-white dark:bg-[#1e1e1e] rounded-2xl border border-black/5 dark:border-white/10">
+          <div className="text-center py-6 bg-white dark:bg-[#1c1a19] rounded-2xl border border-black/5 dark:border-white/10">
             <div 
               className="w-14 h-14 rounded-full mx-auto mb-3 flex items-center justify-center"
               style={{ background: 'linear-gradient(135deg, #ff805220, #ffc10720)' }}
@@ -321,7 +321,7 @@ const Home: React.FC<HomeProps> = ({
 
         return (
           <div className="px-4 md:px-10 py-2 pb-6">
-            <div className="rounded-2xl p-4 md:p-5 bg-white dark:bg-[#1e1e1e] border border-black/5 dark:border-white/10 shadow-sm">
+            <div className="rounded-2xl p-4 md:p-5 bg-white dark:bg-[#1c1a19] border border-black/5 dark:border-white/10 shadow-sm">
               <div className="flex items-center justify-between mb-2.5">
                 <div className="flex items-center gap-2">
                   <h3 className="font-bold text-sm text-slate-800 dark:text-white">Perfil Completado</h3>
@@ -367,14 +367,14 @@ const Home: React.FC<HomeProps> = ({
                 style={{
                   border: '2px solid #ff8052',
                   color: '#ff8052',
-                  background: isDark ? '#1e1e1e' : 'transparent'
+                  background: isDark ? '#1c1a19' : 'transparent'
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor = '#ff8052';
                   e.currentTarget.style.color = 'white';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = isDark ? '#1e1e1e' : 'transparent';
+                  e.currentTarget.style.backgroundColor = isDark ? '#1c1a19' : 'transparent';
                   e.currentTarget.style.color = '#ff8052';
                 }}
               >

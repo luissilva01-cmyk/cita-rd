@@ -57,9 +57,9 @@ const Layout: React.FC<LayoutProps> = ({
   
   // Layout móvil/tablet (existente)
   return (
-    <div className="flex flex-col h-screen w-full max-w-md mx-auto bg-white dark:bg-[#121212] shadow-2xl relative overflow-hidden">
+    <div className="flex flex-col h-screen w-full max-w-md mx-auto bg-white dark:bg-[#0f0e0e] shadow-2xl relative overflow-hidden">
       {/* Header */}
-      <header className="px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center bg-white/80 dark:bg-[#121212]/90 backdrop-blur-md z-10 border-b border-slate-100 dark:border-slate-800 flex-shrink-0">
+      <header className="px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center bg-white/80 dark:bg-[#141312]/80 backdrop-blur-md z-10 border-b border-slate-100 dark:border-white/10 flex-shrink-0">
         <div className="flex items-center gap-2">
           <Logo size={24} useImage={true} />
           <div className="flex flex-col">
@@ -93,7 +93,7 @@ const Layout: React.FC<LayoutProps> = ({
       </main>
 
       {/* Bottom Nav */}
-      <nav className="flex-shrink-0 bg-white dark:bg-[#1a1a1a] border-t border-slate-100 dark:border-slate-800 px-2 sm:px-4 py-2 sm:py-3 flex justify-between items-center z-10">
+      <nav className="flex-shrink-0 bg-white dark:bg-[#141312] border-t border-slate-100 dark:border-white/10 px-2 sm:px-4 py-2 sm:py-3 flex justify-between items-center z-10">
         <NavItem 
           icon={<Home size={22} />} 
           active={activeView === 'home'} 

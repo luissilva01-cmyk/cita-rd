@@ -384,7 +384,7 @@ const Discovery: React.FC<DiscoveryProps> = ({
   }
 
   return (
-    <div className="relative h-full flex flex-col bg-gradient-to-br from-gray-50 to-gray-100 dark:from-[#121212] dark:to-[#1a1a1a] transition-colors">
+    <div className="relative h-full flex flex-col bg-gradient-to-br from-gray-50 to-gray-100 dark:from-[#0f0e0e] dark:to-[#141312] transition-colors">
       {/* Toast Container */}
       <ToastContainer />
 
@@ -399,7 +399,7 @@ const Discovery: React.FC<DiscoveryProps> = ({
       </div>
 
       {/* Filter Chips */}
-      <div className="shrink-0 px-3 py-2 flex gap-2 overflow-x-auto no-scrollbar bg-white/80 dark:bg-[#1e1e1e]/80 backdrop-blur-sm border-b border-gray-100 dark:border-gray-800">
+      <div className="shrink-0 px-3 py-2 flex gap-2 overflow-x-auto no-scrollbar bg-white/80 dark:bg-[#141312]/80 backdrop-blur-sm border-b border-gray-100 dark:border-white/10">
         {([
           { id: 'todos' as FilterChip, label: 'Todos', emoji: '🔥' },
           { id: 'mujeres' as FilterChip, label: 'Mujeres', emoji: '👩' },
@@ -416,9 +416,9 @@ const Discovery: React.FC<DiscoveryProps> = ({
               onClick={() => toggleFilter(chip.id)}
               className="shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold transition-all active:scale-95"
               style={{
-                background: isActive ? 'linear-gradient(135deg, #ff8052, #ffc107)' : isDark ? '#252525' : 'white',
-                color: isActive ? 'white' : isDark ? '#a1a1aa' : '#64748b',
-                border: isActive ? 'none' : `1px solid ${isDark ? '#3a3a3a' : '#e2e8f0'}`,
+                background: isActive ? 'linear-gradient(135deg, #ff8052, #ffc107)' : isDark ? '#1c1a19' : 'white',
+                color: isActive ? 'white' : isDark ? '#a8a5a0' : '#64748b',
+                border: isActive ? 'none' : `1px solid ${isDark ? 'rgba(255,255,255,0.10)' : '#e2e8f0'}`,
                 boxShadow: isActive ? '0 2px 8px rgba(255,128,82,0.3)' : 'none'
               }}
             >

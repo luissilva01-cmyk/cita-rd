@@ -114,7 +114,7 @@ const Matches: React.FC<MatchesProps> = ({
   }
 
   return (
-    <div className="h-full flex flex-col bg-slate-50 dark:bg-[#121212] transition-colors">
+    <div className="h-full flex flex-col bg-slate-50 dark:bg-[#0f0e0e] transition-colors">
       {/* Stories Section */}
       <div className="shrink-0 border-b border-gray-200 dark:border-gray-800 safe-area-top">
         <StoriesRing
@@ -125,7 +125,7 @@ const Matches: React.FC<MatchesProps> = ({
       </div>
       
       {/* Header */}
-      <div className="bg-white dark:bg-[#1a1a1a] border-b border-gray-200 dark:border-gray-800 px-4 pt-6 pb-4 flex-shrink-0">
+      <div className="bg-white dark:bg-[#141312] border-b border-gray-200 dark:border-gray-800 px-4 pt-6 pb-4 flex-shrink-0">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Matches</h1>
           <div className="flex items-center gap-2 bg-orange-50 px-3 py-1.5 rounded-full">

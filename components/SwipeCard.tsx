@@ -319,6 +319,13 @@ const SwipeCard: React.FC<SwipeCardProps> = ({
                 También busca {user.relationshipGoal === 'relacion_seria' ? 'relación seria' : user.relationshipGoal === 'algo_casual' ? 'algo casual' : 'amistad'}
               </div>
             )}
+            {/* First prompt teaser */}
+            {user.prompts?.[0]?.answer && (
+              <div className="mb-3 px-3 py-2 bg-white/10 backdrop-blur-sm rounded-xl">
+                <p className="text-[9px] font-bold text-white/50 uppercase tracking-wide mb-0.5">💬 {user.prompts[0].question}</p>
+                <p className="text-xs text-white/90 line-clamp-2">{user.prompts[0].answer}</p>
+              </div>
+            )}
             
             {/* About Me Button */}
             <button
@@ -421,6 +428,18 @@ const SwipeCard: React.FC<SwipeCardProps> = ({
                     <span className="text-white/90">
                       {user.relationshipGoal === 'relacion_seria' ? '❤️ Relación seria' : user.relationshipGoal === 'algo_casual' ? '🔥 Algo casual' : user.relationshipGoal === 'amistad' ? '🤝 Amistad' : '🤷 Explorando'}
                     </span>
+                  </div>
+                )}
+
+                {/* Prompts de conversación */}
+                {user.prompts && user.prompts.length > 0 && (
+                  <div className="space-y-2">
+                    {user.prompts.filter(p => p.answer).map((p, i) => (
+                      <div key={i} className="bg-white/15 backdrop-blur-sm rounded-2xl p-3">
+                        <p className="text-[10px] font-bold text-white/60 uppercase tracking-wide mb-1">💬 {p.question}</p>
+                        <p className="text-sm text-white leading-relaxed">{p.answer}</p>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>

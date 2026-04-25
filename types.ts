@@ -27,6 +27,9 @@ export interface UserProfile {
   drinking?: string;
   pets?: string;
   
+  // Prompts de conversación (tipo Hinge)
+  prompts?: { question: string; answer: string }[];
+  
   // Propiedades de análisis de perfil
   visibilityBoost?: number;
   profileScore?: number;

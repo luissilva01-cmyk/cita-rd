@@ -642,6 +642,89 @@ const ProfileView: React.FC<ProfileViewProps> = ({
           </div>
         </div>
 
+        {/* Prompts de conversación (tipo Hinge) */}
+        <div className="mt-4">
+          <h3 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
+            💬 Conóceme mejor
+            <span className="text-[10px] font-normal text-slate-400">(elige hasta 3)</span>
+          </h3>
+          {(() => {
+            const PROMPT_OPTIONS = [
+              'La forma de conquistarme es...',
+              'Un domingo perfecto para mí es...',
+              'Mi guilty pleasure es...',
+              'Lo que más valoro en una persona es...',
+              'Si pudiera viajar a cualquier lugar sería...',
+              'Mi canción favorita para bailar es...',
+              'Algo que la gente no espera de mí es...',
+              'Mi comida favorita dominicana es...',
+              'El mejor plan para una primera cita es...',
+              'Me río mucho cuando...',
+            ];
+            const currentPrompts = editedUser.prompts || [];
+
+            if (!isEditing) {
+              if (currentPrompts.length === 0) return <p className="text-slate-400 text-xs">Edita tu perfil para agregar prompts</p>;
+              return (
+                <div className="space-y-3">
+                  {currentPrompts.map((p, i) => (
+                    <div key={i} className="bg-gradient-to-br from-orange-50 to-rose-50 border border-orange-100 rounded-2xl p-4">
+                      <p className="text-[11px] font-bold text-[#ff8052] uppercase tracking-wide mb-1">{p.question}</p>
+                      <p className="text-sm text-slate-700 leading-relaxed">{p.answer}</p>
+                    </div>
+                  ))}
+                </div>
+              );
+            }
+
+            return (
+              <div className="space-y-3">
+                {currentPrompts.map((p, i) => (
+                  <div key={i} className="bg-white border border-orange-200 rounded-2xl p-3 relative">
+                    <p className="text-[10px] font-bold text-[#ff8052] mb-1">{p.question}</p>
+                    <textarea
+                      value={p.answer}
+                      onChange={(e) => {
+                        const updated = [...currentPrompts];
+                        updated[i] = { ...updated[i], answer: e.target.value };
+                        setEditedUser({ ...editedUser, prompts: updated });
+                      }}
+                      rows={2}
+                      maxLength={150}
+                      className="w-full p-2 border border-slate-200 rounded-lg text-sm resize-none focus:ring-1 focus:ring-orange-300"
+                      placeholder="Tu respuesta..."
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditedUser({ ...editedUser, prompts: currentPrompts.filter((_, idx) => idx !== i) });
+                      }}
+                      className="absolute top-2 right-2 text-slate-400 hover:text-red-500 text-xs"
+                    >✕</button>
+                  </div>
+                ))}
+                {currentPrompts.length < 3 && (
+                  <div>
+                    <p className="text-[10px] text-slate-500 mb-2">Elige un prompt:</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {PROMPT_OPTIONS.filter(q => !currentPrompts.some(p => p.question === q)).map((q, i) => (
+                        <button
+                          key={i}
+                          type="button"
+                          onClick={() => setEditedUser({ ...editedUser, prompts: [...currentPrompts, { question: q, answer: '' }] })}
+                          className="px-2.5 py-1.5 bg-orange-50 border border-orange-200 rounded-full text-[10px] font-medium text-[#ff8052] hover:bg-orange-100 transition-colors active:scale-95"
+                        >
+                          + {q}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
+        </div>
+
         {/* Más sobre mí - Optional badges */}
         <div className="mt-4">
           <h3 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">

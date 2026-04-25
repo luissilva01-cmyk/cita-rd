@@ -81,10 +81,11 @@ const Landing: React.FC = () => {
             </div>
           </div>
 
-          {/* Right: Phone mockup — hidden on mobile, visible on lg+ */}
-          <div className="hidden lg:block lg:flex-shrink-0">
-            <div className="relative">
-              <div className="rounded-[2.5rem] overflow-hidden border-[6px] border-gray-800 bg-gray-900 shadow-2xl" style={{ width: 280 }}>
+          {/* Right: Phone mockup — smaller on mobile, larger on desktop */}
+          <div className="flex justify-center mt-8 lg:mt-0 lg:flex-shrink-0">
+            <div className="relative" style={{ transform: 'scale(0.85)' }}>
+              <div className="lg:hidden absolute -inset-4 rounded-[3rem] blur-2xl opacity-30" style={{ background: 'linear-gradient(135deg, #ff8052, #ffc107)' }} />
+              <div className="relative rounded-[2.5rem] overflow-hidden border-[6px] border-gray-800 bg-gray-900 shadow-2xl" style={{ width: 240 }}>
                 <div className="aspect-[9/19] bg-gradient-to-br from-slate-50 to-white relative overflow-hidden">
                   <div className="absolute inset-0 flex flex-col">
                     {/* Mini header */}

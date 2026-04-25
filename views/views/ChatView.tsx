@@ -44,7 +44,8 @@ interface ChatViewProps {
   onSendMessage: (text?: string, type?: Message['type'], content?: string, duration?: number) => void;
   onBack: () => void;
   currentUserId: string;
-  chatId: string; // Necesitamos el chatId para el typing status
+  chatId: string;
+  onUnmatch?: () => void;
 }
 
 const ChatView: React.FC<ChatViewProps> = ({ 
@@ -53,7 +54,8 @@ const ChatView: React.FC<ChatViewProps> = ({
   onSendMessage, 
   onBack, 
   currentUserId,
-  chatId
+  chatId,
+  onUnmatch
 }) => {
   logger.chat.debug('ChatView mounted', { 
     chatId, 
@@ -108,6 +110,8 @@ const ChatView: React.FC<ChatViewProps> = ({
 
   // Estados para IA Emocional
   const [showEmotionalInsights, setShowEmotionalInsights] = useState(false);
+  const [showChatMenu, setShowChatMenu] = useState(false);
+  const [showUnmatchConfirm, setShowUnmatchConfirm] = useState(false);
   
   // Estados para menú contextual de mensajes
   const [contextMenu, setContextMenu] = useState<{
@@ -934,8 +938,63 @@ const ChatView: React.FC<ChatViewProps> = ({
               <div className="absolute -top-1 -right-1 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-green-500 rounded-full"></div>
             )}
           </button>
+
+          {/* 3-dot menu */}
+          <div className="relative">
+            <button
+              onClick={() => setShowChatMenu(!showChatMenu)}
+              className="p-2 hover:bg-slate-100 rounded-full transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-400"
+            >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
+            </button>
+            {showChatMenu && (
+              <>
+                <div className="fixed inset-0 z-30" onClick={() => setShowChatMenu(false)}></div>
+                <div className="absolute right-0 top-12 z-40 bg-white rounded-xl shadow-2xl border border-gray-100 py-1 w-48">
+                  <button
+                    onClick={() => { setShowChatMenu(false); setShowUnmatchConfirm(true); }}
+                    className="w-full text-left px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50 flex items-center gap-2.5"
+                  >
+                    <span>💔</span> Unmatch
+                  </button>
+                  <button
+                    onClick={() => { setShowChatMenu(false); setShowUnmatchConfirm(true); }}
+                    className="w-full text-left px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 flex items-center gap-2.5 border-t border-gray-100"
+                  >
+                    <span>🚫</span> Bloquear y reportar
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
+
+      {/* Unmatch Confirmation Modal */}
+      {showUnmatchConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl text-center">
+            <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-red-50 flex items-center justify-center text-2xl">💔</div>
+            <h3 className="text-lg font-bold text-slate-800 mb-2">¿Hacer unmatch con {match.user.name}?</h3>
+            <p className="text-sm text-gray-500 mb-5">Se eliminará la conversación. Esta acción no se puede deshacer.</p>
+            <div className="flex gap-3">
+              <button onClick={() => setShowUnmatchConfirm(false)} className="flex-1 py-3 rounded-xl font-semibold text-sm border border-gray-200 text-slate-600">Cancelar</button>
+              <button
+                onClick={async () => {
+                  try {
+                    const { deleteDoc, doc } = await import('firebase/firestore');
+                    const { db } = await import('../../services/firebase');
+                    await deleteDoc(doc(db, 'chats', chatId));
+                    setShowUnmatchConfirm(false);
+                    if (onUnmatch) onUnmatch(); else onBack();
+                  } catch { setShowUnmatchConfirm(false); onBack(); }
+                }}
+                className="flex-1 py-3 rounded-xl font-semibold text-sm bg-red-500 text-white"
+              >Unmatch</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Messages - Responsive */}
       <div 

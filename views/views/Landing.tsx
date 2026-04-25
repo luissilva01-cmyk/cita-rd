@@ -81,11 +81,10 @@ const Landing: React.FC = () => {
             </div>
           </div>
 
-          {/* Right: Phone mockup — smaller on mobile, larger on desktop */}
-          <div className="flex justify-center mt-8 lg:mt-0 lg:flex-shrink-0">
-            <div className="relative" style={{ transform: 'scale(0.85)' }}>
-              <div className="lg:hidden absolute -inset-4 rounded-[3rem] blur-2xl opacity-30" style={{ background: 'linear-gradient(135deg, #ff8052, #ffc107)' }} />
-              <div className="relative rounded-[2.5rem] overflow-hidden border-[6px] border-gray-800 bg-gray-900 shadow-2xl" style={{ width: 240 }}>
+          {/* Right: Phone mockup — only on desktop inside hero */}
+          <div className="hidden lg:block lg:flex-shrink-0">
+            <div className="relative">
+              <div className="rounded-[2.5rem] overflow-hidden border-[6px] border-gray-800 bg-gray-900 shadow-2xl" style={{ width: 280 }}>
                 <div className="aspect-[9/19] bg-gradient-to-br from-slate-50 to-white relative overflow-hidden">
                   <div className="absolute inset-0 flex flex-col">
                     {/* Mini header */}
@@ -140,6 +139,53 @@ const Landing: React.FC = () => {
             50% { transform: translateY(-10px); }
           }
         `}</style>
+      </div>
+
+      {/* ═══ MOBILE MOCKUP — only visible on small screens ═══ */}
+      <div className="lg:hidden flex justify-center py-10 -mt-4" style={{
+        background: 'linear-gradient(180deg, #1a0a05 0%, #faf8f6 100%)'
+      }}>
+        <div className="relative" style={{ width: 180 }}>
+          <div className="rounded-[2rem] overflow-hidden border-4 border-gray-800 bg-gray-900 shadow-2xl">
+            <div className="aspect-[9/19] bg-gradient-to-br from-slate-50 to-white relative overflow-hidden">
+              <div className="absolute inset-0 flex flex-col">
+                <div className="p-2 flex items-center justify-center">
+                  <span className="text-[10px] font-bold" style={{
+                    background: 'linear-gradient(to right, #f97316, #eab308)',
+                    WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+                  }}>Ta' Pa' Ti</span>
+                </div>
+                <div className="flex-1 flex items-center justify-center px-2.5 pb-1">
+                  <div className="relative w-full aspect-[3/4] rounded-xl overflow-hidden shadow-md">
+                    <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=300&h=450&fit=crop&crop=face" alt="" className="absolute inset-0 w-full h-full object-cover" />
+                    <div className="absolute bottom-0 left-0 right-0 p-2.5 bg-gradient-to-t from-black/70 to-transparent">
+                      <p className="text-white font-bold text-sm">María, 24</p>
+                      <p className="text-white/80 text-[9px] flex items-center gap-0.5"><MapPin className="w-2.5 h-2.5" /> Santo Domingo</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="pb-2.5 flex justify-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-white shadow flex items-center justify-center text-red-400 text-xs">✕</div>
+                  <div className="w-10 h-10 rounded-full shadow flex items-center justify-center" style={{background: 'linear-gradient(135deg, #ff8052, #ffc107)'}}>
+                    <Heart className="w-4 h-4 text-white" fill="white" />
+                  </div>
+                  <div className="w-8 h-8 rounded-full bg-white shadow flex items-center justify-center">
+                    <Star className="w-3.5 h-3.5 text-blue-500" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {/* Floating notification */}
+          <div className="absolute -right-3 top-1/4 bg-white rounded-xl shadow-lg p-2 flex items-center gap-1.5 border border-gray-100" style={{ animation: 'float 3s ease-in-out infinite' }}>
+            <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{background: 'linear-gradient(135deg, #ff8052, #ffc107)'}}>
+              <Heart className="w-3 h-3 text-white" fill="white" />
+            </div>
+            <div>
+              <p className="text-[9px] font-bold text-gray-900">¡Match!</p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* ═══ TRUST STRIP ═══ */}

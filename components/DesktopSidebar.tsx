@@ -35,9 +35,9 @@ const DesktopSidebar: React.FC<DesktopSidebarProps> = ({
   const messagesCount = totalUnreadMessages;
 
   return (
-    <div className="w-80 bg-white dark:bg-[#141312] h-full flex flex-col shadow-2xl">
+    <div className="w-80 bg-white h-full flex flex-col shadow-2xl">
       {/* Header */}
-      <div className="p-6 border-b border-gray-200 dark:border-white/10">
+      <div className="p-6 border-b border-gray-200">
         <div className="flex items-center space-x-3">
           {/* Ta' Pa' Ti Logo */}
           <div className="w-10 h-10 rounded-full flex items-center justify-center">
@@ -55,7 +55,7 @@ const DesktopSidebar: React.FC<DesktopSidebarProps> = ({
             >
               Ta' Pa' Ti
             </h1>
-            <p className="text-xs text-gray-500 dark:text-gray-400">cuando alguien sí te elige</p>
+            <p className="text-xs text-gray-500">cuando alguien sí te elige</p>
           </div>
         </div>
       </div>
@@ -157,10 +157,10 @@ const NavItem: React.FC<NavItemProps> = ({
   return (
     <button
       onClick={onClick}
-      className={`flex items-center space-x-3 px-4 py-3 rounded-lg w-full text-left transition-colors ${
+      className={`flex items-center space-x-3 px-4 py-3 rounded-lg w-full text-left ${
         active 
-          ? 'bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-400' 
-          : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5'
+          ? 'bg-orange-50 text-orange-700' 
+          : 'text-gray-600 hover:bg-gray-50'
       }`}
     >
       {icon}

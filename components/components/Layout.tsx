@@ -57,9 +57,9 @@ const Layout: React.FC<LayoutProps> = ({
   
   // Layout móvil/tablet (existente)
   return (
-    <div className="flex flex-col h-screen w-full max-w-md mx-auto bg-white dark:bg-[#0f0e0e] shadow-2xl relative overflow-hidden">
+    <div className="flex flex-col h-screen w-full max-w-md mx-auto bg-white shadow-2xl relative overflow-hidden">
       {/* Header */}
-      <header className="px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center bg-white/80 dark:bg-[#141312]/80 backdrop-blur-md z-10 border-b border-slate-100 dark:border-white/10 flex-shrink-0">
+      <header className="px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center bg-white/80 backdrop-blur-md z-10 border-b border-slate-100 flex-shrink-0">
         <div className="flex items-center gap-2">
           <Logo size={24} useImage={true} />
           <div className="flex flex-col">
@@ -75,7 +75,7 @@ const Layout: React.FC<LayoutProps> = ({
             >
               Ta' Pa' Ti
             </h1>
-            <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 -mt-0.5">cuando alguien sí te elige</p>
+            <p className="text-[10px] sm:text-xs text-gray-500 -mt-0.5">cuando alguien sí te elige</p>
           </div>
         </div>
         <button 
@@ -93,7 +93,7 @@ const Layout: React.FC<LayoutProps> = ({
       </main>
 
       {/* Bottom Nav */}
-      <nav className="flex-shrink-0 bg-white dark:bg-[#141312] border-t border-slate-100 dark:border-white/10 px-2 sm:px-4 py-2 sm:py-3 flex justify-between items-center z-10">
+      <nav className="flex-shrink-0 bg-white border-t border-slate-100 px-2 sm:px-4 py-2 sm:py-3 flex justify-between items-center z-10">
         <NavItem 
           icon={<Home size={22} />} 
           active={activeView === 'home'} 
@@ -143,7 +143,7 @@ const NavItem = ({
 }) => (
   <button 
     onClick={onClick}
-    className={`relative flex flex-col items-center gap-1 transition-all min-w-0 flex-1 ${active ? 'text-slate-600 dark:text-white hover:text-slate-600' : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'}`}
+    className={`relative flex flex-col items-center gap-1 transition-all min-w-0 flex-1 ${active ? 'text-slate-600 hover:text-slate-600' : 'text-slate-400 hover:text-slate-600'}`}
     style={active ? {color: '#FF6B6B'} : {}}
   >
     <div className="relative">

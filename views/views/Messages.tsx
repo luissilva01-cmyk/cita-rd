@@ -98,7 +98,7 @@ const Messages: React.FC<MessagesProps> = ({ matches, onSelectMatch, onSendMessa
   }
 
   return (
-    <div className="h-full flex flex-col bg-gradient-to-br from-gray-50 to-gray-100 dark:from-[#0f0e0e] dark:to-[#141312] transition-colors">
+    <div className="h-full flex flex-col bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Stories Section */}
       <div className="shrink-0 border-b border-gray-200 safe-area-top">
         <StoriesRing
@@ -109,9 +109,9 @@ const Messages: React.FC<MessagesProps> = ({ matches, onSelectMatch, onSendMessa
       </div>
       
       {/* Header - Responsive */}
-      <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-100 dark:border-slate-800">
-        <h3 className="text-lg sm:text-xl font-bold text-slate-800 dark:text-white mb-1">Mensajes</h3>
-        <p className="text-slate-600 dark:text-slate-400 text-xs sm:text-sm">{t('matchesCount', { count: matches.length.toString() })}</p>
+      <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-100">
+        <h3 className="text-lg sm:text-xl font-bold text-slate-800 mb-1">Mensajes</h3>
+        <p className="text-slate-600 text-xs sm:text-sm">{t('matchesCount', { count: matches.length.toString() })}</p>
       </div>
 
       {/* Matches List - Responsive */}
@@ -120,7 +120,7 @@ const Messages: React.FC<MessagesProps> = ({ matches, onSelectMatch, onSendMessa
           <button
             key={match.id}
             onClick={() => onSelectMatch(match)}
-            className="w-full p-3 sm:p-4 flex items-center gap-3 sm:gap-4 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors border-b border-slate-50 dark:border-slate-800 min-h-[72px]"
+            className="w-full p-3 sm:p-4 flex items-center gap-3 sm:gap-4 hover:bg-slate-50 border-b border-slate-50 min-h-[72px]"
           >
             {/* Avatar - Responsive with lazy loading */}
             <div className="relative flex-shrink-0">
@@ -149,7 +149,7 @@ const Messages: React.FC<MessagesProps> = ({ matches, onSelectMatch, onSendMessa
             {/* Message Info - Responsive */}
             <div className="flex-1 text-left min-w-0">
               <div className="flex items-center justify-between mb-1">
-                <h3 className="font-semibold text-slate-800 dark:text-white text-sm sm:text-base truncate">{match.user.name}</h3>
+                <h3 className="font-semibold text-slate-800 text-sm sm:text-base truncate">{match.user.name}</h3>
                 <div className="flex items-center gap-1 text-slate-400 flex-shrink-0 ml-2">
                   <Clock size={10} className="sm:w-3 sm:h-3" />
                   <span className="text-[10px] sm:text-xs">{formatTime(match.timestamp)}</span>
@@ -167,7 +167,7 @@ const Messages: React.FC<MessagesProps> = ({ matches, onSelectMatch, onSendMessa
                   </div>
                 </div>
               ) : (
-                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 truncate">
+                <p className="text-xs sm:text-sm text-slate-600 truncate">
                   {match.lastMessage || t('newMatch')}
                 </p>
               )}

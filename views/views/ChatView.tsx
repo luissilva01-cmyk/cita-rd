@@ -841,7 +841,7 @@ const ChatView: React.FC<ChatViewProps> = ({
 
   return (
     <div 
-      className="flex flex-col bg-white dark:bg-[#0f0e0e] chat-view-container transition-colors" 
+      className="flex flex-col bg-white chat-view-container" 
       style={{ 
         minWidth: 0,
         ...(isDesktop ? {
@@ -859,7 +859,7 @@ const ChatView: React.FC<ChatViewProps> = ({
       }}
     >
       {/* Header - Responsive */}
-      <div className="bg-white dark:bg-[#141312] backdrop-blur-md border-b border-slate-200 dark:border-white/10 px-3 sm:px-4 lg:px-6 py-3 sm:py-3 lg:py-4 flex items-center justify-between flex-shrink-0 z-20 safe-area-top" style={{
+      <div className="bg-white backdrop-blur-md border-b border-slate-200 px-3 sm:px-4 lg:px-6 py-3 sm:py-3 lg:py-4 flex items-center justify-between flex-shrink-0 z-20 safe-area-top" style={{
         ...(isDesktop ? {
           borderTopLeftRadius: '16px',
           borderTopRightRadius: '16px'
@@ -868,7 +868,7 @@ const ChatView: React.FC<ChatViewProps> = ({
         <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
           <button 
             onClick={onBack} 
-            className="p-2 -ml-1 sm:-ml-2 hover:bg-slate-100 rounded-full text-slate-600 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+            className="p-2 -ml-1 sm:-ml-2 hover:bg-slate-100 rounded-full text-slate-600 min-w-[44px] min-h-[44px] flex items-center justify-center"
           >
             <ChevronLeft size={20} className="sm:w-6 sm:h-6" />
           </button>
@@ -923,7 +923,7 @@ const ChatView: React.FC<ChatViewProps> = ({
           {/* Botón de IA Emocional */}
           <button 
             onClick={() => setShowEmotionalInsights(true)}
-            className={`p-2 hover:bg-slate-100 rounded-full transition-colors relative min-w-[44px] min-h-[44px] flex items-center justify-center ${
+            className={`p-2 hover:bg-slate-100 rounded-full relative min-w-[44px] min-h-[44px] flex items-center justify-center ${
               currentEmotion || conversationInsights ? 'text-purple-500' : ''
             }`}
             title="Análisis Emocional IA"
@@ -943,7 +943,7 @@ const ChatView: React.FC<ChatViewProps> = ({
           <div className="relative">
             <button
               onClick={() => setShowChatMenu(!showChatMenu)}
-              className="p-2 hover:bg-slate-100 rounded-full transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-400"
+              className="p-2 hover:bg-slate-100 rounded-full min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-400"
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
             </button>
@@ -1249,7 +1249,7 @@ const ChatView: React.FC<ChatViewProps> = ({
           {!icebreakers.length && !loadingIce && (
             <button 
               onClick={loadIcebreakers}
-              className="flex items-center gap-2 bg-indigo-50 text-indigo-600 px-3 sm:px-4 py-2 rounded-full text-xs font-black shadow-sm border border-indigo-100 hover:bg-indigo-100 transition-colors min-h-[44px]"
+              className="flex items-center gap-2 bg-indigo-50 text-indigo-600 px-3 sm:px-4 py-2 rounded-full text-xs font-black shadow-sm border border-indigo-100 hover:bg-indigo-100 min-h-[44px]"
             >
               <Sparkles size={12} className="sm:w-3.5 sm:h-3.5" /> Romper el hielo con IA
             </button>
@@ -1272,7 +1272,7 @@ const ChatView: React.FC<ChatViewProps> = ({
                   <button 
                     key={i}
                     onClick={() => setInputValue(ice)}
-                    className="shrink-0 bg-white border border-indigo-100 text-[10px] sm:text-[11px] px-3 sm:px-4 py-2.5 sm:py-3 rounded-2xl text-slate-700 shadow-sm hover:bg-indigo-50 transition-colors min-h-[44px] flex items-center"
+                    className="shrink-0 bg-white border border-indigo-100 text-[10px] sm:text-[11px] px-3 sm:px-4 py-2.5 sm:py-3 rounded-2xl text-slate-700 shadow-sm hover:bg-indigo-50 min-h-[44px] flex items-center"
                   >
                     {ice}
                   </button>
@@ -1345,13 +1345,13 @@ const ChatView: React.FC<ChatViewProps> = ({
             <div className="flex gap-2 flex-shrink-0">
               <button
                 onClick={handleCancelVoiceRecording}
-                className="px-3 py-1.5 text-red-600 text-sm hover:bg-red-100 rounded-lg transition-colors min-h-[44px] flex items-center"
+                className="px-3 py-1.5 text-red-600 text-sm hover:bg-red-100 rounded-lg min-h-[44px] flex items-center"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleStopVoiceRecording}
-                className="px-3 py-1.5 bg-red-500 text-white text-sm rounded-lg hover:bg-red-600 transition-colors flex items-center gap-1 min-h-[44px]"
+                className="px-3 py-1.5 bg-red-500 text-white text-sm rounded-lg hover:bg-red-600 flex items-center gap-1 min-h-[44px]"
               >
                 <StopCircle size={14} />
                 Enviar
@@ -1400,13 +1400,13 @@ const ChatView: React.FC<ChatViewProps> = ({
               <div className="flex gap-2">
                 <button
                   onClick={handleCancelVideoRecording}
-                  className="px-3 py-1.5 text-purple-600 text-sm hover:bg-purple-100 rounded-lg transition-colors min-h-[44px] flex items-center"
+                  className="px-3 py-1.5 text-purple-600 text-sm hover:bg-purple-100 rounded-lg min-h-[44px] flex items-center"
                 >
                   Cancelar
                 </button>
                 <button
                   onClick={handleStopVideoRecording}
-                  className="px-3 py-1.5 bg-purple-500 text-white text-sm rounded-lg hover:bg-purple-600 transition-colors flex items-center gap-1 min-h-[44px]"
+                  className="px-3 py-1.5 bg-purple-500 text-white text-sm rounded-lg hover:bg-purple-600 flex items-center gap-1 min-h-[44px]"
                 >
                   <StopCircle size={14} />
                   Enviar
@@ -1431,7 +1431,7 @@ const ChatView: React.FC<ChatViewProps> = ({
           {/* Botón de emoji */}
           <button
             onClick={() => setShowEmojiPicker(true)}
-            className="text-slate-400 hover:text-rose-500 transition-colors p-1 sm:p-2 min-w-[32px] min-h-[32px] sm:min-w-[44px] sm:min-h-[44px] flex items-center justify-center flex-shrink-0 rounded-full hover:bg-slate-100"
+            className="text-slate-400 hover:text-rose-500 p-1 sm:p-2 min-w-[32px] min-h-[32px] sm:min-w-[44px] sm:min-h-[44px] flex items-center justify-center flex-shrink-0 rounded-full hover:bg-slate-100"
             disabled={isRecording || isRecordingVideo}
           >
             <Smile size={16} className="sm:w-5 sm:h-5" />
@@ -1440,7 +1440,7 @@ const ChatView: React.FC<ChatViewProps> = ({
           {/* Botón de foto */}
           <button
             onClick={handlePhotoButtonClick}
-            className="text-slate-400 hover:text-rose-500 transition-colors p-1 sm:p-2 min-w-[32px] min-h-[32px] sm:min-w-[44px] sm:min-h-[44px] flex items-center justify-center flex-shrink-0 rounded-full hover:bg-slate-100"
+            className="text-slate-400 hover:text-rose-500 p-1 sm:p-2 min-w-[32px] min-h-[32px] sm:min-w-[44px] sm:min-h-[44px] flex items-center justify-center flex-shrink-0 rounded-full hover:bg-slate-100"
             title="Enviar foto"
             disabled={isRecording || isRecordingVideo}
           >

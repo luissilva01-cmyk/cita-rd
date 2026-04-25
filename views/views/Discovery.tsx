@@ -10,7 +10,6 @@ import CreateStoryModal from '../../components/CreateStoryModal';
 import ReportProfileModal from '../../components/ReportProfileModal';
 import ErrorBoundary from '../../components/ErrorBoundary';
 import { StoryGroup } from '../../services/storiesService';
-import { useThemeContext } from '../../contexts/ThemeContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useToast } from '../../components/Toast';
 import { logger } from '../../utils/logger';
@@ -47,7 +46,6 @@ const Discovery: React.FC<DiscoveryProps> = ({
   
   const { t } = useLanguage();
   const { showToast, ToastContainer } = useToast();
-  const { isDark } = useThemeContext();
   
   // ⚡ IA reactivada: corre en background sin bloquear la UI
   const { predictions, generatePredictions, recordSwipe } = useMatchingAI();
@@ -353,8 +351,8 @@ const Discovery: React.FC<DiscoveryProps> = ({
         <div className="w-24 h-24 bg-gradient-to-br from-orange-400 to-rose-500 rounded-full flex items-center justify-center mb-6">
           <Heart className="text-white" size={40} />
         </div>
-        <h2 className="text-2xl font-bold text-slate-800 dark:text-white mb-4">Sé de los primeros en Ta' Pa' Ti</h2>
-        <p className="text-slate-600 dark:text-slate-400 mb-6">
+        <h2 className="text-2xl font-bold text-slate-800 mb-4">Sé de los primeros en Ta' Pa' Ti</h2>
+        <p className="text-slate-600 mb-6">
           Estamos creciendo rápidamente. Vuelve pronto para descubrir nuevos perfiles en tu área.
         </p>
         <p className="text-sm text-slate-500">
@@ -384,7 +382,7 @@ const Discovery: React.FC<DiscoveryProps> = ({
   }
 
   return (
-    <div className="relative h-full flex flex-col bg-gradient-to-br from-gray-50 to-gray-100 dark:from-[#0f0e0e] dark:to-[#141312] transition-colors">
+    <div className="relative h-full flex flex-col bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Toast Container */}
       <ToastContainer />
 
@@ -399,7 +397,7 @@ const Discovery: React.FC<DiscoveryProps> = ({
       </div>
 
       {/* Filter Chips */}
-      <div className="shrink-0 px-3 py-2 flex gap-2 overflow-x-auto no-scrollbar bg-white/80 dark:bg-[#141312]/80 backdrop-blur-sm border-b border-gray-100 dark:border-white/10">
+      <div className="shrink-0 px-3 py-2 flex gap-2 overflow-x-auto no-scrollbar bg-white/80 backdrop-blur-sm border-b border-gray-100">
         {([
           { id: 'todos' as FilterChip, label: 'Todos', emoji: '🔥' },
           { id: 'mujeres' as FilterChip, label: 'Mujeres', emoji: '👩' },
@@ -416,9 +414,9 @@ const Discovery: React.FC<DiscoveryProps> = ({
               onClick={() => toggleFilter(chip.id)}
               className="shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold transition-all active:scale-95"
               style={{
-                background: isActive ? 'linear-gradient(135deg, #ff8052, #ffc107)' : isDark ? '#1c1a19' : 'white',
-                color: isActive ? 'white' : isDark ? '#a8a5a0' : '#64748b',
-                border: isActive ? 'none' : `1px solid ${isDark ? 'rgba(255,255,255,0.10)' : '#e2e8f0'}`,
+                background: isActive ? 'linear-gradient(135deg, #ff8052, #ffc107)' : 'white',
+                color: isActive ? 'white' : '#64748b',
+                border: isActive ? 'none' : `1px solid ${'#e2e8f0'}`,
                 boxShadow: isActive ? '0 2px 8px rgba(255,128,82,0.3)' : 'none'
               }}
             >
@@ -468,10 +466,10 @@ const Discovery: React.FC<DiscoveryProps> = ({
                 console.log('🚩 Click en botón de reportar');
                 handleReportUser(currentUser);
               }}
-              className="absolute top-4 right-4 z-50 p-2.5 bg-white/80 backdrop-blur-md rounded-full shadow-lg hover:bg-white transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center pointer-events-auto"
+              className="absolute top-4 right-4 z-50 p-2.5 bg-white/80 backdrop-blur-md rounded-full shadow-lg hover:bg-white min-w-[44px] min-h-[44px] flex items-center justify-center pointer-events-auto"
               title="Reportar perfil"
             >
-              <Flag className="text-slate-700 hover:text-red-600 transition-colors" size={20} />
+              <Flag className="text-slate-700 hover:text-red-600" size={20} />
             </button>
           )}
           
@@ -530,7 +528,7 @@ const Discovery: React.FC<DiscoveryProps> = ({
             <div className="flex flex-col sm:flex-row gap-3">
               <button
                 onClick={handleMatchClose}
-                className="flex-1 py-3 px-6 border border-slate-200 rounded-full text-slate-600 font-medium hover:bg-slate-50 transition-colors min-h-[48px] text-sm sm:text-base"
+                className="flex-1 py-3 px-6 border border-slate-200 rounded-full text-slate-600 font-medium hover:bg-slate-50 min-h-[48px] text-sm sm:text-base"
               >
                 {t('keepSwiping')}
               </button>

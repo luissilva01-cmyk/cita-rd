@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { UserProfile } from '../../types';
 import { countReceivedLikes, listenToReceivedLikes } from '../../services/likesService';
+import { useThemeContext } from '../../contexts/ThemeContext';
 
 interface HomeProps {
   currentUser: UserProfile;
@@ -29,6 +30,7 @@ const Home: React.FC<HomeProps> = ({
 }) => {
   const [likesCount, setLikesCount] = useState(0);
   const [animateStats, setAnimateStats] = useState(false);
+  const { isDark } = useThemeContext();
 
   useEffect(() => {
     const loadLikesCount = async () => {
@@ -59,7 +61,7 @@ const Home: React.FC<HomeProps> = ({
   const location = currentUser.location || 'Santo Domingo';
 
   return (
-    <div className="w-full h-full overflow-y-auto pb-24 dark:bg-[#121212] transition-colors" style={{ background: 'linear-gradient(180deg, #fff8f5 0%, #ffffff 40%)' }}>
+    <div className="w-full h-full overflow-y-auto pb-24 transition-colors" style={{ background: isDark ? '#121212' : 'linear-gradient(180deg, #fff8f5 0%, #ffffff 40%)' }}>
 
       {/* Header con saludo */}
       <div className="px-4 md:px-10 pt-5 pb-2 flex items-center gap-3">
@@ -365,14 +367,14 @@ const Home: React.FC<HomeProps> = ({
                 style={{
                   border: '2px solid #ff8052',
                   color: '#ff8052',
-                  background: 'transparent'
+                  background: isDark ? '#1e1e1e' : 'transparent'
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor = '#ff8052';
                   e.currentTarget.style.color = 'white';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.backgroundColor = isDark ? '#1e1e1e' : 'transparent';
                   e.currentTarget.style.color = '#ff8052';
                 }}
               >

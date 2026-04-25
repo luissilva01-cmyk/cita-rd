@@ -226,17 +226,17 @@ const ProfileView: React.FC<ProfileViewProps> = ({
               </button>
               <button
                 onClick={() => setShowAccountSettings(true)}
-                className="p-2 rounded-full hover:bg-slate-100 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+                className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-white/10 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
                 title="Configuración de cuenta"
               >
-                <Settings className="text-slate-600" size={18} />
+                <Settings className="text-slate-600 dark:text-slate-300" size={18} />
               </button>
               <button
                 onClick={() => setIsEditing(!isEditing)}
-                className="p-2 rounded-full hover:bg-slate-100 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+                className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-white/10 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
                 title={isEditing ? 'Cancelar edición' : 'Editar perfil'}
               >
-                <Edit3 className="text-slate-600" size={18} />
+                <Edit3 className="text-slate-600 dark:text-slate-300" size={18} />
               </button>
               <button
                 onClick={handleLogout}
@@ -541,9 +541,9 @@ const ProfileView: React.FC<ProfileViewProps> = ({
                     style={{
                       background: editedUser.relationshipGoal === opt.value
                         ? 'linear-gradient(135deg, #ff8052, #ffc107)'
-                        : 'white',
-                      color: editedUser.relationshipGoal === opt.value ? 'white' : '#475569',
-                      border: editedUser.relationshipGoal === opt.value ? 'none' : '1px solid #e2e8f0'
+                        : isDark ? '#252525' : 'white',
+                      color: editedUser.relationshipGoal === opt.value ? 'white' : isDark ? '#a1a1aa' : '#475569',
+                      border: editedUser.relationshipGoal === opt.value ? 'none' : `1px solid ${isDark ? '#3a3a3a' : '#e2e8f0'}`
                     }}
                   >
                     <span>{opt.emoji}</span>
@@ -774,7 +774,7 @@ const ProfileView: React.FC<ProfileViewProps> = ({
                   ].map(s => (
                     <button key={s.v} type="button" onClick={() => setEditedUser({ ...editedUser, zodiacSign: editedUser.zodiacSign === s.v ? undefined : s.v })}
                       className="px-1.5 py-1.5 rounded-lg text-[10px] font-medium transition-all active:scale-95"
-                      style={{ background: editedUser.zodiacSign === s.v ? 'linear-gradient(135deg, #ff8052, #ffc107)' : '#f1f5f9', color: editedUser.zodiacSign === s.v ? 'white' : '#475569' }}
+                      style={{ background: editedUser.zodiacSign === s.v ? 'linear-gradient(135deg, #ff8052, #ffc107)' : isDark ? '#252525' : '#f1f5f9', color: editedUser.zodiacSign === s.v ? 'white' : isDark ? '#a1a1aa' : '#475569' }}
                     >{s.l}</button>
                   ))}
                 </div>
@@ -787,7 +787,7 @@ const ProfileView: React.FC<ProfileViewProps> = ({
                   {[{ v: 'no_tengo', l: 'No tengo' }, { v: 'tengo', l: 'Tengo' }, { v: 'quiero', l: 'Quiero tener' }, { v: 'no_quiero', l: 'No quiero' }].map(o => (
                     <button key={o.v} type="button" onClick={() => setEditedUser({ ...editedUser, kids: editedUser.kids === o.v ? undefined : o.v })}
                       className="px-3 py-1.5 rounded-full text-xs font-medium transition-all active:scale-95"
-                      style={{ background: editedUser.kids === o.v ? 'linear-gradient(135deg, #ff8052, #ffc107)' : '#f1f5f9', color: editedUser.kids === o.v ? 'white' : '#475569' }}
+                      style={{ background: editedUser.kids === o.v ? 'linear-gradient(135deg, #ff8052, #ffc107)' : isDark ? '#252525' : '#f1f5f9', color: editedUser.kids === o.v ? 'white' : isDark ? '#a1a1aa' : '#475569' }}
                     >{o.l}</button>
                   ))}
                 </div>
@@ -801,7 +801,7 @@ const ProfileView: React.FC<ProfileViewProps> = ({
                     {[{ v: 'no', l: 'No' }, { v: 'social', l: 'Social' }, { v: 'si', l: 'Sí' }].map(o => (
                       <button key={o.v} type="button" onClick={() => setEditedUser({ ...editedUser, smoking: editedUser.smoking === o.v ? undefined : o.v })}
                         className="px-2.5 py-1.5 rounded-full text-[11px] font-medium transition-all active:scale-95"
-                        style={{ background: editedUser.smoking === o.v ? 'linear-gradient(135deg, #ff8052, #ffc107)' : '#f1f5f9', color: editedUser.smoking === o.v ? 'white' : '#475569' }}
+                        style={{ background: editedUser.smoking === o.v ? 'linear-gradient(135deg, #ff8052, #ffc107)' : isDark ? '#252525' : '#f1f5f9', color: editedUser.smoking === o.v ? 'white' : isDark ? '#a1a1aa' : '#475569' }}
                       >{o.l}</button>
                     ))}
                   </div>
@@ -812,7 +812,7 @@ const ProfileView: React.FC<ProfileViewProps> = ({
                     {[{ v: 'no', l: 'No' }, { v: 'social', l: 'Social' }, { v: 'si', l: 'Sí' }].map(o => (
                       <button key={o.v} type="button" onClick={() => setEditedUser({ ...editedUser, drinking: editedUser.drinking === o.v ? undefined : o.v })}
                         className="px-2.5 py-1.5 rounded-full text-[11px] font-medium transition-all active:scale-95"
-                        style={{ background: editedUser.drinking === o.v ? 'linear-gradient(135deg, #ff8052, #ffc107)' : '#f1f5f9', color: editedUser.drinking === o.v ? 'white' : '#475569' }}
+                        style={{ background: editedUser.drinking === o.v ? 'linear-gradient(135deg, #ff8052, #ffc107)' : isDark ? '#252525' : '#f1f5f9', color: editedUser.drinking === o.v ? 'white' : isDark ? '#a1a1aa' : '#475569' }}
                       >{o.l}</button>
                     ))}
                   </div>
@@ -826,7 +826,7 @@ const ProfileView: React.FC<ProfileViewProps> = ({
                   {[{ v: 'perro', l: '🐶 Perro' }, { v: 'gato', l: '🐱 Gato' }, { v: 'ambos', l: '🐾 Ambos' }, { v: 'no', l: 'No tengo' }, { v: 'quiero', l: 'Quiero' }].map(o => (
                     <button key={o.v} type="button" onClick={() => setEditedUser({ ...editedUser, pets: editedUser.pets === o.v ? undefined : o.v })}
                       className="px-3 py-1.5 rounded-full text-xs font-medium transition-all active:scale-95"
-                      style={{ background: editedUser.pets === o.v ? 'linear-gradient(135deg, #ff8052, #ffc107)' : '#f1f5f9', color: editedUser.pets === o.v ? 'white' : '#475569' }}
+                      style={{ background: editedUser.pets === o.v ? 'linear-gradient(135deg, #ff8052, #ffc107)' : isDark ? '#252525' : '#f1f5f9', color: editedUser.pets === o.v ? 'white' : isDark ? '#a1a1aa' : '#475569' }}
                     >{o.l}</button>
                   ))}
                 </div>

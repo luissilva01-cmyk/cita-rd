@@ -10,6 +10,7 @@ import CreateStoryModal from '../../components/CreateStoryModal';
 import ReportProfileModal from '../../components/ReportProfileModal';
 import ErrorBoundary from '../../components/ErrorBoundary';
 import { StoryGroup } from '../../services/storiesService';
+import { useThemeContext } from '../../contexts/ThemeContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useToast } from '../../components/Toast';
 import { logger } from '../../utils/logger';
@@ -46,6 +47,7 @@ const Discovery: React.FC<DiscoveryProps> = ({
   
   const { t } = useLanguage();
   const { showToast, ToastContainer } = useToast();
+  const { isDark } = useThemeContext();
   
   // ⚡ IA reactivada: corre en background sin bloquear la UI
   const { predictions, generatePredictions, recordSwipe } = useMatchingAI();
@@ -414,9 +416,9 @@ const Discovery: React.FC<DiscoveryProps> = ({
               onClick={() => toggleFilter(chip.id)}
               className="shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold transition-all active:scale-95"
               style={{
-                background: isActive ? 'linear-gradient(135deg, #ff8052, #ffc107)' : 'white',
-                color: isActive ? 'white' : '#64748b',
-                border: isActive ? 'none' : '1px solid #e2e8f0',
+                background: isActive ? 'linear-gradient(135deg, #ff8052, #ffc107)' : isDark ? '#252525' : 'white',
+                color: isActive ? 'white' : isDark ? '#a1a1aa' : '#64748b',
+                border: isActive ? 'none' : `1px solid ${isDark ? '#3a3a3a' : '#e2e8f0'}`,
                 boxShadow: isActive ? '0 2px 8px rgba(255,128,82,0.3)' : 'none'
               }}
             >

@@ -1,38 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Heart, Shield, MessageCircle, ChevronRight, MapPin, Check, Star, Users, Sparkles } from 'lucide-react';
 import Logo from '../../components/Logo';
 
 const Landing: React.FC = () => {
   const navigate = useNavigate();
-  const [count, setCount] = useState(0);
-
-  // Animated counter for social proof
-  useEffect(() => {
-    const target = 247;
-    const step = Math.ceil(target / 40);
-    const timer = setInterval(() => {
-      setCount(prev => {
-        if (prev + step >= target) { clearInterval(timer); return target; }
-        return prev + step;
-      });
-    }, 50);
-    return () => clearInterval(timer);
-  }, []);
 
   return (
     <div className="min-h-screen bg-[#faf8f6] overflow-x-hidden">
 
       {/* ═══ HERO — Mobile-first, above the fold ═══ */}
       <div className="relative min-h-[100dvh] flex flex-col">
-        {/* Background photo with overlay */}
-        <div className="absolute inset-0">
-          <img
-            src="https://images.unsplash.com/photo-1522098635955-6a04f1a3010b?w=1200&h=1600&fit=crop"
-            alt=""
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/70" />
+        {/* Background — gradient with warm tones */}
+        <div className="absolute inset-0" style={{
+          background: 'linear-gradient(160deg, #1a0a05 0%, #2d1810 30%, #ff805240 70%, #ffc10730 100%)'
+        }}>
+          {/* Decorative blurred circles */}
+          <div className="absolute top-1/4 right-0 w-80 h-80 rounded-full blur-[100px] opacity-40" style={{ background: '#ff8052' }} />
+          <div className="absolute bottom-1/3 left-0 w-64 h-64 rounded-full blur-[80px] opacity-30" style={{ background: '#ffc107' }} />
         </div>
 
         {/* Nav */}
@@ -51,15 +36,11 @@ const Landing: React.FC = () => {
 
         {/* Hero content — pushed to bottom */}
         <div className="relative z-10 mt-auto px-5 pb-8 sm:px-8 sm:pb-12">
-          {/* Social proof pill */}
-          <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-md border border-white/20 rounded-full px-4 py-2 mb-5">
-            <div className="flex -space-x-2">
-              {['photo-1494790108377-be9c29b29330', 'photo-1507003211169-0a1dd7228f2d', 'photo-1524504388940-b1c1722653e1'].map((id, i) => (
-                <img key={i} src={`https://images.unsplash.com/${id}?w=40&h=40&fit=crop&crop=face`} alt="" className="w-7 h-7 rounded-full border-2 border-white/50 object-cover" />
-              ))}
-            </div>
-            <span className="text-white text-sm font-medium">
-              <strong>{count}+</strong> dominicanos ya conectaron
+          {/* Honest tagline pill */}
+          <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/15 rounded-full px-4 py-2 mb-5">
+            <span className="text-lg">🇩🇴</span>
+            <span className="text-white/90 text-sm font-medium">
+              La nueva app de citas dominicana
             </span>
           </div>
 
@@ -258,34 +239,22 @@ const Landing: React.FC = () => {
         </div>
       </div>
 
-      {/* ═══ TESTIMONIALS / SOCIAL PROOF ═══ */}
+      {/* ═══ WHY TA PA TI ═══ */}
       <div className="py-16 sm:py-20 px-5 sm:px-8 bg-white">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 text-center mb-12">
-            Lo que dicen nuestros usuarios
+            ¿Por qué Ta' Pa' Ti?
           </h2>
           <div className="grid sm:grid-cols-3 gap-6">
             {[
-              { name: 'Carolina, 26', loc: 'Santiago', text: 'Conocí a mi novio aquí. Lo mejor es que todos son reales, no como otras apps llenas de perfiles falsos.', stars: 5 },
-              { name: 'Miguel, 29', loc: 'Santo Domingo', text: 'Me gusta que es dominicana de verdad. La gente es de aquí, cerca, y la app se siente diferente.', stars: 5 },
-              { name: 'Daniela, 23', loc: 'La Romana', text: 'Super fácil de usar. En el primer día ya tenía matches. La recomiendo a todo el mundo.', stars: 5 },
-            ].map((t, i) => (
-              <div key={i} className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
-                <div className="flex gap-0.5 mb-3">
-                  {Array.from({ length: t.stars }).map((_, j) => (
-                    <Star key={j} className="w-4 h-4 text-yellow-400" fill="currentColor" />
-                  ))}
-                </div>
-                <p className="text-gray-700 text-sm leading-relaxed mb-4">"{t.text}"</p>
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold" style={{background: 'linear-gradient(135deg, #ff8052, #ffc107)'}}>
-                    {t.name[0]}
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-gray-900">{t.name}</p>
-                    <p className="text-xs text-gray-500">{t.loc}</p>
-                  </div>
-                </div>
+              { emoji: '🇩🇴', title: 'Hecha aquí', desc: 'No es una app gringa traducida. Está diseñada para cómo conectamos en RD — con sabor y con respeto.' },
+              { emoji: '🛡️', title: 'Sin perfiles falsos', desc: 'Sistema de verificación de fotos. Cada perfil es una persona real, no un bot ni un catfish.' },
+              { emoji: '📍', title: 'Gente cerca', desc: 'Filtros por provincia, distancia real por GPS. Conoce personas que están a minutos de ti.' },
+            ].map((item, i) => (
+              <div key={i} className="bg-gray-50 rounded-2xl p-6 border border-gray-100 text-center">
+                <div className="text-4xl mb-4">{item.emoji}</div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">{item.title}</h3>
+                <p className="text-gray-500 text-sm leading-relaxed">{item.desc}</p>
               </div>
             ))}
           </div>

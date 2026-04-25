@@ -58,6 +58,10 @@ const Discovery: React.FC<DiscoveryProps> = ({
   const [sortedUsers, setSortedUsers] = useState<UserProfile[]>([]);
   const [swipeStartTime, setSwipeStartTime] = useState<number>(Date.now());
 
+  // Rewind state
+  const [lastSwipedUser, setLastSwipedUser] = useState<UserProfile | null>(null);
+  const [canRewind, setCanRewind] = useState(false);
+
   // Daily swipe limit for free users
   const DAILY_SWIPE_LIMIT = 25;
   const [dailySwipes, setDailySwipes] = useState(0);
@@ -260,6 +264,8 @@ const Discovery: React.FC<DiscoveryProps> = ({
     
     // Avanza al siguiente usuario y resetea el tiempo
     console.log('📈 Avanzando índice de', currentIndex, 'a', currentIndex + 1);
+    setLastSwipedUser(currentUser);
+    setCanRewind(true);
     setCurrentIndex(prev => {
       const newIndex = prev + 1;
       console.log('📊 Nuevo índice:', newIndex, 'Total usuarios:', displayUsers.length);
@@ -272,6 +278,14 @@ const Discovery: React.FC<DiscoveryProps> = ({
 
   const handleSwipeLeft = () => handleAction('pass');
   const handleSwipeRight = () => handleAction('like');
+
+  const handleRewind = () => {
+    if (!canRewind || currentIndex <= 0) return;
+    setCurrentIndex(prev => prev - 1);
+    setCanRewind(false);
+    setLastSwipedUser(null);
+    showToast({ type: 'info', title: '⏪ Rewind', message: 'Volviste al perfil anterior', duration: 2000 });
+  };
 
   const handleMatchClose = () => {
     setShowMatch(false);
@@ -460,7 +474,23 @@ const Discovery: React.FC<DiscoveryProps> = ({
           )}
           
           {/* Action Buttons - Positioned on bottom border */}
-          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 flex items-center gap-6 z-30">
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 flex items-center gap-4 z-30">
+            {/* Rewind Button */}
+            <button
+              onClick={handleRewind}
+              disabled={!canRewind}
+              className={`w-11 h-11 rounded-full shadow-lg flex items-center justify-center transition-all min-w-[44px] min-h-[44px] ${
+                canRewind 
+                  ? 'bg-white/90 backdrop-blur-md border border-amber-200 hover:scale-110 text-amber-500' 
+                  : 'bg-white/40 border border-gray-200 text-gray-300 cursor-not-allowed'
+              }`}
+              title="Rewind"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
+              </svg>
+            </button>
+
             <button
               onClick={() => handleAction('pass')}
               className="w-14 h-14 rounded-full bg-white/70 backdrop-blur-md shadow-xl flex items-center justify-center hover:scale-110 transition-transform border border-white/30 min-w-[48px] min-h-[48px]"

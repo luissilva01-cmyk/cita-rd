@@ -9,13 +9,12 @@ const Landing: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#faf8f6] overflow-x-hidden">
 
-      {/* ═══ HERO — Mobile-first, above the fold ═══ */}
+      {/* ═══ HERO ═══ */}
       <div className="relative min-h-[100dvh] flex flex-col">
-        {/* Background — gradient with warm tones */}
+        {/* Background */}
         <div className="absolute inset-0" style={{
           background: 'linear-gradient(160deg, #1a0a05 0%, #2d1810 30%, #ff805240 70%, #ffc10730 100%)'
         }}>
-          {/* Decorative blurred circles */}
           <div className="absolute top-1/4 right-0 w-80 h-80 rounded-full blur-[100px] opacity-40" style={{ background: '#ff8052' }} />
           <div className="absolute bottom-1/3 left-0 w-64 h-64 rounded-full blur-[80px] opacity-30" style={{ background: '#ffc107' }} />
         </div>
@@ -34,67 +33,132 @@ const Landing: React.FC = () => {
           </button>
         </nav>
 
-        {/* Hero content — 2 columns on desktop */}
-        <div className="relative z-10 mt-auto lg:mt-0 lg:flex-1 flex items-end lg:items-center px-5 pb-8 sm:px-8 sm:pb-12 lg:pb-0 lg:max-w-7xl lg:mx-auto lg:w-full lg:gap-12">
-          {/* Left: Text */}
-          <div className="lg:flex-1 lg:py-20">
-            {/* Honest tagline pill */}
+        {/* ── MOBILE layout: mockup top → text bottom ── */}
+        <div className="relative z-10 flex-1 flex flex-col lg:hidden">
+          {/* Mockup centered */}
+          <div className="flex-1 flex items-center justify-center pt-6 pb-2">
+            <div className="relative" style={{ width: 170 }}>
+              <div className="rounded-[2rem] overflow-hidden border-4 border-gray-800 bg-gray-900 shadow-2xl">
+                <div className="aspect-[9/19] bg-gradient-to-br from-slate-50 to-white relative overflow-hidden">
+                  <div className="absolute inset-0 flex flex-col">
+                    <div className="p-1.5 flex items-center justify-center">
+                      <span className="text-[9px] font-bold" style={{
+                        background: 'linear-gradient(to right, #f97316, #eab308)',
+                        WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+                      }}>Ta' Pa' Ti</span>
+                    </div>
+                    <div className="flex-1 flex items-center justify-center px-2 pb-1">
+                      <div className="relative w-full aspect-[3/4] rounded-xl overflow-hidden shadow-md">
+                        <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=300&h=450&fit=crop&crop=face" alt="" className="absolute inset-0 w-full h-full object-cover" />
+                        <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/70 to-transparent">
+                          <p className="text-white font-bold text-xs">María, 24</p>
+                          <p className="text-white/80 text-[8px] flex items-center gap-0.5"><MapPin className="w-2 h-2" /> Santo Domingo</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="pb-2 flex justify-center gap-1.5">
+                      <div className="w-7 h-7 rounded-full bg-white shadow flex items-center justify-center text-red-400 text-[10px]">✕</div>
+                      <div className="w-9 h-9 rounded-full shadow flex items-center justify-center" style={{background: 'linear-gradient(135deg, #ff8052, #ffc107)'}}>
+                        <Heart className="w-3.5 h-3.5 text-white" fill="white" />
+                      </div>
+                      <div className="w-7 h-7 rounded-full bg-white shadow flex items-center justify-center">
+                        <Star className="w-3 h-3 text-blue-500" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {/* Floating notification */}
+              <div className="absolute -right-2 top-1/4 bg-white rounded-xl shadow-lg p-1.5 flex items-center gap-1 border border-gray-100" style={{ animation: 'float 3s ease-in-out infinite' }}>
+                <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{background: 'linear-gradient(135deg, #ff8052, #ffc107)'}}>
+                  <Heart className="w-2.5 h-2.5 text-white" fill="white" />
+                </div>
+                <p className="text-[8px] font-bold text-gray-900 pr-0.5">¡Match!</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Text + CTAs */}
+          <div className="px-5 pb-8">
+            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/15 rounded-full px-3 py-1.5 mb-4">
+              <span className="text-sm">🇩🇴</span>
+              <span className="text-white/90 text-xs font-medium">La nueva app de citas dominicana</span>
+            </div>
+            <h1 className="text-3xl font-extrabold text-white leading-[1.1] mb-3">
+              Encuentra quien <span style={{
+                background: 'linear-gradient(90deg, #ff8052, #ffc107)',
+                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+              }}>ta' pa' ti</span>
+            </h1>
+            <p className="text-white/75 text-sm mb-6 leading-relaxed">
+              Personas reales, cerca de ti, buscando lo mismo que tú.
+            </p>
+            <div className="flex flex-col gap-2.5">
+              <button
+                onClick={() => navigate('/register')}
+                className="group flex items-center justify-center gap-2 px-6 py-3.5 text-white rounded-2xl font-bold text-base transition-all active:scale-95"
+                style={{ background: 'linear-gradient(135deg, #ff8052, #ffc107)', boxShadow: '0 10px 30px rgba(255,128,82,0.4)' }}
+              >
+                Crear mi perfil gratis
+                <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </button>
+              <button
+                onClick={() => navigate('/login')}
+                className="flex items-center justify-center px-6 py-3.5 bg-white/10 backdrop-blur-md text-white rounded-2xl font-semibold text-base border border-white/20 hover:bg-white/20 transition-all"
+              >
+                Ya tengo cuenta
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* ── DESKTOP layout: text left + mockup right ── */}
+        <div className="relative z-10 hidden lg:flex flex-1 items-center max-w-7xl mx-auto w-full px-8 gap-12">
+          {/* Text */}
+          <div className="flex-1 py-20">
             <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/15 rounded-full px-4 py-2 mb-5">
               <span className="text-lg">🇩🇴</span>
-              <span className="text-white/90 text-sm font-medium">
-                La nueva app de citas dominicana
-              </span>
+              <span className="text-white/90 text-sm font-medium">La nueva app de citas dominicana</span>
             </div>
-
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-[1.1] mb-4">
+            <h1 className="text-6xl font-extrabold text-white leading-[1.1] mb-4">
               Encuentra quien<br />
               <span style={{
                 background: 'linear-gradient(90deg, #ff8052, #ffc107)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
+                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
               }}>ta' pa' ti</span>
             </h1>
-
-            <p className="text-white/80 text-lg sm:text-xl max-w-lg mb-8 leading-relaxed">
+            <p className="text-white/80 text-xl max-w-lg mb-8 leading-relaxed">
               La app de citas hecha para República Dominicana. Personas reales, cerca de ti, buscando lo mismo que tú.
             </p>
-
-            {/* CTA buttons */}
-            <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex gap-3">
               <button
                 onClick={() => navigate('/register')}
-                className="group flex items-center justify-center gap-2 px-8 py-4 text-white rounded-2xl font-bold text-lg transition-all duration-300 hover:scale-[1.02] active:scale-95"
-                style={{
-                  background: 'linear-gradient(135deg, #ff8052 0%, #ffc107 100%)',
-                  boxShadow: '0 12px 40px rgba(255, 128, 82, 0.4)'
-                }}
+                className="group flex items-center gap-2 px-8 py-4 text-white rounded-2xl font-bold text-lg transition-all hover:scale-[1.02] active:scale-95"
+                style={{ background: 'linear-gradient(135deg, #ff8052, #ffc107)', boxShadow: '0 12px 40px rgba(255,128,82,0.4)' }}
               >
                 Crear mi perfil gratis
                 <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
               <button
                 onClick={() => navigate('/login')}
-                className="flex items-center justify-center px-8 py-4 bg-white/10 backdrop-blur-md text-white rounded-2xl font-semibold text-lg border border-white/20 hover:bg-white/20 transition-all"
+                className="px-8 py-4 bg-white/10 backdrop-blur-md text-white rounded-2xl font-semibold text-lg border border-white/20 hover:bg-white/20 transition-all"
               >
                 Ya tengo cuenta
               </button>
             </div>
           </div>
-
-          {/* Right: Phone mockup — only on desktop inside hero */}
-          <div className="hidden lg:block lg:flex-shrink-0">
+          {/* Mockup */}
+          <div className="flex-shrink-0">
             <div className="relative">
               <div className="rounded-[2.5rem] overflow-hidden border-[6px] border-gray-800 bg-gray-900 shadow-2xl" style={{ width: 280 }}>
                 <div className="aspect-[9/19] bg-gradient-to-br from-slate-50 to-white relative overflow-hidden">
                   <div className="absolute inset-0 flex flex-col">
-                    {/* Mini header */}
                     <div className="p-3 flex items-center justify-center">
                       <span className="text-sm font-bold" style={{
                         background: 'linear-gradient(to right, #f97316, #eab308)',
                         WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
                       }}>Ta' Pa' Ti</span>
                     </div>
-                    {/* Card */}
                     <div className="flex-1 flex items-center justify-center px-4 pb-2">
                       <div className="relative w-full aspect-[3/4] rounded-2xl overflow-hidden shadow-lg">
                         <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=600&fit=crop&crop=face" alt="" className="absolute inset-0 w-full h-full object-cover" />
@@ -104,26 +168,16 @@ const Landing: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                    {/* Action buttons */}
                     <div className="pb-4 flex justify-center gap-3">
-                      <div className="w-12 h-12 rounded-full bg-white shadow-md flex items-center justify-center">
-                        <span className="text-red-400 text-lg">✕</span>
-                      </div>
-                      <div className="w-14 h-14 rounded-full shadow-md flex items-center justify-center" style={{background: 'linear-gradient(135deg, #ff8052, #ffc107)'}}>
-                        <Heart className="w-6 h-6 text-white" fill="white" />
-                      </div>
-                      <div className="w-12 h-12 rounded-full bg-white shadow-md flex items-center justify-center">
-                        <Star className="w-5 h-5 text-blue-500" />
-                      </div>
+                      <div className="w-12 h-12 rounded-full bg-white shadow-md flex items-center justify-center"><span className="text-red-400 text-lg">✕</span></div>
+                      <div className="w-14 h-14 rounded-full shadow-md flex items-center justify-center" style={{background: 'linear-gradient(135deg, #ff8052, #ffc107)'}}><Heart className="w-6 h-6 text-white" fill="white" /></div>
+                      <div className="w-12 h-12 rounded-full bg-white shadow-md flex items-center justify-center"><Star className="w-5 h-5 text-blue-500" /></div>
                     </div>
                   </div>
                 </div>
               </div>
-              {/* Floating match notification */}
               <div className="absolute -left-6 top-1/3 bg-white rounded-2xl shadow-xl p-3 flex items-center gap-2 border border-gray-100" style={{ animation: 'float 3s ease-in-out infinite' }}>
-                <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{background: 'linear-gradient(135deg, #ff8052, #ffc107)'}}>
-                  <Heart className="w-4 h-4 text-white" fill="white" />
-                </div>
+                <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{background: 'linear-gradient(135deg, #ff8052, #ffc107)'}}><Heart className="w-4 h-4 text-white" fill="white" /></div>
                 <div>
                   <p className="text-xs font-bold text-gray-900">¡Nuevo match!</p>
                   <p className="text-[10px] text-gray-500">Ahora mismo</p>
@@ -139,53 +193,6 @@ const Landing: React.FC = () => {
             50% { transform: translateY(-10px); }
           }
         `}</style>
-      </div>
-
-      {/* ═══ MOBILE MOCKUP — only visible on small screens ═══ */}
-      <div className="lg:hidden flex justify-center py-10 -mt-4" style={{
-        background: 'linear-gradient(180deg, #1a0a05 0%, #faf8f6 100%)'
-      }}>
-        <div className="relative" style={{ width: 180 }}>
-          <div className="rounded-[2rem] overflow-hidden border-4 border-gray-800 bg-gray-900 shadow-2xl">
-            <div className="aspect-[9/19] bg-gradient-to-br from-slate-50 to-white relative overflow-hidden">
-              <div className="absolute inset-0 flex flex-col">
-                <div className="p-2 flex items-center justify-center">
-                  <span className="text-[10px] font-bold" style={{
-                    background: 'linear-gradient(to right, #f97316, #eab308)',
-                    WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-                  }}>Ta' Pa' Ti</span>
-                </div>
-                <div className="flex-1 flex items-center justify-center px-2.5 pb-1">
-                  <div className="relative w-full aspect-[3/4] rounded-xl overflow-hidden shadow-md">
-                    <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=300&h=450&fit=crop&crop=face" alt="" className="absolute inset-0 w-full h-full object-cover" />
-                    <div className="absolute bottom-0 left-0 right-0 p-2.5 bg-gradient-to-t from-black/70 to-transparent">
-                      <p className="text-white font-bold text-sm">María, 24</p>
-                      <p className="text-white/80 text-[9px] flex items-center gap-0.5"><MapPin className="w-2.5 h-2.5" /> Santo Domingo</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="pb-2.5 flex justify-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-white shadow flex items-center justify-center text-red-400 text-xs">✕</div>
-                  <div className="w-10 h-10 rounded-full shadow flex items-center justify-center" style={{background: 'linear-gradient(135deg, #ff8052, #ffc107)'}}>
-                    <Heart className="w-4 h-4 text-white" fill="white" />
-                  </div>
-                  <div className="w-8 h-8 rounded-full bg-white shadow flex items-center justify-center">
-                    <Star className="w-3.5 h-3.5 text-blue-500" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          {/* Floating notification */}
-          <div className="absolute -right-3 top-1/4 bg-white rounded-xl shadow-lg p-2 flex items-center gap-1.5 border border-gray-100" style={{ animation: 'float 3s ease-in-out infinite' }}>
-            <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{background: 'linear-gradient(135deg, #ff8052, #ffc107)'}}>
-              <Heart className="w-3 h-3 text-white" fill="white" />
-            </div>
-            <div>
-              <p className="text-[9px] font-bold text-gray-900">¡Match!</p>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* ═══ TRUST STRIP ═══ */}

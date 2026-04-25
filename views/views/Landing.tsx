@@ -1,473 +1,343 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Heart, Sparkles, Shield, MessageCircle, Users, Zap, ChevronRight, Star, X } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Heart, Shield, MessageCircle, ChevronRight, MapPin, Check, Star, Users, Sparkles } from 'lucide-react';
 import Logo from '../../components/Logo';
 
 const Landing: React.FC = () => {
   const navigate = useNavigate();
-  const features = [
-    {
-      icon: Sparkles,
-      title: 'IA de Compatibilidad',
-      description: 'Algoritmo inteligente que encuentra tu match perfecto basado en intereses y personalidad',
-      color: '#ff8052'
-    },
-    {
-      icon: Shield,
-      title: 'Verificación Real',
-      description: 'Perfiles verificados con fotos reales. Sin catfish, sin sorpresas',
-      color: '#ffc107'
-    },
-    {
-      icon: MessageCircle,
-      title: 'Chat en Tiempo Real',
-      description: 'Mensajes instantáneos, fotos, videos y mensajes de voz',
-      color: '#ff8052'
-    },
-    {
-      icon: Users,
-      title: 'Stories Privadas',
-      description: 'Comparte momentos especiales solo con tus matches',
-      color: '#ffc107'
-    }
-  ];
+  const [count, setCount] = useState(0);
 
-  const stats = [
-    { icon: Users, label: 'Conexiones Auténticas', description: 'Personas reales buscando relaciones genuinas' },
-    { icon: Shield, label: 'Perfiles Verificados', description: 'Sistema de verificación para tu seguridad' },
-    { icon: Heart, label: 'Comunidad Segura', description: 'Ambiente respetuoso y protegido' },
-    { icon: MessageCircle, label: 'Soporte Dedicado', description: 'Estamos aquí para ayudarte' }
-  ];
-
-  const howItWorks = [
-    {
-      step: '1',
-      title: 'Crea tu Perfil',
-      description: 'Sube tus mejores fotos y cuéntanos sobre ti. Nuestro sistema de verificación asegura perfiles reales.',
-      icon: Users
-    },
-    {
-      step: '2',
-      title: 'Descubre Matches',
-      description: 'Nuestra IA analiza compatibilidad y te muestra personas que realmente encajan contigo.',
-      icon: Sparkles
-    },
-    {
-      step: '3',
-      title: 'Conecta y Chatea',
-      description: 'Cuando hay match mutuo, comienza la conversación. Chat, fotos, videos y más.',
-      icon: MessageCircle
-    }
-  ];
+  // Animated counter for social proof
+  useEffect(() => {
+    const target = 247;
+    const step = Math.ceil(target / 40);
+    const timer = setInterval(() => {
+      setCount(prev => {
+        if (prev + step >= target) { clearInterval(timer); return target; }
+        return prev + step;
+      });
+    }, 50);
+    return () => clearInterval(timer);
+  }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white overflow-x-hidden">
-      {/* Hero Section Mejorado */}
-      <div className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
-        {/* Animated background elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full blur-3xl animate-pulse" style={{backgroundColor: 'rgba(255, 128, 82, 0.15)'}}></div>
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full blur-3xl animate-pulse delay-1000" style={{backgroundColor: 'rgba(255, 193, 7, 0.15)'}}></div>
+    <div className="min-h-screen bg-[#faf8f6] overflow-x-hidden">
+
+      {/* ═══ HERO — Mobile-first, above the fold ═══ */}
+      <div className="relative min-h-[100dvh] flex flex-col">
+        {/* Background photo with overlay */}
+        <div className="absolute inset-0">
+          <img
+            src="https://images.unsplash.com/photo-1522098635955-6a04f1a3010b?w=1200&h=1600&fit=crop"
+            alt=""
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/70" />
         </div>
 
-        <div className="relative z-10 max-w-7xl mx-auto text-center">
-          {/* Logo/Brand */}
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="mb-8"
+        {/* Nav */}
+        <nav className="relative z-10 flex items-center justify-between px-5 pt-5 sm:px-8 sm:pt-6">
+          <div className="flex items-center gap-2">
+            <Logo size={32} useImage={true} />
+            <span className="text-white font-bold text-xl tracking-tight">Ta' Pa' Ti</span>
+          </div>
+          <button
+            onClick={() => navigate('/login')}
+            className="text-white/90 text-sm font-semibold px-4 py-2 rounded-full border border-white/30 hover:bg-white/10 transition-all"
           >
-            <div className="inline-flex items-center justify-center mb-6">
-              <Logo size={80} variant="color" />
+            Entrar
+          </button>
+        </nav>
+
+        {/* Hero content — pushed to bottom */}
+        <div className="relative z-10 mt-auto px-5 pb-8 sm:px-8 sm:pb-12">
+          {/* Social proof pill */}
+          <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-md border border-white/20 rounded-full px-4 py-2 mb-5">
+            <div className="flex -space-x-2">
+              {['photo-1494790108377-be9c29b29330', 'photo-1507003211169-0a1dd7228f2d', 'photo-1524504388940-b1c1722653e1'].map((id, i) => (
+                <img key={i} src={`https://images.unsplash.com/${id}?w=40&h=40&fit=crop&crop=face`} alt="" className="w-7 h-7 rounded-full border-2 border-white/50 object-cover" />
+              ))}
             </div>
-            <h1 
-              className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-4"
+            <span className="text-white text-sm font-medium">
+              <strong>{count}+</strong> dominicanos ya conectaron
+            </span>
+          </div>
+
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-[1.1] mb-4">
+            Encuentra quien<br />
+            <span style={{
+              background: 'linear-gradient(90deg, #ff8052, #ffc107)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}>ta' pa' ti</span>
+          </h1>
+
+          <p className="text-white/80 text-lg sm:text-xl max-w-lg mb-8 leading-relaxed">
+            La app de citas hecha para República Dominicana. Personas reales, cerca de ti, buscando lo mismo que tú.
+          </p>
+
+          {/* CTA buttons */}
+          <div className="flex flex-col sm:flex-row gap-3">
+            <button
+              onClick={() => navigate('/register')}
+              className="group flex items-center justify-center gap-2 px-8 py-4 text-white rounded-2xl font-bold text-lg transition-all duration-300 hover:scale-[1.02] active:scale-95"
               style={{
-                background: 'linear-gradient(90deg, #ff6b35 0%, #f7931e 50%, #fdc830 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-                display: 'inline-block'
+                background: 'linear-gradient(135deg, #ff8052 0%, #ffc107 100%)',
+                boxShadow: '0 12px 40px rgba(255, 128, 82, 0.4)'
               }}
             >
-              Ta' Pa' Ti
-            </h1>
-            <p className="text-xl sm:text-2xl text-gray-600 font-light">
-              Cuando alguien sí te elige
-            </p>
-          </motion.div>
-
-          {/* Main CTA */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="mb-12"
-          >
-            <p className="text-lg sm:text-xl text-gray-700 mb-8 max-w-2xl mx-auto">
-              La app de citas que usa inteligencia artificial para encontrar tu match perfecto. 
-              Conexiones reales, personas verificadas, matches que importan.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <button
-                onClick={() => navigate('/register')}
-                className="group px-8 py-4 text-white rounded-full font-semibold text-lg shadow-2xl transition-all duration-300 hover:scale-105 flex items-center gap-2"
-                style={{background: 'linear-gradient(135deg, #ff8052 0%, #ffc107 100%)', boxShadow: '0 20px 60px rgba(255, 128, 82, 0.3)'}}
-              >
-                Comenzar Gratis
-                <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </button>
-              
-              <button
-                onClick={() => navigate('/login')}
-                className="px-8 py-4 bg-white text-gray-900 rounded-full font-semibold text-lg border-2 border-gray-200 hover:bg-gray-50 transition-all duration-300 shadow-sm"
-              >
-                Iniciar Sesión
-              </button>
-            </div>
-          </motion.div>
-
-          {/* Stats */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="grid grid-cols-2 sm:grid-cols-4 gap-6 max-w-5xl mx-auto"
-          >
-            {stats.map((stat, index) => (
-              <div key={index} className="text-center bg-white/60 backdrop-blur-sm rounded-2xl p-4 border border-gray-200">
-                <div className="flex justify-center mb-3">
-                  <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{background: 'linear-gradient(135deg, #ff8052 0%, #ffc107 100%)'}}>
-                    <stat.icon className="w-6 h-6 text-white" />
-                  </div>
-                </div>
-                <div className="text-base sm:text-lg font-bold text-gray-900 mb-1">{stat.label}</div>
-                <div className="text-xs sm:text-sm text-gray-600">{stat.description}</div>
-              </div>
-            ))}
-          </motion.div>
-        </div>
-
-        {/* Scroll indicator */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 1 }}
-          className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
-        >
-          <div className="w-6 h-10 border-2 border-gray-300 rounded-full flex justify-center">
-            <div className="w-1 h-3 bg-gray-400 rounded-full mt-2 animate-bounce"></div>
+              Crear mi perfil gratis
+              <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </button>
+            <button
+              onClick={() => navigate('/login')}
+              className="flex items-center justify-center px-8 py-4 bg-white/10 backdrop-blur-md text-white rounded-2xl font-semibold text-lg border border-white/20 hover:bg-white/20 transition-all"
+            >
+              Ya tengo cuenta
+            </button>
           </div>
-        </motion.div>
+        </div>
       </div>
 
-      {/* App Preview Section */}
-      <div className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="relative"
-          >
-            {/* Decorative elements */}
-            <div className="absolute -top-10 -left-10 w-40 h-40 rounded-full blur-3xl opacity-20" style={{backgroundColor: '#ff8052'}}></div>
-            <div className="absolute -bottom-10 -right-10 w-40 h-40 rounded-full blur-3xl opacity-20" style={{backgroundColor: '#ffc107'}}></div>
-            
-            {/* Image container with gradient border */}
-            <div className="relative rounded-3xl p-1" style={{background: 'linear-gradient(135deg, #ff8052 0%, #ffc107 100%)'}}>
-              <div className="bg-white rounded-3xl p-8 sm:p-12">
-                <div className="grid md:grid-cols-2 gap-12 items-center">
-                  {/* Text content */}
-                  <div className="order-2 md:order-1">
-                    <h3 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-                      Diseñada para conectar
-                    </h3>
-                    <p className="text-lg text-gray-600 mb-6">
-                      Una experiencia intuitiva y moderna que hace que encontrar tu match perfecto sea natural y divertido.
-                    </p>
-                    <ul className="space-y-4">
-                      {[
-                        'Interfaz limpia y fácil de usar',
-                        'Swipe inteligente con IA',
-                        'Chat en tiempo real',
-                        'Stories para compartir momentos'
-                      ].map((feature, index) => (
-                        <li key={index} className="flex items-center gap-3">
-                          <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0" style={{background: 'linear-gradient(135deg, #ff8052 0%, #ffc107 100%)'}}>
-                            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                            </svg>
-                          </div>
-                          <span className="text-gray-700">{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
+      {/* ═══ TRUST STRIP ═══ */}
+      <div className="bg-white border-y border-gray-100 py-5">
+        <div className="max-w-5xl mx-auto px-5 flex flex-wrap justify-center gap-x-8 gap-y-3">
+          {[
+            { icon: Shield, text: 'Perfiles verificados' },
+            { icon: MapPin, text: '100% dominicano' },
+            { icon: Heart, text: 'Matches reales' },
+            { icon: MessageCircle, text: 'Chat seguro' },
+          ].map((item, i) => (
+            <div key={i} className="flex items-center gap-2 text-gray-600 text-sm font-medium">
+              <item.icon className="w-4 h-4" style={{ color: '#ff8052' }} />
+              {item.text}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ═══ HOW IT WORKS — 3 steps visual ═══ */}
+      <div className="py-16 sm:py-20 px-5 sm:px-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-3">
+              Así de fácil es
+            </h2>
+            <p className="text-gray-500 text-lg">En 2 minutos ya estás conectando</p>
+          </div>
+
+          <div className="grid sm:grid-cols-3 gap-8">
+            {[
+              {
+                step: '1',
+                emoji: '📸',
+                title: 'Crea tu perfil',
+                desc: 'Sube tus fotos, di qué buscas y listo. Tu perfil se verifica automáticamente.'
+              },
+              {
+                step: '2',
+                emoji: '🔥',
+                title: 'Desliza y conecta',
+                desc: 'Explora perfiles cerca de ti. Desliza a la derecha si te gusta, a la izquierda si no.'
+              },
+              {
+                step: '3',
+                emoji: '💬',
+                title: 'Habla y queda',
+                desc: 'Cuando hay match mutuo, se abre el chat. Mensajes, fotos, notas de voz.'
+              }
+            ].map((item, i) => (
+              <div key={i} className="text-center group">
+                <div className="relative inline-flex items-center justify-center w-20 h-20 rounded-3xl mb-5 text-4xl transition-transform group-hover:scale-110"
+                  style={{ background: 'linear-gradient(135deg, rgba(255,128,82,0.1), rgba(255,193,7,0.1))' }}
+                >
+                  {item.emoji}
+                  <div className="absolute -top-2 -right-2 w-7 h-7 rounded-full text-white text-xs font-bold flex items-center justify-center"
+                    style={{ background: 'linear-gradient(135deg, #ff8052, #ffc107)' }}
+                  >
+                    {item.step}
                   </div>
-                  
-                  {/* Image mockup */}
-                  <div className="order-1 md:order-2 relative">
-                    <div className="relative mx-auto max-w-sm">
-                      {/* Phone frame */}
-                      <div className="relative rounded-[3rem] overflow-hidden shadow-2xl border-8 border-gray-900 bg-gray-900">
-                        {/* Notch */}
-                        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-40 h-7 bg-gray-900 rounded-b-3xl z-10"></div>
-                        
-                        {/* Screen content - Placeholder gradient */}
-                        <div className="aspect-[9/19.5] bg-gradient-to-br from-slate-50 to-white relative overflow-hidden">
-                          {/* Simulated app interface */}
-                          <div className="absolute inset-0 flex flex-col">
-                            {/* Header */}
-                            <div className="p-4 flex items-center justify-between">
-                              <div className="w-10 h-10 rounded-full" style={{background: 'linear-gradient(135deg, #ff8052 0%, #ffc107 100%)'}}></div>
-                              <div 
-                                className="text-xl font-bold"
-                                style={{
-                                  background: 'linear-gradient(to right, #f97316, #eab308)',
-                                  WebkitBackgroundClip: 'text',
-                                  WebkitTextFillColor: 'transparent',
-                                  backgroundClip: 'text'
-                                }}
-                              >
-                                Ta' Pa' Ti
-                              </div>
-                              <div className="w-10 h-10"></div>
-                            </div>
-                            
-                            {/* Card stack simulation */}
-                            <div className="flex-1 flex items-center justify-center p-6">
-                              <div className="relative w-full max-w-xs aspect-[3/4]">
-                                {/* Background cards */}
-                                <div className="absolute inset-0 rounded-3xl bg-gray-200 transform rotate-6 scale-95 opacity-30"></div>
-                                <div className="absolute inset-0 rounded-3xl bg-gray-300 transform rotate-3 scale-97 opacity-50"></div>
-                                
-                                {/* Main card */}
-                                <div className="relative w-full h-full rounded-3xl overflow-hidden shadow-xl">
-                                  <img 
-                                    src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=600&fit=crop&crop=face" 
-                                    alt="Perfil de ejemplo"
-                                    className="absolute inset-0 w-full h-full object-cover"
-                                  />
-                                  <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/70 via-black/30 to-transparent">
-                                    <div className="text-white">
-                                      <div className="text-2xl font-bold mb-0.5">María, 24</div>
-                                      <div className="text-sm opacity-90 flex items-center gap-1">
-                                        <span>📍</span> Santo Domingo • 2.5 km
-                                      </div>
-                                      <div className="flex gap-1.5 mt-2">
-                                        <span className="px-2 py-0.5 bg-white/20 backdrop-blur-sm rounded-full text-[10px]">Música</span>
-                                        <span className="px-2 py-0.5 bg-white/20 backdrop-blur-sm rounded-full text-[10px]">Viajes</span>
-                                        <span className="px-2 py-0.5 bg-white/20 backdrop-blur-sm rounded-full text-[10px]">❤️ Seria</span>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                            
-                            {/* Bottom actions */}
-                            <div className="p-6 flex justify-center gap-4">
-                              <div className="w-14 h-14 rounded-full bg-white shadow-lg flex items-center justify-center">
-                                <X className="w-6 h-6 text-red-500" />
-                              </div>
-                              <div className="w-16 h-16 rounded-full shadow-lg flex items-center justify-center" style={{background: 'linear-gradient(135deg, #ff8052 0%, #ffc107 100%)'}}>
-                                <Heart className="w-7 h-7 text-white" fill="currentColor" />
-                              </div>
-                              <div className="w-14 h-14 rounded-full bg-white shadow-lg flex items-center justify-center">
-                                <Star className="w-6 h-6 text-blue-500" />
-                              </div>
-                            </div>
-                          </div>
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">{item.title}</h3>
+                <p className="text-gray-500 text-sm leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ═══ APP PREVIEW — Phone mockup with real screenshot feel ═══ */}
+      <div className="py-16 sm:py-20 px-5 sm:px-8 bg-gradient-to-b from-white to-gray-50">
+        <div className="max-w-5xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            {/* Phone */}
+            <div className="relative mx-auto max-w-[280px]">
+              <div className="rounded-[2.5rem] overflow-hidden border-[6px] border-gray-900 bg-gray-900 shadow-2xl">
+                <div className="aspect-[9/19] bg-gradient-to-br from-slate-50 to-white relative overflow-hidden">
+                  <div className="absolute inset-0 flex flex-col">
+                    {/* Mini header */}
+                    <div className="p-3 flex items-center justify-center">
+                      <span className="text-sm font-bold" style={{
+                        background: 'linear-gradient(to right, #f97316, #eab308)',
+                        WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+                      }}>Ta' Pa' Ti</span>
+                    </div>
+                    {/* Card */}
+                    <div className="flex-1 flex items-center justify-center px-4 pb-2">
+                      <div className="relative w-full aspect-[3/4] rounded-2xl overflow-hidden shadow-lg">
+                        <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=600&fit=crop&crop=face" alt="" className="absolute inset-0 w-full h-full object-cover" />
+                        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent">
+                          <p className="text-white font-bold text-lg">María, 24</p>
+                          <p className="text-white/80 text-xs flex items-center gap-1"><MapPin className="w-3 h-3" /> Santo Domingo • 2 km</p>
                         </div>
                       </div>
-                      
-                      {/* Floating elements */}
-                      <motion.div
-                        animate={{ y: [0, -10, 0] }}
-                        transition={{ duration: 3, repeat: Infinity }}
-                        className="absolute -top-4 -right-4 w-16 h-16 rounded-2xl shadow-xl flex items-center justify-center"
-                        style={{background: 'linear-gradient(135deg, #ff8052 0%, #ffc107 100%)'}}
-                      >
-                        <Sparkles className="w-8 h-8 text-white" />
-                      </motion.div>
-                      
-                      <motion.div
-                        animate={{ y: [0, 10, 0] }}
-                        transition={{ duration: 2.5, repeat: Infinity }}
-                        className="absolute -bottom-4 -left-4 w-16 h-16 rounded-2xl bg-white shadow-xl flex items-center justify-center"
-                      >
-                        <MessageCircle className="w-8 h-8" style={{color: '#ff8052'}} />
-                      </motion.div>
+                    </div>
+                    {/* Action buttons */}
+                    <div className="pb-4 flex justify-center gap-3">
+                      <div className="w-12 h-12 rounded-full bg-white shadow-md flex items-center justify-center">
+                        <span className="text-red-400 text-lg">✕</span>
+                      </div>
+                      <div className="w-14 h-14 rounded-full shadow-md flex items-center justify-center" style={{background: 'linear-gradient(135deg, #ff8052, #ffc107)'}}>
+                        <Heart className="w-6 h-6 text-white" fill="white" />
+                      </div>
+                      <div className="w-12 h-12 rounded-full bg-white shadow-md flex items-center justify-center">
+                        <Star className="w-5 h-5 text-blue-500" />
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </motion.div>
-        </div>
-      </div>
-
-      {/* Features Section Mejorado */}
-      <div id="features" className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
-              ¿Por qué Ta' Pa' Ti?
-            </h2>
-            <div className="w-24 h-1.5 rounded-full mx-auto mb-4" style={{background: 'linear-gradient(90deg, #ff8052 0%, #ffc107 100%)'}}></div>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Tecnología de punta para ayudarte a encontrar conexiones reales
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="bg-white rounded-3xl p-6 border border-gray-200 hover:shadow-lg transition-all duration-300 hover:scale-105"
-              >
-                <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4 shadow-lg" style={{backgroundColor: feature.color}}>
-                  <feature.icon className="w-7 h-7 text-white" />
+              {/* Floating notification */}
+              <div className="absolute -right-4 top-1/4 bg-white rounded-2xl shadow-xl p-3 flex items-center gap-2 border border-gray-100 animate-bounce" style={{ animationDuration: '3s' }}>
+                <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{background: 'linear-gradient(135deg, #ff8052, #ffc107)'}}>
+                  <Heart className="w-4 h-4 text-white" fill="white" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">{feature.title}</h3>
-                <p className="text-gray-600">{feature.description}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* How it Works - Versión Vertical Mejorada */}
-      <div className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4 text-center">
-            Cómo Funciona
-          </h2>
-          <div className="w-24 h-1.5 rounded-full mx-auto mb-4" style={{background: 'linear-gradient(90deg, #ff8052 0%, #ffc107 100%)'}}></div>
-          <p className="text-xl text-gray-600 text-center mb-16">
-            Tres simples pasos para encontrar tu match perfecto
-          </p>
-
-          <div className="relative flex flex-col gap-12">
-            {/* Vertical Line */}
-            <div className="absolute left-7 top-0 bottom-0 w-0.5 -z-10 hidden sm:block" style={{background: 'linear-gradient(180deg, #ff8052 0%, #ffc107 100%)'}}></div>
-
-            {howItWorks.map((item, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.2 }}
-                viewport={{ once: true }}
-                className="relative flex items-start gap-6"
-              >
-                <div className="flex-shrink-0 w-14 h-14 rounded-full border-4 border-white flex items-center justify-center text-white font-black text-xl shadow-lg" style={{background: 'linear-gradient(135deg, #ff8052 0%, #ffc107 100%)'}}>
-                  {item.step}
+                <div>
+                  <p className="text-xs font-bold text-gray-900">¡Nuevo match!</p>
+                  <p className="text-[10px] text-gray-500">Ahora mismo</p>
                 </div>
-                <div className="bg-white rounded-2xl p-6 border border-gray-200 flex-1 hover:shadow-lg transition-all duration-300">
-                  <div className="flex items-center gap-3 mb-3">
-                    <item.icon className="w-6 h-6" style={{color: '#ff8052'}} />
-                    <h3 className="text-2xl font-bold text-gray-900">{item.title}</h3>
-                  </div>
-                  <p className="text-gray-600 leading-relaxed">{item.description}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Final CTA */}
-      <div className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
-        <div className="max-w-4xl mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-            viewport={{ once: true }}
-            className="rounded-3xl p-12 shadow-2xl"
-            style={{background: 'linear-gradient(135deg, #ff8052 0%, #ffc107 100%)'}}
-          >
-            <h2 className="text-4xl sm:text-5xl font-bold text-white mb-4">
-              ¿Listo para encontrar tu match?
-            </h2>
-            <p className="text-xl text-white/90 mb-8">
-              Únete a miles de personas que ya encontraron conexiones reales
-            </p>
-            <button
-              onClick={() => navigate('/register')}
-              className="px-10 py-5 bg-white rounded-full font-bold text-lg shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 inline-flex items-center gap-2"
-              style={{color: '#ff8052'}}
-            >
-              Comenzar Ahora - Es Gratis
-              <Zap className="w-5 h-5" />
-            </button>
-          </motion.div>
-        </div>
-      </div>
-
-      {/* Footer */}
-      <footer className="py-12 px-4 sm:px-6 lg:px-8 border-t border-gray-200 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-3 gap-8 mb-8">
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <Logo size={24} useImage={true} />
-                <span 
-                  className="font-bold text-xl"
-                  style={{
-                    background: 'linear-gradient(90deg, #ff6b35 0%, #f7931e 50%, #fdc830 100%)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    backgroundClip: 'text',
-                    display: 'inline-block'
-                  }}
-                >
-                  Ta' Pa' Ti
-                </span>
               </div>
-              <p className="text-gray-600 text-sm mb-4">
-                Cuando alguien sí te elige
-              </p>
-              <p className="text-gray-600 text-sm">
-                Santo Domingo, República Dominicana
-              </p>
             </div>
-            
+
+            {/* Text */}
             <div>
-              <h4 className="text-gray-900 font-semibold mb-4">Producto</h4>
-              <ul className="space-y-2 text-gray-600 text-sm">
-                <li><a href="#features" className="hover:text-gray-900 transition-colors">Características</a></li>
-                <li>
-                  <a 
-                    href="mailto:tapapatisoporte@gmail.com" 
-                    className="hover:text-gray-900 transition-colors"
-                  >
-                    Contacto
-                  </a>
-                </li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="text-gray-900 font-semibold mb-4">Legal</h4>
-              <ul className="space-y-2 text-gray-600 text-sm">
-                <li><a href="/terms-of-service.html" target="_blank" rel="noopener noreferrer" className="hover:text-gray-900 transition-colors">Términos de Servicio</a></li>
-                <li><a href="/privacy-policy.html" target="_blank" rel="noopener noreferrer" className="hover:text-gray-900 transition-colors">Política de Privacidad</a></li>
-              </ul>
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-4 leading-tight">
+                Hecha para<br />dominicanos que<br />buscan algo real
+              </h2>
+              <p className="text-gray-500 text-lg mb-8 leading-relaxed">
+                No es otra app gringa traducida. Ta' Pa' Ti entiende cómo conectamos aquí — con sabor, con flow, con respeto.
+              </p>
+              <div className="space-y-4">
+                {[
+                  'IA que entiende tu tipo',
+                  'Personas verificadas, sin catfish',
+                  'Filtros por provincia, edad, intención',
+                  'Chat con fotos, voz y video',
+                  'Gratis para empezar'
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center gap-3">
+                    <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0" style={{background: 'linear-gradient(135deg, #ff8052, #ffc107)'}}>
+                      <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />
+                    </div>
+                    <span className="text-gray-700 font-medium">{item}</span>
+                  </div>
+                ))}
+              </div>
+              <button
+                onClick={() => navigate('/register')}
+                className="mt-8 px-8 py-4 text-white rounded-2xl font-bold text-lg transition-all hover:scale-[1.02] active:scale-95"
+                style={{
+                  background: 'linear-gradient(135deg, #ff8052, #ffc107)',
+                  boxShadow: '0 8px 30px rgba(255,128,82,0.3)'
+                }}
+              >
+                Únete ahora — es gratis
+              </button>
             </div>
           </div>
-          
-          <div className="border-t border-gray-200 pt-8 text-center text-gray-600 text-sm">
-            <p>&copy; 2026 Ta' Pa' Ti. Todos los derechos reservados.</p>
+        </div>
+      </div>
+
+      {/* ═══ TESTIMONIALS / SOCIAL PROOF ═══ */}
+      <div className="py-16 sm:py-20 px-5 sm:px-8 bg-white">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 text-center mb-12">
+            Lo que dicen nuestros usuarios
+          </h2>
+          <div className="grid sm:grid-cols-3 gap-6">
+            {[
+              { name: 'Carolina, 26', loc: 'Santiago', text: 'Conocí a mi novio aquí. Lo mejor es que todos son reales, no como otras apps llenas de perfiles falsos.', stars: 5 },
+              { name: 'Miguel, 29', loc: 'Santo Domingo', text: 'Me gusta que es dominicana de verdad. La gente es de aquí, cerca, y la app se siente diferente.', stars: 5 },
+              { name: 'Daniela, 23', loc: 'La Romana', text: 'Super fácil de usar. En el primer día ya tenía matches. La recomiendo a todo el mundo.', stars: 5 },
+            ].map((t, i) => (
+              <div key={i} className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
+                <div className="flex gap-0.5 mb-3">
+                  {Array.from({ length: t.stars }).map((_, j) => (
+                    <Star key={j} className="w-4 h-4 text-yellow-400" fill="currentColor" />
+                  ))}
+                </div>
+                <p className="text-gray-700 text-sm leading-relaxed mb-4">"{t.text}"</p>
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold" style={{background: 'linear-gradient(135deg, #ff8052, #ffc107)'}}>
+                    {t.name[0]}
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900">{t.name}</p>
+                    <p className="text-xs text-gray-500">{t.loc}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ═══ FINAL CTA ═══ */}
+      <div className="py-16 sm:py-20 px-5 sm:px-8">
+        <div className="max-w-3xl mx-auto text-center">
+          <div className="rounded-3xl p-10 sm:p-14 relative overflow-hidden"
+            style={{ background: 'linear-gradient(135deg, #ff8052 0%, #ffc107 100%)' }}
+          >
+            <div className="absolute -top-20 -right-20 w-60 h-60 bg-white/10 rounded-full blur-3xl" />
+            <div className="absolute -bottom-20 -left-20 w-60 h-60 bg-white/10 rounded-full blur-3xl" />
+            <div className="relative z-10">
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-3">
+                Tu próximo match te está esperando
+              </h2>
+              <p className="text-white/85 text-lg mb-8 max-w-md mx-auto">
+                Crea tu perfil en 2 minutos y empieza a conocer personas increíbles cerca de ti.
+              </p>
+              <button
+                onClick={() => navigate('/register')}
+                className="px-10 py-4 bg-white rounded-2xl font-bold text-lg shadow-xl hover:shadow-2xl transition-all hover:scale-[1.02] active:scale-95 inline-flex items-center gap-2"
+                style={{ color: '#ff8052' }}
+              >
+                Comenzar Gratis
+                <ChevronRight className="w-5 h-5" />
+              </button>
+              <p className="text-white/60 text-xs mt-4">Sin tarjeta de crédito. Sin compromisos.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ═══ FOOTER ═══ */}
+      <footer className="py-10 px-5 sm:px-8 border-t border-gray-200 bg-white">
+        <div className="max-w-5xl mx-auto">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
+            <div className="flex items-center gap-2">
+              <Logo size={20} useImage={true} />
+              <span className="font-bold" style={{
+                background: 'linear-gradient(90deg, #ff6b35, #fdc830)',
+                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+              }}>Ta' Pa' Ti</span>
+              <span className="text-gray-400 text-sm ml-2">© 2026</span>
+            </div>
+            <div className="flex gap-6 text-sm text-gray-500">
+              <a href="/terms-of-service.html" target="_blank" rel="noopener noreferrer" className="hover:text-gray-900 transition-colors">Términos</a>
+              <a href="/privacy-policy.html" target="_blank" rel="noopener noreferrer" className="hover:text-gray-900 transition-colors">Privacidad</a>
+              <a href="mailto:tapapatisoporte@gmail.com" className="hover:text-gray-900 transition-colors">Contacto</a>
+            </div>
           </div>
         </div>
       </footer>

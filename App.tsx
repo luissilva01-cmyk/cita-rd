@@ -30,6 +30,7 @@ import { getUserChats, sendMessage, listenToMessages, findOrCreateChat, Chat } f
 import { getDiscoveryProfiles, createOrUpdateProfile, getUserProfile } from './services/profileService';
 import { privacyService } from './services/privacyService';
 import { LanguageProvider } from './contexts/LanguageContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import { StoryGroup } from './services/storiesService';
 import { auth, db } from './services/firebase';
 import { doc, getDoc, setDoc, deleteDoc, serverTimestamp, getFirestore } from 'firebase/firestore';
@@ -863,6 +864,7 @@ const App: React.FC = () => {
 
   return (
     <ErrorBoundary level="app">
+      <ThemeProvider>
       <LanguageProvider>
         <Suspense fallback={<LoadingFallback />}>
           {/* Onboarding for new users */}
@@ -958,6 +960,7 @@ const App: React.FC = () => {
           <AnalyticsDashboard />
         </Suspense>
       </LanguageProvider>
+      </ThemeProvider>
     </ErrorBoundary>
   );
 };

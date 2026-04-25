@@ -841,7 +841,7 @@ const ChatView: React.FC<ChatViewProps> = ({
 
   return (
     <div 
-      className="flex flex-col bg-white chat-view-container" 
+      className="flex flex-col bg-white dark:bg-[#121212] chat-view-container transition-colors" 
       style={{ 
         minWidth: 0,
         ...(isDesktop ? {
@@ -859,7 +859,7 @@ const ChatView: React.FC<ChatViewProps> = ({
       }}
     >
       {/* Header - Responsive */}
-      <div className="bg-white backdrop-blur-md border-b border-slate-200 px-3 sm:px-4 lg:px-6 py-3 sm:py-3 lg:py-4 flex items-center justify-between flex-shrink-0 z-20 safe-area-top" style={{
+      <div className="bg-white dark:bg-[#1a1a1a] backdrop-blur-md border-b border-slate-200 dark:border-slate-700 px-3 sm:px-4 lg:px-6 py-3 sm:py-3 lg:py-4 flex items-center justify-between flex-shrink-0 z-20 safe-area-top" style={{
         ...(isDesktop ? {
           borderTopLeftRadius: '16px',
           borderTopRightRadius: '16px'

@@ -351,8 +351,8 @@ const Discovery: React.FC<DiscoveryProps> = ({
         <div className="w-24 h-24 bg-gradient-to-br from-orange-400 to-rose-500 rounded-full flex items-center justify-center mb-6">
           <Heart className="text-white" size={40} />
         </div>
-        <h2 className="text-2xl font-bold text-slate-800 mb-4">Sé de los primeros en Ta' Pa' Ti</h2>
-        <p className="text-slate-600 mb-6">
+        <h2 className="text-2xl font-bold text-slate-800 dark:text-white mb-4">Sé de los primeros en Ta' Pa' Ti</h2>
+        <p className="text-slate-600 dark:text-slate-400 mb-6">
           Estamos creciendo rápidamente. Vuelve pronto para descubrir nuevos perfiles en tu área.
         </p>
         <p className="text-sm text-slate-500">
@@ -382,7 +382,7 @@ const Discovery: React.FC<DiscoveryProps> = ({
   }
 
   return (
-    <div className="relative h-full flex flex-col bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="relative h-full flex flex-col bg-gradient-to-br from-gray-50 to-gray-100 dark:from-[#121212] dark:to-[#1a1a1a] transition-colors">
       {/* Toast Container */}
       <ToastContainer />
 
@@ -397,7 +397,7 @@ const Discovery: React.FC<DiscoveryProps> = ({
       </div>
 
       {/* Filter Chips */}
-      <div className="shrink-0 px-3 py-2 flex gap-2 overflow-x-auto no-scrollbar bg-white/80 backdrop-blur-sm border-b border-gray-100">
+      <div className="shrink-0 px-3 py-2 flex gap-2 overflow-x-auto no-scrollbar bg-white/80 dark:bg-[#1e1e1e]/80 backdrop-blur-sm border-b border-gray-100 dark:border-gray-800">
         {([
           { id: 'todos' as FilterChip, label: 'Todos', emoji: '🔥' },
           { id: 'mujeres' as FilterChip, label: 'Mujeres', emoji: '👩' },

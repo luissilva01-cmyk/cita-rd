@@ -8,6 +8,7 @@ import ProfileScore from '../../components/ProfileScore';
 import AccountSettings from '../../components/AccountSettings';
 import ReportProfileModal from '../../components/ReportProfileModal';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useThemeContext } from '../../contexts/ThemeContext';
 import { logger } from '../../utils/logger';
 import { useAdmin } from '../../hooks/useAdmin';
 
@@ -84,6 +85,7 @@ const ProfileView: React.FC<ProfileViewProps> = ({
 }) => {
   const { t } = useLanguage();
   const { isAdmin } = useAdmin(user.id);
+  const { isDark, toggleTheme } = useThemeContext();
   
   console.log('👤 ProfileView - Props:', { 
     userId: user.id, 
@@ -188,12 +190,12 @@ const ProfileView: React.FC<ProfileViewProps> = ({
   );
 
   return (
-    <div className="h-full overflow-y-auto bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="h-full overflow-y-auto bg-gradient-to-br from-gray-50 to-gray-100 dark:from-[#121212] dark:to-[#1a1a1a] transition-colors">
       {/* Header - Responsive */}
-      <div className="px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center border-b border-slate-100 safe-area-top">
+      <div className="px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center border-b border-slate-100 dark:border-slate-800 safe-area-top">
         <div>
-          <h3 className="text-lg sm:text-xl font-bold text-slate-800 mb-1">Mi Perfil</h3>
-          <p className="text-slate-600 text-xs sm:text-sm">Gestiona tu información personal</p>
+          <h3 className="text-lg sm:text-xl font-bold text-slate-800 dark:text-white mb-1">Mi Perfil</h3>
+          <p className="text-slate-600 dark:text-slate-400 text-xs sm:text-sm">Gestiona tu información personal</p>
         </div>
         <div className="flex items-center gap-2">
           {/* Botón de reportar (solo si NO es perfil propio) */}
@@ -210,6 +212,18 @@ const ProfileView: React.FC<ProfileViewProps> = ({
           {/* Botones solo para perfil propio */}
           {isOwnProfile && (
             <>
+              {/* Dark Mode Toggle */}
+              <button
+                onClick={toggleTheme}
+                className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-white/10 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+                title={isDark ? 'Modo claro' : 'Modo oscuro'}
+              >
+                {isDark ? (
+                  <svg className="w-[18px] h-[18px] text-yellow-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3v1m0 16v1m8.66-13.66l-.71.71M4.05 19.95l-.71.71M21 12h-1M4 12H3m16.66 7.66l-.71-.71M4.05 4.05l-.71-.71M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                ) : (
+                  <svg className="w-[18px] h-[18px] text-slate-600" fill="currentColor" viewBox="0 0 24 24"><path d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"/></svg>
+                )}
+              </button>
               <button
                 onClick={() => setShowAccountSettings(true)}
                 className="p-2 rounded-full hover:bg-slate-100 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"

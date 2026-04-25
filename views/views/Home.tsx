@@ -59,7 +59,7 @@ const Home: React.FC<HomeProps> = ({
   const location = currentUser.location || 'Santo Domingo';
 
   return (
-    <div className="w-full h-full overflow-y-auto pb-24" style={{ background: 'linear-gradient(180deg, #fff8f5 0%, #ffffff 40%)' }}>
+    <div className="w-full h-full overflow-y-auto pb-24 dark:bg-[#121212] transition-colors" style={{ background: 'linear-gradient(180deg, #fff8f5 0%, #ffffff 40%)' }}>
 
       {/* Header con saludo */}
       <div className="px-4 md:px-10 pt-5 pb-2 flex items-center gap-3">
@@ -70,10 +70,10 @@ const Home: React.FC<HomeProps> = ({
             className="w-14 h-14 md:w-16 md:h-16 rounded-full object-cover shadow-lg"
             style={{ border: '3px solid #ff8052' }}
           />
-          <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-400 border-2 border-white rounded-full"></span>
+          <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-400 border-2 border-white dark:border-[#121212] rounded-full"></span>
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-lg md:text-xl font-bold truncate text-slate-800">
+          <p className="text-lg md:text-xl font-bold truncate text-slate-800 dark:text-white">
             ¡Hola, {currentUser.name}! 👋
           </p>
           <p className="text-xs md:text-sm font-medium truncate" style={{ color: '#ff8052' }}>
@@ -230,7 +230,7 @@ const Home: React.FC<HomeProps> = ({
       {/* Actividad Reciente */}
       <div className="px-4 md:px-10 py-2">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-bold tracking-tight text-slate-800">Actividad Reciente</h3>
+          <h3 className="text-sm font-bold tracking-tight text-slate-800 dark:text-white">Actividad Reciente</h3>
           <button 
             onClick={onNavigateToMatches || onNavigateToMessages}
             className="text-xs font-bold" 
@@ -243,21 +243,21 @@ const Home: React.FC<HomeProps> = ({
         {recentMatches.length > 0 ? (
           <div className="space-y-2">
             {recentMatches.slice(0, 3).map((match) => (
-              <div key={match.id} className="flex items-center gap-3 bg-white p-3 rounded-xl border border-black/5 shadow-sm hover:shadow-md transition-shadow">
+              <div key={match.id} className="flex items-center gap-3 bg-white dark:bg-[#1e1e1e] p-3 rounded-xl border border-black/5 dark:border-white/10 shadow-sm hover:shadow-md transition-shadow">
                 <div 
-                  className="w-11 h-11 rounded-full shrink-0 bg-cover bg-center border-2 border-orange-100"
+                  className="w-11 h-11 rounded-full shrink-0 bg-cover bg-center border-2 border-orange-100 dark:border-orange-900"
                   style={{ backgroundImage: `url('${match.images?.[0] || 'https://picsum.photos/seed/' + match.id + '/200/200'}')` }}
                 />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1">
-                    <span className="font-bold text-sm truncate text-slate-800">{match.name}, {match.age}</span>
+                    <span className="font-bold text-sm truncate text-slate-800 dark:text-white">{match.name}, {match.age}</span>
                     {match.isVerified && (
                       <svg className="w-3.5 h-3.5 text-blue-500 shrink-0" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                       </svg>
                     )}
                   </div>
-                  <p className="text-xs text-gray-500 truncate mt-0.5">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">
                     {match.location || 'Cerca de ti'}
                   </p>
                 </div>
@@ -273,7 +273,7 @@ const Home: React.FC<HomeProps> = ({
             ))}
           </div>
         ) : (
-          <div className="text-center py-6 bg-white rounded-2xl border border-black/5">
+          <div className="text-center py-6 bg-white dark:bg-[#1e1e1e] rounded-2xl border border-black/5 dark:border-white/10">
             <div 
               className="w-14 h-14 rounded-full mx-auto mb-3 flex items-center justify-center"
               style={{ background: 'linear-gradient(135deg, #ff805220, #ffc10720)' }}
@@ -282,8 +282,8 @@ const Home: React.FC<HomeProps> = ({
                 <path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
               </svg>
             </div>
-            <h4 className="font-semibold text-gray-800 mb-1 text-sm">¡Comienza a explorar!</h4>
-            <p className="text-xs text-gray-500 mb-3 px-4">
+            <h4 className="font-semibold text-gray-800 dark:text-white mb-1 text-sm">¡Comienza a explorar!</h4>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-3 px-4">
               Descubre personas increíbles que ta' pa' ti
             </p>
             <button
@@ -319,10 +319,10 @@ const Home: React.FC<HomeProps> = ({
 
         return (
           <div className="px-4 md:px-10 py-2 pb-6">
-            <div className="rounded-2xl p-4 md:p-5 bg-white border border-black/5 shadow-sm">
+            <div className="rounded-2xl p-4 md:p-5 bg-white dark:bg-[#1e1e1e] border border-black/5 dark:border-white/10 shadow-sm">
               <div className="flex items-center justify-between mb-2.5">
                 <div className="flex items-center gap-2">
-                  <h3 className="font-bold text-sm text-slate-800">Perfil Completado</h3>
+                  <h3 className="font-bold text-sm text-slate-800 dark:text-white">Perfil Completado</h3>
                   {isComplete && <span className="text-green-500 text-xs">✓</span>}
                 </div>
                 <span 
@@ -332,7 +332,7 @@ const Home: React.FC<HomeProps> = ({
                   {percent}%
                 </span>
               </div>
-              <div className="w-full h-2.5 bg-gray-100 rounded-full mb-3 overflow-hidden">
+              <div className="w-full h-2.5 bg-gray-100 dark:bg-gray-700 rounded-full mb-3 overflow-hidden">
                 <div 
                   className="h-full rounded-full transition-all duration-700 ease-out" 
                   style={{ 

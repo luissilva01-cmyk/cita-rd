@@ -21,6 +21,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #f8f6f5;
+  transition: background-color 0.3s ease, color 0.3s ease;
   /* Prevent zoom on iOS */
   -webkit-text-size-adjust: 100%;
   /* Improve touch scrolling */
@@ -964,4 +965,44 @@ video,
 /* Allow specific elements to exceed */
 html, body, #root, .full-width-allowed {
   max-width: none;
+}
+
+
+/* ═══════════════════════════════════════════════════
+   DARK MODE - Base Styles
+   ═══════════════════════════════════════════════════ */
+
+/* Body dark mode */
+html.dark body {
+  background-color: #121212;
+  color: #e4e4e7;
+}
+
+/* Glass card dark */
+html.dark .glass-card {
+  background: rgba(30, 30, 30, 0.7);
+}
+
+/* Chat input area dark */
+html.dark .chat-input-area {
+  background: #1e1e1e !important;
+  border-top-color: #2a2a2a !important;
+}
+
+/* Desktop sidebar dark */
+html.dark .desktop-sidebar {
+  background: #1a1a1a;
+}
+
+/* Desktop main content dark */
+html.dark .desktop-main-content {
+  background: linear-gradient(135deg, #1a0a05 0%, #1a1200 100%);
+}
+
+/* Scrollbar dark */
+html.dark ::-webkit-scrollbar-track {
+  background: #1e1e1e;
+}
+html.dark ::-webkit-scrollbar-thumb {
+  background: #3a3a3a;
 }

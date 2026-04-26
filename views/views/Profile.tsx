@@ -280,30 +280,7 @@ const ProfileView: React.FC<ProfileViewProps> = ({
         )}
 
         {/* Admin Panel Access Button */}
-        {(() => {
-          console.log('🎨 Renderizando botón admin - Condiciones:', {
-            isOwnProfile,
-            isAdmin,
-            hasNavigateFunction: !!onNavigateToAdmin,
-            shouldShow: isOwnProfile && isAdmin && onNavigateToAdmin
-          });
-          return null;
-        })()}
-        {isOwnProfile && isAdmin && (
-          <button
-            onClick={() => window.location.href = '/admin'}
-            className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl p-4 text-white shadow-lg hover:shadow-xl transition-all flex items-center justify-between group"
-          >
-            <div className="flex items-center gap-3">
-              <Shield className="text-white" size={24} />
-              <div className="text-left">
-                <p className="font-bold text-lg">Panel de Administración</p>
-                <p className="text-sm opacity-90">Gestionar reportes y usuarios</p>
-              </div>
-            </div>
-            <div className="text-2xl group-hover:translate-x-1 transition-transform">→</div>
-          </button>
-        )}
+        {/* Admin access: tapati.online/admin (no visible button) */}
 
         {/* Profile Score Section - Responsive */}
         <div className="space-y-3 sm:space-y-4">

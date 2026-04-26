@@ -62,8 +62,8 @@ const Discovery: React.FC<DiscoveryProps> = ({
   const [lastSwipedUser, setLastSwipedUser] = useState<UserProfile | null>(null);
   const [canRewind, setCanRewind] = useState(false);
 
-  // Daily swipe limit for free users
-  const DAILY_SWIPE_LIMIT = 25;
+  // Daily swipe limit for free users — DISABLED for growth phase
+  const DAILY_SWIPE_LIMIT = 999999;
   const [dailySwipes, setDailySwipes] = useState(0);
   const [showSwipeLimitModal, setShowSwipeLimitModal] = useState(false);
 

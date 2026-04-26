@@ -965,3 +965,58 @@ video,
 html, body, #root, .full-width-allowed {
   max-width: none;
 }
+
+
+/* ═══════════════════════════════════════════════════
+   SCREENSHOT PROTECTION - Disuasión de capturas
+   ═══════════════════════════════════════════════════ */
+
+/* Prevent image dragging and saving */
+img {
+  -webkit-user-drag: none;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Re-enable pointer events for interactive images (buttons with images, etc) */
+button img,
+a img,
+.clickable img,
+.interactive img {
+  pointer-events: auto;
+}
+
+/* Prevent right-click save on profile images */
+.profile-image,
+.profile-image-smart,
+.swipe-card-image {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Blur content when window loses focus (screenshot tool detection) */
+@media screen {
+  .blur-on-hidden {
+    transition: filter 0.15s ease;
+  }
+  
+  .content-hidden .blur-on-hidden {
+    filter: blur(20px) !important;
+  }
+}
+
+/* Prevent print/PDF capture of sensitive content */
+@media print {
+  body * {
+    display: none !important;
+  }
+  body::after {
+    content: "Ta' Pa' Ti - Contenido protegido";
+    display: block;
+    text-align: center;
+    padding: 100px 20px;
+    font-size: 24px;
+    color: #999;
+  }
+}

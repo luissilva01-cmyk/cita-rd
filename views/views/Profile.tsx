@@ -289,9 +289,9 @@ const ProfileView: React.FC<ProfileViewProps> = ({
           });
           return null;
         })()}
-        {isOwnProfile && isAdmin && onNavigateToAdmin && (
+        {isOwnProfile && isAdmin && (
           <button
-            onClick={onNavigateToAdmin}
+            onClick={() => window.location.href = '/admin'}
             className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl p-4 text-white shadow-lg hover:shadow-xl transition-all flex items-center justify-between group"
           >
             <div className="flex items-center gap-3">

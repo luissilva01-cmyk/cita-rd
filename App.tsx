@@ -853,6 +853,7 @@ const App: React.FC = () => {
               <Route path="/" element={<Landing />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/admin" element={<Navigate to="/login" replace />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </Suspense>
@@ -865,6 +866,11 @@ const App: React.FC = () => {
     <ErrorBoundary level="app">
       <LanguageProvider>
         <Suspense fallback={<LoadingFallback />}>
+          {/* Admin Panel — ruta dedicada /admin */}
+          {window.location.pathname === '/admin' ? (
+            <AdminPanel />
+          ) : (
+          <>
           {/* Onboarding for new users */}
           {showOnboarding && <Onboarding onComplete={() => setShowOnboarding(false)} />}
           
@@ -956,6 +962,8 @@ const App: React.FC = () => {
           
           {/* Analytics Dashboard (Dev Only) */}
           <AnalyticsDashboard />
+          </>
+          )}
         </Suspense>
       </LanguageProvider>
     </ErrorBoundary>

@@ -254,6 +254,25 @@ const SwipeCard: React.FC<SwipeCardProps> = ({
           {/* Gradient Overlay */}
           <div className="absolute inset-0 bg-linear-to-b from-transparent via-transparent to-black/70" />
           
+          {/* Watermark Overlay — protección de fotos */}
+          <div className="absolute inset-0 z-10 pointer-events-none overflow-hidden select-none" aria-hidden="true">
+            <div className="absolute inset-0 flex items-center justify-center" style={{
+              transform: 'rotate(-30deg) scale(1.5)',
+            }}>
+              <div className="grid gap-y-10 gap-x-6" style={{
+                gridTemplateColumns: 'repeat(4, 1fr)',
+                width: '200%',
+                marginLeft: '-50%',
+              }}>
+                {Array.from({ length: 20 }).map((_, i) => (
+                  <span key={i} className="text-white/[0.07] text-sm font-bold whitespace-nowrap select-none" style={{ userSelect: 'none' }}>
+                    Ta' Pa' Ti
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+          
           {/* Profile Info */}
           <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
             <div className="flex items-center gap-2 mb-2">

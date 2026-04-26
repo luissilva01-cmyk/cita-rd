@@ -348,16 +348,31 @@ const Discovery: React.FC<DiscoveryProps> = ({
     console.log('❌ No hay usuarios disponibles');
     return (
       <div className="flex flex-col items-center justify-center h-full text-center px-6">
-        <div className="w-24 h-24 bg-gradient-to-br from-orange-400 to-rose-500 rounded-full flex items-center justify-center mb-6">
-          <Heart className="text-white" size={40} />
+        <div className="w-24 h-24 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-full flex items-center justify-center mb-6">
+          <span className="text-4xl">🚀</span>
         </div>
-        <h2 className="text-2xl font-bold text-slate-800 mb-4">Sé de los primeros en Ta' Pa' Ti</h2>
-        <p className="text-slate-600 mb-6">
-          Estamos creciendo rápidamente. Vuelve pronto para descubrir nuevos perfiles en tu área.
+        <h2 className="text-2xl font-bold text-slate-800 mb-3">¡Eres de los primeros!</h2>
+        <p className="text-slate-600 mb-2 max-w-xs">
+          Ta' Pa' Ti está empezando y tú ya estás aquí. Mientras más gente invites, más perfiles verás.
         </p>
-        <p className="text-sm text-slate-500">
-          💡 Mientras tanto, completa tu perfil y activa las notificaciones para no perderte nuevos matches.
+        <p className="text-xs text-slate-400 mb-6">
+          Los primeros miembros siempre tienen ventaja 😉
         </p>
+        <button
+          onClick={() => {
+            const shareText = '👀 Mira esta app de citas dominicana, Ta\' Pa\' Ti. Créate un perfil gratis → https://tapati.online';
+            if (navigator.share) {
+              navigator.share({ title: 'Ta\' Pa\' Ti', text: shareText, url: 'https://tapati.online' }).catch(() => {});
+            } else {
+              window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank');
+            }
+          }}
+          className="px-6 py-3 text-white rounded-full font-semibold text-sm shadow-lg transition-all active:scale-95 flex items-center gap-2"
+          style={{ background: 'linear-gradient(135deg, #25D366, #128C7E)' }}
+        >
+          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492l4.625-1.476A11.929 11.929 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818c-2.168 0-4.19-.587-5.932-1.61l-.425-.253-2.744.877.876-2.688-.278-.442A9.776 9.776 0 012.182 12c0-5.423 4.395-9.818 9.818-9.818S21.818 6.577 21.818 12s-4.395 9.818-9.818 9.818z"/></svg>
+          Invitar por WhatsApp
+        </button>
       </div>
     );
   }

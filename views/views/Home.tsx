@@ -110,6 +110,39 @@ const Home: React.FC<HomeProps> = ({
         </div>
       </div>
 
+      {/* ═══ EARLY ADOPTER BANNER ═══ */}
+      <div className="px-4 md:px-10 py-2">
+        <div className="rounded-2xl p-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white relative overflow-hidden">
+          <div className="relative z-10 flex items-start gap-3">
+            <span className="text-2xl mt-0.5">🚀</span>
+            <div className="flex-1">
+              <p className="font-bold text-sm leading-tight mb-1">
+                Eres de los primeros en Ta' Pa' Ti
+              </p>
+              <p className="text-xs text-white/80 leading-relaxed mb-3">
+                Estamos creciendo — mientras más gente invites, más perfiles verás cerca de ti.
+              </p>
+              <button
+                onClick={() => {
+                  const isFemale = currentUser.gender === 'mujer';
+                  const emoji = isFemale ? '💅' : '👀';
+                  const shareText = `${emoji} Mira esta app de citas dominicana, Ta' Pa' Ti. Créate un perfil gratis → https://tapati.online`;
+                  if (navigator.share) {
+                    navigator.share({ title: 'Ta\' Pa\' Ti', text: shareText, url: 'https://tapati.online' }).catch(() => {});
+                  } else {
+                    window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank');
+                  }
+                }}
+                className="bg-white/20 backdrop-blur-sm text-white px-4 py-2 rounded-xl text-xs font-bold transition-all active:scale-95 border border-white/20"
+              >
+                Invitar amigos →
+              </button>
+            </div>
+          </div>
+          <div className="absolute -right-4 -bottom-4 w-20 h-20 bg-white/10 rounded-full blur-xl"></div>
+        </div>
+      </div>
+
       {/* ═══════════════════════════════════════════════════
           DASHBOARD STATS - 3 tarjetas con métricas rápidas
           ═══════════════════════════════════════════════════ */}

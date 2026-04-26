@@ -385,40 +385,43 @@ const Home: React.FC<HomeProps> = ({
 
       {/* ═══ INVITA A UN PANA ═══ */}
       <div className="px-4 md:px-10 pb-6">
-        <button
-          onClick={() => {
-            const shareText = '👀 Mira esta app de citas dominicana, Ta\' Pa\' Ti. Créate un perfil gratis → https://tapati.online';
-            if (navigator.share) {
-              navigator.share({ title: 'Ta\' Pa\' Ti', text: shareText, url: 'https://tapati.online' }).catch(() => {});
-            } else {
-              // Fallback: copiar al clipboard y abrir WhatsApp
-              navigator.clipboard?.writeText(shareText);
-              window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank');
-            }
-          }}
-          className="w-full rounded-2xl p-4 text-left relative overflow-hidden active:scale-[0.98] transition-transform"
-          style={{ background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)' }}
-        >
-          <div className="flex items-center gap-3 relative z-10">
-            <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-2xl shrink-0">
-              👀
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-white font-bold text-sm leading-tight">
-                ¿Tienes un pana soltero?
-              </p>
-              <p className="text-white/80 text-xs mt-0.5">
-                Mándale esto 👀
-              </p>
-            </div>
-            <div className="shrink-0">
-              <svg className="w-5 h-5 text-white/70" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-              </svg>
-            </div>
-          </div>
-          <div className="absolute -right-6 -bottom-6 w-24 h-24 bg-white/10 rounded-full blur-2xl"></div>
-        </button>
+        {(() => {
+          const isFemale = currentUser.gender === 'mujer';
+          const headline = isFemale ? '¿Tienes una amiga soltera?' : '¿Tienes un pana soltero?';
+          const sub = isFemale ? 'Mándale esto 💅' : 'Mándale esto 👀';
+          const emoji = isFemale ? '💅' : '👀';
+          return (
+            <button
+              onClick={() => {
+                const shareText = `${emoji} Mira esta app de citas dominicana, Ta' Pa' Ti. Créate un perfil gratis → https://tapati.online`;
+                if (navigator.share) {
+                  navigator.share({ title: 'Ta\' Pa\' Ti', text: shareText, url: 'https://tapati.online' }).catch(() => {});
+                } else {
+                  navigator.clipboard?.writeText(shareText);
+                  window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank');
+                }
+              }}
+              className="w-full rounded-2xl p-4 text-left relative overflow-hidden active:scale-[0.98] transition-transform"
+              style={{ background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)' }}
+            >
+              <div className="flex items-center gap-3 relative z-10">
+                <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-2xl shrink-0">
+                  {emoji}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-white font-bold text-sm leading-tight">{headline}</p>
+                  <p className="text-white/80 text-xs mt-0.5">{sub}</p>
+                </div>
+                <div className="shrink-0">
+                  <svg className="w-5 h-5 text-white/70" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                  </svg>
+                </div>
+              </div>
+              <div className="absolute -right-6 -bottom-6 w-24 h-24 bg-white/10 rounded-full blur-2xl"></div>
+            </button>
+          );
+        })()}
       </div>
     </div>
   );

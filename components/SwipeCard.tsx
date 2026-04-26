@@ -255,21 +255,31 @@ const SwipeCard: React.FC<SwipeCardProps> = ({
           <div className="absolute inset-0 bg-linear-to-b from-transparent via-transparent to-black/70" />
           
           {/* Watermark Overlay — protección de fotos */}
-          <div className="absolute inset-0 z-10 pointer-events-none overflow-hidden select-none" aria-hidden="true">
-            <div className="absolute inset-0 flex items-center justify-center" style={{
-              transform: 'rotate(-30deg) scale(1.5)',
+          <div className="absolute inset-0 z-10 pointer-events-none overflow-hidden select-none" aria-hidden="true" style={{ userSelect: 'none' }}>
+            <div style={{
+              position: 'absolute',
+              inset: '-50%',
+              width: '200%',
+              height: '200%',
+              display: 'flex',
+              flexWrap: 'wrap',
+              alignContent: 'center',
+              justifyContent: 'center',
+              gap: '30px 40px',
+              transform: 'rotate(-30deg)',
             }}>
-              <div className="grid gap-y-10 gap-x-6" style={{
-                gridTemplateColumns: 'repeat(4, 1fr)',
-                width: '200%',
-                marginLeft: '-50%',
-              }}>
-                {Array.from({ length: 20 }).map((_, i) => (
-                  <span key={i} className="text-white/[0.07] text-sm font-bold whitespace-nowrap select-none" style={{ userSelect: 'none' }}>
-                    Ta' Pa' Ti
-                  </span>
-                ))}
-              </div>
+              {Array.from({ length: 30 }).map((_, i) => (
+                <span key={i} style={{
+                  color: 'rgba(255,255,255,0.15)',
+                  fontSize: '16px',
+                  fontWeight: 800,
+                  whiteSpace: 'nowrap',
+                  userSelect: 'none',
+                  letterSpacing: '2px',
+                }}>
+                  Ta' Pa' Ti
+                </span>
+              ))}
             </div>
           </div>
           

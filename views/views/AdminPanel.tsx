@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { 
   Shield, 
   AlertTriangle, 
@@ -37,7 +36,6 @@ const CATEGORY_LABELS: Record<string, string> = {
 };
 
 const AdminPanel: React.FC = () => {
-  const navigate = useNavigate();
   const currentUser = auth.currentUser;
   const { isAdmin, loading: adminLoading } = useAdmin(currentUser?.uid);
 
@@ -53,9 +51,9 @@ const AdminPanel: React.FC = () => {
     if (!adminLoading && !isAdmin) {
       logger.ui.warn('Usuario sin permisos de admin intentó acceder al panel');
       alert('⛔ No tienes permisos para acceder a esta página');
-      navigate('/');
+      window.history.back();
     }
-  }, [isAdmin, adminLoading, navigate]);
+  }, [isAdmin, adminLoading]);
 
   // Cargar reportes y estadísticas
   useEffect(() => {
@@ -162,7 +160,7 @@ const AdminPanel: React.FC = () => {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button
-              onClick={() => navigate('/')}
+              onClick={() => window.history.back()}
               className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
             >
               <ArrowLeft size={20} />

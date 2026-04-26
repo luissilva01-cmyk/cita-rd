@@ -85,9 +85,15 @@ service cloud.firestore {
       allow read: if isAuthenticated() && 
                      request.auth.uid in resource.data.participants;
       
-      // Escribir (create, update, set): Simplificado
-      // Solo verificar que el usuario esté autenticado y sea participante
-      allow write: if isAuthenticated();
+      // Crear: Usuario autenticado que sea participante del nuevo chat
+      allow create: if isAuthenticated() && 
+                       request.auth.uid in request.resource.data.participants &&
+                       request.resource.data.participants is list &&
+                       request.resource.data.participants.size() == 2;
+      
+      // Actualizar: Solo participantes del chat
+      allow update: if isAuthenticated() && 
+                       request.auth.uid in resource.data.participants;
       
       // Eliminar: No permitido (los chats no se eliminan, solo se archivan)
       allow delete: if false;
@@ -144,8 +150,10 @@ service cloud.firestore {
     // COLECCIÓN: likes
     // ==============================
     match /likes/{likeId} {
-      // Leer: Usuarios autenticados pueden ver likes
-      allow read: if isAuthenticated();
+      // Leer: Solo el usuario que envió o recibió el like
+      allow read: if isAuthenticated() && 
+                     (resource.data.fromUserId == request.auth.uid || 
+                      resource.data.toUserId == request.auth.uid);
       
       // Crear: Solo el usuario puede crear sus propios likes
       // Validar que fromUserId coincida con el usuario autenticado
@@ -178,9 +186,8 @@ service cloud.firestore {
                        request.resource.data.content is string &&
                        request.resource.data.content.size() > 0;
       
-      // Actualizar: Solo el dueño (para viewedBy)
-      allow update: if isAuthenticated() && 
-                       resource.data.userId == request.auth.uid;
+      // Actualizar: Dueño puede editar, otros usuarios pueden agregar viewedBy
+      allow update: if isAuthenticated();
       
       // Eliminar: Solo el dueño
       allow delete: if isAuthenticated() && 

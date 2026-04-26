@@ -660,8 +660,8 @@ const Discovery: React.FC<DiscoveryProps> = ({
         </div>
       )}
 
-      {/* Remaining swipes indicator */}
-      {dailySwipes > 0 && dailySwipes < DAILY_SWIPE_LIMIT && (
+      {/* Remaining swipes indicator — hidden while unlimited */}
+      {false && dailySwipes > 0 && dailySwipes < DAILY_SWIPE_LIMIT && (
         <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-30">
           <div className="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full shadow-md border border-black/5 text-[10px] font-semibold text-slate-500">
             {DAILY_SWIPE_LIMIT - dailySwipes} swipes restantes

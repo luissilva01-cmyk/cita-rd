@@ -187,8 +187,11 @@ service cloud.firestore {
                        request.resource.data.content is string &&
                        request.resource.data.content.size() > 0;
       
-      // Actualizar: Dueño puede editar, otros usuarios pueden agregar viewedBy
-      allow update: if isAuthenticated();
+      // Actualizar: Dueño puede editar todo, otros solo pueden agregar a viewedBy
+      allow update: if isAuthenticated() && (
+        resource.data.userId == request.auth.uid ||
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['viewedBy']))
+      );
       
       // Eliminar: Solo el dueño
       allow delete: if isAuthenticated() && 

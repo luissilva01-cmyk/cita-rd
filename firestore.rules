@@ -95,8 +95,9 @@ service cloud.firestore {
       allow update: if isAuthenticated() && 
                        request.auth.uid in resource.data.participants;
       
-      // Eliminar: No permitido (los chats no se eliminan, solo se archivan)
-      allow delete: if false;
+      // Eliminar: Solo participantes del chat pueden eliminar (unmatch)
+      allow delete: if isAuthenticated() && 
+                       request.auth.uid in resource.data.participants;
       
       // Subcolección: messages
       match /messages/{messageId} {

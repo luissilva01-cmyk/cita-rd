@@ -829,6 +829,25 @@ const ProfileView: React.FC<ProfileViewProps> = ({
         )}
       </div>
 
+      {/* ═══ AYUDA Y SUGERENCIAS ═══ */}
+      <div className="px-4 sm:px-6 pb-6">
+        <a
+          href="mailto:tapapatisoporte@gmail.com?subject=Feedback%20Ta'%20Pa'%20Ti&body=Hola%20equipo%20Ta'%20Pa'%20Ti,%0A%0A"
+          className="w-full flex items-center gap-3 p-4 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors"
+        >
+          <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
+            <span className="text-lg">💬</span>
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-slate-800">Ayuda y sugerencias</p>
+            <p className="text-xs text-slate-500">¿Algo no funciona? ¿Tienes una idea? Escríbenos</p>
+          </div>
+          <svg className="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+          </svg>
+        </a>
+      </div>
+
       {/* Account Settings Modal */}
       <AccountSettings
         isOpen={showAccountSettings}

@@ -414,6 +414,9 @@ const App: React.FC = () => {
   const handleLike = async (user: UserProfile) => {
     if (!currentUser) return false;
     
+    // No permitir darte like a ti mismo
+    if (user.id === currentUser.id) return false;
+    
     try {
       const db = getFirestore();
       

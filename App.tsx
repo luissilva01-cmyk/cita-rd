@@ -499,6 +499,12 @@ const App: React.FC = () => {
         throw new Error('Parámetros inválidos');
       }
       
+      // No permitir reaccionar a tu propia story
+      if (userId === currentUser!.id) {
+        logger.chat.warn('Intentó reaccionar a su propia story, ignorando');
+        return;
+      }
+      
       // Buscar o crear chat con el usuario
       const chatId = await findOrCreateChat(currentUser!.id, userId);
       

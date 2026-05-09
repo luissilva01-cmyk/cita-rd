@@ -114,7 +114,7 @@ exports.sendMessageNotification = functions.firestore
           senderId: message.senderId,
           senderName: senderName,
           icon: '/logo192.png',
-          clickAction: `https://tapati.app/chat/${chatId}`
+          clickAction: `https://tapati.online/chat/${chatId}`
         },
         webpush: {
           notification: {
@@ -125,7 +125,7 @@ exports.sendMessageNotification = functions.firestore
             vibrate: [200, 100, 200]
           },
           fcmOptions: {
-            link: `https://tapati.app/chat/${chatId}`
+            link: `https://tapati.online/chat/${chatId}`
           }
         },
         token: fcmToken
@@ -197,7 +197,7 @@ exports.sendMatchNotification = functions.firestore
             matchUserId: otherUserId,
             matchUserName: otherUserName,
             icon: '/logo192.png',
-            clickAction: 'https://tapati.app/matches'
+            clickAction: 'https://tapati.online/matches'
           },
           webpush: {
             notification: {
@@ -208,7 +208,7 @@ exports.sendMatchNotification = functions.firestore
               vibrate: [200, 100, 200, 100, 200]
             },
             fcmOptions: {
-              link: 'https://tapati.app/matches'
+              link: 'https://tapati.online/matches'
             }
           },
           token: fcmToken
@@ -312,7 +312,7 @@ exports.sendStoryNotification = functions.firestore
             creatorId: story.userId,
             creatorName: creatorName,
             icon: '/logo192.png',
-            clickAction: 'https://tapati.app/'
+            clickAction: 'https://tapati.online/'
           },
           webpush: {
             notification: {
@@ -323,7 +323,7 @@ exports.sendStoryNotification = functions.firestore
               vibrate: [200, 100, 200]
             },
             fcmOptions: {
-              link: 'https://tapati.app/'
+              link: 'https://tapati.online/'
             }
           },
           token: fcmToken

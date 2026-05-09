@@ -193,6 +193,12 @@ const App: React.FC = () => {
           setCurrentUser(basicProfile);
           // Guardar perfil básico en Firebase
           await createOrUpdateProfile(user.uid, basicProfile);
+          
+          // Show onboarding for first-time users
+          if (!localStorage.getItem('tapati_onboarding_done')) {
+            setShowOnboarding(true);
+          }
+          
           // Redirigir a Profile para completar
           setActiveView('profile');
         }

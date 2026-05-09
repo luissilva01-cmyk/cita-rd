@@ -550,3 +550,111 @@ exports.cleanOrphanedPhotos = functions.https.onCall(async (data, context) => {
     );
   }
 });
+
+
+// ==============================
+// NOTIFICACIÓN DE NUEVO USUARIO
+// ==============================
+
+/**
+ * Envía push notification a todos los usuarios cuando alguien nuevo se registra
+ * 
+ * Trigger: onCreate en /perfiles/{userId}
+ * Notifica: "🔥 Nuevo perfil en Ta' Pa' Ti — entra a ver quién es"
+ */
+exports.notifyNewUser = functions.firestore
+  .document('perfiles/{userId}')
+  .onCreate(async (snap, context) => {
+    const newUser = snap.data();
+    const newUserId = context.params.userId;
+    
+    try {
+      const newUserName = newUser.name || 'Alguien nuevo';
+      const newUserLocation = newUser.location || '';
+      
+      console.log(`🆕 Nuevo usuario registrado: ${newUserName} (${newUserId})`);
+      
+      // Obtener todos los tokens FCM (excepto el del nuevo usuario)
+      const tokensSnapshot = await admin.firestore()
+        .collection('fcmTokens')
+        .get();
+      
+      if (tokensSnapshot.empty) {
+        console.log('No hay tokens FCM registrados');
+        return null;
+      }
+      
+      const tokens = [];
+      tokensSnapshot.forEach(doc => {
+        if (doc.id !== newUserId && doc.data().token) {
+          tokens.push(doc.data().token);
+        }
+      });
+      
+      if (tokens.length === 0) {
+        console.log('No hay otros usuarios con tokens FCM');
+        return null;
+      }
+      
+      console.log(`📤 Enviando notificación a ${tokens.length} usuarios`);
+      
+      // Preparar mensaje
+      const locationText = newUserLocation ? ` de ${newUserLocation}` : '';
+      const body = `${newUserName}${locationText} se unió a Ta' Pa' Ti. ¡Entra a ver su perfil!`;
+      
+      // Enviar a cada token individualmente (multicast puede fallar con tokens inválidos)
+      let successCount = 0;
+      let failCount = 0;
+      
+      for (const token of tokens) {
+        try {
+          await admin.messaging().send({
+            notification: {
+              title: '🔥 Nuevo perfil disponible',
+              body: body
+            },
+            data: {
+              type: 'new_user',
+              newUserId: newUserId,
+              newUserName: newUserName,
+              clickAction: 'https://tapati.online'
+            },
+            webpush: {
+              notification: {
+                icon: '/logo-tpt.png',
+                badge: '/logo-tpt.png',
+                tag: 'new-user',
+                requireInteraction: false,
+                vibrate: [200, 100, 200]
+              },
+              fcmOptions: {
+                link: 'https://tapati.online'
+              }
+            },
+            token: token
+          });
+          successCount++;
+        } catch (err) {
+          failCount++;
+          // Si el token es inválido, eliminarlo
+          if (err.code === 'messaging/registration-token-not-registered' ||
+              err.code === 'messaging/invalid-registration-token') {
+            // Buscar y eliminar el token inválido
+            const invalidTokenQuery = await admin.firestore()
+              .collection('fcmTokens')
+              .where('token', '==', token)
+              .get();
+            invalidTokenQuery.forEach(doc => doc.ref.delete());
+            console.log('🗑️ Token inválido eliminado');
+          }
+        }
+      }
+      
+      console.log(`✅ Notificaciones enviadas: ${successCount} éxito, ${failCount} fallidas`);
+      
+      return null;
+    } catch (error) {
+      console.error('❌ Error en notifyNewUser:', error);
+      return null;
+    }
+  });

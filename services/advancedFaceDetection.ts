@@ -161,8 +161,13 @@ export const detectFaceAdvanced = async (imageUrl: string): Promise<FaceDetectio
         if (!skinToneDetected && !skinClusterValid) {
           confidence = Math.min(confidence, 40);
         }
+        
+        // Si no hay piel Y no hay características faciales → rechazar (flores, objetos)
+        if (!skinToneDetected && !facialFeaturesDetected) {
+          confidence = Math.min(confidence, 25);
+        }
 
-        const hasFace = confidence >= 65;
+        const hasFace = confidence >= 55; // Bajamos de 65 a 55 para ser más permisivos con personas reales
 
         console.log('🔍 [ADVANCED] Resultado:', {
           hasFace, confidence,
@@ -314,22 +319,28 @@ function analyzeSkinTone(pixels: Uint8ClampedArray): boolean {
   const skinPercentage = (skinPixels / totalPixels) * 100;
   console.log('🔍 [SKIN] Porcentaje de piel:', skinPercentage.toFixed(2) + '%');
 
-  // Al menos 15% de la imagen debe ser tono de piel
+  // Al menos 8% de la imagen debe ser tono de piel (bajamos de 15 para ser más permisivos con personas)
   // Pero no más de 80% (eso sería un fondo de color piel, no un rostro)
-  return skinPercentage >= 15 && skinPercentage <= 80;
+  return skinPercentage >= 8 && skinPercentage <= 80;
 }
 
 function isSkinTone(r: number, g: number, b: number): boolean {
   // Piel clara
   const range1 = r > 95 && g > 40 && b > 20 &&
                  r > g && r > b &&
-                 Math.abs(r - g) > 15 && r - b > 15;
+                 Math.abs(r - g) > 15 && r - b > 15 &&
+                 // Excluir tonos muy saturados (flores, frutas)
+                 (r - g) < 100 && (r - b) < 120;
   // Piel media
   const range2 = r > 80 && g > 50 && b > 30 &&
-                 r > g && g > b && r - g < 50;
+                 r > g && g > b && r - g < 50 &&
+                 // Excluir tonos muy rojos/naranjas (flores)
+                 b > 20;
   // Piel oscura
   const range3 = r > 50 && g > 30 && b > 20 &&
-                 r >= g && g >= b && r - b > 10 && r < 160;
+                 r >= g && g >= b && r - b > 10 && r < 160 &&
+                 // Excluir tonos muy saturados
+                 (r - b) < 80;
 
   return range1 || range2 || range3;
 }
@@ -520,19 +531,19 @@ function analyzeSaturation(pixels: Uint8ClampedArray): boolean {
   console.log('🔍 [SATURATION] Promedio:', avgSaturation.toFixed(2) + '%, Alta:', highSatPct.toFixed(2) + '%, Muy alta:', veryHighSatPct.toFixed(2) + '%');
 
   // Dibujos animados: saturación promedio alta
-  if (avgSaturation > 45) {
-    console.log('❌ [SATURATION] RECHAZADO: Saturación promedio muy alta (dibujo animado)');
+  if (avgSaturation > 55) {
+    console.log('❌ [SATURATION] RECHAZADO: Saturación promedio muy alta (dibujo animado o flor)');
     return false;
   }
 
   // Ilustraciones digitales: muchos píxeles muy saturados
-  if (highSatPct > 25) {
-    console.log('❌ [SATURATION] RECHAZADO: Demasiados píxeles saturados (ilustración)');
+  if (highSatPct > 35) {
+    console.log('❌ [SATURATION] RECHAZADO: Demasiados píxeles saturados (ilustración o flor)');
     return false;
   }
 
   // Colores neón / arte digital
-  if (veryHighSatPct > 10) {
+  if (veryHighSatPct > 15) {
     console.log('❌ [SATURATION] RECHAZADO: Colores neón detectados (arte digital)');
     return false;
   }

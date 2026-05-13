@@ -278,20 +278,26 @@ function checkNotScreenshot(pixels: Uint8ClampedArray, width: number, height: nu
   console.log('🔍 [SCREENSHOT] Blanco:', whitePct.toFixed(1) + '%, Negro:', blackPct.toFixed(1) + '%, Gris:', grayPct.toFixed(1) + '%');
 
   // Screenshots típicos: fondo blanco con texto negro
-  if (whitePct > 60 && blackPct > 5) {
+  if (whitePct > 50 && blackPct > 3) {
     console.log('❌ [SCREENSHOT] RECHAZADO: Patrón de screenshot (fondo blanco + texto)');
     return false;
   }
 
   // Fondo negro con texto blanco (dark mode screenshots)
-  if (blackPct > 60 && whitePct > 5) {
+  if (blackPct > 50 && whitePct > 3) {
     console.log('❌ [SCREENSHOT] RECHAZADO: Patrón de screenshot dark mode');
     return false;
   }
 
   // Demasiado gris = UI/interfaz
-  if (grayPct > 50) {
+  if (grayPct > 45) {
     console.log('❌ [SCREENSHOT] RECHAZADO: Demasiado gris, parece interfaz');
+    return false;
+  }
+
+  // Memes: fondo blanco puro muy dominante
+  if (whitePct > 70) {
+    console.log('❌ [SCREENSHOT] RECHAZADO: Fondo blanco dominante (posible meme)');
     return false;
   }
 
@@ -393,7 +399,7 @@ function analyzeSkinClustering(pixels: Uint8ClampedArray, width: number, height:
 
   // En un rostro real, la zona central tiene significativamente más piel que las esquinas
   // Y la zona central debe tener al menos algo de piel
-  if (centralAreaSkin < 10) {
+  if (centralAreaSkin < 12) {
     console.log('❌ [CLUSTER] RECHAZADO: Muy poca piel en zona central');
     return false;
   }
@@ -402,7 +408,7 @@ function analyzeSkinClustering(pixels: Uint8ClampedArray, width: number, height:
   // (podría ser un fondo cálido, arena, etc.)
   if (centralAreaSkin > 5 && cornerSkin > 5) {
     const ratio = centralAreaSkin / (cornerSkin + 0.1);
-    if (ratio < 1.2) {
+    if (ratio < 1.5) {
       console.log('❌ [CLUSTER] RECHAZADO: Piel distribuida uniformemente (no es rostro)');
       return false;
     }

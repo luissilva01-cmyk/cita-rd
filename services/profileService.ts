@@ -108,6 +108,12 @@ export const getDiscoveryProfiles = async (
         return;
       }
       
+      // Excluir perfiles sin fotos (no deben aparecer en Discovery)
+      if (!profile.images || profile.images.length === 0) {
+        logger.profile.debug('⏭️ Saltando perfil sin fotos', { id: profile.id });
+        return;
+      }
+      
       profiles.push(profile);
     });
     

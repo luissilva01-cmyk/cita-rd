@@ -140,7 +140,28 @@ const ProfileView: React.FC<ProfileViewProps> = ({
     }
   };
 
+  const [saveErrors, setSaveErrors] = useState<string[]>([]);
+
   const handleSave = () => {
+    // Validar campos obligatorios antes de guardar
+    const errors: string[] = [];
+    
+    if (!editedUser.images || editedUser.images.length === 0) {
+      errors.push('📸 Sube al menos una foto');
+    }
+    if (!editedUser.bio || editedUser.bio.trim().length < 5) {
+      errors.push('✍️ Escribe una bio (mínimo 5 caracteres)');
+    }
+    if (!editedUser.location || editedUser.location.trim() === '') {
+      errors.push('📍 Selecciona tu provincia');
+    }
+    
+    if (errors.length > 0) {
+      setSaveErrors(errors);
+      return;
+    }
+    
+    setSaveErrors([]);
     onUpdate(editedUser);
     setIsEditing(false);
   };
@@ -812,19 +833,34 @@ const ProfileView: React.FC<ProfileViewProps> = ({
 
         {/* Action Buttons - Responsive */}
         {isEditing && (
-          <div className="flex flex-col sm:flex-row gap-3 pt-4">
-            <button
-              onClick={handleCancel}
-              className="flex-1 py-3 px-6 border border-slate-200 rounded-lg text-slate-600 font-medium hover:bg-slate-50 min-h-[48px] text-sm sm:text-base"
-            >
-              {t('cancel')}
-            </button>
-            <button
-              onClick={handleSave}
-              className="flex-1 py-3 px-6 bg-gradient-to-r from-rose-500 to-pink-600 text-white rounded-lg font-medium hover:shadow-lg transition-all min-h-[48px] text-sm sm:text-base"
-            >
-              {t('save')}
-            </button>
+          <div className="flex flex-col gap-3 pt-4">
+            {/* Errores de validación */}
+            {saveErrors.length > 0 && (
+              <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+                <p className="text-sm font-semibold text-red-700 mb-2">Para guardar necesitas completar:</p>
+                <ul className="space-y-1">
+                  {saveErrors.map((err, i) => (
+                    <li key={i} className="text-sm text-red-600 flex items-center gap-1">
+                      {err}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={handleCancel}
+                className="flex-1 py-3 px-6 border border-slate-200 rounded-lg text-slate-600 font-medium hover:bg-slate-50 min-h-[48px] text-sm sm:text-base"
+              >
+                {t('cancel')}
+              </button>
+              <button
+                onClick={handleSave}
+                className="flex-1 py-3 px-6 bg-gradient-to-r from-rose-500 to-pink-600 text-white rounded-lg font-medium hover:shadow-lg transition-all min-h-[48px] text-sm sm:text-base"
+              >
+                {t('save')}
+              </button>
+            </div>
           </div>
         )}
       </div>

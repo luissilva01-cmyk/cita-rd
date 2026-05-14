@@ -103,6 +103,7 @@ const App: React.FC = () => {
   // Estado para mostrar prompt de notificaciones
   const [showNotificationPrompt, setShowNotificationPrompt] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showIncompleteProfileModal, setShowIncompleteProfileModal] = useState(false);
   
   // Hook para contador de mensajes no leídos
   console.log('🔔 [APP] Llamando useUnreadMessages con userId:', currentUser?.id);
@@ -903,9 +904,9 @@ const App: React.FC = () => {
                                    !currentUser.bio || currentUser.bio.trim() === '' ||
                                    !currentUser.location || currentUser.location.trim() === '';
               
-              // Si el perfil está incompleto y el usuario intenta navegar fuera de Profile, mostrar alerta
+              // Si el perfil está incompleto y el usuario intenta navegar fuera de Profile, mostrar modal
               if (isIncomplete && view !== 'profile') {
-                alert('⚠️ Por favor completa tu perfil antes de explorar la app.\n\n📸 Sube al menos una foto\n✍️ Escribe una bio\n📍 Selecciona tu provincia');
+                setShowIncompleteProfileModal(true);
                 return;
               }
               
@@ -977,6 +978,60 @@ const App: React.FC = () => {
           
           {/* Analytics Dashboard (Dev Only) */}
           <AnalyticsDashboard />
+
+          {/* Modal: Perfil Incompleto */}
+          {showIncompleteProfileModal && currentUser && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+              <div className="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl text-center">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center text-3xl"
+                  style={{ background: 'linear-gradient(135deg, #ff8052, #ffc107)' }}>
+                  👤
+                </div>
+                <h3 className="text-xl font-bold text-slate-800 mb-2">
+                  Completa tu perfil primero
+                </h3>
+                <p className="text-sm text-gray-500 mb-4">
+                  Para explorar la app necesitas completar estos pasos:
+                </p>
+                <div className="space-y-2 mb-6 text-left">
+                  {(!currentUser.images || currentUser.images.length === 0) && (
+                    <div className="flex items-center gap-2 bg-orange-50 rounded-xl px-3 py-2">
+                      <span className="text-lg">📸</span>
+                      <span className="text-sm text-orange-700 font-medium">Sube al menos una foto</span>
+                    </div>
+                  )}
+                  {(!currentUser.bio || currentUser.bio.trim() === '') && (
+                    <div className="flex items-center gap-2 bg-orange-50 rounded-xl px-3 py-2">
+                      <span className="text-lg">✍️</span>
+                      <span className="text-sm text-orange-700 font-medium">Escribe una bio</span>
+                    </div>
+                  )}
+                  {(!currentUser.location || currentUser.location.trim() === '') && (
+                    <div className="flex items-center gap-2 bg-orange-50 rounded-xl px-3 py-2">
+                      <span className="text-lg">📍</span>
+                      <span className="text-sm text-orange-700 font-medium">Selecciona tu provincia</span>
+                    </div>
+                  )}
+                </div>
+                <button
+                  onClick={() => {
+                    setShowIncompleteProfileModal(false);
+                    setActiveView('profile');
+                  }}
+                  className="w-full py-3 rounded-2xl font-bold text-white text-base transition-all active:scale-95"
+                  style={{ background: 'linear-gradient(135deg, #ff8052, #ffc107)' }}
+                >
+                  Completar mi perfil
+                </button>
+                <button
+                  onClick={() => setShowIncompleteProfileModal(false)}
+                  className="w-full mt-2 py-2 text-sm text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  Ahora no
+                </button>
+              </div>
+            </div>
+          )}
           </>
           )}
         </Suspense>

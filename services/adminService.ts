@@ -3,6 +3,7 @@
 
 import { db } from './firebase';
 import { doc, getDoc, collection, query, where, getDocs, updateDoc, orderBy, limit, Timestamp } from 'firebase/firestore';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 import { logger } from '../utils/logger';
 
 export interface AdminUser {
@@ -349,6 +350,29 @@ export async function getUserStats(): Promise<{
     return stats;
   } catch (error) {
     logger.firebase.error('Error obteniendo estadísticas de usuarios', error);
+    throw error;
+  }
+}
+
+/**
+ * Llama a la Cloud Function para limpiar perfiles huérfanos
+ * (perfiles en Firestore cuyo usuario ya no existe en Firebase Auth)
+ */
+export async function cleanOrphanedProfiles(): Promise<{
+  checked: number;
+  orphanedFound: number;
+  deleted: number;
+  deletedIds: string[];
+}> {
+  try {
+    const functions = getFunctions();
+    const cleanFn = httpsCallable(functions, 'cleanOrphanedProfiles');
+    const result = await cleanFn({});
+    const data = result.data as any;
+    logger.firebase.success('Limpieza de perfiles huérfanos completada', data);
+    return data;
+  } catch (error) {
+    logger.firebase.error('Error limpiando perfiles huérfanos', error);
     throw error;
   }
 }

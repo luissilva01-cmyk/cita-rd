@@ -553,6 +553,99 @@ exports.cleanOrphanedPhotos = functions.https.onCall(async (data, context) => {
 
 
 // ==============================
+// LIMPIEZA DE PERFILES HUÉRFANOS
+// ==============================
+
+/**
+ * Elimina perfiles en Firestore cuyo usuario ya no existe en Firebase Auth.
+ * Esto ocurre cuando se borra un usuario directamente desde la consola de Firebase
+ * sin pasar por el flujo de eliminación de cuenta de la app.
+ *
+ * Solo puede ser llamada por un administrador (isAdmin === true en perfiles).
+ */
+exports.cleanOrphanedProfiles = functions.https.onCall(async (data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError('unauthenticated', 'Debes estar autenticado');
+  }
+
+  // Verificar que el llamante es admin
+  const callerDoc = await admin.firestore()
+    .collection('perfiles')
+    .doc(context.auth.uid)
+    .get();
+
+  if (!callerDoc.exists || callerDoc.data().isAdmin !== true) {
+    throw new functions.https.HttpsError('permission-denied', 'Solo administradores pueden ejecutar esta función');
+  }
+
+  try {
+    console.log('🧹 Iniciando limpieza de perfiles huérfanos...');
+
+    const perfilesSnapshot = await admin.firestore().collection('perfiles').get();
+    console.log(`📊 Total perfiles en Firestore: ${perfilesSnapshot.size}`);
+
+    const orphaned = [];
+
+    for (const docSnap of perfilesSnapshot.docs) {
+      const uid = docSnap.id;
+      try {
+        await admin.auth().getUser(uid);
+        // Usuario existe en Auth → no es huérfano
+      } catch (err) {
+        if (err.code === 'auth/user-not-found') {
+          orphaned.push(uid);
+        }
+      }
+    }
+
+    console.log(`🗑️ Perfiles huérfanos encontrados: ${orphaned.length}`);
+
+    // Eliminar cada perfil huérfano y sus datos asociados
+    for (const uid of orphaned) {
+      const batch = admin.firestore().batch();
+
+      // Perfil
+      batch.delete(admin.firestore().collection('perfiles').doc(uid));
+      // Presence
+      batch.delete(admin.firestore().collection('presence').doc(uid));
+      // Privacy settings
+      batch.delete(admin.firestore().collection('privacySettings').doc(uid));
+      // Verification
+      batch.delete(admin.firestore().collection('verifications').doc(uid));
+
+      await batch.commit();
+
+      // Likes dados y recibidos
+      const likesGiven = await admin.firestore().collection('likes').where('fromUserId', '==', uid).get();
+      const likesReceived = await admin.firestore().collection('likes').where('toUserId', '==', uid).get();
+      const likesBatch = admin.firestore().batch();
+      [...likesGiven.docs, ...likesReceived.docs].forEach(d => likesBatch.delete(d.ref));
+      await likesBatch.commit();
+
+      // Stories
+      const stories = await admin.firestore().collection('stories').where('userId', '==', uid).get();
+      const storiesBatch = admin.firestore().batch();
+      stories.docs.forEach(d => storiesBatch.delete(d.ref));
+      await storiesBatch.commit();
+
+      console.log(`✅ Perfil huérfano eliminado: ${uid}`);
+    }
+
+    return {
+      success: true,
+      checked: perfilesSnapshot.size,
+      orphanedFound: orphaned.length,
+      deleted: orphaned.length,
+      deletedIds: orphaned
+    };
+
+  } catch (error) {
+    console.error('❌ Error en cleanOrphanedProfiles:', error);
+    throw new functions.https.HttpsError('internal', `Error: ${error.message}`);
+  }
+});
+
+// ==============================
 // NOTIFICACIÓN DE NUEVO USUARIO
 // ==============================
 

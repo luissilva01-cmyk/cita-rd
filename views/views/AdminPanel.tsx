@@ -22,6 +22,7 @@ import {
   getReportStats,
   toggleUserBlock,
   getUserStats,
+  cleanOrphanedProfiles,
   ReportWithDetails
 } from '../../services/adminService';
 import { logger } from '../../utils/logger';
@@ -49,6 +50,7 @@ const AdminPanel: React.FC = () => {
   const [stats, setStats] = useState({ total: 0, pending: 0, reviewed: 0, resolved: 0 });
   const [userStats, setUserStats] = useState({ total: 0, withPhoto: 0, online: 0, newThisWeek: 0 });
   const [processingReportId, setProcessingReportId] = useState<string | null>(null);
+  const [cleaningOrphans, setCleaningOrphans] = useState(false);
 
   // Verificar permisos de admin
   useEffect(() => {
@@ -115,7 +117,22 @@ const AdminPanel: React.FC = () => {
   };
 
   const handleBlockUser = async (userId: string, reportId: string) => {
-    if (!currentUser) return;
+
+  const handleCleanOrphans = async () => {
+    if (!window.confirm('¿Limpiar perfiles huérfanos? Esto eliminará perfiles de usuarios que ya no existen en Firebase Auth.')) return;
+    setCleaningOrphans(true);
+    try {
+      const result = await cleanOrphanedProfiles();
+      // Recargar stats después de limpiar
+      const userStatsData = await getUserStats();
+      setUserStats(userStatsData);
+      alert(`✅ Limpieza completada.\nPerfiles revisados: ${result.checked}\nHuérfanos encontrados: ${result.orphanedFound}\nEliminados: ${result.deleted}`);
+    } catch (error: any) {
+      alert(`❌ Error: ${error.message || 'No se pudo completar la limpieza'}`);
+    } finally {
+      setCleaningOrphans(false);
+    }
+  };    if (!currentUser) return;
     
     if (!window.confirm('¿Estás seguro de que quieres bloquear a este usuario?')) {
       return;
@@ -230,8 +247,26 @@ const AdminPanel: React.FC = () => {
         </div>
 
         {/* Report Stats */}
-        <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Estadísticas de Reportes</h2>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Estadísticas de Reportes</h2>
+          <button
+            onClick={handleCleanOrphans}
+            disabled={cleaningOrphans}
+            className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 hover:text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
+            title="Elimina perfiles de usuarios que ya no existen en Firebase Auth"
+          >
+            {cleaningOrphans ? (
+              <>
+                <div className="w-4 h-4 border-2 border-slate-300 border-t-transparent rounded-full animate-spin"></div>
+                Limpiando...
+              </>
+            ) : (
+              <>
+                🧹 Limpiar perfiles huérfanos
+              </>
+            )}
+          </button>
+        </div>        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
             <div className="flex items-center justify-between">
               <div>

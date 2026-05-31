@@ -2,7 +2,7 @@
 // Servicio de Administración para Ta' Pa' Ti
 
 import { db } from './firebase';
-import { doc, getDoc, collection, query, where, getDocs, updateDoc, orderBy, limit } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, getDocs, updateDoc, orderBy, limit, Timestamp } from 'firebase/firestore';
 import { logger } from '../utils/logger';
 
 export interface AdminUser {
@@ -282,6 +282,74 @@ export async function getReportCountByUser(userId: string): Promise<number> {
   } catch (error) {
     logger.firebase.error('Error obteniendo conteo de reportes por usuario', error);
     return 0;
+  }
+}
+
+/**
+ * Obtiene estadísticas de usuarios registrados
+ */
+export async function getUserStats(): Promise<{
+  total: number;
+  withPhoto: number;
+  online: number;
+  newThisWeek: number;
+}> {
+  try {
+    const perfilesSnapshot = await getDocs(collection(db, 'perfiles'));
+
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+    let withPhoto = 0;
+    let newThisWeek = 0;
+
+    perfilesSnapshot.forEach(docSnap => {
+      const data = docSnap.data();
+      if (data.photoURL || data.foto || data.profilePhoto) withPhoto++;
+      
+      // Verificar si se registró en los últimos 7 días
+      const createdAt = data.createdAt;
+      if (createdAt) {
+        const createdDate = createdAt instanceof Timestamp 
+          ? createdAt.toDate() 
+          : new Date(createdAt);
+        if (createdDate >= sevenDaysAgo) newThisWeek++;
+      }
+    });
+
+    // Contar usuarios online desde la colección presence
+    let online = 0;
+    try {
+      const presenceSnapshot = await getDocs(collection(db, 'presence'));
+      const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+      presenceSnapshot.forEach(docSnap => {
+        const data = docSnap.data();
+        if (data.online === true) {
+          online++;
+        } else if (data.lastSeen) {
+          const lastSeen = data.lastSeen instanceof Timestamp
+            ? data.lastSeen.toDate()
+            : new Date(data.lastSeen);
+          if (lastSeen >= fiveMinutesAgo) online++;
+        }
+      });
+    } catch {
+      // presence collection may not exist yet
+      online = 0;
+    }
+
+    const stats = {
+      total: perfilesSnapshot.size,
+      withPhoto,
+      online,
+      newThisWeek
+    };
+
+    logger.firebase.success('Estadísticas de usuarios obtenidas', stats);
+    return stats;
+  } catch (error) {
+    logger.firebase.error('Error obteniendo estadísticas de usuarios', error);
+    throw error;
   }
 }
 

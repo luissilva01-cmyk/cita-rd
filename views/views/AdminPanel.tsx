@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Shield, 
-  AlertTriangle, 
   CheckCircle, 
   Clock, 
   Ban, 
-  UserX, 
   Eye, 
   Filter,
   ArrowLeft,
-  TrendingUp
+  TrendingUp,
+  Users,
+  Camera,
+  Wifi,
+  UserPlus
 } from 'lucide-react';
 import { useAdmin } from '../../hooks/useAdmin';
 import { auth } from '../../services/firebase';
@@ -19,6 +21,7 @@ import {
   markReportAsReviewed,
   getReportStats,
   toggleUserBlock,
+  getUserStats,
   ReportWithDetails
 } from '../../services/adminService';
 import { logger } from '../../utils/logger';
@@ -44,6 +47,7 @@ const AdminPanel: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [filterCategory, setFilterCategory] = useState<FilterCategory>('all');
   const [stats, setStats] = useState({ total: 0, pending: 0, reviewed: 0, resolved: 0 });
+  const [userStats, setUserStats] = useState({ total: 0, withPhoto: 0, online: 0, newThisWeek: 0 });
   const [processingReportId, setProcessingReportId] = useState<string | null>(null);
 
   // Verificar permisos de admin
@@ -62,16 +66,19 @@ const AdminPanel: React.FC = () => {
     const loadData = async () => {
       setLoading(true);
       try {
-        const [statsData, reportsData] = await Promise.all([
+        const [statsData, reportsData, userStatsData] = await Promise.all([
           getReportStats(),
-          activeTab === 'pending' ? getPendingReports() : getAllReports()
+          activeTab === 'pending' ? getPendingReports() : getAllReports(),
+          getUserStats()
         ]);
         
         setStats(statsData);
         setReports(reportsData);
+        setUserStats(userStatsData);
         logger.ui.success('Datos del panel de admin cargados', { 
           stats: statsData, 
-          reportsCount: reportsData.length 
+          reportsCount: reportsData.length,
+          userStats: userStatsData
         });
       } catch (error) {
         logger.ui.error('Error cargando datos del panel de admin', error);
@@ -178,6 +185,52 @@ const AdminPanel: React.FC = () => {
 
       {/* Stats Cards */}
       <div className="max-w-7xl mx-auto px-6 py-6">
+        {/* User Stats */}
+        <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Estadísticas de Usuarios</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div className="bg-slate-800 rounded-lg p-4 border border-blue-500/30">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-slate-400 text-sm">Total Usuarios</p>
+                <p className="text-3xl font-bold text-blue-400">{userStats.total}</p>
+              </div>
+              <Users className="text-blue-400" size={32} />
+            </div>
+          </div>
+
+          <div className="bg-slate-800 rounded-lg p-4 border border-purple-500/30">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-slate-400 text-sm">Con Foto</p>
+                <p className="text-3xl font-bold text-purple-400">{userStats.withPhoto}</p>
+              </div>
+              <Camera className="text-purple-400" size={32} />
+            </div>
+          </div>
+
+          <div className="bg-slate-800 rounded-lg p-4 border border-green-500/30">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-slate-400 text-sm">Online Ahora</p>
+                <p className="text-3xl font-bold text-green-400">{userStats.online}</p>
+              </div>
+              <Wifi className="text-green-400" size={32} />
+            </div>
+          </div>
+
+          <div className="bg-slate-800 rounded-lg p-4 border border-orange-500/30">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-slate-400 text-sm">Nuevos (7 días)</p>
+                <p className="text-3xl font-bold text-orange-400">{userStats.newThisWeek}</p>
+              </div>
+              <UserPlus className="text-orange-400" size={32} />
+            </div>
+          </div>
+        </div>
+
+        {/* Report Stats */}
+        <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Estadísticas de Reportes</h2>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
             <div className="flex items-center justify-between">

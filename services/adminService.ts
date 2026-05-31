@@ -301,12 +301,19 @@ export async function getUserStats(): Promise<{
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
+    let total = 0;
     let withPhoto = 0;
     let newThisWeek = 0;
 
     perfilesSnapshot.forEach(docSnap => {
       const data = docSnap.data();
-      if (data.photoURL || data.foto || data.profilePhoto) withPhoto++;
+      
+      // Solo contar perfiles que tienen al menos nombre (descartar documentos vacíos/huérfanos)
+      if (!data.name) return;
+      total++;
+
+      // El campo de fotos es "images" (array de URLs)
+      if (data.images && Array.isArray(data.images) && data.images.length > 0) withPhoto++;
       
       // Verificar si se registró en los últimos 7 días
       const createdAt = data.createdAt;
@@ -319,19 +326,19 @@ export async function getUserStats(): Promise<{
     });
 
     // Contar usuarios online desde la colección presence
+    // Usamos lastSeen con ventana de 10 minutos (más confiable que online:true que puede quedar stale)
     let online = 0;
     try {
       const presenceSnapshot = await getDocs(collection(db, 'presence'));
-      const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+      const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
       presenceSnapshot.forEach(docSnap => {
         const data = docSnap.data();
-        if (data.online === true) {
-          online++;
-        } else if (data.lastSeen) {
-          const lastSeen = data.lastSeen instanceof Timestamp
+        // lastSeen puede ser número (Date.now()) o Timestamp de Firestore
+        if (data.lastSeen) {
+          const lastSeenDate = data.lastSeen instanceof Timestamp
             ? data.lastSeen.toDate()
-            : new Date(data.lastSeen);
-          if (lastSeen >= fiveMinutesAgo) online++;
+            : new Date(typeof data.lastSeen === 'number' ? data.lastSeen : data.lastSeen);
+          if (lastSeenDate >= tenMinutesAgo) online++;
         }
       });
     } catch {
@@ -340,7 +347,7 @@ export async function getUserStats(): Promise<{
     }
 
     const stats = {
-      total: perfilesSnapshot.size,
+      total,
       withPhoto,
       online,
       newThisWeek

@@ -116,14 +116,11 @@ const AdminPanel: React.FC = () => {
     }
   };
 
-  const handleBlockUser = async (userId: string, reportId: string) => {
-
   const handleCleanOrphans = async () => {
     if (!window.confirm('¿Limpiar perfiles huérfanos? Esto eliminará perfiles de usuarios que ya no existen en Firebase Auth.')) return;
     setCleaningOrphans(true);
     try {
       const result = await cleanOrphanedProfiles();
-      // Recargar stats después de limpiar
       const userStatsData = await getUserStats();
       setUserStats(userStatsData);
       alert(`✅ Limpieza completada.\nPerfiles revisados: ${result.checked}\nHuérfanos encontrados: ${result.orphanedFound}\nEliminados: ${result.deleted}`);
@@ -132,7 +129,10 @@ const AdminPanel: React.FC = () => {
     } finally {
       setCleaningOrphans(false);
     }
-  };    if (!currentUser) return;
+  };
+
+  const handleBlockUser = async (userId: string, reportId: string) => {
+    if (!currentUser) return;
     
     if (!window.confirm('¿Estás seguro de que quieres bloquear a este usuario?')) {
       return;

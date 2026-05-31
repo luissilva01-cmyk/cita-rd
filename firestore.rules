@@ -18,8 +18,12 @@ service cloud.firestore {
     
     // Verificar si el usuario es administrador
     function isAdmin() {
-      return isAuthenticated() && 
-             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+      return isAuthenticated() && (
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true) ||
+        (exists(/databases/$(database)/documents/perfiles/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/perfiles/$(request.auth.uid)).data.isAdmin == true)
+      );
     }
     
     // Verificar si el usuario es participante de un chat
